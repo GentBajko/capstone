@@ -1,9 +1,9 @@
 # build — implementation research, then working code
 
 The last stage: turns the whole reference into running code, backend
-first, then frontend. This is the **one command allowed to write source
-code** (core.md hard rule 2's build exception) — and only after its
-plan gate.
+first, then frontend. With `implement`, one of the **two commands
+allowed to write source code** (core.md hard rule 2) — and only after
+its plan gate.
 
 State: `docs/design/build-interview.md` (standard lifecycle per
 core.md; `formalized` here means the walking-skeleton slice runs).

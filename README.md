@@ -113,8 +113,37 @@ as real code sketches, backend first, then frontend, walking-skeleton
 slice up front — and stops for your approval. Then it writes the code.
 If the superpowers plugin is installed it hands the plan to
 superpowers' execution flow; otherwise it executes step by step
-itself. It's the one capstone command allowed to touch your source
+itself. It's one of the two capstone commands allowed to touch your source
 tree, and only after you've seen the plan.
+
+## After build: the feature chain
+
+The pipeline ends with a running project; the feature chain is how it
+grows. `/capstone:implementation add CSV export` takes one feature
+from idea to code in three gated stages — and each stage is also a
+command of its own:
+
+`groom` is brainstorming with the reference open. It reads the
+chapters the feature touches (refreshing stale ones first), the logic
+scenarios it extends, and your code-prefs, then interviews you one
+question at a time — competing approaches with trade-offs, unhappy
+paths, scope cuts — and writes a spec where every requirement traces
+to an answer you gave. A feature that contradicts a recorded design
+decision becomes a question, never a silent override.
+
+`plan` turns the spec into a task-by-task TDD plan an engineer with
+zero context could follow: exact paths, complete code in every step,
+run-and-verify commands, backend before frontend. You approve the
+plan before anything executes.
+
+`implement` writes the code. With superpowers installed it hands your
+spec and plan to superpowers' execution flow; without it, it executes
+inline, checking off tasks as their verifications pass. Afterwards it
+refreshes the affected chapters, so the reference records what was
+actually built.
+
+Everything persists under `docs/design/features/<NN>-<slug>/`, so a
+dead session resumes mid-chain exactly where it stopped.
 
 ## Who it's for
 
@@ -201,7 +230,7 @@ argument-hint: [command] [args...]
 No arguments: invoke the capstone:start skill. If the first argument
 matches a capstone skill (docs, check-docs, ask, changelog, review,
 guides, onboarding, mockup, logic, architecture, code-prefs, stack,
-build, start, help),
+build, groom, plan, implement, implementation, start, help),
 invoke capstone:<that skill> with the remaining arguments.
 
 ARGUMENTS: $ARGUMENTS
@@ -225,6 +254,10 @@ ARGUMENTS: $ARGUMENTS
 | `/capstone:code-prefs` | Interview 4, standalone |
 | `/capstone:stack` | Research libraries and services per capability, with pros/cons and pricing; you pick |
 | `/capstone:build` | Implementation plan (backend, then frontend), your approval, then working code — via superpowers when installed |
+| `/capstone:groom <feature>` | Doc-grounded feature interview → a traceable spec in `docs/design/features/` |
+| `/capstone:plan <feature>` | Task-by-task TDD plan from the groomed spec; you approve before any code |
+| `/capstone:implement <feature>` | Execute the approved plan into code, then refresh the affected chapters |
+| `/capstone:implementation <desc>` | The feature chain: groom → plan → implement, resuming at the first unfinished stage |
 | `/capstone:help` | Usage. In Claude Code a hook answers this before the model is invoked, so it costs zero tokens |
 
 ## Rough edges

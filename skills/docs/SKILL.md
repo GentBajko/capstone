@@ -125,7 +125,8 @@ paths_covered:
    - Index table `| Topic | File | Commit | Generated |`, plus absent
      topics with their reasons.
    - If companion docs exist (`review.md`, `changelog.md`,
-     `onboarding.md`, `code-prefs.md`, `guides/`, `logic/`, `mockup/`),
+     `onboarding.md`, `code-prefs.md`, `implementation.md`, `guides/`,
+     `logic/`, `mockup/`, `features/`),
      list them in a separate "Companion docs" table below the topic
      index —
      the factual reference and the opinionated/instructional outputs

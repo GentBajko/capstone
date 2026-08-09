@@ -26,6 +26,13 @@ Usage: /capstone:<command>
   code-prefs           Code-preferences interview -> normative code-prefs.md
   stack                Research libraries/services per capability, you pick -> 05-dependencies.md
   build                Implementation plan (backend then frontend), gate, then working code
+
+  groom <feature>      Feature interview against the existing docs -> features/<NN>-<slug>/spec.md
+  plan <feature>       Task-by-task TDD plan from a groomed spec; gated on your approval
+  implement <feature>  Execute the approved plan into code, via superpowers when installed
+  implementation <desc>
+                       Chain groom -> plan -> implement, resuming at the first unfinished stage
+
   help                 Show this message
 
 Output: DESIGN.md (root index) + docs/design/*.md topic files, each stamped
