@@ -98,8 +98,9 @@ logic/, mockup/, features/) as a row in a "Companion docs" table (file
 and outputs are markdown — never generate HTML, for anything. The only exceptions are interview Q&A files
 (`architecture-interview.md`, `mockup-interview.md`,
 `code-prefs-interview.md`, `logic-interview.md`, `stack-interview.md`,
-`build-interview.md`, `features/*/feature-interview.md`) and
-`capstone.json`, which are never indexed. After writing your output, add or refresh your
+`build-interview.md`, `features/*/feature-interview.md`,
+`features/*/review-ledger.md`) and `capstone.json`, which are never
+indexed. After writing your output, add or refresh your
 row; if `DESIGN.md` does not exist yet, create a minimal one (title +
 the two tables) rather than leaving the output orphaned.
 

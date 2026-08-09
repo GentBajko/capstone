@@ -29,7 +29,7 @@ an existing feature's slug.
      approval (plan's Resume rules also govern an unapproved or
      truncated `plan.md`);
    - a valid approval → `implement` (unchecked boxes resume mid-plan;
-     every box checked runs only its wrap).
+     every box checked resumes at its review loop and wrap).
 4. Show the three-stage checklist (done / in progress / pending), then
    execute the current stage's protocol file (`groom.md`, `plan.md`,
    `implement.md`) exactly — including its own gate. Do not blend

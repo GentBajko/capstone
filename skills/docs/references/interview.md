@@ -121,6 +121,9 @@ from recorded decisions.
   deprecation policy); messaging (queue vs stream, broker, delivery
   semantics, ordering, DLQs); API gateway/BFF?
 - Composition: how dependencies are wired (DI style, composition roots).
+- Frontend (products with a UI): the §4 Frontend/clients module fills
+  this chapter's Frontend section — walk it before closing this
+  checklist.
 
 ### → models.md
 - Core entities and their relationships; aggregate/invariant boundaries.
@@ -235,10 +238,18 @@ reliability, autonomy vs standardization.
 
 ## 4. Conditional modules (ask only if applicable)
 
-- **Frontend/clients**: rendering model (SPA/MPA/SSR/SSG/islands) per
-  page class; state management split (server-state vs UI state); design
-  system; mobile approach; offline/conflict strategy; bundle/Web-Vitals
-  budgets; client versioning and forced-upgrade policy.
+- **Frontend/clients** — applicable whenever the mockup has screens or
+  the product has any human-facing UI, which is nearly always; the
+  mockup answers UX, not this (screens don't decide a rendering
+  model), and skipping this module is a recorded decision, never a
+  default: rendering model (SPA/MPA/SSR/SSG/islands) per page class;
+  client-side routing; client entry points and bundles; state
+  management split (server-state vs UI state); design system; the
+  API-client seam to the backend (hand-rolled fetch layer, generated
+  client, BFF); mobile approach; offline/conflict strategy;
+  bundle/Web-Vitals budgets; client versioning and forced-upgrade
+  policy. These answers fill architecture.md's Frontend section and
+  data-flow's client state.
 - **Multi-tenant SaaS**: tenant lifecycle (onboard/migrate/offboard/
   export); noisy-neighbor controls and per-tenant quotas; entitlements
   and plan-gated flags; usage metering and billing integration;
@@ -303,3 +314,6 @@ revisit?"):
 - Everything-flexible: extension points and abstractions for futures
   nobody ordered (speculative generality).
 - No walking skeleton in the plan — integration risk saved for the end.
+- Frontend undesigned: a mockup full of screens while every recorded
+  decision is server-side — rendering model, state management, and
+  design system never chosen.

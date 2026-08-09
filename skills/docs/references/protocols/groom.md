@@ -19,7 +19,7 @@ indexed). `<NN>` continues the `features/` folder's numbering (01 when
 the folder is new); `<slug>` is a short kebab name for the feature.
 Output: `spec.md` beside it; the `features/` folder is one Companion
 docs row. Later stages add their own keys to the same frontmatter
-(`plan_approved`, `approved_spec`, `implemented`) —
+(`plan_approved`, `approved_spec`, `base_commit`, `implemented`) —
 `status: formalized` here means the spec is on disk, not that the
 feature is built.
 

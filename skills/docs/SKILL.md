@@ -175,6 +175,10 @@ guides under `guides/`:
    **Changes** → for a topic chapter, re-run its Phase 2 deep-dive and
    rewrite it; for a stale guide, regenerate it per
    `references/protocols/guides.md`'s format instead.
+   Template drift overrides the skip: a chapter missing a required
+   section that `references/topics.md` now defines (the template
+   changed after the chapter was stamped) is stale regardless of
+   `git diff` — regenerate it against the current template.
 5. Re-run the **Applicable** test from `references/topics.md` for every
    topic the index lists as absent; generate any newly applicable topic
    at its fixed chapter number and update its index row.

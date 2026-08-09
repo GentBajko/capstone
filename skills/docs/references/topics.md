@@ -27,10 +27,18 @@ Required sections:
   events, queues; where each is registered and dispatched.
 - `## Composition` — where objects are wired together (DI container,
   factories, `main()`).
+- `## Frontend` — for products with a human-facing UI: rendering model
+  (SPA/MPA/SSR/SSG/islands) per page class, routing, client entry
+  points and bundles, design system / component library, and the
+  API-client seam to the backend. A project with no human-facing UI
+  records exactly that, in one line; a recorded decision to defer or
+  skip the frontend satisfies the section too, cited
+  ("deferred per architecture-interview.md §Qn").
 
 Checklist: dependency direction verified by reading imports, not assumed
 from directory names; registries and dispatch tables enumerated in full,
-not sampled.
+not sampled; the rendering model read from the client build config and
+entry files, not assumed from the framework's name.
 
 ## models.md
 
@@ -86,7 +94,8 @@ Required sections:
 - `## Lifecycles` — each major flow (request, command, job) traced end to
   end with `file:line` at each hop.
 - `## State` — where state lives (stores, caches, DB sessions, client
-  state) and who mutates it.
+  state) and who mutates it; for UI products, the client split:
+  server-state vs UI state and the owning store/library per side.
 - `## Side-effect boundaries` — where IO happens (DB, network, disk) and
   how it is isolated, or that it is not.
 - `## Failure paths` — what happens on exception, disconnect, or timeout

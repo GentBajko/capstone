@@ -138,8 +138,11 @@ plan before anything executes.
 
 `implement` writes the code. With superpowers installed it hands your
 spec and plan to superpowers' execution flow; without it, it executes
-inline, checking off tasks as their verifications pass. Afterwards it
-refreshes the affected chapters, so the reference records what was
+inline, checking off tasks as their verifications pass. Then it
+reviews the full diff recursively — a different lens each round,
+every finding adversarially verified, fixes fed back into the next
+round — until two consecutive rounds find nothing new. Only then does
+it refresh the affected chapters, so the reference records what was
 actually built.
 
 Everything persists under `docs/design/features/<NN>-<slug>/`, so a
@@ -256,7 +259,7 @@ ARGUMENTS: $ARGUMENTS
 | `/capstone:build` | Implementation plan (backend, then frontend), your approval, then working code — via superpowers when installed |
 | `/capstone:groom <feature>` | Doc-grounded feature interview → a traceable spec in `docs/design/features/` |
 | `/capstone:plan <feature>` | Task-by-task TDD plan from the groomed spec; you approve before any code |
-| `/capstone:implement <feature>` | Execute the approved plan into code, then refresh the affected chapters |
+| `/capstone:implement <feature>` | Execute the approved plan into code, review until dry, then refresh the affected chapters |
 | `/capstone:implementation <desc>` | The feature chain: groom → plan → implement, resuming at the first unfinished stage |
 | `/capstone:help` | Usage. In Claude Code a hook answers this before the model is invoked, so it costs zero tokens |
 

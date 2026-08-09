@@ -1,6 +1,6 @@
 ---
 name: implement
-description: Use when an approved feature plan is ready to become code - executes plan.md task by task with verification, via superpowers when installed, then refreshes the affected reference chapters.
+description: Use when an approved feature plan is ready to become code - executes plan.md task by task with verification, via superpowers when installed, reviews the diff recursively until no new findings survive, then refreshes the affected reference chapters.
 ---
 
 # Capstone: implement
