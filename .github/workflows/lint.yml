@@ -20,3 +20,16 @@ jobs:
             if ($errs) { Write-Output "PARSE ERRORS in $($_.Name):"; $errs; $failed = $true }
           }
           if ($failed) { exit 1 }
+
+  # The PowerShell twin is the Windows contributor's only lint. Parsing it
+  # is not enough - it must actually run, on both shells the docs name.
+  lint-sync-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cross-file invariants (PowerShell 7)
+        shell: pwsh
+        run: ./skills/docs/scripts/lint-sync.ps1
+      - name: Cross-file invariants (Windows PowerShell 5.1)
+        shell: powershell
+        run: ./skills/docs/scripts/lint-sync.ps1

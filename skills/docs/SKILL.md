@@ -23,7 +23,8 @@ generate/refresh the architecture reference."
    relative paths inside the repository.
 1. Routing. The reserved subcommand words (`check-docs`, `ask`,
    `changelog`, `review`, `guides`, `onboarding`, `mockup`, `logic`,
-   `architecture`, `code-prefs`, `stack`, `build`, `start`) each route to
+   `architecture`, `code-prefs`, `stack`, `build`, `groom`, `plan`,
+   `implement`, `implementation`, `start`) each route to
    `references/protocols/<name>.md` — read `references/core.md` plus
    that one protocol file and execute it; behaviors live there, not
    here. **Exception: when this skill was invoked as `docs`, topic
