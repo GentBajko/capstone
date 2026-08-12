@@ -54,11 +54,16 @@ Per scenario, cover until nothing is left to invent:
 When a scenario has nothing left to invent, present its summary, get
 the user's confirmation ("laid bare?"), then write
 `docs/design/logic/<NN>-<scenario>.md` immediately — sections exactly
-as the bullets above, every rule traceable to its `§Q` entry — flip
-that scenario's checklist entry to `written`, and move to the next.
+as the bullets above, every rule traceable to its `§Q` entry — append
+that scenario's changelog entry per core.md's ledger (key
+`logic/<NN>-<scenario>@Q<n>`, `<n>` the highest `§Q` the scenario file
+cites), flip that scenario's checklist entry to `written`, and move to
+the next.
 The user may stop at any point; written scenarios stand, the remaining
 list stays `pending` in the frontmatter. A scenario the user decides
-not to spec is marked `dropped`, with the reason in a `### D<n>` entry.
+not to spec is marked `dropped`, with the reason in a `### D<n>` entry —
+a drop is a done marker too, so it gets its own changelog entry naming
+the scenario and that reason.
 
 ## Phase C — wrap
 

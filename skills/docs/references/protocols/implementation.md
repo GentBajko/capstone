@@ -33,7 +33,9 @@ an existing feature's slug.
 4. Show the three-stage checklist (done / in progress / pending), then
    execute the current stage's protocol file (`groom.md`, `plan.md`,
    `implement.md`) exactly — including its own gate. Do not blend
-   stages.
+   stages. A stage counts as done only when its marker AND its changelog
+   key are both present; a marker with no key is a torn write — append
+   that stage's missing entry per core.md, never re-run the stage.
 5. When a stage completes, announce it in one line and continue
    ("spec approved — planning next; say stop to pause"). Stopping is
    always safe: every stage persists its state, and the next

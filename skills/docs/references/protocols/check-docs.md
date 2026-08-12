@@ -1,6 +1,6 @@
 # check-docs — read-only trust report
 
-No writes. Two parts:
+No writes — and no changelog entry: nothing was done, only read. Two parts:
 
 1. **Staleness**: for each stamped file (topic chapters and stamped
    guides), read its stamp and `paths_covered`, then from the repo root

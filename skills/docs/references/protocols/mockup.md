@@ -76,7 +76,11 @@ Every element must trace to an interview answer; anything invented is
 marked "assumed" inline. The folder's **only index is `README.md`** — a
 markdown table mapping screens → scenarios → interview entries, with
 all "assumed" items collected there for the user to review. Only after
-every screen file and the README are on disk, set `status: formalized`
+every screen file and the README are on disk, append the changelog entry
+per core.md's ledger — key `mockup/all@Q<n>`, `<n>` the highest
+`### Q<n>` in `mockup-interview.md`; record the screens written with the
+scenarios they serve, the purpose and business-model decisions, and the
+vagueness the gate left open. Then set `status: formalized`
 in the interview file (per core.md's Interview lifecycle).
 
 **Handoff:** (when running inside the `start` pipeline, it continues

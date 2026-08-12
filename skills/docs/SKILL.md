@@ -119,7 +119,14 @@ paths_covered:
    macOS/Linux/Git Bash, or `powershell -ExecutionPolicy Bypass -File
    scripts\init-config.ps1` on Windows. If neither shell is available,
    write the JSON template from `references/core.md` yourself.
-4. Write `<index_file>` **last**, so the index reflects what was
+4. Append the changelog entry per `references/core.md`'s Changelog
+   ledger — key `docs/<topic|all>@<the run's stamp>`; one bullet per
+   chapter written **this run** (every one, never only those you judge
+   materially changed — that judgment is the escape hatch), the topics
+   recorded absent with their reasons, and whether the index was created
+   or refreshed. Nothing written (Phase 1 step 9's empty-repo stop) → no
+   entry.
+5. Write `<index_file>` **last**, so the index reflects what was
    actually generated. Structure:
    - Project one-liner, tech stack, and paradigm summary in a few lines.
    - Module map with `file:line` entry-point pointers.
@@ -132,7 +139,7 @@ paths_covered:
      index —
      the factual reference and the opinionated/instructional outputs
      stay visibly distinct. Interview Q&A files are never indexed.
-5. Monorepos: split a topic per subsystem while keeping the parent
+6. Monorepos: split a topic per subsystem while keeping the parent
    chapter's number (`01-architecture-frontend.md`,
    `01-architecture-backend.md`) when one file would be unwieldy; the
    index shows the split.
@@ -183,8 +190,14 @@ guides under `guides/`:
 5. Re-run the **Applicable** test from `references/topics.md` for every
    topic the index lists as absent; generate any newly applicable topic
    at its fixed chapter number and update its index row.
-6. Always re-verify the index's module map and rows.
-7. Fall back to a full rebuild when the stamped commit is unreachable
+6. If any file was rewritten in this run, append the changelog entry per
+   `references/core.md` — the files regenerated and each one's trigger
+   (covered paths changed, `mode: prescriptive` with code now present,
+   template drift, newly applicable topic), the divergences recorded,
+   and the files skipped as current. A run where every file was current
+   (step 4's "No changes → skip") writes nothing.
+7. Always re-verify the index's module map and rows.
+8. Fall back to a full rebuild when the stamped commit is unreachable
    (rebase, shallow clone), there is no git repo, or the user passed
    `rebuild`.
 

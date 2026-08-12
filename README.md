@@ -247,7 +247,7 @@ ARGUMENTS: $ARGUMENTS
 | `/capstone:docs` | Generate or refresh the reference (`rebuild` forces, a topic name targets one chapter) |
 | `/capstone:check-docs` | Staleness and citation-drift report, read-only |
 | `/capstone:ask <question>` | Answer from the docs, with citations |
-| `/capstone:changelog [<ref>]` | Architecture-level change history since a ref |
+| `/capstone:changelog [<ref>]` | Architecture-level change history since a ref — and the append-only ledger every writing command records itself in |
 | `/capstone:review` | The opt-in judgment: ranked findings with evidence |
 | `/capstone:guides [<task>]` | Runbooks: run locally, deploy, plus workflows mined from your repo's patterns |
 | `/capstone:onboarding` | A reading path for someone's first day in the codebase |

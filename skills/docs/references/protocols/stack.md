@@ -44,8 +44,11 @@ recorded as derived decisions, not re-asked.
 Set `status: awaiting-formalization`; present the summary table
 (capability → pick → one-line why). On formalization, write or update
 `05-dependencies.md` listing every pick with version floor, license,
-pricing notes, and `§Q` traceability; update the index; then set
-`status: formalized`. On a repo with no code the chapter carries
+pricing notes, and `§Q` traceability; append the changelog entry per
+core.md's ledger — key `stack/all@Q<n>`; record the capability → pick
+table with version floors, licenses and pricing, what each pick replaced
+in the architecture stage's draft, and the capabilities still open.
+Update the index; then set `status: formalized`. On a repo with no code the chapter carries
 `mode: prescriptive`; on a repo that already has code, write the picks
 into the existing descriptive chapter as decision facts ("picked
 (stack-interview.md §Q4), not yet installed") without flipping its

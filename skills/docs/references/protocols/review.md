@@ -1,7 +1,10 @@
 # review — opt-in judgment (the one exception to "describe, never judge")
 
 1. Ensure the reference is current (run the refresh path first if stale) —
-   judgments must rest on verified facts.
+   judgments must rest on verified facts. Before overwriting an existing
+   `review.md`, read its stamp: if no changelog entry carries it, append
+   that catch-up entry first — the rewrite destroys the only other
+   evidence the earlier run happened.
 2. Review across these dimensions, drawing evidence from the topic files
    and spot-checking source: boundary integrity (violations of the
    project's own layering), dead or unwired code, typing erosion
@@ -16,5 +19,10 @@
    findings ranked by severity, each with: the claim, evidence
    (`file:line`), why it matters, and a suggested direction (one
    sentence — no implementation plans).
-4. Never edit code. Each rerun replaces the file. List it only under
+4. Append the changelog entry per core.md's ledger — key
+   `review/all@<stamp>` (`#2`, `#3` … for further reviews at the same
+   stamp, each a real event). Facts about the run only: the file written
+   or replaced, its stamp, the finding count and the count per severity
+   band, and the dimensions exercised. The opinions stay in `review.md`.
+5. Never edit code. Each rerun replaces the file. List it only under
    DESIGN.md's Companion docs table, never in the topic index.

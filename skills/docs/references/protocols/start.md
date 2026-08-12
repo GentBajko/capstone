@@ -29,7 +29,9 @@ wherever it stopped:
      resumes coding per its Resume rules instead of re-gating), or
      `logic` with pending scenarios in its checklist.
    - **done** — status `formalized` (which per the lifecycle implies
-     the outputs are on disk).
+     the outputs are on disk) and its changelog key is present;
+     `formalized` with no key is repairable: append the missing entry
+     from the recorded decisions, without re-interviewing.
    - **outputs missing** — status `formalized` but outputs missing or
      partial (a crash between output writes and reality): regenerate
      the outputs from the recorded decisions, without re-interviewing.

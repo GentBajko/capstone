@@ -81,8 +81,14 @@ and leave `expertise` null.
    source code and their implementation-plan artifacts — that is their
    purpose — and only after their plan gates.
 3. **Docs are skill-owned** — re-runs may rewrite any generated section;
-   manual edits are not preserved.
+   manual edits are not preserved. Sole exception: `changelog.md` is
+   append-only — re-runs add entries and never rewrite, reorder, or
+   drop them.
 4. Follow `style.md` (same directory) for every sentence you write.
+5. **Record what you did** — every run that writes or changes a durable
+   output appends its entry to `<docs_dir>/changelog.md` before setting
+   its done marker (Changelog ledger, below). Nothing this plugin does
+   goes unrecorded.
 
 Everything a subcommand writes carries the topic-file frontmatter stamps
 (`generated_at_commit`, `generated_date`, plus `paths_covered` where the
@@ -100,16 +106,59 @@ and outputs are markdown — never generate HTML, for anything. The only excepti
 `code-prefs-interview.md`, `logic-interview.md`, `stack-interview.md`,
 `build-interview.md`, `features/*/feature-interview.md`,
 `features/*/review-ledger.md`) and `capstone.json`, which are never
-indexed. After writing your output, add or refresh your
+indexed. After writing your output, append your changelog entry
+(Changelog ledger, below), then add or refresh your
 row; if `DESIGN.md` does not exist yet, create a minimal one (title +
 the two tables) rather than leaving the output orphaned.
+
+## Changelog ledger — `<docs_dir>/changelog.md`
+
+**Every run that writes or changes a durable output records itself
+there: one entry per done marker, appended before that marker is set.**
+The entry is an output like any other — the run is not finished until it
+is on disk. Protocols that only read (`check-docs`, `ask`, `help`) or
+only route (`start`, `implementation`) write no entry; a refresh one of
+them delegates is recorded by the protocol that performs it.
+
+Create the file on first write — any stage may be its first writer —
+with frontmatter stamps only (no `paths_covered`, so no refresh path
+regenerates it), and add its Companion docs row. **Insert directly below
+the frontmatter, never at end of file**: entries are newest-first and
+`protocols/changelog.md` reads from the top. Only the `changelog`
+command writes a heading carrying a `(<base>..<head>)` range; a stage
+entry is
+
+    ## <date> — <stage>: <target>
+    key: <stage>/<target>@<rev>
+
+followed by one bullet per output path, naming what changed about it,
+the decisions and rejected options recorded, and what was left open,
+deferred, dropped, or ruled out of scope — the facts a later rewrite of
+that output would erase. It is a receipt, not a second copy: never
+restate what the output already says, point at it. `<target>` is the
+thing acted on (`03-invite-links`, `02-models.md`, `run-locally`; `all`
+for a run covering the whole project). `<rev>` is the highest interview
+question number the output traces to (`Q7`) for a stage with an
+interview file, otherwise the run's stamp.
+
+Before appending, search the file for the key: if it is already there,
+this is a resumed run and the entry stands — never append a second.
+A done marker found with no matching key is a torn write: append the
+missing entry from the recorded decisions, never re-run the stage.
+Writes to `*-interview.md`, `features/*/review-ledger.md` and
+`capstone.json` are not reported. A run that produced little still
+records — a dropped scenario, a topic recorded absent, a capability left
+open are the entry's content, never a reason to skip it. `docs_in_git`
+and the absence of git change how an entry is stamped, never whether it
+is written.
 
 ## Interview lifecycle (shared by all interviews)
 
 An interview file's `status` moves `interviewing` →
 `awaiting-formalization` (set when the summary gate is presented) →
 `formalized`, and **`formalized` is written only AFTER the stage's
-outputs are fully on disk** — never before generation, so a crash can't
+outputs — its changelog entry included — are fully on disk** — never
+before generation, so a crash can't
 strand a formalized stage with missing outputs. Exception: `logic` has
 per-scenario gates instead of one summary gate, so it never uses
 `awaiting-formalization` — it stays `interviewing` and keeps a scenario
@@ -119,7 +168,8 @@ straight to `formalized` once every listed scenario is `written` or
 `dropped` and the index row exists. The pipeline runner
 (`protocols/start.md`) keys stage completion on these rules.
 
-Voice: `check-docs`/`ask`/`changelog` are facts only. `review` is the
+Voice: `check-docs`/`ask`/`changelog` are facts only — including the
+changelog entries other stages append, `review`'s among them. `review` is the
 one opinionated output. `code-prefs`, `logic`, `stack`, and `groom`'s
 `spec.md` are normative but only record the user's own stated
 decisions; `build`'s `implementation.md` and `plan`'s `plan.md` are

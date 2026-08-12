@@ -111,13 +111,24 @@ Entered when Phase C goes dry.
 1. The spec's Reference impact chapters are now stale by construction —
    run the `docs` refresh on them so the reference records what was
    actually built, divergences included.
-2. Only now record `implemented: true` in the feature-interview
+2. Append the changelog entry per core.md's ledger — key
+   `implement/<NN>-<slug>@Q<n>`, the same highest `§Q` (this stage adds
+   none, so the key is stable across a resumed review loop). Record the
+   completed task list, the files the `base_commit`..HEAD diff touched,
+   the chapters refreshed in step 1, and the review-loop counts from
+   `review-ledger.md` — rounds run, findings confirmed, fixed, refuted,
+   and the dry verdict — which nothing else preserves, since that ledger
+   is never indexed.
+3. Only now record `implemented: true` in the feature-interview
    frontmatter — the chain's done marker, written after the refresh
    for the same reason `formalized` waits for outputs (a crash can't
    strand a "done" feature with a stale reference). The lifecycle
    `status` has been `formalized` since the spec landed.
-3. Offer `changelog` to record the architecture-level delta.
 4. Finish the branch — the step Phase B deferred: superpowers'
    finishing-a-development-branch when installed, the repo's own
    merge flow otherwise (on a consented main run there is no branch
    to finish — just the repo's push conventions).
+5. Run `changelog` (execute `protocols/changelog.md`) — mandatory, not
+   offered. Running it after the branch is finished keeps its refs
+   reachable from the mainline; if a PR merge has not landed locally
+   yet, run it once the merge is pulled.

@@ -44,7 +44,11 @@ Every code decision follows `code-prefs.md`.
 
 Set `status: awaiting-formalization`; present the plan summary (layout,
 build order, the first slice). The user approves before any code is
-written. On approval, record `plan_approved: true` in the interview
+written. On approval, append the changelog entry per core.md's ledger —
+key `build/plan@Q<n>` from `build-interview.md`'s highest `### Q<n>`;
+record the approved module layout, the build order starting with the
+walking-skeleton slice, and the per-step verification method. Then
+record `plan_approved: true` in the interview
 frontmatter — Phase C's coding sessions resume against it.
 
 ## Phase C — write the code
@@ -61,8 +65,13 @@ steps, backend first, frontend second, verifying each step as the plan
 specifies, honoring `code-prefs.md` throughout.
 
 Either way, code lands in the repository's source tree (never under
-the docs area). Set `status: formalized` only when the walking-skeleton
-slice actually runs.
+the docs area). Append the changelog entry per core.md's ledger — key
+`build/code@Q<n>`, same `<n>`; record which build-order steps are
+complete, the source paths created, the dependencies installed, and the
+divergences from `implementation.md`. Then set `status: formalized` only
+when the walking-skeleton slice actually runs, and run `changelog` to
+record the architecture-level delta (mandatory; outside git it writes
+nothing and says so).
 
 ## After
 

@@ -19,3 +19,11 @@ citing the file it touches and quoting exact commands → how to verify it
 worked. Commands must come from verified sources (manifests, compose
 files, README, or tested patterns in the repo) — never invented. If a
 step cannot be verified, mark it "unverified" inline.
+
+Record: with every guide file on disk, append ONE changelog entry for
+the run per core.md's ledger — key `guides/<sorted slugs>@<stamp>`;
+list the slugs this run wrote (a refresh regenerates a subset), their
+paths, and the count of steps marked "unverified". Then add or refresh
+the `guides/` Companion docs row. Before regenerating a guide that
+already exists, check its stamp is recorded and append the catch-up
+entry if not.

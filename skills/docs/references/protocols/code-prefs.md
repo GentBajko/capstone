@@ -76,7 +76,10 @@ Write `docs/design/code-prefs.md`: frontmatter stamps (no
 code."; rules organized by the domains above, each traceable to its
 `§Q` entry; imperative voice.
 
-Then update the DESIGN.md index per core.md, set `status: formalized`
+Then append the changelog entry per core.md's ledger — key
+`code-prefs/all@Q<n>` from the interview's highest `### Q<n>`; record
+the rules decided per domain and the domains the user ruled out. Update
+the DESIGN.md index per core.md, set `status: formalized`
 in the interview file (only now that the output is on disk, per
 core.md's Interview lifecycle), and suggest — never do unasked —
 seeding the project's `AGENTS.md`/`CLAUDE.md` from it.

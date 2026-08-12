@@ -130,5 +130,28 @@ if ($InGit) {
   Write-Output "note: dead-name check skipped (not a git checkout)"
 }
 
+# 11. every writing protocol carries its changelog pointer, the exempt
+#     ones say so, and the old opt-in is gone
+foreach ($n in @('groom', 'plan', 'implement', 'mockup', 'logic', 'architecture',
+    'code-prefs', 'stack', 'build', 'review', 'guides', 'onboarding')) {
+  if (-not (Select-String -Path "skills/docs/references/protocols/$n.md" -Pattern 'changelog entry' -SimpleMatch -Quiet)) {
+    Err "protocol $n.md has no changelog-entry step"
+  }
+}
+if (-not (Select-String -Path skills/docs/SKILL.md -Pattern 'changelog entry' -SimpleMatch -Quiet)) {
+  Err "docs/SKILL.md has no changelog-entry step"
+}
+if (-not (Select-String -Path skills/docs/references/core.md -Pattern 'Changelog ledger' -SimpleMatch -Quiet)) {
+  Err "core.md has no Changelog ledger section"
+}
+if (Select-String -Path skills/docs/references/protocols/implement.md -Pattern 'Offer `changelog' -SimpleMatch -Quiet) {
+  Err "implement.md still carries the old opt-in changelog offer"
+}
+foreach ($n in @('check-docs', 'ask')) {
+  if (-not (Select-String -Path "skills/docs/references/protocols/$n.md" -Pattern 'no changelog entry|never appends a changelog' -Quiet)) {
+    Err "protocol $n.md lacks its explicit changelog exemption"
+  }
+}
+
 if ($Fail -eq 0) { Write-Output "lint-sync: all invariants hold" } else { Write-Output "lint-sync: FAILURES above" }
 exit $Fail

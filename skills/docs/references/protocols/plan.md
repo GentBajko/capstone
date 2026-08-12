@@ -77,7 +77,10 @@ and signatures used in later tasks match the tasks that defined them.
 ## Phase C — the gate
 
 Present the summary: file map, task list, what Task 1 proves. The user
-approves before any code is written. On approval record
+approves before any code is written. On approval, first append the
+changelog entry per core.md's ledger — key `plan/<NN>-<slug>@Q<n>` from
+the same highest `§Q`; record the file map, the task count and titles,
+and the global constraints pinned. Then record
 `plan_approved: true` and `approved_spec: <checksum of spec.md>`
 (`git hash-object spec.md`; any stable checksum outside git) in the
 interview frontmatter — `implement` and the chain verify the approval

@@ -109,6 +109,15 @@ these differences:
 - A banner on each file: "Prescriptive — written from the design
   interview, not from code."
 
+Append the changelog entry per core.md's ledger — key
+`architecture/all@Q<n>`, `<n>` the highest `### Q<n>`/`### D<n>` in
+`architecture-interview.md`; record the chapters written and that they
+carry `mode: prescriptive`, the one-way-door choices with the
+alternatives rejected, the walking-skeleton slice, the deferred
+decisions with their triggers, and the topics recorded not-applicable
+with their reasons. A later `docs` refresh of these chapters is a `docs`
+run and records itself as `docs`, never as an architecture entry.
+
 Only after every output is on disk, set `status: formalized` (per
 core.md's Interview lifecycle — never before generation).
 

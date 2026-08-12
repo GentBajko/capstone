@@ -93,8 +93,12 @@ edge-case posture, what's out of scope — and set
 Self-review before handing the file over (fix inline, don't re-gate):
 no placeholders ("TBD", "handle errors appropriately"), no section
 contradicting another, no requirement readable two ways, scoped to a
-single plan. Then set `status: formalized` (only now, outputs on
-disk), add or refresh the `features/` Companion docs row, and hand the
+single plan. Then append the changelog entry per core.md's ledger — key
+`groom/<NN>-<slug>@Q<n>`, `<n>` the highest `§Q` in
+`feature-interview.md`; record the chosen approach with the rejected
+alternatives and the out-of-scope rulings. Add or refresh the
+`features/` Companion docs row, set `status: formalized` (only now,
+outputs on disk), and hand the
 user the `spec.md` path to review — a standalone run stops here; an
 `implementation` chain run announces the stage and continues.
 

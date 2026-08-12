@@ -22,6 +22,8 @@ that reader.
   understand code. No introductions, no summaries of summaries.
 - `DESIGN.md` stays under ~2 pages. Topic files have no hard cap but must
   earn their length: if a section repeats the index, cut it.
+- `changelog.md` is exempt from every length rule: it is never
+  condensed, summarized, or pruned.
 
 ## Naming
 

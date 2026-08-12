@@ -130,7 +130,28 @@ else
   echo "note: dead-name check skipped (not a git checkout)"
 fi
 
-# 11. bash syntax of every .sh
+# 11. every writing protocol carries its changelog pointer, the exempt
+#     ones say so, and the old opt-in is gone (core.md hard rule 5 is
+#     only as good as its sites)
+for n in groom plan implement mockup logic architecture code-prefs stack \
+         build review guides onboarding; do
+  grep -q 'changelog entry' "skills/docs/references/protocols/$n.md" \
+    || err "protocol $n.md has no changelog-entry step"
+done
+grep -q 'changelog entry' skills/docs/SKILL.md \
+  || err "docs/SKILL.md has no changelog-entry step"
+grep -q 'Changelog ledger' skills/docs/references/core.md \
+  || err "core.md has no Changelog ledger section"
+if grep -q 'Offer `changelog' skills/docs/references/protocols/implement.md; then
+  err "implement.md still carries the old opt-in changelog offer"
+fi
+for n in check-docs ask; do
+  grep -Eq 'no changelog entry|never appends a changelog' \
+    "skills/docs/references/protocols/$n.md" \
+    || err "protocol $n.md lacks its explicit changelog exemption"
+done
+
+# 12. bash syntax of every .sh
 for s in skills/docs/scripts/*.sh; do
   bash -n "$s" 2>/dev/null || err "bash syntax error in $s"
 done

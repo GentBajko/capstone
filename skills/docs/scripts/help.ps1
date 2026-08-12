@@ -38,6 +38,7 @@ Usage: /capstone:<command>
 Output: DESIGN.md (root index) + docs/design/*.md topic files, each stamped
 with the commit it was derived at. Re-runs refresh only drifted topics.
 Docs are strictly descriptive; only `review` judges.
+Every command that writes records itself in docs/design/changelog.md.
 
 Config: docs/design/capstone.json — expertise 1-5 (vibe coder ...
 architect; how technical conversations are, asked once then saved),
