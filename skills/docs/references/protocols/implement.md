@@ -35,7 +35,9 @@ a feature branch (or worktree) named after the slug first. Record
 `base_commit` in the feature-interview frontmatter — the branch
 point, or HEAD before Task 1 on a consented main run; Phase C reviews
 the diff from it. Read
-`plan.md`, `spec.md`, `code-prefs.md`, and the guides the plan's
+`plan.md`, `spec.md`, `code-prefs.md`, `../code-craft.md` (the
+TDD + YAGNI discipline the code follows; code-prefs wins on
+conflict), and the guides the plan's
 verification steps rely on (`guides/run-locally.md` if present).
 Review the plan critically —
 a contradiction between tasks, or between plan and spec, goes to the
@@ -65,7 +67,8 @@ are the durable progress record — check each as it passes, not in
 batches, so a dead session resumes mid-task.
 
 Either way, code lands in the repository's source tree (never under
-the docs area), and every code decision follows `code-prefs.md`.
+the docs area), and every code decision follows `code-prefs.md` and
+`code-craft.md`.
 
 ## Phase C — review until dry
 
@@ -82,7 +85,9 @@ restarting at round one.
 
 1. **Round** — independent reviews of the diff, each through a
    different lens: spec compliance (every `spec.md` requirement
-   implemented, nothing extra), code quality per `code-prefs.md` and
+   implemented, nothing extra), code quality per `code-prefs.md`,
+   `code-craft.md` (unearned abstractions and unclimbed ladder rungs
+   are findings), and
    the conventions chapter, and the spec's unhappy paths actually
    exercised by the tests. Fresh eyes every round — with subagents,
    dispatch one reviewer per lens; without, re-read the diff once per

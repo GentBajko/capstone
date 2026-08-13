@@ -43,7 +43,10 @@ Then write `docs/capstone/implementation.md`:
   craft floor and finish-review flow.
 - Per step: how to verify it works before moving on.
 
-Every code decision follows `code-prefs.md`.
+Every code decision follows `code-prefs.md`, and every plan step and
+line of code obeys `../code-craft.md` (TDD + YAGNI, earned
+interfaces; code-prefs wins on conflict) — the layout and sketches
+carry no layer, file, or abstraction the ladder didn't earn.
 
 ## Phase B — the gate
 

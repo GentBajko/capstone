@@ -2,7 +2,7 @@
   "name": "capstone",
   "displayName": "Capstone",
   "description": "Architecture reference generator: a lean DESIGN.md index plus docs/capstone/ topic files stamped to the commit they were derived at, refreshed incrementally via git. Companion commands for staleness checks, cited Q&A, changelogs, opt-in review, runbooks, onboarding tours, a greenfield design interview, product-discovery mockups, and a frontend-design stage.",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "author": {
     "name": "Gent Bajko",
     "email": "gent.bajko@gmail.com"

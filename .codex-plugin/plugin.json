@@ -1,6 +1,6 @@
 {
   "name": "capstone",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "description": "Architecture reference docs: DESIGN.md + docs/capstone/ topic files stamped to commits, refreshed incrementally via git, plus check-docs/ask/changelog/review/guides/onboarding, a greenfield design interview, product-discovery mockups, and a frontend-design stage.",
   "author": {
     "name": "Gent Bajko",

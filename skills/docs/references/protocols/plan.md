@@ -34,7 +34,9 @@ Phase A's sources as needed — then re-present the gate.
 
 Read the spec, then exactly what it cites: its Reference impact
 chapters, the `logic/` scenarios and `mockup/` screens it names, plus
-`code-prefs.md` (every code decision follows it) and the conventions
+`code-prefs.md` (every code decision follows it),
+`../code-craft.md` (the TDD + YAGNI discipline every planned task
+obeys; code-prefs wins on conflict) and the conventions
 and testing chapters for how code and tests are written here. The
 chapters answer where things live and how they connect; read source
 files only where the plan must name exact lines, or where a chapter
@@ -69,6 +71,15 @@ everything. `plan.md`:
 Placeholders are plan failures — never "TBD", "add validation",
 "similar to Task N", tests described but not written, or names no task
 defines. If a step changes code, the step shows the code.
+
+Every task climbs code-craft's ladder before it is written down: a
+task that builds what a rung above already provides — or an
+abstraction no rung earned — is cut from the plan, not deferred to
+the executor's judgment — unless a spec requirement mandates it,
+which is a recorded user decision and earns it per code-craft's
+never-lazy list. The plan's tests are YAGNI-scoped per
+code-craft; its interfaces appear only where that file says one is
+earned.
 
 Self-review (fix inline): every spec requirement points at a task that
 implements it; none of the placeholder patterns above survive; names
