@@ -75,7 +75,9 @@ discovered — surface them as questions, not verdicts. If the user stops
 earlier, leave status as `interviewing`; the pipeline treats pending
 scenarios as in-progress.
 
-**Consumers:** `architecture` reads `docs/capstone/logic/` to pre-fill models
+**Consumers:** `design` reads `docs/capstone/logic/` to style each
+screen's states and unhappy paths. `architecture` reads
+`docs/capstone/logic/` to pre-fill models
 (entities, invariants, consistency needs), data-flow (lifecycles), and
 quality-attribute scenarios — never re-asking what a scenario file
 answers.

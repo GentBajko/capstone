@@ -11,11 +11,11 @@ runs rewrites only the parts the code actually changed. Your agent
 opens one index and eight chapters and already knows the codebase. No
 exploration phase, no guessing.
 
-For new projects it works in the other direction: four interviews that
-pull the product, the business rules, the architecture, and your coding
-taste out of your head before any code exists — then a research pass
-that picks your actual stack with you, and a build stage that turns all
-of it into running code.
+For new projects it works in the other direction: five interviews that
+pull the product, the business rules, the frontend design, the
+architecture, and your coding taste out of your head before any code
+exists — then a research pass that picks your actual stack with you,
+and a build stage that turns all of it into running code.
 
 It runs in Claude Code, Copilot CLI, Gemini CLI, Antigravity, and
 OpenCode today. Codex, Cursor, and Kimi manifests ship in the repo but
@@ -49,7 +49,7 @@ reports staleness without writing anything, and `/capstone:ask` answers
 questions from the docs with citations instead of re-reading your
 source.
 
-## The four interviews
+## The five interviews
 
 Type `capstone` with nothing else and it runs them in order, resuming
 wherever you stopped last time. Or run any one directly. Every answer
@@ -77,6 +77,20 @@ the formulas with real numbers, what happens when the payment fails,
 when the user clicks twice, when two people edit at once. One markdown
 file per scenario. This is the part of a spec that everyone skips and
 then pays for.
+
+### design
+
+The mockup says what's on each screen; `design` decides how it looks
+and feels. It reads the screens and the logic, proposes a design read
+(what kind of surface, for whom, in what language), then interviews
+you through the visual world, the tokens (type, color, spacing,
+motion), and each screen's composition and states. If you have the
+`impeccable` or `design-taste-frontend` skills installed it runs their
+actual flows — concept candidates, the anti-convergence roll, the
+craft floor — and records the outcome; without them a vendored
+distillation of both carries the same method. The output is a design
+folder `build` implements: a direction contract, a design-system
+chapter `stack` honors, and one design file per mockup screen.
 
 ### architecture
 
@@ -238,8 +252,8 @@ argument-hint: [command] [args...]
 
 No arguments: invoke the capstone:start skill. If the first argument
 matches a capstone skill (docs, check-docs, ask, changelog, review,
-guides, onboarding, mockup, logic, architecture, code-prefs, stack,
-build, groom, plan, implement, implementation, start, help),
+guides, onboarding, mockup, logic, design, architecture, code-prefs,
+stack, build, groom, plan, implement, implementation, start, help),
 invoke capstone:<that skill> with the remaining arguments.
 
 ARGUMENTS: $ARGUMENTS
@@ -249,7 +263,7 @@ ARGUMENTS: $ARGUMENTS
 
 | Command | What it does |
 | --- | --- |
-| `/capstone:start` | The pipeline: mockup → logic → architecture → code-prefs → stack → build, resuming at the first unfinished stage |
+| `/capstone:start` | The pipeline: mockup → logic → design → architecture → code-prefs → stack → build, resuming at the first unfinished stage |
 | `/capstone:docs` | Generate or refresh the reference (`rebuild` forces, a topic name targets one chapter) |
 | `/capstone:check-docs` | Staleness and citation-drift report, read-only |
 | `/capstone:ask <question>` | Answer from the docs, with citations |
@@ -259,8 +273,9 @@ ARGUMENTS: $ARGUMENTS
 | `/capstone:onboarding` | A reading path for someone's first day in the codebase |
 | `/capstone:mockup` | Interview 1, standalone |
 | `/capstone:logic` | Interview 2, standalone |
-| `/capstone:architecture` | Interview 3, standalone |
-| `/capstone:code-prefs` | Interview 4, standalone |
+| `/capstone:design` | Interview 3, standalone: the frontend design — direction, tokens, per-screen chapters |
+| `/capstone:architecture` | Interview 4, standalone |
+| `/capstone:code-prefs` | Interview 5, standalone |
 | `/capstone:stack` | Research libraries and services per capability, with pros/cons and pricing; you pick |
 | `/capstone:build` | Implementation plan (backend, then frontend), your approval, then working code — via superpowers when installed |
 | `/capstone:groom <feature>` | Doc-grounded feature interview → a traceable spec in `docs/capstone/features/` |

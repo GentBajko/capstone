@@ -21,7 +21,10 @@ jobs, search, UI framework/component kit, state management, testing
 stack, hosting/deploy target, CI, monitoring — plus anything the
 architecture interview left open. Confirm the list with the user and
 seed the ledger with it. Capabilities `code-prefs.md` already pins are
-recorded as derived decisions, not re-asked.
+recorded as derived decisions, not re-asked. So are the commitments
+`docs/capstone/design/02-system.md` records when it exists — the
+design system / component kit, faces, icon family are user decisions:
+research within them, never silently re-open them.
 
 ## Phase B — research and pick, one capability at a time
 

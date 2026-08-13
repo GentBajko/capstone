@@ -133,8 +133,8 @@ fi
 # 11. every writing protocol carries its changelog pointer, the exempt
 #     ones say so, and the old opt-in is gone (core.md hard rule 5 is
 #     only as good as its sites)
-for n in groom plan implement mockup logic architecture code-prefs stack \
-         build review guides onboarding; do
+for n in groom plan implement mockup logic design architecture \
+         code-prefs stack build review guides onboarding; do
   grep -q 'changelog entry' "skills/docs/references/protocols/$n.md" \
     || err "protocol $n.md has no changelog-entry step"
 done

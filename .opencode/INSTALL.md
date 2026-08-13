@@ -17,7 +17,7 @@ project-level):
 
 Restart OpenCode. The plugin registers all capstone skills (docs,
 check-docs, ask, changelog, review, guides, onboarding,
-mockup, logic, architecture, code-prefs, stack, build, groom, plan,
-implement, implementation, start, help).
+mockup, logic, design, architecture, code-prefs, stack, build, groom,
+plan, implement, implementation, start, help).
 
 Verify by asking: "Generate the architecture reference for this codebase."

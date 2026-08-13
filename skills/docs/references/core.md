@@ -43,9 +43,9 @@ config file is never indexed (it is a settings file, not a doc).
 `docs_in_git` (`"commit" | "ignore" | "ask"`) pre-answers the
 commit-or-gitignore question **for the factual reference only** — the
 index and the topic chapters, plus `guides/`, `onboarding.md`,
-`logic/`, `mockup/` and `code-prefs.md`. `language` sets the generated
-docs' language. The user can change any key by editing the file or just
-telling you.
+`logic/`, `mockup/`, `design/` and `code-prefs.md`. `language` sets the
+generated docs' language. The user can change any key by editing the
+file or just telling you.
 
 ## Local-only outputs — `<docs_dir>/.gitignore`
 
@@ -107,7 +107,11 @@ and leave `expertise` null.
    directly or as `start`'s final stage) and the `implement` protocol
    (invoked directly or as `implementation`'s final stage) write
    source code and their implementation-plan artifacts — that is their
-   purpose — and only after their plan gates.
+   purpose — and only after their plan gates. The `design` protocol
+   may invoke the installed `impeccable` / `design-taste-frontend`
+   skills; their own working artifacts (`PRODUCT.md`, `.impeccable/`,
+   surface briefs) are those skills' to write per their own rules —
+   outside the docs area, never indexed or maintained by this plugin.
 3. **Docs are skill-owned** — re-runs may rewrite any generated section;
    manual edits are not preserved. Sole exception: `changelog.md` is
    append-only — re-runs add entries and never rewrite, reorder, or
@@ -127,11 +131,12 @@ refresh protocol applies; date-only outside git).
 index (chapterized filenames: `01-architecture.md` … `08-glossary.md`,
 so the folder reads in order even without the index), everything else
 (review, changelog, onboarding, code-prefs, implementation, guides/,
-logic/, mockup/, features/) as a row in a "Companion docs" table (file
-· what it is · date). All indexes
+logic/, mockup/, design/, features/) as a row in a "Companion docs"
+table (file · what it is · date). All indexes
 and outputs are markdown — never generate HTML, for anything. The only exceptions are interview Q&A files
 (`architecture-interview.md`, `mockup-interview.md`,
-`code-prefs-interview.md`, `logic-interview.md`, `stack-interview.md`,
+`code-prefs-interview.md`, `logic-interview.md`,
+`design-interview.md`, `stack-interview.md`,
 `build-interview.md`, `features/*/feature-interview.md`,
 `features/*/review-ledger.md`) and `capstone.json`, which are never
 indexed. After writing your output, append your changelog entry
@@ -198,8 +203,8 @@ straight to `formalized` once every listed scenario is `written` or
 
 Voice: `check-docs`/`ask`/`changelog` are facts only — including the
 changelog entries other stages append, `review`'s among them. `review` is the
-one opinionated output. `code-prefs`, `logic`, `stack`, and `groom`'s
-`spec.md` are normative but only record the user's own stated
+one opinionated output. `code-prefs`, `logic`, `design`, `stack`, and
+`groom`'s `spec.md` are normative but only record the user's own stated
 decisions; `build`'s `implementation.md` and `plan`'s `plan.md` are
 instructional like `guides`. `guides`/`onboarding` may use
 imperative/narrative voice, but every command must be verified and every

@@ -86,7 +86,8 @@ in the interview file (per core.md's Interview lifecycle).
 **Handoff:** (when running inside the `start` pipeline, it continues
 automatically) the natural next step is the `logic` skill — it takes the
 scenarios this mockup depicts and lays their business rules bare, one
-by one, before any architecture. `architecture` (run after either) reads
+by one; `design` then turns the screens into a committed frontend
+design, before any architecture. `architecture` (run after these) reads
 `mockup-interview.md` and never re-asks what it answers — its framing
 section (§0 of `../interview.md`) is largely pre-filled by this
 interview.

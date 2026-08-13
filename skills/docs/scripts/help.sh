@@ -7,7 +7,7 @@ capstone — codebase architecture reference generator
 Usage: /capstone:<command>
 
   start                Run the greenfield pipeline stage by stage:
-                       mockup -> logic -> architecture -> code-prefs -> stack -> build
+                       mockup -> logic -> design -> architecture -> code-prefs -> stack -> build
                        (resumes at the first incomplete stage; also
                         triggers on a bare "capstone" prompt)
 
@@ -24,6 +24,8 @@ Usage: /capstone:<command>
   onboarding           Guided reading path for new contributors -> onboarding.md
   mockup               Product discovery: seed + adaptive interview -> traceable markdown mockup
   logic                Business-logic interview, scenario by scenario -> docs/capstone/logic/
+  design               Frontend design from the mockup + logic -> docs/capstone/design/
+                       (uses the impeccable/design-taste skills when installed)
   architecture         Greenfield: exhaustive architecture interview -> prescriptive reference
   code-prefs           Code-preferences interview -> normative code-prefs.md
   stack                Research libraries/services per capability, you pick -> 05-dependencies.md

@@ -21,8 +21,9 @@ restart finished steps.
 ## Phase A — implementation research
 
 Read everything: the index and chapters, `docs/capstone/logic/`,
-`docs/capstone/mockup/`, `docs/capstone/code-prefs.md`, and the stack
-chapter. Research — web search when available — how the chosen pieces
+`docs/capstone/mockup/`, `docs/capstone/design/`,
+`docs/capstone/code-prefs.md`, and the stack chapter. Research — web
+search when available — how the chosen pieces
 actually connect: scaffold conventions for the chosen framework,
 integration patterns between the picks (auth ↔ framework, ORM ↔
 database, deploy target), official quickstarts for anything unfamiliar.
@@ -35,7 +36,11 @@ Then write `docs/capstone/implementation.md`:
   to the architecture chapters that decided it.
 - Build order: the walking-skeleton slice first (recorded in the
   architecture interview), then backend capabilities in logic-scenario
-  priority order, then frontend screens in mockup order.
+  priority order, then frontend screens in mockup order — each
+  implementing its `design/screens/` chapter and
+  `design/02-system.md`'s Implementation constraints; when the
+  `impeccable` skill is installed, the frontend pass also honors its
+  craft floor and finish-review flow.
 - Per step: how to verify it works before moving on.
 
 Every code decision follows `code-prefs.md`.

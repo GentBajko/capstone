@@ -6,13 +6,14 @@ wherever it stopped:
 
 1. `mockup` → `docs/capstone/mockup/` (+ `mockup-interview.md`)
 2. `logic` → `docs/capstone/logic/` (+ `logic-interview.md`)
-3. `architecture` → the prescriptive reference
+3. `design` → `docs/capstone/design/` (+ `design-interview.md`)
+4. `architecture` → the prescriptive reference
    (+ `architecture-interview.md`)
-4. `code-prefs` → `docs/capstone/code-prefs.md`
+5. `code-prefs` → `docs/capstone/code-prefs.md`
    (+ `code-prefs-interview.md`)
-5. `stack` → the researched, user-picked stack in `05-dependencies.md`
+6. `stack` → the researched, user-picked stack in `05-dependencies.md`
    (+ `stack-interview.md`)
-6. `build` → `docs/capstone/implementation.md`, then working code
+7. `build` → `docs/capstone/implementation.md`, then working code
    (+ `build-interview.md`)
 
 ## Procedure
@@ -49,9 +50,9 @@ wherever it stopped:
    - On a `docs` answer: execute the `docs` skill's protocol now and
      end the pipeline run.
 5. Run the first non-done stage by executing its protocol file
-   (`mockup.md`, `logic.md`, `architecture.md`, `code-prefs.md`,
-   `stack.md`, `build.md`) exactly — including its own formalization
-   gate. Do not blend stages.
+   (`mockup.md`, `logic.md`, `design.md`, `architecture.md`,
+   `code-prefs.md`, `stack.md`, `build.md`) exactly — including its
+   own formalization gate. Do not blend stages.
 6. When a stage formalizes, announce it in one line and continue to
    the next ("mockup done — moving to logic; say stop to pause").
    Stopping is always safe: every stage persists its interview file,

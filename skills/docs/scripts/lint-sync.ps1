@@ -132,8 +132,9 @@ if ($InGit) {
 
 # 11. every writing protocol carries its changelog pointer, the exempt
 #     ones say so, and the old opt-in is gone
-foreach ($n in @('groom', 'plan', 'implement', 'mockup', 'logic', 'architecture',
-    'code-prefs', 'stack', 'build', 'review', 'guides', 'onboarding')) {
+foreach ($n in @('groom', 'plan', 'implement', 'mockup', 'logic', 'design',
+    'architecture', 'code-prefs', 'stack', 'build', 'review', 'guides',
+    'onboarding')) {
   if (-not (Select-String -Path "skills/docs/references/protocols/$n.md" -Pattern 'changelog entry' -SimpleMatch -Quiet)) {
     Err "protocol $n.md has no changelog-entry step"
   }
