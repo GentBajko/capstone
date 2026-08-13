@@ -6,12 +6,14 @@ The config lives at the fixed path `docs/capstone/capstone.json` no
 matter what `docs_dir` is set to — `docs_dir` relocates generated
 outputs only, never the config, so a custom `docs_dir` can always be
 discovered. Read it first if present; absent keys use the defaults
-below. **Legacy path:** capstone used to default to `docs/design`. If
-`docs/capstone/capstone.json` is absent but `docs/design/capstone.json`
-exists, that project predates the rename — use it and its `docs_dir` as
-they stand, and offer once to move the directory to `docs/capstone`
-(`git mv` when tracked) and update `docs_dir`; never migrate unasked and
-never generate a second tree alongside the old one.
+below. **Legacy path:** capstone used to default to `docs/design`. The
+initializer migrates that layout automatically and idempotently — when
+`docs/design` exists and `docs/capstone` does not, it moves the tree
+(`git mv` when tracked, so history follows), repoints the moved docs'
+cross-references, the index, and a `docs_dir` that named the old default
+(a custom one is left alone), then untracks whatever the ignore list
+below now covers. Say what it reported. If both directories exist it
+merges nothing and `docs/capstone` wins — resolve that with the user.
 `docs_dir` and `index_file` must be relative paths inside the
 repository; refuse anything else. The plugin materializes the file:
 whenever you write any output and it does not exist, run the idempotent

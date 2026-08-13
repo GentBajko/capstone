@@ -160,6 +160,9 @@ for r in 'features/' '\*-interview.md' 'capstone.json' 'review.md' 'changelog.md
 done
 grep -q 'Local-only outputs' skills/docs/references/core.md \
   || err "core.md has no Local-only outputs section"
+for f in skills/docs/scripts/init-config.sh skills/docs/scripts/init-config.ps1; do
+  grep -q 'docs/design' "$f" || err "$f dropped the legacy docs/design migration"
+done
 
 # 13. bash syntax of every .sh
 for s in skills/docs/scripts/*.sh; do

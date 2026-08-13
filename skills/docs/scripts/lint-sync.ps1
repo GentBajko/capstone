@@ -165,6 +165,11 @@ foreach ($r in @('features/', '*-interview.md', 'capstone.json', 'review.md', 'c
 if (-not (Select-String -Path skills/docs/references/core.md -Pattern 'Local-only outputs' -SimpleMatch -Quiet)) {
   Err "core.md has no Local-only outputs section"
 }
+foreach ($f in @('skills/docs/scripts/init-config.sh', 'skills/docs/scripts/init-config.ps1')) {
+  if (-not (Select-String -Path $f -Pattern 'docs/design' -SimpleMatch -Quiet)) {
+    Err "$f dropped the legacy docs/design migration"
+  }
+}
 
 if ($Fail -eq 0) { Write-Output "lint-sync: all invariants hold" } else { Write-Output "lint-sync: FAILURES above" }
 exit $Fail

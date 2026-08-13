@@ -1,6 +1,6 @@
 {
   "name": "capstone",
   "description": "Architecture reference docs: DESIGN.md + docs/capstone/ topic files stamped to commits, refreshed incrementally via git, plus check-docs/ask/changelog/review/guides/onboarding, a greenfield design interview, and product-discovery mockups.",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "contextFileName": "GEMINI.md"
 }
