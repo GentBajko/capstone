@@ -5,7 +5,7 @@ description: Use when asking an architecture question the docs/capstone referenc
 
 # Capstone: ask
 
-From this skill's base directory, read `../docs/references/core.md`, then
+From this skill's base directory, read `../core/references/core.md`, then
 execute
-`../docs/references/protocols/ask.md`
+`../core/references/protocols/ask.md`
 exactly. Arguments to this invocation are the question.

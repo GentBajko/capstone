@@ -5,7 +5,7 @@ description: Use when asked for a new-contributor onboarding tour - an ordered r
 
 # Capstone: onboarding
 
-From this skill's base directory, read `../docs/references/core.md`, then
+From this skill's base directory, read `../core/references/core.md`, then
 execute
-`../docs/references/protocols/onboarding.md`
+`../core/references/protocols/onboarding.md`
 exactly.

@@ -5,7 +5,7 @@ description: Use when starting work on a feature or change for a project that al
 
 # Capstone: groom
 
-From this skill's base directory, read `../docs/references/core.md`, then
+From this skill's base directory, read `../core/references/core.md`, then
 execute
-`../docs/references/protocols/groom.md`
+`../core/references/protocols/groom.md`
 exactly.

@@ -9,12 +9,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Cross-file invariants
-        run: bash skills/docs/scripts/lint-sync.sh
+        run: bash skills/core/scripts/lint-sync.sh
       - name: PowerShell scripts parse
         shell: pwsh
         run: |
           $failed = $false
-          Get-ChildItem skills/docs/scripts/*.ps1 | ForEach-Object {
+          Get-ChildItem skills/core/scripts/*.ps1 | ForEach-Object {
             $errs = $null
             [void][System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$errs)
             if ($errs) { Write-Output "PARSE ERRORS in $($_.Name):"; $errs; $failed = $true }
@@ -29,7 +29,22 @@ jobs:
       - uses: actions/checkout@v4
       - name: Cross-file invariants (PowerShell 7)
         shell: pwsh
-        run: ./skills/docs/scripts/lint-sync.ps1
+        run: ./skills/core/scripts/lint-sync.ps1
       - name: Cross-file invariants (Windows PowerShell 5.1)
         shell: powershell
-        run: ./skills/docs/scripts/lint-sync.ps1
+        run: ./skills/core/scripts/lint-sync.ps1
+      - name: Help script runs
+        shell: pwsh
+        run: |
+          $out = ./skills/core/scripts/help.ps1
+          if (-not $out) { Write-Output "help.ps1 produced no output"; exit 1 }
+      - name: Init-config runs and is idempotent
+        shell: pwsh
+        run: |
+          $tmp = Join-Path $env:RUNNER_TEMP "capstone-init"
+          New-Item -ItemType Directory -Force $tmp | Out-Null
+          Push-Location $tmp
+          & $env:GITHUB_WORKSPACE/skills/core/scripts/init-config.ps1 docs/capstone
+          if (-not (Test-Path docs/capstone/capstone.json)) { Write-Output "config not created"; exit 1 }
+          & $env:GITHUB_WORKSPACE/skills/core/scripts/init-config.ps1 docs/capstone
+          Pop-Location

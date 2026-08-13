@@ -1,1 +1,1 @@
-@./skills/docs/SKILL.md
+@./skills/core/references/dispatcher.md

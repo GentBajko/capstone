@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}\"/skills/docs/scripts/help-hook.sh"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}\"/skills/core/scripts/help-hook.sh"
           }
         ]
       }

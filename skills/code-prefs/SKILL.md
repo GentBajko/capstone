@@ -5,7 +5,7 @@ description: Use when capturing how code should be written in this project - typ
 
 # Capstone: code-prefs
 
-From this skill's base directory, read `../docs/references/core.md`, then
+From this skill's base directory, read `../core/references/core.md`, then
 execute
-`../docs/references/protocols/code-prefs.md`
+`../core/references/protocols/code-prefs.md`
 exactly.

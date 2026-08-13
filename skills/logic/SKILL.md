@@ -5,7 +5,7 @@ description: Use when pinning down an app's business logic scenario by scenario 
 
 # Capstone: logic
 
-From this skill's base directory, read `../docs/references/core.md`, then
+From this skill's base directory, read `../core/references/core.md`, then
 execute
-`../docs/references/protocols/logic.md`
+`../core/references/protocols/logic.md`
 exactly.

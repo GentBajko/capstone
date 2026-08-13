@@ -24,8 +24,8 @@ files, so wherever skills work, this works.
 
 ## The docs
 
-`/capstone:docs` on an existing repo produces a `DESIGN.md` index and
-eight numbered chapters in `docs/capstone/`:
+`/capstone:generate` on an existing repo produces a `DESIGN.md` index
+and eight numbered chapters in `docs/capstone/`:
 
 ```
 01-architecture.md   layers, boundaries, entry points, dispatch tables
@@ -42,10 +42,10 @@ Everything is facts with `file:line` citations. No advice, no grades,
 no "consider refactoring". The one exception is `/capstone:review`,
 which judges only because you asked it to.
 
-Refreshes are cheap. Each chapter's frontmatter lists the paths it was
-derived from; `git diff` against the stamped commit decides what's
-stale. Untouched chapters are never rewritten. `/capstone:check-docs`
-reports staleness without writing anything, and `/capstone:ask` answers
+Refreshes are cheap: `/capstone:sync` rewrites only the chapters whose
+listed paths changed since their stamped commit — untouched chapters
+are never touched. `/capstone:sync check` reports staleness without
+writing anything, and `/capstone:ask` answers
 questions from the docs with citations instead of re-reading your
 source.
 
@@ -98,7 +98,7 @@ The big interview. It isn't done until every section of the future docs
 is answerable from your recorded decisions. One question at a time. It
 reads the mockup and logic files first and never re-asks what they
 already answer. At the end you approve the summary, and it writes the
-same eight chapters as `docs`, marked prescriptive. Once real code
+same eight chapters as `generate`, marked prescriptive. Once real code
 exists, refresh runs replace intent with observation and note where the
 implementation diverged from the plan.
 
@@ -189,7 +189,8 @@ out:
   "subagent_threshold": 150,
   "docs_in_git": "ask",
   "language": "en",
-  "pipeline": null
+  "pipeline": null,
+  "workspaces": null
 }
 ```
 
@@ -204,12 +205,22 @@ every `*-interview.md`, `capstone.json`, `review.md`, and
 `changelog.md`. Capstone writes `docs/capstone/.gitignore` listing
 exactly those, and the feature chain never commits the docs area at all
 — it commits source code only. `subagent_threshold` is the source-file count
-above which `docs` fans out parallel subagents instead of reading
+above which `generate` fans out parallel subagents instead of reading
 everything itself. `pipeline` records the answer to the one-time
 question `start` asks on repos that already have code: pipeline or
-docs.
+generate. `workspaces`, when set, gives each workspace its own docs
+area under its path, with the root `DESIGN.md` as an
+index-of-indexes.
 
 ## Install
+
+Any agent, via the skills CLI's interactive installer (it detects
+your installed agents and offers a per-agent selection; pick ALL
+capstone skills — `core` carries the shared rules the others read):
+
+```bash
+npx skills add GentBajko/capstone
+```
 
 Claude Code:
 
@@ -241,7 +252,7 @@ OpenCode, in `opencode.json`:
 { "plugin": ["capstone@git+https://github.com/GentBajko/capstone.git"] }
 ```
 
-Commands come out namespaced (`/capstone:docs`). If you want a bare
+Commands come out namespaced (`/capstone:generate`). If you want a bare
 `/capstone` in Claude Code, drop this in `~/.claude/commands/capstone.md`:
 
 ```markdown
@@ -251,7 +262,7 @@ argument-hint: [command] [args...]
 ---
 
 No arguments: invoke the capstone:start skill. If the first argument
-matches a capstone skill (docs, check-docs, ask, changelog, review,
+matches a capstone skill (generate, sync, doctor, ask, changelog, review,
 guides, onboarding, mockup, logic, design, architecture, code-prefs,
 stack, build, groom, plan, implement, implementation, start, help),
 invoke capstone:<that skill> with the remaining arguments.
@@ -264,8 +275,9 @@ ARGUMENTS: $ARGUMENTS
 | Command | What it does |
 | --- | --- |
 | `/capstone:start` | The pipeline: mockup → logic → design → architecture → code-prefs → stack → build, resuming at the first unfinished stage |
-| `/capstone:docs` | Generate or refresh the reference (`rebuild` forces, a topic name targets one chapter) |
-| `/capstone:check-docs` | Staleness and citation-drift report, read-only |
+| `/capstone:generate` | Build the reference from scratch (`rebuild` forces, a topic name targets one chapter) |
+| `/capstone:sync` | Refresh what drifted; `sync check` is the read-only trust report |
+| `/capstone:doctor` | Diagnose and repair the docs area: torn writes, index drift, voided approvals, absorption gaps |
 | `/capstone:ask <question>` | Answer from the docs, with citations |
 | `/capstone:changelog [<ref>]` | Architecture-level change history since a ref — and the append-only ledger every writing command records itself in |
 | `/capstone:review` | The opt-in judgment: ranked findings with evidence |
@@ -284,11 +296,21 @@ ARGUMENTS: $ARGUMENTS
 | `/capstone:implementation <desc>` | The feature chain: groom → plan → implement, resuming at the first unfinished stage |
 | `/capstone:help` | Usage. In Claude Code a hook answers this before the model is invoked, so it costs zero tokens |
 
+Renamed in 3.0: `docs` split into `generate` (from scratch) and
+`sync` (incremental refresh); `check-docs` became `sync check`.
+
+## CI
+
+Copy `templates/capstone-sync-check.yml` into your repo's
+`.github/workflows/` and add an `ANTHROPIC_API_KEY` secret: every PR
+then runs `sync check` headlessly and fails when the reference is
+stale (the job parses the report's final `SYNC CHECK:` line).
+
 ## Rough edges
 
 The zero-token help trick is Claude Code only; other harnesses spend one
-small model turn on it. The PowerShell scripts are syntax-checked but
-not yet tested on a real Windows box. The `logic` interview on a real
+small model turn on it. The PowerShell twins run in CI on a real
+Windows runner (both shells); broader Windows field-testing is thin. The `logic` interview on a real
 app is an afternoon, not ten minutes, and that's by design. Retrieval
 is grep over eight markdown files, which is plenty at this scale and
 unproven on giant monorepos.

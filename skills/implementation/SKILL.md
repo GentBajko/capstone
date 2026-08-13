@@ -5,7 +5,7 @@ description: Use when the user wants a feature implemented, added, or built end 
 
 # Capstone: implementation
 
-From this skill's base directory, read `../docs/references/core.md`, then
+From this skill's base directory, read `../core/references/core.md`, then
 execute
-`../docs/references/protocols/implementation.md`
+`../core/references/protocols/implementation.md`
 exactly.

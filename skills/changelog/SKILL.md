@@ -5,7 +5,7 @@ description: Use when asked how the architecture changed since a commit - append
 
 # Capstone: changelog
 
-From this skill's base directory, read `../docs/references/core.md`, then
+From this skill's base directory, read `../core/references/core.md`, then
 execute
-`../docs/references/protocols/changelog.md`
+`../core/references/protocols/changelog.md`
 exactly. Arguments to this invocation are the base ref (optional).

@@ -5,7 +5,7 @@ description: Use when turning a finished capstone design into working code - res
 
 # Capstone: build
 
-From this skill's base directory, read `../docs/references/core.md`, then
+From this skill's base directory, read `../core/references/core.md`, then
 execute
-`../docs/references/protocols/build.md`
+`../core/references/protocols/build.md`
 exactly.
