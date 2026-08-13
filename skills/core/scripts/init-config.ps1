@@ -125,3 +125,8 @@ if (Get-Command git -ErrorAction SilentlyContinue) {
     }
   }
 }
+
+# A skipped git branch above leaves $LASTEXITCODE non-zero (e.g. 128 from
+# rev-parse outside a repo); callers and CI read the script exit code, so
+# reaching this line means success.
+exit 0
