@@ -153,5 +153,18 @@ foreach ($n in @('check-docs', 'ask')) {
   }
 }
 
+# 12. the local-only ignore list is identical in both initializers and
+#     documented in core.md (hand-synced across three files)
+foreach ($r in @('features/', '*-interview.md', 'capstone.json', 'review.md', 'changelog.md')) {
+  foreach ($f in @('skills/docs/scripts/init-config.sh', 'skills/docs/scripts/init-config.ps1')) {
+    if (-not (Select-String -Path $f -Pattern "^$([regex]::Escape($r))$" -Quiet)) {
+      Err "$f ignore template missing rule $r"
+    }
+  }
+}
+if (-not (Select-String -Path skills/docs/references/core.md -Pattern 'Local-only outputs' -SimpleMatch -Quiet)) {
+  Err "core.md has no Local-only outputs section"
+}
+
 if ($Fail -eq 0) { Write-Output "lint-sync: all invariants hold" } else { Write-Output "lint-sync: FAILURES above" }
 exit $Fail

@@ -7,13 +7,13 @@
   },
   "metadata": {
     "description": "Capstone: architecture reference docs for AI-first codebases",
-    "version": "2.6.0"
+    "version": "2.7.0"
   },
   "plugins": [
     {
       "name": "capstone",
       "source": "./",
-      "description": "Architecture reference generator: DESIGN.md + docs/design/ stamped to commits, with check-docs/ask/changelog/review/guides/onboarding commands, a greenfield design interview, and product-discovery mockups.",
+      "description": "Architecture reference generator: DESIGN.md + docs/capstone/ stamped to commits, with check-docs/ask/changelog/review/guides/onboarding commands, a greenfield design interview, and product-discovery mockups.",
       "strict": true
     }
   ]

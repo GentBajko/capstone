@@ -12,9 +12,9 @@
    (partial-failure consequences, swallowed errors), test-coverage gaps
    weighted by criticality, internal consistency (the project violating
    its own stated conventions), and — when
-   `docs/design/code-prefs.md` exists — divergence between the user's
+   `docs/capstone/code-prefs.md` exists — divergence between the user's
    stated preferences and the observed conventions.
-3. Write `docs/design/review.md`: frontmatter stamps; a banner line
+3. Write `docs/capstone/review.md`: frontmatter stamps; a banner line
    "Opinion — generated judgment, not part of the factual reference.";
    findings ranked by severity, each with: the claim, evidence
    (`file:line`), why it matters, and a suggested direction (one

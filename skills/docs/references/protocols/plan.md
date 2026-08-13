@@ -13,7 +13,7 @@ disk. Interview missing or not yet `formalized` → execute
 regenerates.
 
 State: the feature's
-`docs/design/features/<NN>-<slug>/feature-interview.md`
+`docs/capstone/features/<NN>-<slug>/feature-interview.md`
 (`plan_approved: true` is set at the gate; the lifecycle `status`
 stays `formalized` — this stage never touches it). Output: `plan.md`
 beside the spec. Resolve a `<feature>` argument as `groom`'s Resume

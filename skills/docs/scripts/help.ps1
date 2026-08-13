@@ -21,7 +21,7 @@ Usage: /capstone:<command>
   guides [<task>]      How-to guides: run-locally, deploy, project workflows
   onboarding           Guided reading path for new contributors -> onboarding.md
   mockup               Product discovery: seed + adaptive interview -> traceable markdown mockup
-  logic                Business-logic interview, scenario by scenario -> docs/design/logic/
+  logic                Business-logic interview, scenario by scenario -> docs/capstone/logic/
   architecture         Greenfield: exhaustive architecture interview -> prescriptive reference
   code-prefs           Code-preferences interview -> normative code-prefs.md
   stack                Research libraries/services per capability, you pick -> 05-dependencies.md
@@ -35,12 +35,12 @@ Usage: /capstone:<command>
 
   help                 Show this message
 
-Output: DESIGN.md (root index) + docs/design/*.md topic files, each stamped
+Output: DESIGN.md (root index) + docs/capstone/*.md topic files, each stamped
 with the commit it was derived at. Re-runs refresh only drifted topics.
 Docs are strictly descriptive; only `review` judges.
-Every command that writes records itself in docs/design/changelog.md.
+Every command that writes records itself in docs/capstone/changelog.md.
 
-Config: docs/design/capstone.json — expertise 1-5 (vibe coder ...
+Config: docs/capstone/capstone.json — expertise 1-5 (vibe coder ...
 architect; how technical conversations are, asked once then saved),
 docs_dir, index_file, subagent_threshold, docs_in_git, language, pipeline.
 '@

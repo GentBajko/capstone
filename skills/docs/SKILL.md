@@ -1,13 +1,13 @@
 ---
 name: docs
-description: Use when asked to generate, update, or refresh a codebase's architecture reference docs (DESIGN.md plus docs/design/ topic files), map the architecture, or document the data models, typing conventions, and module boundaries so AI sessions read docs instead of re-exploring the repo. Descriptive only; refreshes just the topics whose covered paths changed since their commit stamps.
+description: Use when asked to generate, update, or refresh a codebase's architecture reference docs (DESIGN.md plus docs/capstone/ topic files), map the architecture, or document the data models, typing conventions, and module boundaries so AI sessions read docs instead of re-exploring the repo. Descriptive only; refreshes just the topics whose covered paths changed since their commit stamps.
 ---
 
 # Capstone: Codebase Architecture Reference Generator
 
 Generate or refresh a descriptive architecture reference for the current
 project: a lean `DESIGN.md` index at the project root plus topic files in
-`docs/design/`. The audience is future Claude sessions — they read these
+`docs/capstone/`. The audience is future Claude sessions — they read these
 docs instead of re-exploring the repository.
 
 **Announce at start:** "I'm using the capstone skill to
@@ -17,7 +17,7 @@ generate/refresh the architecture reference."
 
 0. Read `references/core.md` — the hard rules, voice rules, and user
    config. The config always lives at the fixed path
-   `docs/design/capstone.json`, regardless of `docs_dir` (`docs_dir`
+   `docs/capstone/capstone.json`, regardless of `docs_dir` (`docs_dir`
    relocates generated outputs only, never the config). Its keys
    override the defaults below; `docs_dir` and `index_file` must be
    relative paths inside the repository.
@@ -113,12 +113,13 @@ paths_covered:
    Anchor every glob at the repository root with the `:(top)` magic
    pathspec (e.g. `:(top)src/api/**`) so staleness checks work from
    any cwd.
-3. Ensure the config file exists by running the platform-appropriate
-   initializer from this skill's `scripts/` directory (idempotent —
-   never overwrites): `bash scripts/init-config.sh` on
-   macOS/Linux/Git Bash, or `powershell -ExecutionPolicy Bypass -File
-   scripts\init-config.ps1` on Windows. If neither shell is available,
-   write the JSON template from `references/core.md` yourself.
+3. Ensure the config file and the docs area's `.gitignore` exist by
+   running the platform-appropriate initializer from this skill's
+   `scripts/` directory (idempotent — never overwrites either):
+   `bash scripts/init-config.sh <docs_dir>` on macOS/Linux/Git Bash, or
+   `powershell -ExecutionPolicy Bypass -File scripts\init-config.ps1
+   <docs_dir>` on Windows. If neither shell is available, write the JSON
+   template and the ignore list from `references/core.md` yourself.
 4. Append the changelog entry per `references/core.md`'s Changelog
    ledger — key `docs/<topic|all>@<the run's stamp>`; one bullet per
    chapter written **this run** (every one, never only those you judge
@@ -151,10 +152,14 @@ paths_covered:
 2. Spot-check three `file:line` pointers across topic files against the
    actual source.
 3. Report to the user: files written, topics skipped or absent and why.
-4. If the generated files are untracked and not covered by `.gitignore`:
+4. The local-only outputs (`features/`, interviews, `review.md`,
+   `changelog.md`, `capstone.json`) are already covered by
+   `<docs_dir>/.gitignore` — this question is only about the factual
+   reference. If those generated files are untracked and not covered by
+   `.gitignore`:
    honor the `docs_in_git` config key when set (`commit` or `ignore`);
    when it is `ask` or unset, ask the user whether to commit them or add
-   `/DESIGN.md` and `/docs/design/` to `.gitignore` — never decide
+   `/DESIGN.md` and `/docs/capstone/` to `.gitignore` — never decide
    unilaterally. On later runs, respect whichever choice is in place.
 
 ## Refresh protocol

@@ -12,7 +12,7 @@ Prerequisite: a stamped `DESIGN.md` index. Without one, stop and point
 the user at `docs` (existing code) or `start` (greenfield) — grooming
 against no reference is guessing.
 
-State: `docs/design/features/<NN>-<slug>/feature-interview.md` — same
+State: `docs/capstone/features/<NN>-<slug>/feature-interview.md` — same
 resumable format as the other interviews (frontmatter with `status`,
 numbered `§Q` decision entries; standard lifecycle per core.md; never
 indexed). `<NN>` continues the `features/` folder's numbering (01 when
@@ -24,7 +24,7 @@ docs row. Later stages add their own keys to the same frontmatter
 feature is built.
 
 **Resume:** before anything else, match the request against existing
-`docs/design/features/*/` slugs and spec titles — never mint a new
+`docs/capstone/features/*/` slugs and spec titles — never mint a new
 `<NN>` for a feature that already has a folder. On a match, read its
 `feature-interview.md` and continue: `interviewing` resumes the
 interview after re-running Phase A's staleness pass (never re-ask an

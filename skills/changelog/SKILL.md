@@ -1,6 +1,6 @@
 ---
 name: changelog
-description: Use when asked how the architecture changed since a commit - appends an architecture-level entry to docs/design/changelog.md.
+description: Use when asked how the architecture changed since a commit - appends an architecture-level entry to docs/capstone/changelog.md.
 ---
 
 # Capstone: changelog

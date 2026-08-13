@@ -1,12 +1,18 @@
 # Shared Rules (read by every subcommand)
 
-## User config — `docs/design/capstone.json`
+## User config — `docs/capstone/capstone.json`
 
-The config lives at the fixed path `docs/design/capstone.json` no
+The config lives at the fixed path `docs/capstone/capstone.json` no
 matter what `docs_dir` is set to — `docs_dir` relocates generated
 outputs only, never the config, so a custom `docs_dir` can always be
 discovered. Read it first if present; absent keys use the defaults
-below. `docs_dir` and `index_file` must be relative paths inside the
+below. **Legacy path:** capstone used to default to `docs/design`. If
+`docs/capstone/capstone.json` is absent but `docs/design/capstone.json`
+exists, that project predates the rename — use it and its `docs_dir` as
+they stand, and offer once to move the directory to `docs/capstone`
+(`git mv` when tracked) and update `docs_dir`; never migrate unasked and
+never generate a second tree alongside the old one.
+`docs_dir` and `index_file` must be relative paths inside the
 repository; refuse anything else. The plugin materializes the file:
 whenever you write any output and it does not exist, run the idempotent
 initializer from the `docs` skill's `scripts/` directory —
@@ -17,7 +23,7 @@ template yourself —
 ```json
 {
   "expertise": null,
-  "docs_dir": "docs/design",
+  "docs_dir": "docs/capstone",
   "index_file": "DESIGN.md",
   "subagent_threshold": 150,
   "docs_in_git": "ask",
@@ -33,9 +39,29 @@ docs-vs-pipeline fork (see `protocols/start.md`) has not been asked;
 config file is never indexed (it is a settings file, not a doc).
 
 `docs_in_git` (`"commit" | "ignore" | "ask"`) pre-answers the
-commit-or-gitignore question. `language` sets the generated docs'
-language. The user can change any key by editing the file or just
+commit-or-gitignore question **for the factual reference only** — the
+index and the topic chapters, plus `guides/`, `onboarding.md`,
+`logic/`, `mockup/` and `code-prefs.md`. `language` sets the generated
+docs' language. The user can change any key by editing the file or just
 telling you.
+
+## Local-only outputs — `<docs_dir>/.gitignore`
+
+Some outputs are personal working state and are **never committed**,
+whatever `docs_in_git` says: `features/` (the whole feature chain —
+interviews, specs, plans, review ledgers), every `*-interview.md`,
+`capstone.json`, `review.md`, and `changelog.md`. The initializer writes
+`<docs_dir>/.gitignore` listing exactly those; whenever you write into
+`<docs_dir>` and that file is absent, create it — the same idempotent
+initializer does both (`init-config.sh [docs_dir]` /
+`init-config.ps1 [docs_dir]`). The `.gitignore` itself is committed, so
+the rules travel with the repo.
+
+**`groom`, `plan`, and `implement` never commit the docs area.** They
+commit source code only — `implement`'s per-task commits name the paths
+the task touched and never `git add` `<docs_dir>` or `<index_file>`.
+Reference chapters that `implement`'s wrap refreshes are left staged or
+dirty for the repo's normal flow to handle, per `docs_in_git`.
 
 **`expertise` (1–5) calibrates every conversation with the user — never
 the generated docs**, which serve AI sessions and stay dense per
@@ -73,7 +99,7 @@ and leave `expertise` null.
    recommendations, grades, or comparisons. Sole exception: `review`,
    and only because the user explicitly invoked it.
 2. **Write only the configured docs area** — `<docs_dir>/*` plus the
-   index `<index_file>` (defaults: `docs/design/*` and `DESIGN.md`) and
+   index `<index_file>` (defaults: `docs/capstone/*` and `DESIGN.md`) and
    the config file. Never touch source code, `openspec/`, or
    human-authored docs. Sole exceptions: the `build` protocol (invoked
    directly or as `start`'s final stage) and the `implement` protocol
@@ -95,7 +121,7 @@ Everything a subcommand writes carries the topic-file frontmatter stamps
 refresh protocol applies; date-only outside git).
 
 **Index maintenance:** every file this plugin writes under
-`docs/design/` must be listed in `DESIGN.md` — topics in the topic
+`docs/capstone/` must be listed in `DESIGN.md` — topics in the topic
 index (chapterized filenames: `01-architecture.md` … `08-glossary.md`,
 so the folder reads in order even without the index), everything else
 (review, changelog, onboarding, code-prefs, implementation, guides/,

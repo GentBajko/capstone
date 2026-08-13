@@ -14,11 +14,13 @@ spec); a checksum mismatch is a voided approval — likewise `plan`.
 `plan_approved` with `plan.md` missing or truncated is a crash:
 re-run `plan`'s Phase B from the spec, then re-gate.
 
-**Resume:** if docs are committed, the feature's progress lives on
-its branch — check out the feature branch before reading `plan.md`'s
-boxes. If the branch's feature-interview frontmatter disagrees with
-the entry branch's copy (different approval keys), the newer approval
-governs: merge the docs forward before resuming.
+**Resume:** `features/` is gitignored (core.md's Local-only outputs), so
+the feature's progress lives in the working tree and is never
+branch-scoped — read `plan.md`'s boxes directly, whatever is checked
+out, and there is no docs copy to merge forward. The code those boxes
+describe IS branch-scoped, so confirm the checked-out branch is the one
+`base_commit` names before trusting a checked box; on a mismatch, say so
+and check the branch out rather than re-running its tasks.
 Walk the boxes in order: check off any unchecked step whose
 verification already passes, continue executing from the first one
 that doesn't. Never redo checked steps. Every box checked but
@@ -55,7 +57,8 @@ review until dry, and only Phase D finishes the branch.
 
 **Otherwise**: execute inline — tasks in order, steps exactly as
 written, every verification run and passing before its box is checked
-off in `plan.md`, one commit per task. Stop and ask instead of
+off in `plan.md`, one commit per task — naming the source paths that
+task touched, never `git add`-ing the docs area or the index. Stop and ask instead of
 guessing when a dependency is missing, a verification keeps failing,
 or an instruction can be read two ways. The checked boxes in `plan.md`
 are the durable progress record — check each as it passes, not in

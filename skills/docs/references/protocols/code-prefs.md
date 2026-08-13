@@ -5,13 +5,13 @@ of what the code currently does. The output is normative (the one other
 place besides `review` allowed to say "do X, never Y" — because every
 rule is the user's own recorded decision, not the skill's opinion).
 
-Interview state: `docs/design/code-prefs-interview.md` — same resumable
+Interview state: `docs/capstone/code-prefs-interview.md` — same resumable
 format as the other interviews (status frontmatter per core.md's
 Interview lifecycle, `### Q<n>` entries appended before the next
 question, and an `## Open questions` ledger seeded once with the nine
 Phase B domains as checkboxes, maintained by appends and toggles —
 never whole-file rewrites). Interview files are never indexed. Output:
-`docs/design/code-prefs.md` — indexed under Companion docs.
+`docs/capstone/code-prefs.md` — indexed under Companion docs.
 
 ## Phase A — setup / resume
 
@@ -20,7 +20,7 @@ ground the interview in whatever already exists — each source read
 lazily, only when the current question domain touches it, and only if
 present:
 
-- The conventions topic (`docs/design/03-conventions.md`): ask
+- The conventions topic (`docs/capstone/03-conventions.md`): ask
   preference questions as confirmations of observed reality ("the code
   currently uses exceptions everywhere — preference or accident?")
   rather than from scratch.
@@ -28,7 +28,7 @@ present:
   `05-dependencies.md`) or the `architecture` interview's decisions: the
   chosen stack scopes the library questions — ask about the libraries
   the project actually faces, not generic ones.
-- The mockup (`docs/design/mockup/README.md`): its scenarios inform
+- The mockup (`docs/capstone/mockup/README.md`): its scenarios inform
   testing and error-handling preferences (what must never break, what
   the user journey tolerates).
 
@@ -70,7 +70,7 @@ they do.
 
 ## Phase D — the output
 
-Write `docs/design/code-prefs.md`: frontmatter stamps (no
+Write `docs/capstone/code-prefs.md`: frontmatter stamps (no
 `paths_covered` — preferences don't go stale with code); banner
 "User-stated preferences — normative, not a description of current
 code."; rules organized by the domains above, each traceable to its

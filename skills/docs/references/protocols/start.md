@@ -4,15 +4,15 @@ Entry point when the user says just "capstone" or asks to start or
 continue the pipeline. Runs the interview chain in order, resuming
 wherever it stopped:
 
-1. `mockup` → `docs/design/mockup/` (+ `mockup-interview.md`)
-2. `logic` → `docs/design/logic/` (+ `logic-interview.md`)
+1. `mockup` → `docs/capstone/mockup/` (+ `mockup-interview.md`)
+2. `logic` → `docs/capstone/logic/` (+ `logic-interview.md`)
 3. `architecture` → the prescriptive reference
    (+ `architecture-interview.md`)
-4. `code-prefs` → `docs/design/code-prefs.md`
+4. `code-prefs` → `docs/capstone/code-prefs.md`
    (+ `code-prefs-interview.md`)
 5. `stack` → the researched, user-picked stack in `05-dependencies.md`
    (+ `stack-interview.md`)
-6. `build` → `docs/design/implementation.md`, then working code
+6. `build` → `docs/capstone/implementation.md`, then working code
    (+ `build-interview.md`)
 
 ## Procedure

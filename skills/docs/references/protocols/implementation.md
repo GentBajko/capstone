@@ -9,7 +9,7 @@ an existing feature's slug.
 
 1. Per core.md: read the config.
 2. Resolve the feature: match the argument against
-   `docs/design/features/*/` slugs and spec titles. No match → a new
+   `docs/capstone/features/*/` slugs and spec titles. No match → a new
    feature: next `<NN>`, a short kebab slug derived from the
    description. No argument → list existing features with their stage
    and ask which to continue (or offer a new one).

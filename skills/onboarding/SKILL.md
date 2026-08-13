@@ -1,6 +1,6 @@
 ---
 name: onboarding
-description: Use when asked for a new-contributor onboarding tour - an ordered reading path written to docs/design/onboarding.md.
+description: Use when asked for a new-contributor onboarding tour - an ordered reading path written to docs/capstone/onboarding.md.
 ---
 
 # Capstone: onboarding

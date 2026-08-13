@@ -1,6 +1,6 @@
 ---
 name: review
-description: Use when asked for an opinionated architecture review - severity-ranked findings with evidence, written to docs/design/review.md. Opt-in judgment.
+description: Use when asked for an opinionated architecture review - severity-ranked findings with evidence, written to docs/capstone/review.md. Opt-in judgment.
 ---
 
 # Capstone: review

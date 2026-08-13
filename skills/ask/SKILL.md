@@ -1,6 +1,6 @@
 ---
 name: ask
-description: Use when asking an architecture question the docs/design reference can answer - cited Q&A, refreshing stale topics first.
+description: Use when asking an architecture question the docs/capstone reference can answer - cited Q&A, refreshing stale topics first.
 ---
 
 # Capstone: ask

@@ -151,7 +151,17 @@ for n in check-docs ask; do
     || err "protocol $n.md lacks its explicit changelog exemption"
 done
 
-# 12. bash syntax of every .sh
+# 12. the local-only ignore list is identical in both initializers and
+#     documented in core.md (hand-synced across three files)
+for r in 'features/' '\*-interview.md' 'capstone.json' 'review.md' 'changelog.md'; do
+  for f in skills/docs/scripts/init-config.sh skills/docs/scripts/init-config.ps1; do
+    grep -q "^$r$" "$f" || err "$f ignore template missing rule $r"
+  done
+done
+grep -q 'Local-only outputs' skills/docs/references/core.md \
+  || err "core.md has no Local-only outputs section"
+
+# 13. bash syntax of every .sh
 for s in skills/docs/scripts/*.sh; do
   bash -n "$s" 2>/dev/null || err "bash syntax error in $s"
 done

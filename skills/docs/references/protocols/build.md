@@ -5,9 +5,9 @@ first, then frontend. With `implement`, one of the **two commands
 allowed to write source code** (core.md hard rule 2) — and only after
 its plan gate.
 
-State: `docs/design/build-interview.md` (standard lifecycle per
+State: `docs/capstone/build-interview.md` (standard lifecycle per
 core.md; `formalized` here means the walking-skeleton slice runs).
-Plan output: `docs/design/implementation.md` (companion, indexed).
+Plan output: `docs/capstone/implementation.md` (companion, indexed).
 Prerequisite: if `stack-interview.md` is not `formalized`, execute
 `protocols/stack.md` first — `05-dependencies.md` existing is not
 enough, since the architecture stage writes a draft of it too.
@@ -20,13 +20,13 @@ restart finished steps.
 
 ## Phase A — implementation research
 
-Read everything: the index and chapters, `docs/design/logic/`,
-`docs/design/mockup/`, `docs/design/code-prefs.md`, and the stack
+Read everything: the index and chapters, `docs/capstone/logic/`,
+`docs/capstone/mockup/`, `docs/capstone/code-prefs.md`, and the stack
 chapter. Research — web search when available — how the chosen pieces
 actually connect: scaffold conventions for the chosen framework,
 integration patterns between the picks (auth ↔ framework, ORM ↔
 database, deploy target), official quickstarts for anything unfamiliar.
-Then write `docs/design/implementation.md`:
+Then write `docs/capstone/implementation.md`:
 
 - The module/file layout to create — backend tree, then frontend tree.
 - Per component: what it does, its key files, and real code sketches

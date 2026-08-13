@@ -25,7 +25,7 @@ files, so wherever skills work, this works.
 ## The docs
 
 `/capstone:docs` on an existing repo produces a `DESIGN.md` index and
-eight numbered chapters in `docs/design/`:
+eight numbered chapters in `docs/capstone/`:
 
 ```
 01-architecture.md   layers, boundaries, entry points, dispatch tables
@@ -145,7 +145,7 @@ round — until two consecutive rounds find nothing new. Only then does
 it refresh the affected chapters, so the reference records what was
 actually built.
 
-Everything persists under `docs/design/features/<NN>-<slug>/`, so a
+Everything persists under `docs/capstone/features/<NN>-<slug>/`, so a
 dead session resumes mid-chain exactly where it stopped.
 
 ## Who it's for
@@ -164,13 +164,13 @@ session, and stop guessing wrong about it.
 
 ## Settings
 
-First run creates `docs/design/capstone.json` with every key spelled
+First run creates `docs/capstone/capstone.json` with every key spelled
 out:
 
 ```json
 {
   "expertise": null,
-  "docs_dir": "docs/design",
+  "docs_dir": "docs/capstone",
   "index_file": "DESIGN.md",
   "subagent_threshold": 150,
   "docs_in_git": "ask",
@@ -182,8 +182,14 @@ out:
 `expertise` is 1 to 5 as above. It starts `null` so the first
 interactive command asks once, saves your answer, and never asks again.
 `docs_in_git` set to `"commit"` or `"ignore"` skips the question about
-whether generated docs belong in version control, which also makes
-headless runs possible. `subagent_threshold` is the source-file count
+whether the generated docs belong in version control, which also makes
+headless runs possible — it governs the factual reference only. Some
+outputs are personal working state and are never committed whatever it
+says: `features/` (the whole `groom` → `plan` → `implement` chain),
+every `*-interview.md`, `capstone.json`, `review.md`, and
+`changelog.md`. Capstone writes `docs/capstone/.gitignore` listing
+exactly those, and the feature chain never commits the docs area at all
+— it commits source code only. `subagent_threshold` is the source-file count
 above which `docs` fans out parallel subagents instead of reading
 everything itself. `pipeline` records the answer to the one-time
 question `start` asks on repos that already have code: pipeline or
@@ -257,7 +263,7 @@ ARGUMENTS: $ARGUMENTS
 | `/capstone:code-prefs` | Interview 4, standalone |
 | `/capstone:stack` | Research libraries and services per capability, with pros/cons and pricing; you pick |
 | `/capstone:build` | Implementation plan (backend, then frontend), your approval, then working code — via superpowers when installed |
-| `/capstone:groom <feature>` | Doc-grounded feature interview → a traceable spec in `docs/design/features/` |
+| `/capstone:groom <feature>` | Doc-grounded feature interview → a traceable spec in `docs/capstone/features/` |
 | `/capstone:plan <feature>` | Task-by-task TDD plan from the groomed spec; you approve before any code |
 | `/capstone:implement <feature>` | Execute the approved plan into code, review until dry, then refresh the affected chapters |
 | `/capstone:implementation <desc>` | The feature chain: groom → plan → implement, resuming at the first unfinished stage |

@@ -1,6 +1,6 @@
 ---
 name: check-docs
-description: Use when asking if the architecture docs (DESIGN.md/docs/design) are still current - read-only staleness and pointer-drift report.
+description: Use when asking if the architecture docs (DESIGN.md/docs/capstone) are still current - read-only staleness and pointer-drift report.
 ---
 
 # Capstone: check-docs

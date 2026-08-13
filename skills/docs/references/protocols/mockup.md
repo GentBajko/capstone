@@ -15,7 +15,7 @@ when nothing remains that would change the mockup.
 
 ## Phase A — setup / resume
 
-State lives in `docs/design/mockup-interview.md`, same resumable format
+State lives in `docs/capstone/mockup-interview.md`, same resumable format
 as `architecture`'s interview file (status frontmatter per core.md's
 Interview lifecycle, numbered `### Q<n>` entries with question, answer
 as given, and normalized decision, plus an `## Open threads` ledger:
@@ -59,7 +59,7 @@ formalizes or amends; do not generate until they do.
 
 ## Phase E — the mockup
 
-On formalization, write `docs/design/mockup/` as **chapterized
+On formalization, write `docs/capstone/mockup/` as **chapterized
 markdown — no HTML anywhere**. One file per screen the scenarios imply,
 numbered in journey order (`01-<screen>.md`, `02-<screen>.md`, …), each
 with frontmatter naming the scenario(s) it serves and the `§Q` entries

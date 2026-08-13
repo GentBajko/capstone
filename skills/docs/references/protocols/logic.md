@@ -6,15 +6,15 @@ first, until a developer could implement it without inventing a single
 rule. Like `code-prefs`, the output is normative but records only the
 user's own stated decisions.
 
-Interview state: `docs/design/logic-interview.md` (same resumable
-format; never indexed). Output: `docs/design/logic/` — one chapterized
+Interview state: `docs/capstone/logic-interview.md` (same resumable
+format; never indexed). Output: `docs/capstone/logic/` — one chapterized
 file per scenario (`01-<scenario>.md`, `02-…`), the folder indexed under
 Companion docs.
 
 ## Phase A — setup / resume
 
 Resume from the interview file if present. Build the scenario list:
-from `docs/design/mockup/README.md` and `mockup-interview.md` if they
+from `docs/capstone/mockup/README.md` and `mockup-interview.md` if they
 exist (each journey/screen flow is a candidate scenario — confirm the
 list with the user); otherwise elicit it ("walk me through everything a
 user can do, headline by headline"). Order by importance and record the
@@ -53,7 +53,7 @@ Per scenario, cover until nothing is left to invent:
 
 When a scenario has nothing left to invent, present its summary, get
 the user's confirmation ("laid bare?"), then write
-`docs/design/logic/<NN>-<scenario>.md` immediately — sections exactly
+`docs/capstone/logic/<NN>-<scenario>.md` immediately — sections exactly
 as the bullets above, every rule traceable to its `§Q` entry — append
 that scenario's changelog entry per core.md's ledger (key
 `logic/<NN>-<scenario>@Q<n>`, `<n>` the highest `§Q` the scenario file
@@ -75,7 +75,7 @@ discovered — surface them as questions, not verdicts. If the user stops
 earlier, leave status as `interviewing`; the pipeline treats pending
 scenarios as in-progress.
 
-**Consumers:** `architecture` reads `docs/design/logic/` to pre-fill models
+**Consumers:** `architecture` reads `docs/capstone/logic/` to pre-fill models
 (entities, invariants, consistency needs), data-flow (lifecycles), and
 quality-attribute scenarios — never re-asking what a scenario file
 answers.

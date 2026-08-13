@@ -15,17 +15,17 @@ as a question or an explicitly-confirmed default, not silently adopted.
 Read `../interview.md` in full before asking the first question; its
 Conduct rules section governs the whole interview. Then check for
 upstream artifacts — each read only if it exists:
-`docs/design/code-prefs.md`, `docs/design/logic/` (the business-logic
+`docs/capstone/code-prefs.md`, `docs/capstone/logic/` (the business-logic
 scenario files — they pre-fill models: entities, invariants,
 consistency needs; data-flow: lifecycles; and quality-attribute
-scenarios), `docs/design/mockup-interview.md`, and the mockup itself
-(`docs/design/mockup/README.md`, plus individual screens when a
+scenarios), `docs/capstone/mockup-interview.md`, and the mockup itself
+(`docs/capstone/mockup/README.md`, plus individual screens when a
 question touches the flows they depict). Record everything they answer
 as derived decisions — never re-ask it.
 
 ## Phase A — setup / resume
 
-The interview state lives in `docs/design/architecture-interview.md`.
+The interview state lives in `docs/capstone/architecture-interview.md`.
 If it exists, read it and resume — never re-ask an answered question.
 If not, create it, **seeding `## Open questions` once** as a
 section-granularity checkbox ledger (about 20 lines, one box per

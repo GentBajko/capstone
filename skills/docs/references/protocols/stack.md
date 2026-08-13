@@ -5,7 +5,7 @@ needs into concrete, user-picked libraries, packages, and paid services
 — with real research, options, and trade-offs, not defaults from
 memory.
 
-Interview state: `docs/design/stack-interview.md` (standard lifecycle
+Interview state: `docs/capstone/stack-interview.md` (standard lifecycle
 per core.md, ledger seeded with the capability list). Output:
 `05-dependencies.md` written or updated (`mode: prescriptive` while no
 code exists) with the chosen stack.
@@ -14,7 +14,7 @@ code exists) with the chosen stack.
 
 Read the reference (especially `05-dependencies.md`,
 `01-architecture.md`, `04-data-flow.md`, `07-operations.md`),
-`docs/design/logic/`, and `docs/design/code-prefs.md`. List every
+`docs/capstone/logic/`, and `docs/capstone/code-prefs.md`. List every
 capability the design needs a concrete pick for — typically: database,
 cache, auth, payments, email/notifications, file storage, background
 jobs, search, UI framework/component kit, state management, testing

@@ -1,6 +1,6 @@
 ---
 name: guides
-description: Use when asked for how-to runbooks (run locally, deploy, project workflows) written to docs/design/guides/.
+description: Use when asked for how-to runbooks (run locally, deploy, project workflows) written to docs/capstone/guides/.
 ---
 
 # Capstone: guides
