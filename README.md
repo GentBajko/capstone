@@ -1,7 +1,7 @@
 # Capstone
 
 Architecture docs your AI agent reads instead of re-exploring the repo
-every session — stamped to commits, refreshed only where the code
+every session. Stamped to commits, refreshed only where the code
 moved. For new projects, an interview pipeline that designs the whole
 thing before building it.
 
@@ -24,6 +24,36 @@ Any other agent (70+ via the skills CLI): `npx skills add GentBajko/capstone`
 
 Works in Claude Code, Copilot CLI, Gemini CLI, Antigravity, and
 OpenCode. Plain `SKILL.md` files, MIT.
+
+<details>
+<summary>All commands</summary>
+
+| Command | What it does |
+| --- | --- |
+| `/capstone:start` | The pipeline: mockup → logic → design → architecture → code-prefs → stack → build, resuming at the first unfinished stage |
+| `/capstone:generate` | Build the reference from scratch (`rebuild` forces, a topic name targets one chapter) |
+| `/capstone:sync` | Refresh what drifted; `sync check` is the read-only trust report |
+| `/capstone:doctor` | Diagnose and repair the docs area: torn writes, index drift, voided approvals, absorption gaps |
+| `/capstone:ask <question>` | Answer from the docs, with citations |
+| `/capstone:changelog [<ref>]` | Architecture-level change history since a ref, plus the append-only ledger every writing command records itself in |
+| `/capstone:be-review` | The opt-in judgment: architecture and backend findings, ranked with evidence |
+| `/capstone:fe-review` | The opt-in UI judgment: improvements graded against your own design docs, via impeccable/design-taste when installed |
+| `/capstone:guides [<task>]` | Runbooks: run locally, deploy, plus workflows mined from your repo's patterns |
+| `/capstone:onboarding` | A reading path for someone's first day in the codebase |
+| `/capstone:mockup` | Interview 1, standalone |
+| `/capstone:logic` | Interview 2, standalone |
+| `/capstone:design` | Interview 3, standalone: the frontend design (direction, tokens, per-screen chapters) |
+| `/capstone:architecture` | Interview 4, standalone |
+| `/capstone:code-prefs` | Interview 5, standalone |
+| `/capstone:stack` | Research libraries and services per capability, with pros/cons and pricing; you pick (`refresh` re-vets recorded picks) |
+| `/capstone:build` | Implementation plan (backend, then frontend), your approval, then working code, via superpowers when installed |
+| `/capstone:groom <feature>` | Doc-grounded feature interview → a traceable spec in `docs/capstone/features/` |
+| `/capstone:plan <feature>` | Task-by-task TDD plan from the groomed spec; you approve before any code |
+| `/capstone:implement <feature>` | Execute the approved plan into code, review until dry, then refresh the affected chapters |
+| `/capstone:implementation <desc>` | The feature chain: groom → plan → implement, resuming at the first unfinished stage |
+| `/capstone:help` | Usage. In Claude Code a hook answers this before the model is invoked, so it costs zero tokens |
+
+</details>
 
 <details>
 <summary>What do the generated docs look like?</summary>
@@ -63,34 +93,34 @@ artifact (a PRD, screenshots) and pre-fills what it answers. On
 existing codebases, `logic` and `design` run in reverse: they draft
 from the observed code and you confirm.
 
-**mockup** — product discovery. Three fixed questions, then every
+**mockup**. Product discovery. Three fixed questions, then every
 question after that is generated from your answers until nothing is
 left to invent. One file per screen: ASCII wireframe, exact copy and
 behavior, the empty/error/success states. No visual UI? It records
 your surfaces (api, cli) and the design stage skips itself.
 
-**logic** — one scenario at a time, walked until a developer could
+**logic**. One scenario at a time, walked until a developer could
 implement it without inventing a single rule: exact steps, real
 formulas, what happens when the payment fails or the user clicks
 twice. The part of a spec everyone skips and then pays for.
 
-**design** — how it looks and feels: a design read, the visual world,
+**design**. How it looks and feels: a design read, the visual world,
 the tokens, each screen's composition and states. Runs the
 `impeccable` and `design-taste-frontend` skills when installed,
 vendored distillations of both otherwise. Output: a direction
 contract, a design-system chapter `stack` honors, one file per screen
 for `build` to implement.
 
-**architecture** — the big interview. Done only when every section of
+**architecture**. The big interview. Done only when every section of
 the future docs is answerable from your recorded decisions. Writes
 the same eight chapters, marked prescriptive; once code exists,
 `sync` replaces intent with observation.
 
-**code-prefs** — how you want code written: typing strictness,
+**code-prefs**. How you want code written: typing strictness,
 library versus hand-rolled, error handling, what an AI must never do
 in your repo. Also a decent starting point for a CLAUDE.md.
 
-**stack, then build** — `stack` researches real options per
+**stack, then build**. `stack` researches real options per
 capability, licenses and prices included; you pick, and
 `stack refresh` re-vets the picks months later. `build` writes an
 implementation plan, stops for your approval, then writes the code,
@@ -217,40 +247,6 @@ invoke capstone:<that skill> with the remaining arguments.
 
 ARGUMENTS: $ARGUMENTS
 ```
-
-</details>
-
-<details>
-<summary>All commands</summary>
-
-| Command | What it does |
-| --- | --- |
-| `/capstone:start` | The pipeline: mockup → logic → design → architecture → code-prefs → stack → build, resuming at the first unfinished stage |
-| `/capstone:generate` | Build the reference from scratch (`rebuild` forces, a topic name targets one chapter) |
-| `/capstone:sync` | Refresh what drifted; `sync check` is the read-only trust report |
-| `/capstone:doctor` | Diagnose and repair the docs area: torn writes, index drift, voided approvals, absorption gaps |
-| `/capstone:ask <question>` | Answer from the docs, with citations |
-| `/capstone:changelog [<ref>]` | Architecture-level change history since a ref, plus the append-only ledger every writing command records itself in |
-| `/capstone:be-review` | The opt-in judgment: architecture and backend findings, ranked with evidence |
-| `/capstone:fe-review` | The opt-in UI judgment: improvements graded against your own design docs, via impeccable/design-taste when installed |
-| `/capstone:guides [<task>]` | Runbooks: run locally, deploy, plus workflows mined from your repo's patterns |
-| `/capstone:onboarding` | A reading path for someone's first day in the codebase |
-| `/capstone:mockup` | Interview 1, standalone |
-| `/capstone:logic` | Interview 2, standalone |
-| `/capstone:design` | Interview 3, standalone: the frontend design (direction, tokens, per-screen chapters) |
-| `/capstone:architecture` | Interview 4, standalone |
-| `/capstone:code-prefs` | Interview 5, standalone |
-| `/capstone:stack` | Research libraries and services per capability, with pros/cons and pricing; you pick (`refresh` re-vets recorded picks) |
-| `/capstone:build` | Implementation plan (backend, then frontend), your approval, then working code, via superpowers when installed |
-| `/capstone:groom <feature>` | Doc-grounded feature interview → a traceable spec in `docs/capstone/features/` |
-| `/capstone:plan <feature>` | Task-by-task TDD plan from the groomed spec; you approve before any code |
-| `/capstone:implement <feature>` | Execute the approved plan into code, review until dry, then refresh the affected chapters |
-| `/capstone:implementation <desc>` | The feature chain: groom → plan → implement, resuming at the first unfinished stage |
-| `/capstone:help` | Usage. In Claude Code a hook answers this before the model is invoked, so it costs zero tokens |
-
-Renamed in 3.0: `docs` split into `generate` and `sync`; `check-docs`
-became `sync check`. In 3.1, `review` became `be-review` and
-`fe-review` joined it.
 
 </details>
 
