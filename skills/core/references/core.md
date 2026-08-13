@@ -61,7 +61,9 @@ file or just telling you.
 Some outputs are personal working state and are **never committed**,
 whatever `docs_in_git` says: `features/` (the whole feature chain —
 interviews, specs, plans, review ledgers), every `*-interview.md`,
-`capstone.json`, `review.md`, and `changelog.md`. The initializer writes
+`capstone.json`, `be-review.md`, `fe-review.md`, and `changelog.md`
+(plus any legacy `review.md`). The
+initializer writes
 `<docs_dir>/.gitignore` listing exactly those; whenever you write into
 `<docs_dir>` and that file is absent, create it — the same idempotent
 initializer does both (`init-config.sh [docs_dir]` /
@@ -86,10 +88,22 @@ style.md regardless:
    translate ("roughly how many people at once?") and derive the
    technical targets yourself, recording them as derived decisions.
    This overrides the interview conduct rules' quantification demands:
-   the numbers still get recorded, but you compute them.
+   the numbers still get recorded, but you compute them. While
+   working — any stage, not just interviews — narrate each meaningful
+   step in one or two plain sentences: what is being done and why it
+   matters to the product ("I'm writing down checkout's rules now so
+   the code we build later can't get them wrong"). When a stage
+   finishes, say in plain words what now exists and what comes next.
+   Narration is conversation only; the generated docs stay dense per
+   style.md.
 2. **explorer** — as 1, but introduce the proper term alongside each
    plain explanation and add short why-it-matters notes; teach while
-   asking.
+   asking. The working narration teaches too: name the proper term
+   for what just happened and the one transferable idea behind it
+   ("this file is a 'migration' — a script that changes the
+   database's shape without losing its data"). One concept per step;
+   the user is here to learn the craft, never to sit through a
+   lecture.
 3. **builder** (default) — normal technical vocabulary; recommended
    option first with one-line trade-offs.
 4. **engineer** — terse; jargon unexplained; ask for numbers directly
@@ -98,7 +112,8 @@ style.md regardless:
    challenge weak or inconsistent answers; the user drives, you record.
 
 If `expertise` is null or missing and the task is interactive (any
-interview, `ask`, `onboarding`, `review`), ask ONE question — "How
+interview, `ask`, `onboarding`, `be-review`, `fe-review`), ask ONE
+question — "How
 technical should I be with you?" with the five levels — then write the
 answer into the config file (creating it with all keys if needed), and
 never ask again. Non-interactive runs behave as level 3 without asking
@@ -114,11 +129,32 @@ remains. One-way doors (irreversible decisions per `interview.md`'s
 conduct rules) are never taken from an artifact silently — each is
 re-confirmed individually.
 
+**Delegation installs:** when a protocol names an optional
+method-source skill that is not installed, offer — once per run,
+interactive runs only — to install it before falling back: name the
+skill, the one-line gain, and the exact command; on yes, run it,
+confirm the skill list picks it up, and proceed delegated. On no (or
+non-interactive), take the protocol's fallback without comment.
+Verified installers:
+
+- `impeccable`: `npx skills add pbakaus/impeccable`
+- `design-taste-frontend`: `npx skills add Leonxlnx/taste-skill`
+- `improve-codebase-architecture` / `codebase-design` /
+  `code-review`: `npx skills add mattpocock/skills -s <skill> -g -y`
+- superpowers (a plugin, not a skill):
+  `claude plugin marketplace add obra/superpowers-marketplace`, then
+  `claude plugin install superpowers@superpowers-marketplace`
+- anything else: resolve the source via `npx skills find <name>` or
+  the skill's documented installer and show the user what was found —
+  never guess an install command; a wrong source runs someone else's
+  code.
+
 ## Hard rules
 
 1. **Describe, never judge** — facts with `file:line` pointers; no
-   recommendations, grades, or comparisons. Sole exception: `review`,
-   and only because the user explicitly invoked it.
+   recommendations, grades, or comparisons. Sole exceptions:
+   `be-review` and `fe-review`, and only because the user explicitly
+   invoked them.
 2. **Write only the configured docs area** — `<docs_dir>/*` plus the
    index `<index_file>` (defaults: `docs/capstone/*` and `DESIGN.md`) and
    the config file. Never touch source code, `openspec/`, or
@@ -148,7 +184,7 @@ anything else:
 
 1. **Own state first.** A protocol with an interview or state file
    reads it before anything else; a protocol whose prior outputs
-   exist (`design/`, `logic/`, `spec.md`, `review.md`, …) reads them
+   exist (`design/`, `logic/`, `spec.md`, `be-review.md`, …) reads them
    before regenerating or extending — never write blind over your own
    docs.
 2. **Discovery through the index, never by globbing.**
@@ -158,7 +194,7 @@ anything else:
    where and how; open source only where a chapter is stamped stale,
    labels its coverage shallow, or exact lines must be named.
 4. **Refresh-before-trust only where the protocol says so** (groom's
-   staleness pass, ask's step 2, review's step 1); everywhere else
+   staleness pass, ask's step 2, be-review's step 1); everywhere else
    read as-is and note the stamps.
 5. **Never re-read** what is already in context this session unless
    it changed on disk.
@@ -249,8 +285,9 @@ straight to `formalized` once every listed scenario is `written` or
 (`protocols/start.md`) keys stage completion on these rules.
 
 Voice: `sync check`/`ask`/`changelog` are facts only — including the
-changelog entries other stages append, `review`'s among them. `review` is the
-one opinionated output. `code-prefs`, `logic`, `design`, `stack`, and
+changelog entries other stages append, the two reviews' among them.
+`be-review` and `fe-review` are the opinionated outputs.
+`code-prefs`, `logic`, `design`, `stack`, and
 `groom`'s `spec.md` are normative but only record the user's own stated
 decisions (`logic` and `design` in extraction mode are descriptive like
 the chapters — observed fact, hard rule 1 in full); `build`'s `implementation.md` and `plan`'s `plan.md` are

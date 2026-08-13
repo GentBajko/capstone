@@ -141,8 +141,8 @@ fi
 #     ones say so, and the old opt-in is gone (core.md hard rule 5 is
 #     only as good as its sites)
 for n in groom plan implement mockup logic design architecture \
-         code-prefs stack build review guides onboarding generate sync \
-         doctor; do
+         code-prefs stack build be-review fe-review guides onboarding \
+         generate sync doctor; do
   grep -q 'changelog entry' "skills/core/references/protocols/$n.md" \
     || err "protocol $n.md has no changelog-entry step"
 done
@@ -159,7 +159,7 @@ done
 
 # 12. the local-only ignore list is identical in both initializers and
 #     documented in core.md (hand-synced across three files)
-for r in 'features/' '\*-interview.md' 'capstone.json' 'review.md' 'changelog.md'; do
+for r in 'features/' '\*-interview.md' 'capstone.json' 'review.md' 'be-review.md' 'fe-review.md' 'changelog.md'; do
   for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
     grep -q "^$r$" "$f" || err "$f ignore template missing rule $r"
   done

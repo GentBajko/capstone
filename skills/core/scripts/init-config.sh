@@ -94,6 +94,8 @@ capstone.json
 
 # Opinionated and personal outputs
 review.md
+be-review.md
+fe-review.md
 changelog.md
 EOF
   echo "created: $IGNORE"

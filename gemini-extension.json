@@ -1,6 +1,6 @@
 {
   "name": "capstone",
-  "description": "Architecture reference docs: DESIGN.md + docs/capstone/ topic files stamped to commits, kept current by generate/sync (formerly docs/check-docs), plus doctor/ask/changelog/review/guides/onboarding, a greenfield pipeline from product mockup to running code with a frontend-design stage, and a doc-grounded feature chain.",
-  "version": "3.0.1",
+  "description": "Architecture reference docs: DESIGN.md + docs/capstone/ topic files stamped to commits, kept current by generate/sync (formerly docs/check-docs), plus doctor/ask/changelog/be-review/fe-review/guides/onboarding, a greenfield pipeline from product mockup to running code with a frontend-design stage, and a doc-grounded feature chain.",
+  "version": "3.1.0",
   "contextFileName": "GEMINI.md"
 }

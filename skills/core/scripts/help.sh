@@ -21,7 +21,8 @@ Usage: /capstone:<command>
   doctor               Verify and repair the docs area: torn writes, index
                        drift, voided approvals, absorption gaps
   ask <question>       Answer an architecture question from the docs, with citations
-  review               Opt-in judgment: prioritized improvement report -> review.md
+  be-review            Opt-in judgment: architecture/backend findings -> be-review.md
+  fe-review            Opt-in judgment: UI improvements vs your own design docs -> fe-review.md
   changelog [<ref>]    Architectural change history since <ref> -> changelog.md
   guides [<task>]      How-to guides: run-locally, deploy, project workflows
   onboarding           Guided reading path for new contributors -> onboarding.md
@@ -45,7 +46,7 @@ Usage: /capstone:<command>
 
 Output: DESIGN.md (root index) + docs/capstone/*.md topic files, each stamped
 with the commit it was derived at. `sync` refreshes only what drifted.
-Docs are strictly descriptive; only `review` judges.
+Docs are strictly descriptive; only be-review and fe-review judge.
 Every command that writes records itself in docs/capstone/changelog.md.
 
 Interview commands accept an optional artifact argument (a PRD, notes,

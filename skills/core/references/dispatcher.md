@@ -8,7 +8,8 @@ protocol files.
 1. Read `core.md` (same directory) first — hard rules, voice, and
    user config.
 2. Route on the first argument. The reserved subcommand words
-   (`generate`, `sync`, `doctor`, `ask`, `changelog`, `review`, `guides`,
+   (`generate`, `sync`, `doctor`, `ask`, `changelog`, `be-review`,
+   `fe-review`, `guides`,
    `onboarding`, `mockup`, `logic`, `design`, `architecture`,
    `code-prefs`, `stack`, `build`, `groom`, `plan`, `implement`,
    `implementation`, `start`) each route to `protocols/<name>.md` —

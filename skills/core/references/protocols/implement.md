@@ -50,7 +50,9 @@ user before Task 1, batched, not one interrupt per discovery mid-run.
 ## Phase B — execute
 
 **If the superpowers plugin is available** (its skills appear in your
-skill list): hand off — the spec and plan ARE superpowers' spec and
+skill list — missing on an interactive run, offer its install per
+core.md's Delegation installs first): hand off — the spec and plan
+ARE superpowers' spec and
 plan, so skip its brainstorming and writing-plans stages and execute
 `plan.md` via `superpowers:subagent-driven-development` (recommended)
 or `superpowers:executing-plans`, whichever the user picks. As each

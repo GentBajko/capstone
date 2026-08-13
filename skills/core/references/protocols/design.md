@@ -49,6 +49,9 @@ recorded in the interview file stand whichever source asked them:
   and the rulings where the two skills disagree) and §8 (the split
   pre-flight) apply.
 
+A named skill missing on an interactive run → offer its install per
+core.md's Delegation installs before taking the fallback.
+
 Conversation cadence is capstone's whatever the source: one question
 per turn, expertise-calibrated per core.md (level 1 hears "calm or
 bold?", never "what DESIGN_VARIANCE?"); impeccable's decision page

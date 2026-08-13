@@ -123,7 +123,7 @@ paths_covered:
    - Module map with `file:line` entry-point pointers.
    - Index table `| Topic | File | Commit | Generated |`, plus absent
      topics with their reasons.
-   - If companion docs exist (`review.md`, `changelog.md`,
+   - If companion docs exist (`be-review.md`, `fe-review.md`, `changelog.md`,
      `onboarding.md`, `code-prefs.md`, `implementation.md`,
      `guides/`, `logic/`, `mockup/`, `design/`, `features/`), list
      them in a separate "Companion docs" table below the topic
@@ -143,7 +143,8 @@ paths_covered:
    the actual source.
 3. Report to the user: files written, topics skipped or absent and
    why.
-4. The local-only outputs (`features/`, interviews, `review.md`,
+4. The local-only outputs (`features/`, interviews, `be-review.md`,
+   `fe-review.md`,
    `changelog.md`, `capstone.json`) are already covered by
    `<docs_dir>/.gitignore` — this question is only about the factual
    reference. If those generated files are untracked and not covered

@@ -67,7 +67,9 @@ frontmatter — Phase C's coding sessions resume against it.
 ## Phase C — write the code
 
 **If the superpowers plugin is available** (its skills appear in your
-skill list): hand off — invoke `superpowers:writing-plans` with
+skill list — missing on an interactive run, offer its install per
+core.md's Delegation installs first): hand off — invoke
+`superpowers:writing-plans` with
 `implementation.md` plus the reference as the spec (capstone's docs ARE
 the spec; skip superpowers' brainstorming), then execute the resulting
 plan via whichever superpowers execution flow the user picks

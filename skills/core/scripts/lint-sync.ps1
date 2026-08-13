@@ -142,7 +142,7 @@ if ($InGit) {
 # 11. every writing protocol carries its changelog pointer, the exempt
 #     ones say so, and the old opt-in is gone
 foreach ($n in @('groom', 'plan', 'implement', 'mockup', 'logic', 'design',
-    'architecture', 'code-prefs', 'stack', 'build', 'review', 'guides',
+    'architecture', 'code-prefs', 'stack', 'build', 'be-review', 'fe-review', 'guides',
     'onboarding', 'generate', 'sync', 'doctor')) {
   if (-not (Select-String -Path "skills/core/references/protocols/$n.md" -Pattern 'changelog entry' -SimpleMatch -Quiet)) {
     Err "protocol $n.md has no changelog-entry step"
@@ -162,7 +162,7 @@ foreach ($n in @('ask')) {
 
 # 12. the local-only ignore list is identical in both initializers and
 #     documented in core.md (hand-synced across three files)
-foreach ($r in @('features/', '*-interview.md', 'capstone.json', 'review.md', 'changelog.md')) {
+foreach ($r in @('features/', '*-interview.md', 'capstone.json', 'review.md', 'be-review.md', 'fe-review.md', 'changelog.md')) {
   foreach ($f in @('skills/core/scripts/init-config.sh', 'skills/core/scripts/init-config.ps1')) {
     if (-not (Select-String -Path $f -Pattern "^$([regex]::Escape($r))$" -Quiet)) {
       Err "$f ignore template missing rule $r"

@@ -6,8 +6,8 @@ domain: `03-conventions.md`; the index plus `01-architecture.md` and
 `mockup/README.md` — never bulk-read upfront.
 
 Elicits how the user **wants** code written in this project — independent
-of what the code currently does. The output is normative (the one other
-place besides `review` allowed to say "do X, never Y" — because every
+of what the code currently does. The output is normative (allowed,
+like the reviews, to say "do X, never Y" — because every
 rule is the user's own recorded decision, not the skill's opinion).
 
 Interview state: `docs/capstone/code-prefs-interview.md` — same resumable
@@ -92,5 +92,5 @@ core.md's Interview lifecycle), and suggest — never do unasked —
 seeding the project's `AGENTS.md`/`CLAUDE.md` from it.
 
 **Consumers:** the `architecture` interview pre-fills its conventions answers
-from this file and never re-asks; `review` gains a
+from this file and never re-asks; `be-review` gains a
 preference-divergence dimension when this file exists.

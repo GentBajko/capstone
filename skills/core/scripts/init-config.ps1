@@ -100,6 +100,8 @@ capstone.json
 
 # Opinionated and personal outputs
 review.md
+be-review.md
+fe-review.md
 changelog.md
 '@
   Write-Utf8NoBom $Ignore ($Rules + "`n")
