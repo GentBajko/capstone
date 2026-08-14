@@ -96,16 +96,32 @@ for p in skills/core/references/protocols/*.md; do
   printf '%s' "$ROUTELIST" | grep -q "\`$n\`" || err "dispatcher.md routing list missing $n"
 done
 
-# 6. hook wiring: matcher == script guard == existing skill
+# 6. hook wiring: matcher == script guard == existing skill, and the
+#    install-time global-config hook is in place
 grep -q '"matcher": "capstone:help"' hooks/hooks.json || err "hooks.json matcher is not capstone:help"
 grep -q '"command_name":"capstone:help"' skills/core/scripts/help-hook.sh || err "help-hook.sh guard string wrong"
 grep -q 'skills/core/scripts/help-hook.sh' hooks/hooks.json || err "hooks.json does not point at help-hook.sh"
+grep -q 'CLAUDE_CODE_ENTRYPOINT' skills/core/scripts/help-hook.sh \
+  || err "help-hook.sh lost its terminal-only guard (GUI surfaces swallow block reasons)"
+grep -q '"SessionStart"' hooks/hooks.json || err "hooks.json has no SessionStart hook"
+grep -q 'init-config.sh --global' hooks/hooks.json || err "hooks.json SessionStart does not run init-config.sh --global"
 
-# 7. config template keys identical everywhere they appear
+# 7. config template keys identical everywhere they appear: the global
+#    template's keys in both initializers, core.md, and README; the
+#    project-scoped keys (never in the global template) documented in
+#    core.md and README
 for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1 \
          skills/core/references/core.md README.md; do
-  for k in expertise docs_dir index_file subagent_threshold docs_in_git language pipeline workspaces; do
+  for k in expertise teaching_mode docs_dir index_file subagent_threshold docs_in_git language; do
     grep -q "\"$k\"" "$f" || err "$f config template missing key $k"
+  done
+  for k in pipeline workspaces; do
+    grep -q "\"$k\"" "$f" && err "$f global template carries project-scoped key $k"
+  done
+done
+for f in skills/core/references/core.md README.md; do
+  for k in pipeline workspaces; do
+    grep -q "\`$k\`" "$f" || err "$f does not document project-scoped config key $k"
   done
 done
 

@@ -163,9 +163,10 @@ source: your recorded decisions outrank generic best practice.
 Yes. Set `expertise: 1` and everything happens in plain language:
 capstone asks how many people might use the thing rather than what
 your p99 latency budget is, derives the technical targets itself, and
-confirms them in words you can sanity-check. It also narrates what
-it's doing and why as it works; level 2 adds the proper term for each
-concept, so you learn the craft along the way. The output stays
+confirms them in words you can sanity-check. Set
+`teaching_mode: true` and it also narrates what it's doing and why as
+it works, naming the proper term for each concept — one per step — so
+you learn the craft along the way. The output stays
 rigorous either way. Engineers set `expertise: 5` for terse questions
 and trade-off tables.
 
@@ -174,27 +175,33 @@ and trade-off tables.
 <details>
 <summary>Settings</summary>
 
-First run creates `docs/capstone/capstone.json`:
+Installing creates `~/.claude/capstone.json` (the first session after
+install runs the plugin's SessionStart hook) — one config for the
+user, shared by every project:
 
 ```json
 {
   "expertise": null,
+  "teaching_mode": false,
   "docs_dir": "docs/capstone",
   "index_file": "DESIGN.md",
   "subagent_threshold": 150,
   "docs_in_git": "ask",
-  "language": "en",
-  "pipeline": null,
-  "workspaces": null
+  "language": "en"
 }
 ```
 
-`expertise` (1 to 5) is asked once and saved. `docs_in_git` governs
+`expertise` (1 to 5) is asked once and saved. `teaching_mode: true`
+makes capstone narrate and teach as it works, at any expertise level.
+`docs_in_git` governs
 the factual reference only; interviews, `features/`, the reviews, and
 the changelog stay local via a generated `.gitignore`.
 `subagent_threshold` is the source-file count above which `generate`
-fans out subagents. `pipeline` records the one-time
-pipeline-or-generate choice on repos that already have code.
+fans out subagents. Project-scoped state lives in an optional
+`docs/capstone/capstone.json`, created only when there is something to
+record — any global key set there overrides the global file for that
+repo, `pipeline` records the one-time
+pipeline-or-generate choice on repos that already have code, and
 `workspaces` gives each monorepo workspace its own docs area with the
 root `DESIGN.md` as an index-of-indexes.
 

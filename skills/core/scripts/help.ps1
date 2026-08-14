@@ -50,8 +50,11 @@ Every command that writes records itself in docs/capstone/changelog.md.
 Interview commands accept an optional artifact argument (a PRD, notes,
 screenshots) that pre-fills answers for your confirmation.
 
-Config: docs/capstone/capstone.json — expertise 1-5 (vibe coder ...
-architect; how technical conversations are, asked once then saved),
-docs_dir, index_file, subagent_threshold, docs_in_git, language,
-pipeline, workspaces.
+Config: capstone.json in the agent's global folder (~/.claude; created
+at install) — expertise 1-5 (vibe coder ... architect; how technical
+conversations are, asked once then saved), teaching_mode (true =
+narrate and teach while working), docs_dir, index_file,
+subagent_threshold, docs_in_git, language. Per-project state and
+overrides live in an optional docs/capstone/capstone.json: pipeline,
+workspaces, or any global key to override for that repo.
 '@

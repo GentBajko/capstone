@@ -1,5 +1,15 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}\"/skills/core/scripts/init-config.sh --global"
+          }
+        ]
+      }
+    ],
     "UserPromptExpansion": [
       {
         "matcher": "capstone:help",

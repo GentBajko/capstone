@@ -101,14 +101,14 @@ paths_covered:
    repo-wide. Anchor every glob at the repository root with the
    `:(top)` magic pathspec (e.g. `:(top)src/api/**`) so staleness
    checks work from any cwd.
-3. Ensure the config file and the docs area's `.gitignore` exist by
+3. Ensure the global config and the docs area's `.gitignore` exist by
    running the platform-appropriate initializer from the `core`
    skill's `scripts/` directory (idempotent — never overwrites
    either):
    `init-config.sh <docs_dir>` via bash on macOS/Linux/Git Bash, or
    `init-config.ps1 <docs_dir>` via powershell on Windows. If neither
-   shell is available, write the JSON template and the ignore list
-   from core.md yourself.
+   shell is available, write the global JSON template and the ignore
+   list from core.md yourself.
 4. Append the changelog entry per core.md's Changelog ledger — key
    `generate/<topic|all>@<the run's stamp>`; one bullet per chapter
    written **this run** (every one, never only those you judge
@@ -163,7 +163,8 @@ as an index-of-indexes: project one-liner, a workspace table (name ·
 path · index link · newest stamp), and cross-cutting notes. When
 Phase 1 recon detects workspace manifests (`pnpm-workspace.yaml`,
 `go.work`, a Cargo, uv, or poetry workspace) and `workspaces` is
-unset, offer to record them in the config — never silently.
+unset, offer to record them in the project config (per core.md,
+creating it holding just that key if absent) — never silently.
 
 ## Non-git projects
 

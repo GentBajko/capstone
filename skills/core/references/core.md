@@ -1,49 +1,56 @@
 # Shared Rules (read by every subcommand)
 
-## User config — `docs/capstone/capstone.json`
+## User config — global `capstone.json`, per-project overrides
 
-The config lives at the fixed path `docs/capstone/capstone.json` no
-matter what `docs_dir` is set to — `docs_dir` relocates generated
-outputs only, never the config, so a custom `docs_dir` can always be
-discovered. Read it first if present; absent keys use the defaults
-below. **Legacy path:** capstone used to default to `docs/design`. The
-initializer migrates that layout automatically and idempotently — when
-`docs/design` exists and `docs/capstone` does not, it moves the tree
-(`git mv` when tracked, so history follows), repoints the moved docs'
-cross-references, the index, and a `docs_dir` that named the old default
-(a custom one is left alone), then untracks whatever the ignore list
-below now covers. Say what it reported. If both directories exist it
-merges nothing and `docs/capstone` wins — resolve that with the user.
-`docs_dir` and `index_file` must be relative paths inside the
-repository; refuse anything else. The plugin materializes the file:
-whenever you write any output and it does not exist, run the idempotent
-initializer from the `core` skill's `scripts/` directory —
-`init-config.sh` via bash (macOS/Linux/Git Bash) or `init-config.ps1`
-via powershell (Windows); if neither shell is available, write this
+The config belongs to the user, not the repo: `capstone.json` lives in
+the agent's global config folder — `~/.claude` for Claude Code (or
+`$CLAUDE_CONFIG_DIR` when set); the agent's own equivalent
+(`~/.codex`, `~/.gemini`, …) elsewhere — and is created at
+installation, not per project: the plugin's SessionStart hook runs the
+idempotent initializer from the `core` skill's `scripts/` directory
+(`init-config.sh --global` via bash) on the first session after
+install. When the file is missing anyway (an agent without hook
+support), run that initializer yourself — `init-config.sh --global`
+via bash (macOS/Linux/Git Bash) or `init-config.ps1 -Global` via
+powershell (Windows); if neither shell is available, write this
 template yourself —
 
 ```json
 {
   "expertise": null,
+  "teaching_mode": false,
   "docs_dir": "docs/capstone",
   "index_file": "DESIGN.md",
   "subagent_threshold": 150,
   "docs_in_git": "ask",
-  "language": "en",
-  "pipeline": null,
-  "workspaces": null
+  "language": "en"
 }
 ```
 
+Read it first; absent keys use the defaults above.
+
+**Per-project state and overrides — `docs/capstone/capstone.json`,
+optional.** Never created as a matter of course; it exists only when
+something project-scoped must be recorded. Any global key set there
+overrides the global file for this repo, and two keys are project
+state that never goes global — `pipeline` and `workspaces`; a
+protocol recording one creates the file holding just that key. The
+project file's path is fixed no matter what `docs_dir` is set to —
+`docs_dir` relocates generated outputs only, never the config, so a
+custom `docs_dir` can always be discovered. `docs_dir` and
+`index_file` must be relative paths inside the repository; refuse
+anything else. Neither config file is ever indexed (settings, not
+docs).
+
 `"expertise": null` means "not yet asked" — behave as level 3 until the
-ask-once rule below fills it. `"pipeline": null` means the
+ask-once rule below fills it. `pipeline` absent (or `null`) means the
 generate-vs-pipeline fork (see `protocols/start.md`) has not been asked;
-`true`/`false` records the user's answer so it is never re-asked. The
-config file is never indexed (it is a settings file, not a doc).
-`workspaces` (`null` or a list of `{"name", "path"}`) — `null` means a
+`true`/`false` records the user's answer so it is never re-asked.
+`workspaces` (absent/`null` or a list of `{"name", "path"}`) — absent means a
 single-rooted project. When set, each workspace carries its own docs
 area at `<path>/docs/capstone/` (config keys inherit from the root
-file), the root `<index_file>` becomes an index-of-indexes (a
+project file, then the global file), the root `<index_file>` becomes
+an index-of-indexes (a
 workspace table linking each workspace's index), `generate` and
 `sync` iterate the workspaces (an argument targets one), `ask` greps
 every workspace's docs, and other commands operate on the workspace
@@ -54,7 +61,17 @@ commit-or-gitignore question **for the factual reference only** — the
 index and the topic chapters, plus `guides/`, `onboarding.md`,
 `logic/`, `mockup/`, `design/` and `code-prefs.md`. `language` sets the
 generated docs' language. The user can change any key by editing the
-file or just telling you.
+files or just telling you.
+
+**Legacy path:** capstone used to default to `docs/design`. The
+initializer (its per-project run, per Local-only outputs below)
+migrates that layout automatically and idempotently — when
+`docs/design` exists and `docs/capstone` does not, it moves the tree
+(`git mv` when tracked, so history follows), repoints the moved docs'
+cross-references, the index, and a `docs_dir` that named the old default
+(a custom one is left alone), then untracks whatever the ignore list
+below now covers. Say what it reported. If both directories exist it
+merges nothing and `docs/capstone` wins — resolve that with the user.
 
 ## Local-only outputs — `<docs_dir>/.gitignore`
 
@@ -63,11 +80,12 @@ whatever `docs_in_git` says: `features/` (the whole feature chain —
 interviews, specs, plans, review ledgers), every `*-interview.md`,
 `capstone.json`, `be-review.md`, `fe-review.md`, and `changelog.md`
 (plus any legacy `review.md`). The
-initializer writes
+initializer's per-project run writes
 `<docs_dir>/.gitignore` listing exactly those; whenever you write into
 `<docs_dir>` and that file is absent, create it — the same idempotent
-initializer does both (`init-config.sh [docs_dir]` /
-`init-config.ps1 [docs_dir]`). The `.gitignore` itself is committed, so
+initializer without the global flag (`init-config.sh [docs_dir]` /
+`init-config.ps1 [docs_dir]`) does that, the legacy migration above,
+and the retroactive untracking. The `.gitignore` itself is committed, so
 the rules travel with the repo.
 
 **`groom`, `plan`, and `implement` never commit the docs area.** They
@@ -88,22 +106,10 @@ style.md regardless:
    translate ("roughly how many people at once?") and derive the
    technical targets yourself, recording them as derived decisions.
    This overrides the interview conduct rules' quantification demands:
-   the numbers still get recorded, but you compute them. While
-   working — any stage, not just interviews — narrate each meaningful
-   step in one or two plain sentences: what is being done and why it
-   matters to the product ("I'm writing down checkout's rules now so
-   the code we build later can't get them wrong"). When a stage
-   finishes, say in plain words what now exists and what comes next.
-   Narration is conversation only; the generated docs stay dense per
-   style.md.
+   the numbers still get recorded, but you compute them.
 2. **explorer** — as 1, but introduce the proper term alongside each
    plain explanation and add short why-it-matters notes; teach while
-   asking. The working narration teaches too: name the proper term
-   for what just happened and the one transferable idea behind it
-   ("this file is a 'migration' — a script that changes the
-   database's shape without losing its data"). One concept per step;
-   the user is here to learn the craft, never to sit through a
-   lecture.
+   asking.
 3. **builder** (default) — normal technical vocabulary; recommended
    option first with one-line trade-offs.
 4. **engineer** — terse; jargon unexplained; ask for numbers directly
@@ -111,11 +117,27 @@ style.md regardless:
 5. **architect** — maximally terse; lead with trade-off matrices;
    challenge weak or inconsistent answers; the user drives, you record.
 
+**`teaching_mode` (boolean, default `false`) turns on
+teach-while-working narration at any expertise level.** When `true`,
+while working — any stage, not just interviews — narrate each
+meaningful step in one or two sentences: what is being done and why it
+matters to the product, naming the proper term for what just happened
+and the one transferable idea behind it ("this file is a 'migration' —
+a script that changes the database's shape without losing its data").
+One concept per step; the user is here to learn the craft, never to
+sit through a lecture. When a stage finishes, say what now exists and
+what comes next. Vocabulary follows `expertise` — level 1 hears the
+plain words first with the term in passing, level 4 just the term.
+Narration is conversation only; the generated docs stay dense per
+style.md. When `false`, no teaching narration — report per your level
+and move on.
+
 If `expertise` is null or missing and the task is interactive (any
 interview, `ask`, `onboarding`, `be-review`, `fe-review`), ask ONE
 question — "How
 technical should I be with you?" with the five levels — then write the
-answer into the config file (creating it with all keys if needed), and
+answer into the global config file (creating it with all keys if
+needed), and
 never ask again. Non-interactive runs behave as level 3 without asking
 and leave `expertise` null.
 
@@ -157,7 +179,8 @@ Verified installers:
    invoked them.
 2. **Write only the configured docs area** — `<docs_dir>/*` plus the
    index `<index_file>` (defaults: `docs/capstone/*` and `DESIGN.md`) and
-   the config file. Never touch source code, `openspec/`, or
+   the two config files (global and per-project). Never touch source
+   code, `openspec/`, or
    human-authored docs. Sole exceptions: the `build` protocol (invoked
    directly or as `start`'s final stage) and the `implement` protocol
    (invoked directly or as `implementation`'s final stage) write

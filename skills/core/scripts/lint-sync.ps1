@@ -90,19 +90,33 @@ Get-ChildItem skills/core/references/protocols/*.md | ForEach-Object {
   if ($routelist -notmatch [regex]::Escape("$tick$n$tick")) { Err "dispatcher.md routing list missing $n" }
 }
 
-# 6. hook wiring
+# 6. hook wiring, and the install-time global-config hook is in place
 $hooks = Get-Content hooks/hooks.json -Raw
 if ($hooks -notmatch '"matcher": "capstone:help"') { Err "hooks.json matcher wrong" }
 if ($hooks -notmatch 'skills/core/scripts/help-hook\.sh') { Err "hooks.json does not point at help-hook.sh" }
 if ((Get-Content skills/core/scripts/help-hook.sh -Raw) -notmatch '"command_name":"capstone:help"') { Err "help-hook guard wrong" }
+if ((Get-Content skills/core/scripts/help-hook.sh -Raw) -notmatch 'CLAUDE_CODE_ENTRYPOINT') { Err "help-hook.sh lost its terminal-only guard (GUI surfaces swallow block reasons)" }
+if ($hooks -notmatch '"SessionStart"') { Err "hooks.json has no SessionStart hook" }
+if ($hooks -notmatch 'init-config\.sh --global') { Err "hooks.json SessionStart does not run init-config.sh --global" }
 
-# 7. config template keys everywhere
+# 7. config template keys everywhere: the global template's keys in
+#    both initializers, core.md, and README; the project-scoped keys
+#    (never in the global template) documented in core.md and README
 $files = @('skills/core/scripts/init-config.sh', 'skills/core/scripts/init-config.ps1',
   'skills/core/references/core.md', 'README.md')
-$keys = @('expertise', 'docs_dir', 'index_file', 'subagent_threshold', 'docs_in_git', 'language', 'pipeline', 'workspaces')
+$keys = @('expertise', 'teaching_mode', 'docs_dir', 'index_file', 'subagent_threshold', 'docs_in_git', 'language')
+$projKeys = @('pipeline', 'workspaces')
 foreach ($f in $files) {
   $c = Get-Content $f -Raw
   foreach ($k in $keys) { if ($c -notmatch [regex]::Escape('"' + $k + '"')) { Err "$f config template missing key $k" } }
+  foreach ($k in $projKeys) { if ($c -match [regex]::Escape('"' + $k + '"')) { Err "$f global template carries project-scoped key $k" } }
+}
+$tick = [char]0x60
+foreach ($f in @('skills/core/references/core.md', 'README.md')) {
+  $c = Get-Content $f -Raw
+  foreach ($k in $projKeys) {
+    if ($c -notmatch [regex]::Escape("$tick$k$tick")) { Err "$f does not document project-scoped config key $k" }
+  }
 }
 
 # 8. .sh/.ps1 pairing (help-hook.sh exempt: hooks.json invokes bash explicitly)

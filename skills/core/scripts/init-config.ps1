@@ -1,12 +1,19 @@
-# Materializes capstone's local files, idempotently:
-#   0. migrates a legacy docs/design tree to docs/capstone
-#   1. creates docs/capstone/capstone.json if absent
+# Materializes capstone's files, idempotently:
+#   0. creates the global config <global>/capstone.json if absent
+#      (-Global: do only this — the SessionStart hook's mode, silent
+#       unless it creates)
+#   1. migrates a legacy docs/design tree to docs/capstone
 #   2. creates <docs_dir>/.gitignore if absent
-# The config path is fixed regardless of docs_dir (see core.md); the
-# .gitignore goes in the docs area, which the first argument may relocate.
-# Never overwrites an existing config or ignore file. UTF-8 without BOM.
-# Usage: powershell -ExecutionPolicy Bypass -File init-config.ps1 [docs_dir]
-param([string]$DocsDir = "docs/capstone")
+# The global folder is ~/.claude, or $env:CLAUDE_CONFIG_DIR when the
+# agent sets it ($env:CAPSTONE_GLOBAL_DIR overrides both, for
+# non-Claude agents). The per-project docs/capstone/capstone.json is
+# never created here — it is optional override/state, written by
+# protocols only when a project-scoped key gets recorded (see core.md).
+# The .gitignore goes in the docs area, which the DocsDir argument may
+# relocate. Never overwrites an existing config or ignore file. UTF-8
+# without BOM.
+# Usage: powershell -ExecutionPolicy Bypass -File init-config.ps1 [-Global] [docs_dir]
+param([switch]$Global, [string]$DocsDir = "docs/capstone")
 $Legacy = Join-Path "docs" "design"
 $Target = Join-Path "docs" "capstone"
 
@@ -22,7 +29,30 @@ function Repoint($Path) {
   }
 }
 
-# 0. Retroactive migration. Only when the new tree does not exist yet —
+# 0. the global config
+$GlobalDir = if ($env:CAPSTONE_GLOBAL_DIR) { $env:CAPSTONE_GLOBAL_DIR }
+             elseif ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR }
+             else { Join-Path $HOME ".claude" }
+$GlobalFile = Join-Path $GlobalDir "capstone.json"
+if (-not (Test-Path $GlobalFile)) {
+  New-Item -ItemType Directory -Force -Path $GlobalDir | Out-Null
+  $GlobalJson = @'
+{
+  "expertise": null,
+  "teaching_mode": false,
+  "docs_dir": "docs/capstone",
+  "index_file": "DESIGN.md",
+  "subagent_threshold": 150,
+  "docs_in_git": "ask",
+  "language": "en"
+}
+'@
+  Write-Utf8NoBom $GlobalFile ($GlobalJson + "`n")
+  Write-Output "created: $GlobalFile"
+}
+if ($Global) { exit 0 }
+
+# 1. Retroactive migration. Only when the new tree does not exist yet —
 #    if both are present this is not a stale layout and nothing is merged.
 if ((Test-Path $Legacy) -and -not (Test-Path $Target)) {
   $tracked = $false
@@ -54,28 +84,6 @@ if ((Test-Path $Legacy) -and -not (Test-Path $Target)) {
   if ($DocsDir -eq 'docs/design') { $DocsDir = 'docs/capstone' }
 } elseif ((Test-Path $Legacy) -and (Test-Path $Target)) {
   Write-Output "note: both $Legacy and $Target exist - not merging; $Target wins"
-}
-
-# 1. config, at the fixed path
-$File = Join-Path $Target "capstone.json"
-New-Item -ItemType Directory -Force -Path $Target | Out-Null
-if (Test-Path $File) {
-  Write-Output "exists: $File"
-} else {
-  $Json = @'
-{
-  "expertise": null,
-  "docs_dir": "docs/capstone",
-  "index_file": "DESIGN.md",
-  "subagent_threshold": 150,
-  "docs_in_git": "ask",
-  "language": "en",
-  "pipeline": null,
-  "workspaces": null
-}
-'@
-  Write-Utf8NoBom $File ($Json + "`n")
-  Write-Output "created: $File"
 }
 
 # 2. the docs area's ignore list

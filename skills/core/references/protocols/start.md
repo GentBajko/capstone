@@ -53,7 +53,9 @@ wherever it stopped:
      the same measurement as `generate`'s Phase 1 step 8), ask
      whether they want this greenfield pipeline or `generate`, and
      write
-     the answer to the config's `pipeline` key.
+     the answer to the project config's `pipeline` key (per core.md,
+     creating `docs/capstone/capstone.json` holding just that key if
+     absent).
    - On a `generate` answer: execute `protocols/generate.md` now and
      end the pipeline run.
 5. Run the first non-done stage by executing its protocol file
