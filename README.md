@@ -22,8 +22,8 @@ Install in Claude Code:
 
 Any other agent (70+ via the skills CLI): `npx skills add GentBajko/capstone`
 
-Works in Claude Code, Copilot CLI, Gemini CLI, Antigravity, and
-OpenCode. Plain `SKILL.md` files, MIT.
+Works in Claude Code, GitHub Copilot (CLI, VS Code, JetBrains), Gemini
+CLI, Antigravity, and OpenCode. Plain `SKILL.md` files, MIT.
 
 <details>
 <summary>All commands</summary>
@@ -223,6 +223,19 @@ Copilot CLI uses the marketplace format:
 copilot plugin marketplace add GentBajko/capstone
 copilot plugin install capstone@capstone-marketplace
 ```
+
+GitHub Copilot's Agent Skills (VS Code, JetBrains, and Copilot CLI's
+own agent mode) read plain `SKILL.md` folders from `.agents/skills/`,
+`.github/skills/`, or `.claude/skills/` — no marketplace step. The
+`gh` CLI (v2.90.0+) installs every capstone skill directly:
+
+```bash
+gh skill install GentBajko/capstone --all --agent github-copilot
+```
+
+Add `--scope user` for a one-time global install instead of
+per-project. `npx skills add GentBajko/capstone --agent github-copilot`
+does the same on older `gh` versions.
 
 Gemini CLI: `gemini extensions install https://github.com/GentBajko/capstone`
 
