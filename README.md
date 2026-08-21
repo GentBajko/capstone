@@ -225,23 +225,17 @@ copilot plugin install capstone@capstone-marketplace
 ```
 
 GitHub Copilot's Agent Skills (VS Code, JetBrains, and Copilot CLI's
-own agent mode) read plain `SKILL.md` folders straight from
-`.agents/skills/`, `.github/skills/`, or `.claude/skills/` in your
-project — no marketplace step. The skills CLI writes them there:
+own agent mode) read plain `SKILL.md` folders from `.agents/skills/`,
+`.github/skills/`, or `.claude/skills/` — no marketplace step. The
+`gh` CLI (v2.90.0+) installs every capstone skill directly:
 
 ```bash
-npx skills add GentBajko/capstone --agent github-copilot
+gh skill install GentBajko/capstone --all --agent github-copilot
 ```
 
-or copy manually; keep `core/` alongside the command skills, they
-resolve its shared rules via `../core/`:
-
-```bash
-git clone https://github.com/GentBajko/capstone /tmp/capstone
-cp -r /tmp/capstone/skills/. .agents/skills/
-```
-
-Then turn on Agent Skills in Copilot's settings.
+Add `--scope user` for a one-time global install instead of
+per-project. `npx skills add GentBajko/capstone --agent github-copilot`
+does the same on older `gh` versions.
 
 Gemini CLI: `gemini extensions install https://github.com/GentBajko/capstone`
 
