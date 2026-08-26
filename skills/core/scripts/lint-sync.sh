@@ -174,11 +174,17 @@ for n in ask; do
 done
 
 # 12. the local-only ignore list is identical in both initializers and
-#     documented in core.md (hand-synced across three files)
-for r in 'features/' '\*-interview.md' 'capstone.json' 'review.md' 'be-review.md' 'fe-review.md' 'changelog.md'; do
+#     documented in core.md (hand-synced across three files); changelog.md
+#     is part of the reference and must never reappear in the templates,
+#     and both initializers must carry the unignore migration for it
+for r in 'features/' '\*-interview.md' 'capstone.json' 'review.md' 'be-review.md' 'fe-review.md'; do
   for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
     grep -q "^$r$" "$f" || err "$f ignore template missing rule $r"
   done
+done
+for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
+  grep -q "^changelog\.md$" "$f" && err "$f ignore template still lists changelog.md (it follows docs_in_git now)"
+  grep -q "unignored: changelog.md" "$f" || err "$f lost the changelog.md unignore migration"
 done
 grep -q 'Local-only outputs' skills/core/references/core.md \
   || err "core.md has no Local-only outputs section"

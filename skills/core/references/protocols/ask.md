@@ -1,4 +1,4 @@
-# ask <question> — cited Q&A
+# ask <question> - cited Q&A
 
 **Reads:** config → `<index_file>` (the question's topic rows) → the
 touched topic chapters (after step 2's staleness pass) → source only
@@ -16,4 +16,4 @@ to spot-check cited pointers.
    question touches.
 5. If the docs cannot answer, say so explicitly, answer from targeted
    code reading instead, and name which topic file should have covered
-   it — that gap is a template bug worth reporting to the user.
+   it: that gap is a template bug worth reporting to the user.

@@ -9,16 +9,16 @@ from recorded decisions.
 ## Conduct rules
 
 - One question per turn; offer concrete options when enumerable.
-- Quantify everything: "fast", "secure", "scalable" are banned answers —
+- Quantify everything: "fast", "secure", "scalable" are banned answers:
   push for a number, a percentile, and how it would be measured. A
   quality target without a measure is recorded as a wish, not a decision.
-- Classify each decision as a **one-way door** (irreversible — gets
+- Classify each decision as a **one-way door** (irreversible: gets
   rigor, alternatives, and explicit confirmation) or **two-way door**
-  (reversible — decide fast, record, move on).
-- For the macro-structure decision, present **2–3 candidates** with
+  (reversible: decide fast, record, move on).
+- For the macro-structure decision, present **2-3 candidates** with
   trade-offs, never one.
 - Offer defaults explicitly (boring technology, monolith-first, buy for
-  generic subdomains, YAGNI) and let the user accept or override — never
+  generic subdomains, YAGNI) and let the user accept or override; never
   silently adopt them.
 - Record non-goals and out-of-scope items as decisions too.
 - Log every unverified assumption in the interview file as a risk with a
@@ -30,10 +30,10 @@ from recorded decisions.
 
 ### 0.1 Business & product
 - What problem, for whom, why now; how is success measured (KPIs)?
-- Business model / revenue mechanics — what must the system protect?
+- Business model / revenue mechanics: what must the system protect?
 - Expected lifespan (18 months vs 15 years); exit scenarios (acquisition,
   white-label, on-prem sales, sunset)?
-- Time-to-market vs quality — which wins when they conflict?
+- Time-to-market vs quality: which wins when they conflict?
 - Budget: build cost, run cost ceiling, team cost; acceptable unit
   economics (cost per user/request/tenant)?
 - Cost of an hour of downtime; cost of a data breach?
@@ -66,7 +66,7 @@ from recorded decisions.
 - Team size, skills, seniority now; hiring plan; time zones?
 - How many teams will own this; what can each own end-to-end (cognitive
   load budget)?
-- Ops maturity: can they run Kubernetes / Kafka / multi-region — honestly?
+- Ops maturity: can they run Kubernetes / Kafka / multi-region, honestly?
 - Who has architecture decision authority; who arbitrates conflicts?
 - Existing conventions, platforms, golden paths to reuse?
 - Conway check: do intended team boundaries match the intended
@@ -75,7 +75,7 @@ from recorded decisions.
 ### 0.5 Operations & risk posture
 - Availability target as a real number per capability tier (each nine
   costs ~10x); error-budget appetite?
-- RTO/RPO per data class — minutes, not adjectives?
+- RTO/RPO per data class: minutes, not adjectives?
 - Who operates it: dedicated ops, you-build-it-you-run-it, nobody?
 - On-call expectations, support hours, SLAs promised to customers?
 - Maintenance windows acceptable or zero-downtime mandated?
@@ -83,7 +83,7 @@ from recorded decisions.
 
 ## 1. Shape decisions (the one-way doors)
 
-- **Macro-structure** (2–3 candidates): monolith / modular monolith /
+- **Macro-structure** (2-3 candidates): monolith / modular monolith /
   service-based / microservices / serverless / event-driven / plugin.
   Default bias: modular monolith with enforced boundaries unless a hard
   driver (independent scaling, team autonomy at scale, fault isolation,
@@ -98,14 +98,14 @@ from recorded decisions.
   choreography for workflows; workflow engine or not.
 - **Hosting**: cloud (which provider) / on-prem / hybrid / edge;
   single vs multi-region; multi-cloud only with a priced reason.
-- **Compute model**: PaaS / containers / Kubernetes / serverless — buy
+- **Compute model**: PaaS / containers / Kubernetes / serverless; buy
   the lowest-ops option the requirements allow.
 - **Primary language(s) + framework(s)**: team fit, hiring pool, boring
   bias; polyglot policy.
 - **Tenancy model** (if multi-tenant): pooled / siloed / bridge; isolation
   guarantee level.
 - **Build vs buy per capability**: auth/IdP (build: never), payments,
-  email/SMS, search, analytics, admin — enumerate and decide each.
+  email/SMS, search, analytics, admin; enumerate and decide each.
 - **Repo topology**: monorepo vs polyrepo; build tooling.
 - For every one-way door: record the rejected alternatives and why.
 
@@ -117,12 +117,12 @@ from recorded decisions.
 - Module boundaries: public surfaces, who may import what?
 - Entry points: processes, CLIs, workers planned?
 - Communication: protocols per edge (REST/GraphQL/gRPC/WebSocket/SSE/
-  webhooks); API style rules (pagination, errors — RFC 9457?, versioning,
+  webhooks); API style rules (pagination, errors (RFC 9457?), versioning,
   deprecation policy); messaging (queue vs stream, broker, delivery
   semantics, ordering, DLQs); API gateway/BFF?
 - Composition: how dependencies are wired (DI style, composition roots).
 - Frontend (products with a UI): the §4 Frontend/clients module fills
-  this chapter's Frontend section — walk it before closing this
+  this chapter's Frontend section; walk it before closing this
   checklist.
 
 ### → models.md
@@ -139,7 +139,7 @@ from recorded decisions.
 - Soft vs hard delete; audit/history requirements.
 - Data lifecycle: retention, archival, purge, legal hold, erasure
   mechanics; PII classification and mapping.
-- Analytics path: OLTP/OLAP split, warehouse, CDC — or explicitly none.
+- Analytics path: OLTP/OLAP split, warehouse, CDC; or explicitly none.
 - Search: DB-native vs dedicated engine.
 - Caching layers and invalidation strategy.
 - Backup strategy incl. restore-testing cadence.
@@ -156,7 +156,7 @@ from recorded decisions.
 - Code standards: linting, formatting, review rules.
 
 ### → data-flow.md
-- The 2–3 critical lifecycles, hop by hop, at design level (request,
+- The 2-3 critical lifecycles, hop by hop, at design level (request,
   command, job, event).
 - State: what lives where; who mutates it; session externalization
   (stateless compute?).
@@ -173,7 +173,7 @@ from recorded decisions.
 - External services (DB, cache, broker, IdP, payments, email, storage,
   monitoring): provider each, and the outage behavior per dependency.
 - Vendor lock-in posture: priced exit path per critical dependency (lock-in
-  is a trade-off, not a sin — the failure is not pricing it).
+  is a trade-off, not a sin; the failure is not pricing it).
 - Dependency governance: update cadence, scanning, SBOM?
 
 ### → testing.md
@@ -181,7 +181,7 @@ from recorded decisions.
 - Doubles policy: structural fakes vs mocks; test data management (never
   prod PII).
 - Contract testing at boundaries?
-- Non-functional suites: load, chaos, security, accessibility — which,
+- Non-functional suites: load, chaos, security, accessibility: which,
   when?
 - Testability requirements: deterministic time/IDs/randomness seams.
 - Coverage/flake/runtime policies.
@@ -206,7 +206,7 @@ from recorded decisions.
 ### → glossary.md
 - Elicit the domain's own vocabulary: ask the user to define every term
   of art, lifecycle state, and invented noun; one meaning per term per
-  context. Capture disagreements — they usually mark context boundaries.
+  context. Capture disagreements: they usually mark context boundaries.
 
 ## 3. Quality attributes (numbers or it didn't happen)
 
@@ -238,7 +238,7 @@ reliability, autonomy vs standardization.
 
 ## 4. Conditional modules (ask only if applicable)
 
-- **Frontend/clients** — applicable whenever the mockup has screens or
+- **Frontend/clients**: applicable whenever the mockup has screens or
   the product has any human-facing UI, which is nearly always; the
   mockup answers UX, not this (screens don't decide a rendering
   model), and skipping this module is a recorded decision, never a
@@ -274,7 +274,7 @@ reliability, autonomy vs standardization.
 
 - What is the riskiest assumption, and what is the cheapest spike that
   would test it? Record spikes as pre-build work.
-- Pre-mortem: "it's 18 months later and this failed — why?" Record the
+- Pre-mortem: "it's 18 months later and this failed: why?" Record the
   answers as risks.
 - Agree the **walking-skeleton slice**: the thinnest end-to-end path
   (UI → API → data → deploy → observe) to build first; it becomes part of
@@ -287,7 +287,7 @@ reliability, autonomy vs standardization.
 ## 6. Red-flag screen
 
 Check the recorded decisions against the classic failure modes; each hit
-becomes one final question ("you chose X with Y — accepted trade-off or
+becomes one final question ("you chose X with Y: accepted trade-off or
 revisit?"):
 
 - Distribution before boundaries: microservices chosen while domain
@@ -303,7 +303,7 @@ revisit?"):
 - One availability number for everything; NFRs still adjectives; no
   latency budget decomposition.
 - Security, tenancy isolation, audit, or accessibility deferred to
-  "later" — the retrofits that cost 10x.
+  "later": the retrofits that cost 10x.
 - No rollback path; migrations that make deploys one-way.
 - Backups without restore drills; DR targets without a drill plan.
 - Observability absent from v1 scope; no cost model or unit-economics
@@ -313,7 +313,7 @@ revisit?"):
 - Vendor lock-in unpriced; no exit note on any critical dependency.
 - Everything-flexible: extension points and abstractions for futures
   nobody ordered (speculative generality).
-- No walking skeleton in the plan — integration risk saved for the end.
+- No walking skeleton in the plan: integration risk saved for the end.
 - Frontend undesigned: a mockup full of screens while every recorded
-  decision is server-side — rendering model, state management, and
+  decision is server-side; rendering model, state management, and
   design system never chosen.

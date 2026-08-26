@@ -1,7 +1,7 @@
-# Code craft — TDD + YAGNI for every line this plugin writes
+# Code craft - TDD + YAGNI for every line this plugin writes
 
 Read by `protocols/plan.md`, `protocols/build.md`, and
-`protocols/implement.md` — the stages that write implementation plans
+`protocols/implement.md`, the stages that write implementation plans
 and source code. Adapted from the ponytail skill. Precedence: the
 project's `code-prefs.md` records the user's own decisions and wins
 wherever the two conflict; this file governs everything code-prefs
@@ -10,7 +10,7 @@ code never written.
 
 ## The ladder
 
-Stop at the first rung that holds — after understanding the problem,
+Stop at the first rung that holds, after understanding the problem,
 never instead of it. Read the task and the code it touches, trace the
 real flow end to end, then climb:
 
@@ -36,7 +36,7 @@ broken.
 - No unrequested abstractions: no factory for one product, no config
   for a value that never changes, no scaffolding "for later".
 - Deletion over addition. Boring over clever. Fewest files possible.
-  Shortest working diff wins — in the right place; the smallest change
+  Shortest working diff wins, in the right place; the smallest change
   in the wrong place is a second bug.
 - Two same-size options: take the one correct on edge cases. Less
   code, never a flimsier algorithm.
@@ -54,28 +54,28 @@ test the behavior being built now, with the project's real runner; no
 speculative suites for unbuilt features, no fixture cathedrals, no
 per-function ceremony. Non-trivial logic (a branch, a loop, a parser,
 a money/security path) always leaves its failing-then-green check
-behind. Trivial one-liners need no test — YAGNI applies to tests too.
+behind. Trivial one-liners need no test: YAGNI applies to tests too.
 
 ## Interfaces: earned, not speculative
 
 - Consumer-side interfaces/Protocols for typing and test doubles are
-  notation, not abstraction — narrow, named by behavior, always fine.
+  notation, not abstraction: narrow, named by behavior, always fine.
 - An adapter/seam is EARNED by one of: (a) a commodity-shaped boundary
   with real swap probability (email, payments, blob storage, SMS, LLM
   providers); (b) portability within ONE guarantee family (Kafka ↔
-  Kinesis: durable partitioned log — never across families; Kafka to
+  Kinesis: durable partitioned log; never across families; Kafka to
   Redis pub/sub is a redesign, not a plug); (c) a second real
   implementation existing today.
 - One seam per guarantee family, named by behavior. Domain types cross
   the seam; vendor types (`ConsumerRecord`, shard iterators, partition
   numbers) never leak past it.
 - Banned: provider-side god-interfaces (`IDatabase`), abstraction over
-  an abstraction (an interface over an ORM — the ORM is the database
+  an abstraction (an interface over an ORM: the ORM is the database
   abstraction), DI ceremony for one implementation, config-switchable
   backends for hypothetical vendors. Swappability elsewhere comes from
   locality (one contained module), not ceremony.
 - The seam interface is written when the second implementation becomes
-  real — it teaches the true shape. An in-memory test fake validates
+  real: it teaches the true shape. An in-memory test fake validates
   the seam's shape, not its semantics.
 
 ## Never lazy about
@@ -84,5 +84,5 @@ Understanding the problem (read fully, then be lazy); input validation
 at trust boundaries; error handling that prevents data loss; security;
 accessibility basics; typing per `code-prefs.md` (annotations, enums,
 Protocols are how minimal code is written, never bloat to cut);
-anything the spec or the user explicitly requires — the user insisting
+anything the spec or the user explicitly requires: the user insisting
 on the full version ends the argument.

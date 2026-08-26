@@ -15,7 +15,7 @@ export const CapstonePlugin = async () => {
   const skillsDir = path.resolve(__dirname, '../../skills');
 
   return {
-    // Config.get() returns a cached singleton — pushing the path here makes
+    // Config.get() returns a cached singleton; pushing the path here makes
     // the skills visible when OpenCode lazily discovers them later.
     config: async (config) => {
       config.skills = config.skills || {};

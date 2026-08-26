@@ -1,4 +1,4 @@
-# Capstone reference trust check — a TEMPLATE for your repo's CI.
+# Capstone reference trust check, a TEMPLATE for your repo's CI.
 # Copy into .github/workflows/, add an ANTHROPIC_API_KEY repo secret.
 # Fails the job when the reference is stale, by parsing the report's
 # final "SYNC CHECK:" verdict line (sync.md guarantees that line).

@@ -175,12 +175,22 @@ foreach ($n in @('ask')) {
 }
 
 # 12. the local-only ignore list is identical in both initializers and
-#     documented in core.md (hand-synced across three files)
-foreach ($r in @('features/', '*-interview.md', 'capstone.json', 'review.md', 'be-review.md', 'fe-review.md', 'changelog.md')) {
+#     documented in core.md (hand-synced across three files); changelog.md
+#     is part of the reference and must never reappear in the templates,
+#     and both initializers must carry the unignore migration for it
+foreach ($r in @('features/', '*-interview.md', 'capstone.json', 'review.md', 'be-review.md', 'fe-review.md')) {
   foreach ($f in @('skills/core/scripts/init-config.sh', 'skills/core/scripts/init-config.ps1')) {
     if (-not (Select-String -Path $f -Pattern "^$([regex]::Escape($r))$" -Quiet)) {
       Err "$f ignore template missing rule $r"
     }
+  }
+}
+foreach ($f in @('skills/core/scripts/init-config.sh', 'skills/core/scripts/init-config.ps1')) {
+  if (Select-String -Path $f -Pattern '^changelog\.md$' -Quiet) {
+    Err "$f ignore template still lists changelog.md (it follows docs_in_git now)"
+  }
+  if (-not (Select-String -Path $f -Pattern 'unignored: changelog.md' -SimpleMatch -Quiet)) {
+    Err "$f lost the changelog.md unignore migration"
   }
 }
 if (-not (Select-String -Path skills/core/references/core.md -Pattern 'Local-only outputs' -SimpleMatch -Quiet)) {

@@ -5,7 +5,7 @@ description: Use when asked what the capstone plugin can do - prints the usage b
 
 # Capstone: help
 
-Run exactly one tool call and nothing else — the platform-appropriate
+Run exactly one tool call and nothing else: the platform-appropriate
 variant (both live in `../core/scripts/` relative to this skill's
 base directory):
 
