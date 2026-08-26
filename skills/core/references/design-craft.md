@@ -1,22 +1,22 @@
-# Design craft — method fallback and the always-on floor
+# Design craft - method fallback and the always-on floor
 
-Read by `protocols/design.md`. Sections 1–6 are the method source for
+Read by `protocols/design.md`. Sections 1-6 are the method source for
 any surface no installed skill covers, and that skill's own text wins
 wherever it does cover one: `impeccable` covers every mode, so its
-presence closes §1–6 entirely; `design-taste-frontend` covers Persuade,
-Read, and Experience, so with only Taste installed §1–6 still governs
-the Operate screens it declines. Sections 7–8 load in every mode: §7 is
+presence closes §1-6 entirely; `design-taste-frontend` covers Persuade,
+Read, and Experience, so with only Taste installed §1-6 still governs
+the Operate screens it declines. Sections 7-8 load in every mode: §7 is
 the merged refuse list plus the rulings where the two skills disagree,
 §8 the pre-flight both paths run. Distilled from impeccable and
 design-taste-frontend ("Taste"). Every ban here binds the shipped
-interface — its copy, composition, and code — never capstone's own
+interface (its copy, composition, and code), never capstone's own
 documentation prose.
 
 ## 1. Posture
 
 Design as a director with a point of view, not a generator of safe
 defaults. Go all out: no hedging, no timid middle options invented to
-avoid deciding. The deliverable is complete — every screen, every
+avoid deciding. The deliverable is complete: every screen, every
 state, nothing left as an exercise. **The brief wins**: pinned
 aesthetics, materials, fonts, and palettes are honored even against a
 warning in this file; redirecting a clear brief toward your own taste
@@ -24,19 +24,19 @@ is failure. Verify in bounded passes, never open-ended polish loops.
 
 ## 2. Modes
 
-The mode names what the visitor's success looks like on this surface —
+The mode names what the visitor's success looks like on this surface,
 chosen per surface, never per product:
 
-- **Persuade** — the visitor decides and acts; design is the product.
+- **Persuade**: the visitor decides and acts; design is the product.
   Landing, marketing, pricing.
-- **Operate** — the visitor completes a task. App UI, dashboards,
+- **Operate**: the visitor completes a task. App UI, dashboards,
   settings, tools. Scanability, consistency, and native expectations
   outrank expression; brand lives in precise details. The failure mode
-  is not flatness but strangeness without purpose — the bar is earned
+  is not flatness but strangeness without purpose; the bar is earned
   familiarity, and the tool should disappear into the task.
-- **Read** — the visitor understands something. Docs, guides, help.
+- **Read**: the visitor understands something. Docs, guides, help.
   Structure for comprehension, then make staying worth it.
-- **Experience** — the visitor is inside the work. Portfolios,
+- **Experience**: the visitor is inside the work. Portfolios,
   galleries. The artifact leads from the first viewport.
 
 A tool's landing page is still Persuade; a fashion house's docs are
@@ -57,12 +57,12 @@ Then set three dials, reasoned from the read, never silently baseline:
 
 | Read signals | VARIANCE | MOTION | DENSITY |
 |---|---|---|---|
-| minimalist / calm / editorial / Linear-style | 5–6 | 3–4 | 2–3 |
-| premium consumer / luxury / brand | 7–8 | 5–7 | 3–4 |
-| playful / experimental / agency | 9–10 | 8–10 | 3–4 |
-| marketing surface, no stated vibe | 7–9 | 6–8 | 3–5 |
-| trust-first / public-sector / regulated | 3–4 | 2–3 | 4–5 |
-| product app screens (Operate) | 3–5 | 2–4 | 4–7 |
+| minimalist / calm / editorial / Linear-style | 5-6 | 3-4 | 2-3 |
+| premium consumer / luxury / brand | 7-8 | 5-7 | 3-4 |
+| playful / experimental / agency | 9-10 | 8-10 | 3-4 |
+| marketing surface, no stated vibe | 7-9 | 6-8 | 3-5 |
+| trust-first / public-sector / regulated | 3-4 | 2-3 | 4-5 |
+| product app screens (Operate) | 3-5 | 2-4 | 4-7 |
 
 Asymmetric layouts above 768px always collapse to strict single column
 below it; the collapse is declared per screen, never assumed.
@@ -74,12 +74,12 @@ The anti-convergence method, run before any token is picked:
 1. Name in one sentence each: the product's unique mechanism, the
    audience's real scene, its cultural home, and what the flagship
    surface must prove.
-2. Name the category rut — the look this category always ships — and
+2. Name the category rut (the look this category always ships) and
    its predictable opposite. Keep both off the candidate list. A brief
    that paints its own picture (a name, a metaphor) adds its literal
    reading to the rut: spend at most one candidate on it.
 3. From the audience's cultural world, list candidate visual worlds
-   the audience knows by heart — objects, places, rituals, and just as
+   the audience knows by heart: objects, places, rituals, and just as
    much its graphic traditions: notation, publications, identity
    programs, data graphics, interfaces it reads daily. Each carries
    one line on why it resonates and can carry the mechanism. When most
@@ -88,23 +88,23 @@ The anti-convergence method, run before any token is picked:
 4. Commit to ONE direction and present it fully: its world, the
    flagship first viewport, the visitor path, the signature
    interaction, the honest risk. Offer the others as named alternates,
-   one line each — never a ranked menu that invites the safest card.
+   one line each, never a ranked menu that invites the safest card.
 5. Always offer the standing exit: the category standard, played
-   straight, as the user's door — never recommended, never used to
+   straight, as the user's door, never recommended, never used to
    soften the committed direction. If the user takes it, ask which two
    or three products it should sit alongside, make their craft level
    the bar, and execute the convention at full fidelity, without irony.
 
 **Color strategy**, picked before any color: Restrained (neutrals plus
-one accent — the floor for Operate and Read), Committed (one saturated
-color carries 30–60% of the surface), Full palette (3–4 named roles),
+one accent; the floor for Operate and Read), Committed (one saturated
+color carries 30-60% of the surface), Full palette (3-4 named roles),
 or Drenched (the surface IS the color). Persuade and Experience
 surfaces have permission for the bolder strategies; take them when the
-brief allows. Color commits at page scale — fields that own regions,
+brief allows. Color commits at page scale: fields that own regions,
 not accents scattered on neutral ground.
 
 **Theme from the use scene, never category default**: write one
-sentence — who uses this, where, under what ambient light — and let it
+sentence (who uses this, where, under what ambient light) and let it
 force light, dark, or both.
 
 **Faces**: choose type like objects from the subject's world, in the
@@ -114,16 +114,16 @@ training-data defaults mean you stopped looking: Inter-as-display,
 Fraunces, Instrument Serif, Instrument Sans, Playfair Display,
 Cormorant, Lora, Crimson, Newsreader, Syne, Space Grotesk, Space Mono,
 IBM Plex, DM Sans, DM Serif, Outfit, Plus Jakarta Sans. Naming one
-anyway requires a reason no other face could satisfy — and a subject
+anyway requires a reason no other face could satisfy, and a subject
 association ("books want a serif") is never that reason.
 
 **Calibration self-check**: if someone could guess the aesthetic from
-the category alone — or from category-plus-avoidance — the direction
+the category alone, or from category-plus-avoidance, the direction
 failed; rework until neither answer is obvious. Energy is not the
 enemy of trust: "no hype" rules out hype devices, not exuberance.
 
 **Design systems**: when the read names a real system, use the
-official package, never a hand-rolled imitation — Fluent
+official package, never a hand-rolled imitation: Fluent
 (`@fluentui/react-components`), Material (`@material/web`), Carbon
 (`@carbon/react`), Shopify Polaris, Atlaskit, Primer, GOV.UK Frontend,
 USWDS, Radix Themes, shadcn/ui (never in default state), Bootstrap,
@@ -136,15 +136,15 @@ tech) are built honestly with native CSS and labeled as such.
 The committed direction is recorded as four blocks; if any block reads
 like a mood, the direction is not decided yet:
 
-- **THESIS** — the one idea this frontend owns, and the
+- **THESIS**: the one idea this frontend owns, and the
   category-default arrangement it refuses.
-- **OWN-WORLD** — the palette and component language, specific enough
+- **OWN-WORLD**: the palette and component language, specific enough
   to be recognizable with all content removed.
-- **STORY** — what the visitor understands, believes, and does.
-- **FIRST VIEWPORT** — the flagship surface's exact composition: what
+- **STORY**: what the visitor understands, believes, and does.
+- **FIRST VIEWPORT**: the flagship surface's exact composition: what
   is where, at what scale, where the primary action sits. A thesis,
   not a header: demonstrate the mechanism immediately. The memory
-  test — if someone left after one viewport, what would they describe
+  test: if someone left after one viewport, what would they describe
   an hour later? A mood means the concept has not committed.
 
 ## 6. Craft rules
@@ -152,7 +152,7 @@ like a mood, the direction is not decided yet:
 ### Typography
 
 - Display default `text-4xl md:text-6xl` range, tighter tracking;
-  body 65–75ch measure. Plan headline scale and asset size together —
+  body 65-75ch measure. Plan headline scale and asset size together:
   a four-line headline is a font-size error, not a copy-length error.
 - Serif is very discouraged as a default; "creative = serif" is the
   most-tested AI tell. It is acceptable only when the brand names one,
@@ -163,22 +163,22 @@ like a mood, the direction is not decided yet:
 - Italic display words with descenders (`y g j p q`) need
   `leading-[1.1]` minimum plus bottom reserve, or they clip.
 - Operate surfaces: one family is often right; fixed rem scale, not
-  fluid; step ratio 1.125–1.2; density is a permission, not a flaw.
+  fluid; step ratio 1.125-1.2; density is a permission, not a flaw.
 
 ### Color
 
 - One locked accent, used identically on every screen; saturation
   under 80% unless the brand demands more. No AI-purple defaults, no
   neon gradients unbriefed.
-- The premium-consumer default palette — warm cream/beige grounds,
-  brass/clay/oxblood accents, espresso near-blacks — is banned as a
+- The premium-consumer default palette (warm cream/beige grounds,
+  brass/clay/oxblood accents, espresso near-blacks) is banned as a
   reach; it is what every model ships for artisan briefs. Rotate to a
   different family (cold luxury, forest, black-and-tan, cobalt+cream,
   terracotta+slate, olive+brick, monochrome+one pop) unless the brand
   explicitly names those colors.
 - No pure `#000` or `#fff`; off-black and off-white keep depth. On
   colored surfaces, secondary text is tinted from the hue, never gray.
-- Contrast floors: 4.5:1 body and placeholder, 3:1 large text — on
+- Contrast floors: 4.5:1 body and placeholder, 3:1 large text, on
   every theme the project ships. Semantic state colors (hover, focus,
   selected, disabled, error, warning, success, info) are standardized
   once for Operate surfaces.
@@ -190,7 +190,7 @@ like a mood, the direction is not decided yet:
   square layout is broken design.
 - Shadows carry an offset and a soft blur, tinted toward the
   background hue; a zero-offset colored halo is decoration. Cards only
-  where elevation communicates real hierarchy — otherwise group with
+  where elevation communicates real hierarchy; otherwise group with
   borders, dividers, or space.
 
 ### Layout
@@ -211,11 +211,11 @@ like a mood, the direction is not decided yet:
 ### States
 
 - Every interactive component ships default, hover, focus, active,
-  disabled, loading, error — all of them, not half.
+  disabled, loading, error; all of them, not half.
 - Loading is skeletal and matches the final layout's shape; no
   spinners in content. Empty states teach the interface. Errors are
   inline where the user acts.
-- Overlays escape their containers (dialog, popover, portal) — an
+- Overlays escape their containers (dialog, popover, portal): an
   absolutely positioned dropdown inside `overflow: hidden` gets
   clipped.
 
@@ -226,12 +226,12 @@ like a mood, the direction is not decided yet:
   transition. "It looked cool" fails.
 - One authored moment beats scattered hover effects and identical
   entrances on every section. Marquees: at most one per page.
-- Operate: 150–250ms transitions, state-conveying only, no page-load
-  choreography — users load into a task.
+- Operate: 150-250ms transitions, state-conveying only, no page-load
+  choreography: users load into a task.
 - Reduced motion is honored always: loops, parallax, and scroll
   effects collapse to static.
 - Implementation floor: animate transform and opacity only; no
-  `window.addEventListener('scroll')` — scroll work uses
+  `window.addEventListener('scroll')`: scroll work uses
   IntersectionObserver, scroll-driven animations, or a library's
   scroll hooks, isolated in leaf components with cleanup.
 
@@ -243,20 +243,20 @@ like a mood, the direction is not decided yet:
   screenshots, never hand-rolled decorative SVGs, never emoji or
   unicode glyphs standing in for icons.
 - One icon family per project, one stroke weight, from a real library.
-- Logo walls are logos only — no category captions under them.
+- Logo walls are logos only: no category captions under them.
 
 ### Copy
 
 - The product's own language; one register per page. Controls name
   their action; errors name the problem and the recovery.
-- Zero em-dashes (`—`) in interface copy — headlines, labels, body,
+- Zero em-dashes (U+2014) in interface copy: headlines, labels, body,
   quotes, buttons, captions, alt text. Restructure the sentence.
 - No AI-tell copy: "Quietly trusted by", poetic section labels ("From
   the field", "On our desks"), micro-meta sentences under headings,
-  mock-humble asides, generic step labels ("Step 1/2/3" — the verb is
+  mock-humble asides, generic step labels ("Step 1/2/3"; the verb is
   the label).
 - No Jane Doe, no Acme: names, brands, and avatars read as real and
-  locale-appropriate. Numbers are real, labeled mock, or absent —
+  locale-appropriate. Numbers are real, labeled mock, or absent;
   never fake-precise spec aesthetics.
 
 ## 7. Refuse list and rulings
@@ -270,11 +270,11 @@ softening it:
 - The hero-metric template: big number, small label, supporting
   stats, accent.
 - Section numbers (01/02/03) when the sequence carries no information.
-- Modal as first thought — exhaust inline and progressive disclosure.
+- Modal as first thought: exhaust inline and progressive disclosure.
 - Gradient text; glass/blur as decoration rather than a specific
   effect; thick colored side-borders on cards and callouts; hard
   offset shadows outside a genuinely neobrutalist world.
-- Monospace as a "technical" costume — mono is for code, data,
+- Monospace as a "technical" costume: mono is for code, data,
   measurement.
 - Decorative status dots, scroll cues, version labels and build
   footers on marketing surfaces, locale/time/weather strips.
@@ -286,9 +286,9 @@ delegated or not):
 
 - **Eyebrows/kickers above headings: banned outright.** Impeccable's
   ban supersedes Taste's one-per-three-sections ration; no brief earns
-  it back. The heading carries its own weight.
+  it back.
 - **Theme: the use-scene rule wins.** Derived from who/where/under
-  what light — never "dual-mode by default", never category default.
+  what light, never "dual-mode by default", never category default.
   When both themes ship, hierarchy parity and contrast floors hold in
   both.
 - **Color: impeccable's strategy framework governs** (Restrained /
@@ -325,7 +325,7 @@ delegated or not):
 - Contrast verified 4.5:1 / 3:1 on every shipped theme, buttons and
   form fields included (no white-on-white CTAs, no gray-on-colored
   secondary text).
-- One radius system, one icon family and stroke weight, one accent —
+- One radius system, one icon family and stroke weight, one accent,
   as `02-system.md` locks them.
 - Animation on transform/opacity only; no scroll listeners; reduced
   motion collapses every effect; motion isolated in leaf components

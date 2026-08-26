@@ -17,17 +17,17 @@ looked rather than omitting a section.
 
 Required sections:
 
-- `## Layers` — the layers/tiers that exist, each with its directories and
+- `## Layers`: the layers/tiers that exist, each with its directories and
   dependency direction (what imports what).
-- `## Module boundaries` — per module: public surface; what it may not
+- `## Module boundaries`: per module: public surface; what it may not
   import and what may not import it, as enforced or as observed.
-- `## Entry points` — every process entry (CLI, server, workers) with
+- `## Entry points`: every process entry (CLI, server, workers) with
   `file:line`.
-- `## Communication` — how parts talk: HTTP routes, websocket commands,
+- `## Communication`: how parts talk: HTTP routes, websocket commands,
   events, queues; where each is registered and dispatched.
-- `## Composition` — where objects are wired together (DI container,
+- `## Composition`: where objects are wired together (DI container,
   factories, `main()`).
-- `## Frontend` — for products with a human-facing UI: rendering model
+- `## Frontend`: for products with a human-facing UI: rendering model
   (SPA/MPA/SSR/SSG/islands) per page class, routing, client entry
   points and bundles, design system / component library, and the
   API-client seam to the backend. A project with no human-facing UI
@@ -47,17 +47,17 @@ schemas, DTOs). Inapplicable only for pure-script repos.
 
 Required sections:
 
-- `## Entities` — table: name, definition site, storage (DB table /
+- `## Entities`: table: name, definition site, storage (DB table /
   in-memory / file), one-line purpose.
-- `## Fields and types` — per entity: fields with types, optionality,
+- `## Fields and types`: per entity: fields with types, optionality,
   defaults.
-- `## Relationships` — how entities reference each other (foreign keys,
+- `## Relationships`: how entities reference each other (foreign keys,
   composition, ID references).
-- `## Boundaries` — which representations exist across DB schema ↔ domain
+- `## Boundaries`: which representations exist across DB schema ↔ domain
   ↔ API/DTO, and where each conversion happens.
-- `## Validation` — where and how data is validated (library, custom, or
+- `## Validation`: where and how data is validated (library, custom, or
   recorded as absent).
-- `## Schema` — per-table DDL as the migrations define it: columns with
+- `## Schema`: per-table DDL as the migrations define it: columns with
   types and defaults, indexes, constraints; note tables with no
   corresponding code model.
 
@@ -71,14 +71,14 @@ migration files, not inferred from models.
 
 Required sections:
 
-- `## Paradigm` — the OOP/functional/procedural mix, and which parts use
+- `## Paradigm`: the OOP/functional/procedural mix, and which parts use
   which.
-- `## Typing` — the level actually in force: strictness config quoted;
+- `## Typing`: the level actually in force: strictness config quoted;
   Protocol/interface usage; enum usage; escape hatches present (`Any`,
   `as`, ignore comments) with counts and locations.
-- `## Error handling` — exceptions vs result types; where errors cross
+- `## Error handling`: exceptions vs result types; where errors cross
   boundaries; logging pattern.
-- `## Dependency injection` — how dependencies reach code: constructor,
+- `## Dependency injection`: how dependencies reach code: constructor,
   parameters, globals, container.
 
 Checklist: report what IS, including violations of the project's own
@@ -91,14 +91,14 @@ configs; counts come from grep, not impressions.
 
 Required sections:
 
-- `## Lifecycles` — each major flow (request, command, job) traced end to
+- `## Lifecycles`: each major flow (request, command, job) traced end to
   end with `file:line` at each hop.
-- `## State` — where state lives (stores, caches, DB sessions, client
+- `## State`: where state lives (stores, caches, DB sessions, client
   state) and who mutates it; for UI products, the client split:
   server-state vs UI state and the owning store/library per side.
-- `## Side-effect boundaries` — where IO happens (DB, network, disk) and
+- `## Side-effect boundaries`: where IO happens (DB, network, disk) and
   how it is isolated, or that it is not.
-- `## Failure paths` — what happens on exception, disconnect, or timeout
+- `## Failure paths`: what happens on exception, disconnect, or timeout
   at each boundary of the traced flows; consequences of partial failure
   between non-atomic steps (state saved but events dropped, etc.).
 
@@ -112,10 +112,10 @@ and uncaught propagation stated as such.
 
 Required sections:
 
-- `## Runtime dependencies` — table: package, version constraint, what it
+- `## Runtime dependencies`: table: package, version constraint, what it
   is used for, where it is integrated.
-- `## Dev and tooling` — table: package, role.
-- `## External services` — databases, APIs, brokers: connection setup
+- `## Dev and tooling`: table: package, role.
+- `## External services`: databases, APIs, brokers: connection setup
   sites and config sources.
 
 Checklist: derived from manifests cross-checked against imports; declared
@@ -128,13 +128,13 @@ configuration.
 
 Required sections:
 
-- `## Processes` — every runnable process: exact local command, container
+- `## Processes`: every runnable process: exact local command, container
   command, and what it depends on.
-- `## Configuration` — the environment variable inventory: name, default,
+- `## Configuration`: the environment variable inventory: name, default,
   consuming code, documented where.
-- `## Infrastructure` — containers/services with images, ports,
+- `## Infrastructure`: containers/services with images, ports,
   healthchecks, compose profiles, volumes.
-- `## Developer workflow` — exact commands for tests, type check,
+- `## Developer workflow`: exact commands for tests, type check,
   lint/format, and migrations.
 
 Checklist: commands verified against compose files/scripts/README, not
@@ -147,7 +147,7 @@ inferable from code structure alone.
 
 Required sections:
 
-- `## Concepts` — term → what it means in this system → where implemented
+- `## Concepts`: term → what it means in this system → where implemented
   (`file:line`).
 
 Checklist: covers every mechanism whose name alone does not explain it
@@ -157,15 +157,15 @@ not just location.
 ## testing.md
 
 **Applicable:** a test suite exists. If absent, the DESIGN.md index
-records: "testing — absent (no test suite found under <paths checked>)".
+records: "testing: absent (no test suite found under <paths checked>)".
 
 Required sections:
 
-- `## Layout` — where tests live, how they map to source, and the exact
+- `## Layout`: where tests live, how they map to source, and the exact
   command that runs them.
-- `## Doubles` — how the suite fakes collaborators (structural fakes,
+- `## Doubles`: how the suite fakes collaborators (structural fakes,
   mocks, fixtures) with cited examples.
-- `## Coverage shape` — which areas are heavily tested and which have no
+- `## Coverage shape`: which areas are heavily tested and which have no
   tests, by module, from file inspection (a coverage tool only if the
   project already configures one).
 

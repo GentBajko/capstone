@@ -1,34 +1,36 @@
-# generate — build the architecture reference
+# generate - build the architecture reference
 
 **Reads:** config → the existing `<index_file>` and stamps (mode
 select) → Phase 1's recon set (manifests, type/lint configs,
 README/CLAUDE/AGENTS, tree, entry points) → `../topics.md`. The
-deep-dive reads source per topic; nothing else unprompted.
+deep-dive reads source per topic, and the logic extraction reads the
+composed chapters (per logic.md); nothing else unprompted.
 
 Builds the descriptive reference for the current project: a lean
-`DESIGN.md` index at the project root plus chapterized topic files in
-`docs/capstone/`. The audience is future AI sessions — they read these
-docs instead of re-exploring the repository. Incremental upkeep is
-`sync`'s job; `generate` is the from-scratch verb.
+`DESIGN.md` index at the project root, chapterized topic files in
+`docs/capstone/`, and the `logic/` business-logic map. The audience is
+future AI sessions; they read these docs instead of re-exploring the
+repository. Incremental upkeep is `sync`'s job; `generate` is the
+from-scratch verb.
 
 **Announce at start:** "I'm using the capstone generate skill to build
 the architecture reference."
 
-## Phase 0 — mode select
+## Phase 0 - mode select
 
 0. Per core.md: read the config first. `docs_dir` and `index_file`
    must be relative paths inside the repository.
-1. A single topic argument → run Phase 1 recon, then Phases 2–4 for
-   that topic only, regardless of staleness — a topic argument always
-   regenerates its chapter.
-2. `rebuild` → full generation (Phases 1–4), overwriting what exists.
+1. A single topic argument → run Phase 1 recon, then Phases 2-4 for
+   that topic only, regardless of staleness; a topic argument always
+   regenerates its chapter (and skips the logic extraction).
+2. `rebuild` → full generation (Phases 1-4), overwriting what exists.
 3. Bare `generate` with no stamped index → full generation.
 4. Bare `generate` when `<docs_dir>/<index_file>` and stamped topics
    already exist → confirm once before proceeding: a full rebuild
    rewrites every chapter; `sync` refreshes only what drifted. Never
    silently rewrite a current reference.
 
-## Phase 1 — inline recon
+## Phase 1 - inline recon
 
 Do this in the main session with cheap reads only:
 
@@ -51,11 +53,11 @@ Do this in the main session with cheap reads only:
 8. Measure size: count tracked source files (`git ls-files` filtered
    to source extensions; `find` outside git).
 9. If that count is ~0 and no entry points or manifests were found,
-   stop here. There is nothing to describe yet — generate nothing and
+   stop here. There is nothing to describe yet; generate nothing and
    point the user at `start` (or `architecture` directly), the
    greenfield path.
 
-## Phase 2 — deep-dive
+## Phase 2 - deep-dive
 
 - **At or below the subagent threshold (default 150 source files):**
   analyze each applicable topic inline yourself, against that topic's
@@ -68,13 +70,13 @@ Do this in the main session with cheap reads only:
      `../topics.md`.
   2. The full module map from Phase 1, marked authoritative:
      "Do not re-derive the module map."
-  3. The rules: read-only — modify nothing; facts only; a `file:line`
+  3. The rules: read-only, modify nothing; facts only; a `file:line`
      pointer for every claim; no recommendations; return raw markdown
      matching the required sections, no preamble.
 
-## Phase 3 — compose
+## Phase 3 - compose
 
-1. Write each topic file **chapterized** — a numbered prefix in
+1. Write each topic file **chapterized**: a numbered prefix in
    reading order so the folder itself reads like a table of contents:
    `01-architecture.md`, `02-models.md`, `03-conventions.md`,
    `04-data-flow.md`, `05-dependencies.md`, `06-testing.md`,
@@ -93,7 +95,7 @@ paths_covered:
 ---
 ```
 
-2. Choose `paths_covered` globs deliberately — they drive `sync`'s
+2. Choose `paths_covered` globs deliberately; they drive `sync`'s
    staleness. Cover every directory the topic's content was derived
    from, but prefer the tightest globs that still do: package-level
    over repo-level, so unrelated commits don't mark the topic stale.
@@ -103,60 +105,70 @@ paths_covered:
    checks work from any cwd.
 3. Ensure the global config and the docs area's `.gitignore` exist by
    running the platform-appropriate initializer from the `core`
-   skill's `scripts/` directory (idempotent — never overwrites
+   skill's `scripts/` directory (idempotent, never overwrites
    either):
    `init-config.sh <docs_dir>` via bash on macOS/Linux/Git Bash, or
    `init-config.ps1 <docs_dir>` via powershell on Windows. If neither
    shell is available, write the global JSON template and the ignore
    list from core.md yourself.
-4. Append the changelog entry per core.md's Changelog ledger — key
+4. **Logic extraction**: build `docs/capstone/logic/` per logic.md's
+   extraction mode, invoked as its "Invoked by `generate` or `sync`"
+   rules say: the entry-point inventory from the module map and the
+   just-written chapters, one descriptive scenario file per scenario
+   covering logic.md's full Phase B section list, every rule cited
+   `file:line`, stamped with `paths_covered`. Above the subagent
+   threshold, dispatch extraction per scenario like Phase 2's
+   per-topic dispatch, same rules. A repo with no observable entry
+   points records `logic/` absent in the index with that reason.
+   Existing `logic/` files are left alone; extraction fills only the
+   scenarios the map is missing.
+5. Append the changelog entry per core.md's Changelog ledger, key
    `generate/<topic|all>@<the run's stamp>`; one bullet per chapter
-   written **this run** (every one, never only those you judge
-   materially changed — that judgment is the escape hatch), the
-   topics recorded absent with their reasons, and whether the index
-   was created or refreshed. Nothing written (Phase 1 step 9's
-   empty-repo stop) → no entry.
-5. Write `<index_file>` **last**, so the index reflects what was
+   and logic scenario written **this run** (every one, never only
+   those you judge materially changed; that judgment is the escape
+   hatch), the topics recorded absent with their reasons, and whether
+   the index was created or refreshed. Nothing written (Phase 1 step
+   9's empty-repo stop) → no entry.
+6. Write `<index_file>` **last**, so the index reflects what was
    actually generated. Structure:
    - Project one-liner, tech stack, and paradigm summary in a few
      lines.
    - Module map with `file:line` entry-point pointers.
    - Index table `| Topic | File | Commit | Generated |`, plus absent
      topics with their reasons.
-   - If companion docs exist (`be-review.md`, `fe-review.md`, `changelog.md`,
-     `onboarding.md`, `code-prefs.md`, `implementation.md`,
-     `guides/`, `logic/`, `mockup/`, `design/`, `features/`), list
-     them in a separate "Companion docs" table below the topic
-     index — the factual reference and the opinionated/instructional
-     outputs stay visibly distinct. Interview Q&A files are never
-     indexed.
-6. Monorepos: split a topic per subsystem while keeping the parent
+   - If companion docs exist (`be-review.md`, `fe-review.md`,
+     `changelog.md`, `onboarding.md`, `code-prefs.md`,
+     `implementation.md`, `guides/`, `logic/`, `mockup/`, `design/`,
+     `features/`), list them in a separate "Companion docs" table
+     below the topic index; the factual reference and the
+     opinionated/instructional outputs stay visibly distinct.
+     Interview Q&A files are never indexed.
+7. Monorepos: split a topic per subsystem while keeping the parent
    chapter's number (`01-architecture-frontend.md`,
    `01-architecture-backend.md`) when one file would be unwieldy; the
    index shows the split.
 
-## Phase 4 — verify
+## Phase 4 - verify
 
 1. Re-read the index: every topic link resolves to an existing file;
    every listed stamp matches that file's frontmatter.
-2. Spot-check three `file:line` pointers across topic files against
-   the actual source.
+2. Spot-check three `file:line` pointers across topic and logic files
+   against the actual source.
 3. Report to the user: files written, topics skipped or absent and
    why.
 4. The local-only outputs (`features/`, interviews, `be-review.md`,
-   `fe-review.md`,
-   `changelog.md`, `capstone.json`) are already covered by
-   `<docs_dir>/.gitignore` — this question is only about the factual
-   reference. If those generated files are untracked and not covered
-   by `.gitignore`: honor the `docs_in_git` config key when set
-   (`commit` or `ignore`); when it is `ask` or unset, ask the user
-   whether to commit them or add `/DESIGN.md` and `/docs/capstone/`
-   to `.gitignore` — never decide unilaterally. On later runs,
-   respect whichever choice is in place.
+   `fe-review.md`, `capstone.json`) are already covered by
+   `<docs_dir>/.gitignore`; this question is only about the factual
+   reference (`changelog.md` included). If those generated files are
+   untracked and not covered by `.gitignore`: honor the `docs_in_git`
+   config key when set (`commit` or `ignore`); when it is `ask` or
+   unset, ask the user whether to commit them or add `/DESIGN.md` and
+   `/docs/capstone/` to `.gitignore`; never decide unilaterally. On
+   later runs, respect whichever choice is in place.
 
 ## Workspaces
 
-When config `workspaces` is set, run Phases 1–4 once per workspace
+When config `workspaces` is set, run Phases 1-4 once per workspace
 with `<path>/docs/capstone/` as its docs area (a workspace name as
 argument targets just that one), then write the root `<index_file>`
 as an index-of-indexes: project one-liner, a workspace table (name ·
@@ -164,7 +176,7 @@ path · index link · newest stamp), and cross-cutting notes. When
 Phase 1 recon detects workspace manifests (`pnpm-workspace.yaml`,
 `go.work`, a Cargo, uv, or poetry workspace) and `workspaces` is
 unset, offer to record them in the project config (per core.md,
-creating it holding just that key if absent) — never silently.
+creating it holding just that key if absent); never silently.
 
 ## Non-git projects
 

@@ -1,17 +1,18 @@
 # Materializes capstone's files, idempotently:
 #   0. creates the global config <global>/capstone.json if absent
-#      (-Global: do only this — the SessionStart hook's mode, silent
+#      (-Global: do only this, the SessionStart hook's mode, silent
 #       unless it creates)
 #   1. migrates a legacy docs/design tree to docs/capstone
-#   2. creates <docs_dir>/.gitignore if absent
+#   2. creates <docs_dir>/.gitignore if absent; drops the stale
+#      changelog.md rule from an existing one
 # The global folder is ~/.claude, or $env:CLAUDE_CONFIG_DIR when the
 # agent sets it ($env:CAPSTONE_GLOBAL_DIR overrides both, for
 # non-Claude agents). The per-project docs/capstone/capstone.json is
-# never created here — it is optional override/state, written by
+# never created here: it is optional override/state, written by
 # protocols only when a project-scoped key gets recorded (see core.md).
 # The .gitignore goes in the docs area, which the DocsDir argument may
-# relocate. Never overwrites an existing config or ignore file. UTF-8
-# without BOM.
+# relocate. Never overwrites an existing config; only the stale-rule
+# removal above touches an existing ignore file. UTF-8 without BOM.
 # Usage: powershell -ExecutionPolicy Bypass -File init-config.ps1 [-Global] [docs_dir]
 param([switch]$Global, [string]$DocsDir = "docs/capstone")
 $Legacy = Join-Path "docs" "design"
@@ -52,7 +53,7 @@ if (-not (Test-Path $GlobalFile)) {
 }
 if ($Global) { exit 0 }
 
-# 1. Retroactive migration. Only when the new tree does not exist yet —
+# 1. Retroactive migration. Only when the new tree does not exist yet;
 #    if both are present this is not a stale layout and nothing is merged.
 if ((Test-Path $Legacy) -and -not (Test-Path $Target)) {
   $tracked = $false
@@ -90,7 +91,16 @@ if ((Test-Path $Legacy) -and -not (Test-Path $Target)) {
 New-Item -ItemType Directory -Force -Path $DocsDir | Out-Null
 $Ignore = Join-Path $DocsDir ".gitignore"
 if (Test-Path $Ignore) {
-  Write-Output "exists: $Ignore"
+  # Older versions ignored changelog.md. It is part of the reference
+  # now (follows docs_in_git), so drop the stale rule.
+  $lines = @(Get-Content $Ignore)
+  if ($lines -contains 'changelog.md') {
+    $kept = @($lines | Where-Object { $_ -ne 'changelog.md' })
+    Write-Utf8NoBom $Ignore (($kept -join "`n") + "`n")
+    Write-Output "unignored: changelog.md in $Ignore"
+  } else {
+    Write-Output "exists: $Ignore"
+  }
 } else {
   $Rules = @'
 # Capstone's local-only outputs. Committed docs are the factual
@@ -110,7 +120,6 @@ capstone.json
 review.md
 be-review.md
 fe-review.md
-changelog.md
 '@
   Write-Utf8NoBom $Ignore ($Rules + "`n")
   Write-Output "created: $Ignore"

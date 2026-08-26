@@ -32,7 +32,7 @@ OpenCode. Plain `SKILL.md` files, MIT.
 | --- | --- |
 | `/capstone:start` | The pipeline: mockup → logic → design → architecture → code-prefs → stack → build, resuming at the first unfinished stage |
 | `/capstone:generate` | Build the reference from scratch (`rebuild` forces, a topic name targets one chapter) |
-| `/capstone:sync` | Refresh what drifted; `sync check` is the read-only trust report |
+| `/capstone:sync` | Refresh what drifted and extract `logic/` scenarios the map is missing; `sync check` is the read-only trust report |
 | `/capstone:doctor` | Diagnose and repair the docs area: torn writes, index drift, voided approvals, absorption gaps |
 | `/capstone:ask <question>` | Answer from the docs, with citations |
 | `/capstone:changelog [<ref>]` | Architecture-level change history since a ref, plus the append-only ledger every writing command records itself in |
@@ -58,8 +58,9 @@ OpenCode. Plain `SKILL.md` files, MIT.
 <details>
 <summary>What do the generated docs look like?</summary>
 
-`/capstone:generate` produces a `DESIGN.md` index and eight numbered
-chapters in `docs/capstone/`:
+`/capstone:generate` produces a `DESIGN.md` index, eight numbered
+chapters in `docs/capstone/`, and a `logic/` folder mapping the
+observed business logic scenario by scenario:
 
 ```
 01-architecture.md   layers, boundaries, entry points, dispatch tables
@@ -73,9 +74,10 @@ chapters in `docs/capstone/`:
 ```
 
 Everything is facts with `file:line` citations, never advice.
-`/capstone:sync` refreshes only what drifted; `sync check` reports
-staleness, citation drift, and unabsorbed features without writing a
-byte. `/capstone:ask` answers questions from the docs instead of
+`/capstone:sync` refreshes only what drifted and extracts any
+business-logic scenarios the map is missing; `sync check` reports
+staleness, citation drift, logic-coverage gaps, and unabsorbed
+features without writing a byte. `/capstone:ask` answers questions from the docs instead of
 re-reading your source. `/capstone:doctor` repairs the docs area's
 own wounds. Every command declares exactly what it reads before
 acting, so re-runs don't burn tokens re-exploring what the docs
@@ -165,7 +167,7 @@ capstone asks how many people might use the thing rather than what
 your p99 latency budget is, derives the technical targets itself, and
 confirms them in words you can sanity-check. Set
 `teaching_mode: true` and it also narrates what it's doing and why as
-it works, naming the proper term for each concept — one per step — so
+it works, naming the proper term for each concept, one per step, so
 you learn the craft along the way. The output stays
 rigorous either way. Engineers set `expertise: 5` for terse questions
 and trade-off tables.
@@ -176,7 +178,7 @@ and trade-off tables.
 <summary>Settings</summary>
 
 Installing creates `~/.claude/capstone.json` (the first session after
-install runs the plugin's SessionStart hook) — one config for the
+install runs the plugin's SessionStart hook): one config for the
 user, shared by every project:
 
 ```json
@@ -194,12 +196,13 @@ user, shared by every project:
 `expertise` (1 to 5) is asked once and saved. `teaching_mode: true`
 makes capstone narrate and teach as it works, at any expertise level.
 `docs_in_git` governs
-the factual reference only; interviews, `features/`, the reviews, and
-the changelog stay local via a generated `.gitignore`.
+the factual reference, `changelog.md` included; interviews,
+`features/`, and the two reviews stay local via a generated
+`.gitignore`.
 `subagent_threshold` is the source-file count above which `generate`
 fans out subagents. Project-scoped state lives in an optional
 `docs/capstone/capstone.json`, created only when there is something to
-record — any global key set there overrides the global file for that
+record; any global key set there overrides the global file for that
 repo, `pipeline` records the one-time
 pipeline-or-generate choice on repos that already have code, and
 `workspaces` gives each monorepo workspace its own docs area with the

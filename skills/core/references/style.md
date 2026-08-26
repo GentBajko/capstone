@@ -1,12 +1,11 @@
 # Writing Rules for Generated Docs
 
 The audience is a future Claude session with zero context that must answer
-architecture questions without exploring the repo. Every rule below serves
-that reader.
+architecture questions without exploring the repo.
 
 ## Voice
 
-- Declarative facts only. "Commands are validated in `server/ws.py:88`" —
+- Declarative facts only. "Commands are validated in `server/ws.py:88`",
   never "commands should be validated" or "consider validating".
 - No recommendations, no judgments, no TODOs, no hedging ("probably",
   "seems to", "appears").
@@ -34,7 +33,7 @@ that reader.
 
 ## Structure
 
-- Follow the required section templates in `topics.md` exactly — future
+- Follow the required section templates in `topics.md` exactly: future
   sessions rely on stable headings to jump to what they need.
 - Absent things are facts too: record them where a reader would look
   ("No message queue; all communication is synchronous websocket frames").

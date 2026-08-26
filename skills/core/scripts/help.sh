@@ -2,7 +2,7 @@
 # Prints capstone usage. Single source of truth for the help text.
 # Keep in sync with help.ps1 (same text; lint-sync.sh asserts it).
 cat <<'EOF'
-capstone — codebase architecture reference generator
+capstone - codebase architecture reference generator
 
 Usage: /capstone:<command>
 
@@ -15,9 +15,10 @@ Usage: /capstone:<command>
                        a topic name regenerates one chapter
                        (architecture, models, conventions, data-flow,
                         dependencies, testing, operations, glossary)
-  sync                 Refresh only the stamped files whose covered paths changed
+  sync                 Refresh the stamped files that drifted; extract the
+                       logic/ scenarios the business-logic map is missing
   sync check           Read-only trust report: staleness, pointer drift,
-                       absorption drift, stack re-vetting
+                       absorption drift, logic coverage, stack re-vetting
   doctor               Verify and repair the docs area: torn writes, index
                        drift, voided approvals, absorption gaps
   ask <question>       Answer an architecture question from the docs, with citations
@@ -44,8 +45,9 @@ Usage: /capstone:<command>
 
   help                 Show this message
 
-Output: DESIGN.md (root index) + docs/capstone/*.md topic files, each stamped
-with the commit it was derived at. `sync` refreshes only what drifted.
+Output: DESIGN.md (root index), docs/capstone/*.md topic files, and the
+logic/ scenario map, each stamped with the commit it was derived at.
+`sync` refreshes only what drifted.
 Docs are strictly descriptive; only be-review and fe-review judge.
 Every command that writes records itself in docs/capstone/changelog.md.
 
@@ -53,7 +55,7 @@ Interview commands accept an optional artifact argument (a PRD, notes,
 screenshots) that pre-fills answers for your confirmation.
 
 Config: capstone.json in the agent's global folder (~/.claude; created
-at install) — expertise 1-5 (vibe coder ... architect; how technical
+at install): expertise 1-5 (vibe coder ... architect; how technical
 conversations are, asked once then saved), teaching_mode (true =
 narrate and teach while working), docs_dir, index_file,
 subagent_threshold, docs_in_git, language. Per-project state and
