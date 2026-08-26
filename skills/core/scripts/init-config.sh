@@ -86,9 +86,11 @@ mkdir -p "$DOCS_DIR"
 IGNORE="$DOCS_DIR/.gitignore"
 if [ -f "$IGNORE" ]; then
   # Older versions ignored changelog.md. It is part of the reference
-  # now (follows docs_in_git), so drop the stale rule.
+  # now (follows docs_in_git), so drop the stale rule. sed, not
+  # grep -v: grep exits 1 when nothing survives, which set -e would
+  # turn into a crash on a one-line ignore file.
   if grep -q '^changelog\.md$' "$IGNORE"; then
-    grep -v '^changelog\.md$' "$IGNORE" > "$IGNORE.capstone-tmp" \
+    sed '/^changelog\.md$/d' "$IGNORE" > "$IGNORE.capstone-tmp" \
       && mv "$IGNORE.capstone-tmp" "$IGNORE"
     echo "unignored: changelog.md in $IGNORE"
   else
