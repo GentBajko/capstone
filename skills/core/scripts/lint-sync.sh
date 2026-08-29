@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 # Asserts every keep-in-sync-by-hand invariant in this plugin.
 # Run from the repo root. Exit non-zero listing each failure.
-# help-hook.sh is exempt from the .sh/.ps1 pair rule: hooks.json invokes
-# bash explicitly, so it is bash-only by design.
+# Two scripts are exempt from the .sh/.ps1 pair rule. help-hook.sh:
+# hooks.json invokes bash explicitly, so it is bash-only by design.
+# This file: it never runs on a user machine, only in CI and on
+# contributor machines, and Git Bash covers Windows there (contributing
+# needs git, and Git for Windows ships bash). A hand-mirrored twin of
+# this file drifts silently - a missing check still reports success -
+# so there is deliberately only one implementation.
 # POSIX-portable regex only: no GNU-only \| or \b, so this runs on
 # macOS/BSD grep as well as GNU.
 set -u
@@ -164,12 +169,17 @@ for f in skills/core/references/core.md README.md; do
   done
 done
 
-# 8. .sh/.ps1 pairing (help-hook.sh exempt, lint-sync pairs with itself)
+# 8. .sh/.ps1 pairing. Exempt: help-hook.sh and lint-sync.sh (see header).
 for s in skills/core/scripts/*.sh; do
   b=$(basename "$s" .sh)
-  case "$b" in help-hook) continue;; esac
+  case "$b" in help-hook|lint-sync) continue;; esac
   [ -f "skills/core/scripts/$b.ps1" ] || err "$b.sh has no $b.ps1 twin"
 done
+# 8b. ...and the lint twin must not come back by reflex. Every defect the
+#     mirror ever had was a sync defect: blocks silently absent, or placed
+#     after the exit so they never ran. One implementation cannot drift.
+[ -e "skills/core/scripts/lint-sync.ps1" ] \
+  && err "lint-sync.ps1 is back; the lint is bash-only by design (see header)"
 
 # 9. every tracked .json parses (a stray comma in marketplace.json breaks
 #    installation for every user, and no grep-based check would see it)

@@ -39,18 +39,14 @@ jobs:
           }
           if ($failed) { exit 1 }
 
-  # The PowerShell twin is the Windows contributor's only lint. Parsing it
-  # is not enough - it must actually run, on both shells the docs name.
-  lint-sync-windows:
+  # init-config.ps1 and help.ps1 run on user machines, so parsing them is
+  # not enough: every defect the .ps1 scripts have had showed up only when
+  # they were executed. The lint is not run here - it is bash-only by
+  # design (lint-sync.sh's header), and Git Bash covers Windows.
+  windows-scripts:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Cross-file invariants (PowerShell 7)
-        shell: pwsh
-        run: ./skills/core/scripts/lint-sync.ps1
-      - name: Cross-file invariants (Windows PowerShell 5.1)
-        shell: powershell
-        run: ./skills/core/scripts/lint-sync.ps1
       - name: Help script runs
         shell: pwsh
         run: |
@@ -75,4 +71,20 @@ jobs:
           if (($out -join ' ') -notmatch 'unignored: changelog.md') { Write-Output "unignore migration did not report: $out"; exit 1 }
           if (Select-String -Path docs/capstone/.gitignore -Pattern '^changelog\.md$' -Quiet) { Write-Output "stale changelog.md rule not removed"; exit 1 }
           if (-not (Select-String -Path docs/capstone/.gitignore -Pattern '^features/$' -Quiet)) { Write-Output "migration dropped other rules"; exit 1 }
+          Pop-Location
+      # Windows ships PowerShell 5.1, and it is what the docs tell users to
+      # run (help/SKILL.md's `powershell -File`, generate.md's init-config).
+      # pwsh 7 passing proves nothing about 5.1, so smoke both there too.
+      - name: User-facing scripts run on Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          $out = ./skills/core/scripts/help.ps1
+          if (-not $out) { Write-Output "help.ps1 produced no output on 5.1"; exit 1 }
+          $tmp = Join-Path $env:RUNNER_TEMP "capstone-init-51"
+          New-Item -ItemType Directory -Force $tmp | Out-Null
+          $env:CAPSTONE_GLOBAL_DIR = Join-Path $env:RUNNER_TEMP "capstone-global-51"
+          Push-Location $tmp
+          & $env:GITHUB_WORKSPACE/skills/core/scripts/init-config.ps1 docs/capstone
+          if (-not (Test-Path (Join-Path $env:CAPSTONE_GLOBAL_DIR "capstone.json"))) { Write-Output "global config not created on 5.1"; exit 1 }
+          if (-not (Test-Path docs/capstone/.gitignore)) { Write-Output ".gitignore not created on 5.1"; exit 1 }
           Pop-Location
