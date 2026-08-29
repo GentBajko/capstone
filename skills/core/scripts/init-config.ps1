@@ -53,6 +53,11 @@ if (-not (Test-Path $GlobalFile)) {
 }
 if ($Global) { exit 0 }
 
+# git may be absent (a plain download, or simply not on PATH). Every
+# call below is guarded by this, so the migrations fall back to plain
+# moves instead of spraying not-recognized errors at the user.
+$HasGit = [bool](Get-Command git -ErrorAction SilentlyContinue)
+
 # 1. Retroactive migration. Only when the new tree does not exist yet;
 #    if both are present this is not a stale layout and nothing is merged.
 if ((Test-Path $Legacy) -and -not (Test-Path $Target)) {
@@ -101,7 +106,7 @@ if (Test-Path $ProjCfg) {
 if ((Test-Path $OldIdx) -and (-not (Test-Path $NewIdx)) -and
     (($CfgIdx -eq "") -or ($CfgIdx -eq $OldIdx))) {
   New-Item -ItemType Directory -Force -Path $DocsDir | Out-Null
-  $tracked = & git ls-files $OldIdx 2>$null
+  $tracked = if ($HasGit) { & git ls-files $OldIdx 2>$null } else { $null }
   if ($tracked) { & git mv $OldIdx $NewIdx 2>$null; if ($LASTEXITCODE -ne 0) { Move-Item $OldIdx $NewIdx } }
   else { Move-Item $OldIdx $NewIdx }
   Write-Output "migrated: $OldIdx -> $NewIdx"
@@ -134,7 +139,7 @@ foreach ($pair in @(@('design', 'uiux'), @('design-interview.md', 'uiux-intervie
   $old = Join-Path $DocsDir $pair[0]
   $new = Join-Path $DocsDir $pair[1]
   if ((Test-Path $old) -and (-not (Test-Path $new))) {
-    $tracked = & git ls-files $old 2>$null
+    $tracked = if ($HasGit) { & git ls-files $old 2>$null } else { $null }
     if ($tracked) { & git mv $old $new 2>$null; if ($LASTEXITCODE -ne 0) { Move-Item $old $new } }
     else { Move-Item $old $new }
     Write-Output "migrated: $old -> $new"

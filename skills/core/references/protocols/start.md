@@ -58,7 +58,7 @@ wherever it stopped:
    - On a `generate` answer: execute `protocols/generate.md` now and
      end the pipeline run.
 5. Run the first non-done stage by executing its protocol file
-   (`mockup.md`, `logic.md`, `design.md`, `architecture.md`,
+   (`mockup.md`, `logic.md`, `uiux.md`, `architecture.md`,
    `code-prefs.md`, `stack.md`, `build.md`) exactly, including its
    own formalization gate. Do not blend stages.
 6. When a stage formalizes, announce it in one line and continue to

@@ -11,9 +11,9 @@ protocol files.
 2. Route on the first argument. The reserved subcommand words
    (`generate`, `sync`, `doctor`, `review`, `mockup`,
    `logic`, `uiux`, `architecture`, `code-prefs`, `stack`, `build`,
-   `groom`, `plan`, `implement`, `implementation`, `start`) each route
-   to `protocols/<name>.md`:
-   execute that one protocol exactly; behaviors live there, not here.
+   `groom`, `plan`, `implement`, `implementation`, `start`)
+   each route to `protocols/<name>.md`: execute that one protocol
+   exactly; behaviors live there, not here.
 3. Exception: when invoked as `generate`, topic names win over
    subcommand words: `generate architecture` regenerates
    `01-architecture.md` and never starts the architecture interview.

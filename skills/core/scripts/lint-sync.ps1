@@ -288,13 +288,10 @@ foreach ($f in @('skills/core/scripts/help.sh', 'skills/core/scripts/help.ps1', 
   }
 }
 $pipeArrow = [char]0x2192
-$pipeReadme = "mockup $pipeArrow logic $pipeArrow design $pipeArrow architecture $pipeArrow code-prefs $pipeArrow stack $pipeArrow build"
+$pipeReadme = "mockup $pipeArrow logic $pipeArrow uiux $pipeArrow architecture $pipeArrow code-prefs $pipeArrow stack $pipeArrow build"
 if (-not (Select-String -Path README.md -Pattern $pipeReadme -SimpleMatch -Quiet)) {
   Err "README.md missing the pipeline-order string"
 }
-
-if ($Fail -eq 0) { Write-Output "lint-sync: all invariants hold" } else { Write-Output "lint-sync: FAILURES above" }
-exit $Fail
 
 # 12c. execution is capstone's own: the two code-writing stages ask the
 #      user for subagent-vs-inline, and no protocol invokes superpowers
@@ -312,3 +309,57 @@ if ($sp) { Err "a protocol invokes a superpowers skill: $($sp.Name -join ' ')" }
 if (Select-String -Path skills/core/references/core-authoring.md -Pattern 'superpowers' -SimpleMatch -Quiet) {
   Err "core-authoring.md still lists superpowers as an installable delegation"
 }
+
+# 12d. review is one command with two sides, one output file, ignored
+foreach ($pat in @('docs/capstone/review.md', 'rewrites only its own section')) {
+  if (-not (Select-String -Path skills/core/references/protocols/review.md -Pattern $pat -SimpleMatch -Quiet)) {
+    Err "review.md missing: $pat"
+  }
+}
+foreach ($f in @('skills/core/scripts/init-config.sh', 'skills/core/scripts/init-config.ps1')) {
+  if (-not (Select-String -Path $f -Pattern '^review\.md$' -Quiet)) {
+    Err "$f ignore template does not cover review.md"
+  }
+}
+if (-not (Select-String -Path skills/core/references/core.md -Pattern 'sole opinionated output' -SimpleMatch -Quiet)) {
+  Err "core.md does not name review as the sole opinionated output"
+}
+
+# 12e. the craft files are the method, not a fallback
+foreach ($n in @('uiux', 'review', 'build')) {
+  if (Select-String -Path "skills/core/references/protocols/$n.md" -Pattern 'impeccable|design-taste|improve-codebase-architecture|codebase-design' -Quiet) {
+    Err "protocol $n.md still routes method to an installed skill"
+  }
+}
+if (Select-String -Path skills/core/references/core-authoring.md -Pattern 'Delegation installs' -SimpleMatch -Quiet) {
+  Err "core-authoring.md still carries the Delegation installs section"
+}
+foreach ($f in @('uiux-craft', 'arch-craft')) {
+  foreach ($pat in @('**Attribution.**', 'This file is the method')) {
+    if (-not (Select-String -Path "skills/core/references/$f.md" -Pattern $pat -SimpleMatch -Quiet)) {
+      Err "$f.md missing: $pat"
+    }
+  }
+}
+foreach ($pair in @(@('uiux-craft', 'Apache License 2.0'),
+                    @('uiux-craft', 'Copyright (c) 2026 Leonxlnx'),
+                    @('arch-craft', 'Matt Pocock'))) {
+  if (-not (Select-String -Path "skills/core/references/$($pair[0]).md" -Pattern $pair[1] -SimpleMatch -Quiet)) {
+    Err "$($pair[0]).md missing licence line: $($pair[1])"
+  }
+}
+
+# 12f. uiux/ gets the same generate+sync extraction logic/ has
+foreach ($pair in @(
+    @('generate.md', '**Design extraction**'),
+    @('sync.md', '**Design coverage.**'),
+    @('uiux.md', 'Invoked by `generate` or `sync`'),
+    @('logic.md', 'Invoked by `generate` or `sync`'),
+    @('sync.md', 'never touched here'))) {
+  if (-not (Select-String -Path "skills/core/references/protocols/$($pair[0])" -Pattern $pair[1] -SimpleMatch -Quiet)) {
+    Err "$($pair[0]) missing: $($pair[1])"
+  }
+}
+
+if ($Fail -eq 0) { Write-Output "lint-sync: all invariants hold" } else { Write-Output "lint-sync: FAILURES above" }
+exit $Fail

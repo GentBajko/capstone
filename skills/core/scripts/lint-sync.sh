@@ -123,8 +123,13 @@ done
 
 # 5b. the dispatcher's reserved-word list carries every routable
 #     subcommand (on Gemini, skills/core/references/dispatcher.md is the only entry point)
+# both anchors must be present: without the end anchor sed runs to EOF
+# and the check silently degrades into "is the name anywhere in the file"
+grep -q 'The reserved subcommand words' skills/core/references/dispatcher.md \
+  || err "dispatcher.md reserved-subcommand sentence not found"
+grep -q 'each route to' skills/core/references/dispatcher.md \
+  || err "dispatcher.md routing sentence lost its 'each route to' anchor"
 ROUTELIST=$(sed -n '/The reserved subcommand words/,/each route to/p' skills/core/references/dispatcher.md)
-[ -n "$ROUTELIST" ] || err "dispatcher.md reserved-subcommand sentence not found"
 for p in skills/core/references/protocols/*.md; do
   n=$(basename "$p" .md)
   printf '%s' "$ROUTELIST" | grep -q "\`$n\`" || err "dispatcher.md routing list missing $n"
