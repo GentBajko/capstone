@@ -5,7 +5,7 @@ description: Use when the capstone docs area needs a consistency check or repair
 
 # Capstone: doctor
 
-From this skill's base directory, read `../core/references/core.md`, then
-execute
+From this skill's base directory, read `../core/references/core.md`
+and `../core/references/core-authoring.md`, then execute
 `../core/references/protocols/doctor.md`
 exactly.

@@ -5,7 +5,7 @@ description: Use when picking the concrete libraries, packages, and paid service
 
 # Capstone: stack
 
-From this skill's base directory, read `../core/references/core.md`, then
-execute
+From this skill's base directory, read `../core/references/core.md`
+and `../core/references/core-authoring.md`, then execute
 `../core/references/protocols/stack.md`
 exactly.

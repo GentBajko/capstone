@@ -68,7 +68,8 @@ everything. `plan.md`:
   then checkbox (`- [ ]`) steps of 2-5 minutes each: write the failing
   test (the actual test code), run it and see it fail (exact command,
   expected failure), implement minimally (the actual code), run it and
-  see it pass (exact command), commit.
+  see it pass (exact command), commit (message per code-craft's Git
+  section: `<type>(<scope>): <subject>` plus the why in the body).
 - Backend before frontend where the feature spans both.
 - **Coverage**, the closing section: a table with one row per
   numbered spec requirement, per Behavior rule (each happy-path step,

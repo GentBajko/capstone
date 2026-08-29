@@ -1,12 +1,11 @@
-# design - frontend design from the mockup and logic
+# uiux - how the UI looks and how the UX behaves
 
-**Reads:** config → `design-interview.md` (resume) →
+**Reads:** config → `uiux-interview.md` (resume) →
 `docs/capstone/mockup/` and `mockup-interview.md` (the brief) →
 `docs/capstone/logic/` (states, unhappy paths) → the existing
-`design/` outputs when re-entering → `../design-craft.md` (§7-8
-always; §1-6 only without the installed skills) → in extraction mode:
-the conventions and architecture chapters, then the frontend token,
-component, and route sources.
+`uiux/` outputs when re-entering → `../uiux-craft.md` (the method,
+in full) → in extraction mode: the conventions and architecture
+chapters, then the frontend token, component, and route sources.
 
 Sits between `logic` and `architecture`: turns the mockup's screens
 and the logic's rules into a committed frontend design (direction,
@@ -14,59 +13,37 @@ design system, one design chapter per screen) that `stack` honors and
 `build` implements. Docs only, never code. Like `code-prefs`, the
 output is normative but records only decisions the user has confirmed.
 
-## Method sources
+## Method
 
-Detected fresh every session from the skill list, never cached; a
-resume on another machine degrades gracefully, and decisions already
-recorded in the interview file stand whichever source asked them:
+`../uiux-craft.md` is the method, in full and for every surface:
+§1-3 the posture, modes, and dials; §4 the visual world and the
+direction session's five steps; §5 the direction contract; §6 the
+craft rules; §7 the refuse list and rulings; §8 the pre-flight; §9 the
+extraction pass. No installed skill substitutes for it, so the same
+project designs the same way on any machine and a resume elsewhere
+reaches the same questions.
 
-- **`impeccable` installed**: invoke it and follow its flows by name,
-  never by file path: `shape`'s discovery for what the capstone docs
-  leave open; `new-work` for the visual world (visual authority, the
-  cultural-world candidates, its concept roll, challenger cards, the
-  standing exit, its decision page and sketches when available); its
-  visualize step when image generation exists. Feed it
-  `docs/capstone/mockup/`, `docs/capstone/logic/`, and
-  `mockup-interview.md` as the brief: impeccable's first rule is that
-  the brief wins, so the user is never re-asked product truth.
-  Impeccable may write its own working artifacts (`PRODUCT.md`,
-  `.impeccable/`, surface briefs) per its own rules: core.md hard
-  rule 2's stated exception; they are not capstone outputs and are
-  never indexed.
-- **`design-taste-frontend` installed**: load it for the Persuade,
-  Read, and Experience surfaces the mockup implies: landing, marketing,
-  editorial, and showcase screens are its declared scope. Its dials,
-  design-system map, layout discipline, and pre-flight bind those
-  surfaces; record its dial values as decisions. It declares itself out
-  of scope for Operate surfaces (dashboards, dense product UI, data
-  tables, wizards); say so rather than stretching it over them.
-- **Any surface no installed skill covers**: `../design-craft.md`
-  §1-6 is the method source: with neither skill installed, that is
-  every surface; with only Taste installed, it is the Operate screens
-  Taste declines. Impeccable covers every mode, so its presence closes
-  §1-6 entirely.
-- **Always, delegated or not**: `../design-craft.md` §7 (refuse list
-  and the rulings where the two skills disagree) and §8 (the split
-  pre-flight) apply.
+**Capabilities, not method.** Two things the harness may or may not
+have change what this stage can *do*, never how it decides: image
+generation (the direction's sketches, offered when it exists and
+skipped in one line when it does not) and a live browser (screenshots
+of an existing frontend in extraction mode). Their absence never
+changes a design decision.
 
-A named skill missing on an interactive run → offer its install per
-core.md's Delegation installs before taking the fallback.
-
-Conversation cadence is capstone's whatever the source: one question
-per turn, expertise-calibrated per core.md (level 1 hears "calm or
-bold?", never "what DESIGN_VARIANCE?"); impeccable's decision page
-counts as one question. Every decision, whichever skill produced it,
-is appended to the interview file before the next question.
+Conversation cadence: one question per turn, expertise-calibrated per
+core.md (level 1 hears "calm or bold?", never "what
+DESIGN_VARIANCE?"). Every decision is appended to the interview file
+before the next question.
 
 ## Phase A - setup / resume
 
-State: `docs/capstone/design-interview.md` (standard resumable format
+State: `docs/capstone/uiux-interview.md` (standard resumable format
 and lifecycle per core.md: numbered `### Q<n>` entries with question,
 answer as given, and normalized decision, plus an `## Open threads`
 ledger seeded once with three areas: direction, system, screens).
 Resume = read the file, never re-ask. An artifact argument (brand
 book, Figma export, reference screenshots) seeds the interview per
-core.md's Artifact seeding rule.
+core-authoring.md's Artifact seeding rule.
 
 Prerequisite: either `mockup-interview.md` is `formalized` with
 `docs/capstone/mockup/` on disk (greenfield: the screens are this
@@ -76,7 +53,7 @@ Extraction mode below). Neither → say so, point at `mockup` (or
 
 If the mockup's `surfaces` frontmatter records no visual surface
 (`cli`/`api`/`none` only), there is nothing to design: write
-`design-interview.md` with `status: formalized` and `skipped: no-ui`
+`uiux-interview.md` with `status: formalized` and `skipped: no-ui`
 in its frontmatter, append the changelog entry (key
 `design/skipped@<stamp>`, recording the surfaces that made it moot)
 and hand back; inside `start` the pipeline continues.
@@ -88,20 +65,42 @@ leans on the mockup's `## States` sections only.
 
 With no mockup but existing frontend code, this stage documents the
 incumbent design as observed fact instead of interviewing a new one.
-With `impeccable` installed, its `document` flow is the method;
-otherwise extract guided by `../design-craft.md`'s §6 categories. Read
-the conventions and architecture chapters first, then the frontend
-sources of visual truth (tokens, theme, components, routes/views).
+`../uiux-craft.md` §9 is the method: its read order (tokens and
+theme, the component language and the states each primitive actually
+implements, routes and their observed modes, each surface's
+composition), and its rule that what you cannot find is itself a
+finding. Read the conventions and architecture chapters first, then
+those frontend sources of visual truth.
 Confirm only the surface inventory with the user (which routes are the
-screens), then write `design/` as observed: `01-direction.md` records
+screens), then write `uiux/` as observed: `01-direction.md` records
 the incumbent world as found (no contract blocks are invented for
 it), `02-system.md` the observed tokens and components with
-`file:line` cites, `screens/NN-<route>.md` per confirmed surface.
+`file:line` cites, `03-experience.md` the interaction patterns the
+code actually implements (what confirms, what undoes, what retries,
+what a slow request renders, what is remembered between visits), and
+`screens/NN-<route>.md` per confirmed surface.
 Every file carries `paths_covered` (the frontend globs it was read
 from) so `sync` refreshes it as the code moves. Voice: descriptive;
 this mode records what is, never what should be; the changelog key is
 `design/all@<stamp>` (no interview to number). The greenfield
 interview phases below do not run.
+
+**Invoked by `generate` or `sync`** (their design-coverage steps):
+run the extraction above, scoped to the surfaces no design chapter
+claims, with these differences: the files are written directly as
+descriptive observations (hard rule 1; no confirmation gate), the
+surface inventory is confirmed with the user only when the run is
+interactive, no `uiux-interview.md` is created (nothing was asked),
+and the invoking protocol's changelog entry records the files instead
+of a `uiux/` key. `01-direction.md` is written only when the
+extraction can actually observe a direction: tokens and a component
+language that hold across surfaces. Where it cannot, the file records
+that the incumbent has no consistent visual system, with the
+divergences as evidence, and no contract blocks are invented.
+
+A later standalone `uiux` run confirms or corrects those drafts and
+records the decisions as usual: that is what turns an extracted
+description into the committed design the rest of the pipeline reads.
 
 ## Phase B - the design read (the seeds)
 
@@ -128,19 +127,27 @@ The seeds (the only predetermined questions):
 3. The use scene: who uses this, where, under what ambient light;
    and let the answer force light, dark, or both. Never a category
    default.
+4. The UX posture: "when the user is mid-task and something goes
+   wrong, should the product get out of the way, or stop them and
+   make them confirm?" The answer sets the default for confirmations,
+   undo, destructive actions, and how loudly errors interrupt.
 
-## Phase C - direction, system, screens
+## Phase C - direction, system, experience, screens
 
-Generation rule for every question after the seeds: **"if I had to
-lay out every screen right now, what design decision would I have to
-invent?"** The next question is whatever tops that list, routed
-through the method source:
+Two generation rules run together, and whichever list is longer picks
+the next question: **"if I had to lay out every screen right now, what
+visual decision would I have to invent?"** and **"if I had to make
+this product feel right to use, what interaction decision would I have
+to invent?"** The first drives Direction, System, and Screens; the
+second drives Experience. A stage that only ever asks the first
+produces a good-looking product nobody can operate.
 
-- **Direction** (the visual world): with impeccable, run new-work's
-  process faithfully, including its roll and its standing exit (the
-  category standard, always offered, never recommended), recording
-  the assignment, the challengers, the canon option, and the user's
-  choice; without it, follow design-craft §4-5. Then the color
+- **Direction** (the visual world): run uiux-craft §4's direction
+  session, all five steps in order (the four sentences, the rut struck
+  out, the candidate worlds as a set, one commitment presented in full
+  with its alternates, and the standing exit offered last), recording
+  the candidates, the commitment, the alternates declined, and the
+  user's choice. Then §5's contract, the color
   strategy (Restrained / Committed / Full palette / Drenched; Operate
   surfaces floor at Restrained), faces chosen past the anti-default
   list, and the calibration self-check: guessable from the category
@@ -149,6 +156,19 @@ through the method source:
   per shipped theme, the single locked accent, spacing and radius
   locks, icon family, motion language, and the component-library /
   design-system pick (a user decision `stack` will honor).
+- **Experience** (how it behaves): the decisions no wireframe shows
+  and no business rule settles, asked once and applied everywhere.
+  Navigation model and how the user knows where they are. Feedback:
+  what is optimistic, what waits, and what the wait looks like past
+  roughly a second. Destructive actions: confirm, undo, or both, per
+  the posture seed. Error recovery: what the product does with the
+  user's work when a step fails, and whether it retries silently.
+  Progressive disclosure: what is visible by default versus behind a
+  step. Input burden: what is remembered, defaulted, or asked again.
+  Keyboard, pointer, and touch expectations, and the accessibility
+  floor (`logic`'s rules say what must be true; this says what the
+  user is put through to satisfy them). Each answer is a rule
+  `screens/` then applies rather than re-decides.
 - **Screens**: for each mockup screen, resolve what the wireframe
   underdetermines: composition and focal moment, the styled meaning
   of every state (the mockup's `## States` crossed with the logic
@@ -168,9 +188,9 @@ generate until they do.
 
 ## Phase E - the design docs
 
-On formalization, first run design-craft §8's design-time pre-flight
+On formalization, first run uiux-craft §8's design-time pre-flight
 (every mode, delegated or not); fix failures before writing. Then
-write `docs/capstone/design/` (chapterized markdown, no HTML,
+write `docs/capstone/uiux/` (chapterized markdown, no HTML,
 standard frontmatter stamps plus the `§Q` entries each file
 implements, anything invented marked "assumed" inline):
 
@@ -196,8 +216,19 @@ implements, anything invented marked "assumed" inline):
   moment, 150-250ms Operate transitions, state-conveying only,
   reduced-motion behavior); the component-library / design-system
   pick with its reasoning; and `## Implementation constraints`:
-  design-craft §8's build-time checklist copied in, plus any
+  uiux-craft §8's build-time checklist copied in, plus any
   project-specific additions.
+- `03-experience.md`: the Phase C Experience answers as rules the
+  screens apply rather than re-decide: navigation model and
+  orientation; feedback thresholds (what is optimistic, what waits,
+  what a wait longer than ~1s shows); destructive-action policy
+  (confirm, undo, or both); error recovery and what happens to the
+  user's work; progressive-disclosure defaults; input burden (what is
+  remembered, defaulted, never re-asked); keyboard, pointer, and touch
+  expectations; the accessibility floor. Each rule traceable to its
+  `§Q`. `build` reads this beside `02-system.md`; `review`'s frontend
+  side judges the shipped UX against it, the same way it judges the
+  shipped UI against the system chapter.
 - `screens/<NN>-<screen>.md`: one per mockup screen, same number and
   slug as its mockup file (the subfolder exists so numbering can
   mirror `mockup/` exactly). Frontmatter names the mockup file, the
@@ -208,22 +239,24 @@ implements, anything invented marked "assumed" inline):
   logic unhappy path surfacing here, each with its styled treatment:
   empty states teach, loading is skeletal, errors name the problem
   and the recovery); `## Motion` (each moment and what it
-  communicates); `## Copy` (register, key labels, tone rules).
+  communicates); `## Copy` (register, key labels, tone rules). Where a
+  screen needs an interaction `03-experience.md` already rules on,
+  cite the rule instead of restating it; a screen that contradicts it
+  is a question for the user, not a local exception.
 - `README.md`: the folder's index, like the mockup's: a table design
   chapter → mockup screen → logic scenarios → `§Q`, with every
   "assumed" item collected for the user to review.
 
 Only after every file is on disk, append the changelog entry per
 core.md's ledger (key `design/all@Q<n>`, `<n>` the highest `### Q<n>`
-in `design-interview.md`), recording the committed direction, the
+in `uiux-interview.md`), recording the committed direction, the
 alternates and canon declined, the dial and token decisions, the
 per-screen coverage, and what the gate left vague. Add the Companion
-docs row for `design/`; then set `status: formalized` (per core.md's
+docs row for `uiux/`; then set `status: formalized` (per core.md's
 Interview lifecycle).
 
 **Handoff:** (when running inside the `start` pipeline, it continues
 automatically) next is `architecture`: its inputs are unchanged
 (mockup and logic). `stack` honors `02-system.md`'s committed picks;
 `build` implements `screens/` and enforces the Implementation
-constraints, honoring impeccable's craft floor and finish-review flow
-when that skill is installed.
+constraints, which carry uiux-craft §8's build-time checklist.

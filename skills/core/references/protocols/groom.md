@@ -3,7 +3,7 @@
 **Reads:** config → the feature's `feature-interview.md` (resume) →
 `<index_file>` → the touched topic chapters (after the staleness
 pass) → the `logic/` scenarios and `mockup/` screens it extends, plus
-the `design/` chapters for UI features → `code-prefs.md`.
+the `uiux/` chapters for UI features → `code-prefs.md`.
 
 First stage of the feature chain (`groom` → `plan` → `implement`,
 chained by `implementation`): turns a feature idea into a spec a
@@ -13,9 +13,10 @@ adapted to capstone: the chapters are the context, every answer
 persists before the next question, and the spec traces each
 requirement to a recorded decision.
 
-Prerequisite: a stamped `DESIGN.md` index. Without one, stop and point
-the user at `generate` (existing code) or `start` (greenfield): grooming
-against no reference is guessing.
+Prerequisite: a stamped index. Without one, build it first per core.md's
+Missing reference rule (run `sync`, which falls back to `generate`),
+then groom against it: grooming against no reference is guessing, and
+`sync` producing no index either is the one case that stops the run.
 
 State: `docs/capstone/features/<NN>-<slug>/feature-interview.md`, same
 resumable format as the other interviews (frontmatter with `status`,
@@ -29,8 +30,20 @@ docs row. Later stages add their own keys to the same frontmatter
 feature is built.
 
 **Resume:** before anything else, match the request against existing
-`docs/capstone/features/*/` slugs and spec titles: never mint a new
-`<NN>` for a feature that already has a folder. On a match, read its
+`docs/capstone/features/*/` slugs and spec titles **and against the
+`implement/<NN>-<slug>` keys in `changelog.md`**, whose features are
+shipped and whose folders `implement` deleted. Never mint a new `<NN>`
+that a key already retired, and never reuse a retired slug's number.
+
+A match on a changelog key only (no folder) is a **shipped** feature:
+say so and show that entry. A request to change it is a new feature
+grooming against the shipped behavior now recorded in `logic/` and the
+chapters, not a reopening: give it the next `<NN>`, and have its `§Q`
+entries cite the earlier key as the thing being amended. There is no
+folder to reopen, and re-deriving one from the changelog would invent
+decisions the user never restated.
+
+A match on a folder still present continues as before: read its
 `feature-interview.md` and continue: `interviewing` resumes the
 interview after re-running Phase A's staleness pass (never re-ask an
 answered `§Q`), `awaiting-formalization` re-presents the gate,
@@ -45,7 +58,7 @@ recorded `§Q` decisions, without re-interviewing.
 ## Phase A - study
 
 1. Per core.md: read the config; expertise governs the conversation.
-2. From the DESIGN.md index, pick the topics the feature touches:
+2. From the index, pick the topics the feature touches:
    architecture and models almost always; the rest as the idea
    implies. Run `sync check`'s staleness test on just those topics
    and refresh any stale ones first (as `ask` does): a spec groomed
@@ -55,10 +68,10 @@ recorded `§Q` decisions, without re-interviewing.
    exists → stale by definition, refresh first.
 3. Read the picked chapters, plus whichever companion docs bear on the
    feature: the `logic/` scenarios it extends, the `mockup/` screens
-   it changes, the `design/` chapters it touches, `code-prefs.md`.
+   it changes, the `uiux/` chapters it touches, `code-prefs.md`.
    Never ask what these already answer.
 4. An artifact argument (a ticket, a PRD, notes) seeds the interview
-   per core.md's Artifact seeding rule.
+   per core-authoring.md's Artifact seeding rule.
 
 ## Phase B - the interview
 
@@ -96,9 +109,9 @@ edge-case posture, what's out of scope) and set
 - **Reference impact**: which chapters this will change once built,
   AND the scenario docs to absorb into after implementation: the
   `logic/` scenarios it adds or amends, the `mockup/` screens it
-  changes, the `design/` chapters it touches (`plan` reads this to
+  changes, the `uiux/` chapters it touches (`plan` reads this to
   scope its study; `implement`'s wrap performs the absorption; the
-  `sync` refresh and `changelog` settle the chapters).
+  `sync` refresh settles the chapters).
 - **Out of scope**: non-goals, recorded as decisions.
 
 Self-review before handing the file over (fix inline, don't re-gate):

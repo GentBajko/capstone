@@ -1,11 +1,17 @@
-# Architecture craft - be-review's fallback method
+# Architecture craft - review's backend method
 
-Read by `protocols/be-review.md` when the deep-module skills
-(`improve-codebase-architecture`, `codebase-design`) are not
-installed; when they are, their own text wins and this file stays
-closed except §5's rulings, which bind always. Adapted from
-mattpocock/skills (MIT, © Matt Pocock), the deep-module school:
-Ousterhout's depth, Feathers' seams, Fowler's smells.
+Read by `protocols/review.md`. **This file is the method** for the
+backend side, in full: no installed skill substitutes for it, so the
+same codebase is judged the same way on any machine. §5's rulings
+(recorded decisions override the baseline; skip what tooling already
+enforces) bind every finding.
+
+**Attribution.** Adapted, condensed and modified, from
+mattpocock/skills (MIT, © Matt Pocock,
+<https://github.com/mattpocock/skills>), the deep-module school:
+Ousterhout's depth, Feathers' seams, Fowler's smells. That project
+does not endorse this adaptation, and is not required for any capstone
+command to run.
 
 ## 1. Vocabulary
 

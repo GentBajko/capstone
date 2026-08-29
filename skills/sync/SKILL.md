@@ -5,7 +5,7 @@ description: Use when asked to refresh, update, or bring the architecture refere
 
 # Capstone: sync
 
-From this skill's base directory, read `../core/references/core.md`, then
-execute
+From this skill's base directory, read `../core/references/core.md`
+and `../core/references/core-authoring.md`, then execute
 `../core/references/protocols/sync.md`
 exactly.

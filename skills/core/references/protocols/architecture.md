@@ -34,7 +34,7 @@ as derived decisions; never re-ask it.
 The interview state lives in `docs/capstone/architecture-interview.md`.
 If it exists, read it and resume; never re-ask an answered question.
 An artifact argument (an RFC, an ADR set, notes) seeds the interview
-per core.md's Artifact seeding rule.
+per core-authoring.md's Artifact seeding rule.
 If not, create it, **seeding `## Open questions` once** as a
 section-granularity checkbox ledger (about 20 lines, one box per
 `../interview.md` section, not per question):

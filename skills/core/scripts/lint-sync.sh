@@ -58,6 +58,40 @@ for d in skills/*/; do
   [ -f "skills/core/references/protocols/$n.md" ] || err "skill $n has no protocol file"
   grep -q "protocols/$n\.md" "skills/$n/SKILL.md" \
     || err "skills/$n/SKILL.md does not wire protocols/$n.md"
+  grep -q 'references/core\.md' "skills/$n/SKILL.md" \
+    || err "skills/$n/SKILL.md does not wire core.md"
+  # the shared rules are split: writers read both files, the two chain
+  # runners route rather than write and read core.md alone
+  case "$n" in
+    start|implementation)
+      grep -q 'core-authoring\.md` is not' "skills/$n/SKILL.md" \
+        || err "router $n should read core.md alone and say why" ;;
+    *)
+      grep -q 'and `\.\./core/references/core-authoring\.md`' "skills/$n/SKILL.md" \
+        || err "skills/$n/SKILL.md does not wire core-authoring.md" ;;
+  esac
+done
+[ -f skills/core/references/core-authoring.md ] || err "core-authoring.md is missing"
+grep -q 'core-authoring\.md' skills/core/references/core.md \
+  || err "core.md does not point at core-authoring.md"
+grep -q 'core-authoring\.md' skills/core/references/dispatcher.md \
+  || err "dispatcher.md does not load core-authoring.md"
+# contributor-only material must not sit in the runtime path
+grep -q '^Maintenance: each subcommand' skills/core/references/core.md \
+  && err "core.md still carries the contributor Maintenance block (belongs in CONTRIBUTING.md)"
+[ -f CONTRIBUTING.md ] || err "CONTRIBUTING.md is missing"
+# each shared-rules section lives in exactly one of the two files
+for h in 'Changelog ledger' 'Interview lifecycle' 'Hard rules' 'Read discipline'; do
+  grep -q "^## .*$h" skills/core/references/core.md \
+    || err "core.md lost section: $h"
+  grep -q "^## .*$h" skills/core/references/core-authoring.md \
+    && err "core-authoring.md duplicates core.md section: $h"
+done
+for h in 'Local-only outputs' 'Artifact seeding' 'Index maintenance'; do
+  grep -q "^## .*$h" skills/core/references/core-authoring.md \
+    || err "core-authoring.md lost section: $h"
+  grep -q "^## .*$h" skills/core/references/core.md \
+    && err "core.md duplicates core-authoring.md section: $h"
 done
 
 # 3b. every protocol declares its inputs (core.md Read discipline)
@@ -89,8 +123,13 @@ done
 
 # 5b. the dispatcher's reserved-word list carries every routable
 #     subcommand (on Gemini, skills/core/references/dispatcher.md is the only entry point)
+# both anchors must be present: without the end anchor sed runs to EOF
+# and the check silently degrades into "is the name anywhere in the file"
+grep -q 'The reserved subcommand words' skills/core/references/dispatcher.md \
+  || err "dispatcher.md reserved-subcommand sentence not found"
+grep -q 'each route to' skills/core/references/dispatcher.md \
+  || err "dispatcher.md routing sentence lost its 'each route to' anchor"
 ROUTELIST=$(sed -n '/The reserved subcommand words/,/each route to/p' skills/core/references/dispatcher.md)
-[ -n "$ROUTELIST" ] || err "dispatcher.md reserved-subcommand sentence not found"
 for p in skills/core/references/protocols/*.md; do
   n=$(basename "$p" .md)
   printf '%s' "$ROUTELIST" | grep -q "\`$n\`" || err "dispatcher.md routing list missing $n"
@@ -149,6 +188,30 @@ if [ "$IN_GIT" -eq 1 ]; then
   if git grep -l 'archdesign' -- . ':!skills/core/scripts/lint-sync.*' >/dev/null 2>&1; then
     err "stale 'archdesign' references: $(git grep -l 'archdesign' -- . ':!skills/core/scripts/lint-sync.*' | tr '\n' ' ')"
   fi
+  # 10b. the removed commands must not be routable again by accident:
+  #      no protocol file, no wrapper, no help line, no dispatcher word.
+  for n in ask changelog guides onboarding be-review fe-review; do
+    [ -e "skills/$n" ] && err "removed skill skills/$n/ is back"
+    [ -e "skills/core/references/protocols/$n.md" ] \
+      && err "removed protocol $n.md is back"
+    bash skills/core/scripts/help.sh | grep -Eq "^  $n( |$)" \
+      && err "help.sh advertises removed command $n"
+    sed -n '/The reserved subcommand words/,/each route to/p' \
+      skills/core/references/dispatcher.md | grep -q "\`$n\`" \
+      && err "dispatcher.md still routes removed command $n"
+  done
+  # 10c. the index lives in the docs area and carries no stamp columns
+  for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1 \
+           skills/core/references/core.md README.md; do
+    grep -q '"index_file": "docs/capstone/00-index.md"' "$f" \
+      || err "$f does not carry the docs-area index_file default"
+  done
+  grep -q 'Topic | File | Commit' skills/core/references/protocols/generate.md \
+    && err "generate.md still specifies stamp columns in the index table"
+  for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
+    grep -q '00-index.md' "$f" || err "$f lost the root-DESIGN.md index migration"
+    grep -q 'uiux-interview.md' "$f" || err "$f lost the design->uiux migration"
+  done
 else
   echo "note: dead-name check skipped (not a git checkout)"
 fi
@@ -156,8 +219,8 @@ fi
 # 11. every writing protocol carries its changelog pointer, the exempt
 #     ones say so, and the old opt-in is gone (core.md hard rule 5 is
 #     only as good as its sites)
-for n in groom plan implement mockup logic design architecture \
-         code-prefs stack build be-review fe-review guides onboarding \
+for n in groom plan implement mockup logic uiux architecture \
+         code-prefs stack build review \
          generate sync doctor; do
   grep -q 'changelog entry' "skills/core/references/protocols/$n.md" \
     || err "protocol $n.md has no changelog-entry step"
@@ -167,11 +230,10 @@ grep -q 'Changelog ledger' skills/core/references/core.md \
 if grep -q 'Offer `changelog' skills/core/references/protocols/implement.md; then
   err "implement.md still carries the old opt-in changelog offer"
 fi
-for n in ask; do
-  grep -Eq 'no changelog entry|never appends a changelog' \
-    "skills/core/references/protocols/$n.md" \
-    || err "protocol $n.md lacks its explicit changelog exemption"
-done
+# the ledger outlived the `changelog` command: changelog.md is still
+# written by every stage, but nothing may route to a protocol for it
+grep -q 'Merges:' skills/core/references/core.md \
+  || err "core.md lost the changelog merge-resolution rule"
 
 # 12. the local-only ignore list is identical in both initializers and
 #     documented in core.md (hand-synced across three files); changelog.md
@@ -186,11 +248,99 @@ for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1;
   grep -q "^changelog\.md$" "$f" && err "$f ignore template still lists changelog.md (it follows docs_in_git now)"
   grep -q "unignored: changelog.md" "$f" || err "$f lost the changelog.md unignore migration"
 done
-grep -q 'Local-only outputs' skills/core/references/core.md \
-  || err "core.md has no Local-only outputs section"
+grep -q 'Local-only outputs' skills/core/references/core-authoring.md \
+  || err "core-authoring.md has no Local-only outputs section"
 for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
   grep -q 'docs/design' "$f" || err "$f dropped the legacy docs/design migration"
 done
+
+# 12b. the git standards code-craft.md defines are wired at every site
+#      that branches or commits
+for n in plan build implement; do
+  grep -q 'code-craft' "skills/core/references/protocols/$n.md" \
+    || err "protocol $n.md does not reference code-craft.md"
+done
+grep -q '^## Git: branches, commits' skills/core/references/code-craft.md \
+  || err "code-craft.md has no Git section"
+grep -q "Git section" skills/core/references/protocols/implement.md \
+  || err "implement.md does not cite code-craft's Git section"
+
+# 12c. execution is capstone's own: the two code-writing stages ask the
+#      user for subagent-vs-inline and record it, and no protocol
+#      invokes a superpowers skill at runtime (prose attribution in
+#      groom/plan is fine; a `superpowers:<skill>` call is not)
+for n in implement build; do
+  grep -q 'execution: subagent | inline' "skills/core/references/protocols/$n.md" \
+    || err "protocol $n.md does not record the execution mode"
+  grep -q 'Ask the mode once' "skills/core/references/protocols/$n.md" \
+    || err "protocol $n.md does not ask subagent-vs-inline before executing"
+done
+if grep -rl 'superpowers:' skills/core/references/protocols/ >/dev/null 2>&1; then
+  err "a protocol invokes a superpowers skill: $(grep -rl 'superpowers:' skills/core/references/protocols/ | tr '\n' ' ')"
+fi
+grep -q 'superpowers' skills/core/references/core-authoring.md \
+  && err "core-authoring.md still lists superpowers as an installable delegation"
+
+# 12d. review is one command with two sides, one output file, ignored
+grep -q '^# review \[backend|frontend\]' skills/core/references/protocols/review.md \
+  || err "review.md H1 does not declare its backend|frontend argument"
+for s in backend frontend; do
+  grep -q "^## $(echo $s | tr '[:lower:]' '[:upper:]' | cut -c1)$(echo $s | cut -c2-)\$" \
+    skills/core/references/protocols/review.md \
+    || grep -q "### $(echo $s | tr '[:lower:]' '[:upper:]' | cut -c1)$(echo $s | cut -c2-)\$" \
+    skills/core/references/protocols/review.md \
+    || err "review.md has no $s method-source section"
+done
+grep -q 'docs/capstone/review\.md' skills/core/references/protocols/review.md \
+  || err "review.md does not name its output file"
+grep -q 'rewrites only its own section' skills/core/references/protocols/review.md \
+  || err "review.md does not state that a one-sided run preserves the other side"
+for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
+  grep -q '^review\.md$' "$f" || err "$f ignore template does not cover review.md"
+done
+grep -q 'sole opinionated output' skills/core/references/core.md \
+  || err "core.md does not name review as the sole opinionated output"
+
+# 12e. the craft files are the method, not a fallback: no protocol may
+#      route method to an installed skill, and each craft file must
+#      carry its upstream attribution (Apache-2.0 and MIT both require
+#      it, and both files are modified derivatives)
+for n in uiux review build; do
+  grep -Eq 'impeccable|design-taste|improve-codebase-architecture|codebase-design' \
+    "skills/core/references/protocols/$n.md" \
+    && err "protocol $n.md still routes method to an installed skill"
+done
+grep -q 'Delegation installs' skills/core/references/core-authoring.md \
+  && err "core-authoring.md still carries the Delegation installs section"
+for f in uiux-craft arch-craft; do
+  grep -q '^\*\*Attribution\.\*\*' "skills/core/references/$f.md" \
+    || err "$f.md has no Attribution block"
+  grep -q 'This file is the method' "skills/core/references/$f.md" \
+    || err "$f.md does not declare itself the method"
+done
+grep -q 'Apache License 2.0' skills/core/references/uiux-craft.md \
+  || err "uiux-craft.md does not name impeccable's Apache-2.0 licence"
+grep -q 'Copyright (c) 2026 Leonxlnx' skills/core/references/uiux-craft.md \
+  || err "uiux-craft.md does not carry taste-skill's MIT copyright line"
+grep -q '© Matt Pocock' skills/core/references/arch-craft.md \
+  || err "arch-craft.md lost its MIT copyright line"
+
+# 12f. design/ gets the same generate+sync extraction logic/ has: a
+#      brownfield repo must end up with a frontend design record, not
+#      only a business-logic one
+grep -q '\*\*Design extraction\*\*' skills/core/references/protocols/generate.md \
+  || err "generate.md has no design-extraction step"
+grep -q '\*\*Design coverage\.\*\*' skills/core/references/protocols/sync.md \
+  || err "sync.md refresh has no design-coverage step"
+grep -q '\*\*Design coverage\*\*' skills/core/references/protocols/sync.md \
+  || err "sync check has no design-coverage report"
+grep -q 'Invoked by `generate` or `sync`' skills/core/references/protocols/uiux.md \
+  || err "design.md has no headless extraction block for generate/sync"
+grep -q 'Invoked by `generate` or `sync`' skills/core/references/protocols/logic.md \
+  || err "logic.md lost its headless extraction block"
+# extraction must never clobber a committed design
+grep -q 'never touched here' skills/core/references/protocols/sync.md \
+  || err "sync.md does not protect interview-derived design/ files from extraction"
 
 # 13. bash syntax of every .sh
 for s in skills/core/scripts/*.sh; do
@@ -199,11 +349,11 @@ done
 
 
 # 14. the pipeline order is spelled identically everywhere it appears
-PIPE='mockup -> logic -> design -> architecture -> code-prefs -> stack -> build'
+PIPE='mockup -> logic -> uiux -> architecture -> code-prefs -> stack -> build'
 for f in skills/core/scripts/help.sh skills/core/scripts/help.ps1 skills/start/SKILL.md; do
   grep -qF "$PIPE" "$f" || err "$f missing the pipeline-order string"
 done
-grep -qF 'mockup → logic → design → architecture → code-prefs → stack → build' README.md \
+grep -qF 'mockup → logic → uiux → architecture → code-prefs → stack → build' README.md \
   || err "README.md missing the pipeline-order string"
 
 [ "$FAIL" -eq 0 ] && echo "lint-sync: all invariants hold" || echo "lint-sync: FAILURES above"

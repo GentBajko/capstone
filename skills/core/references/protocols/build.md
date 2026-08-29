@@ -1,7 +1,7 @@
 # build - implementation research, then working code
 
 **Reads:** config → `build-interview.md` (resume) → the index and
-chapters → `logic/`, `mockup/`, `design/`, `code-prefs.md`,
+chapters → `logic/`, `mockup/`, `uiux/`, `code-prefs.md`,
 `../code-craft.md` → the stack chapter → the existing
 `implementation.md` (resume).
 
@@ -26,7 +26,7 @@ finished steps.
 ## Phase A - implementation research
 
 Read everything: the index and chapters, `docs/capstone/logic/`,
-`docs/capstone/mockup/`, `docs/capstone/design/`,
+`docs/capstone/mockup/`, `docs/capstone/uiux/`,
 `docs/capstone/code-prefs.md`, and the stack chapter. Research (web
 search when available) how the chosen pieces actually connect:
 scaffold conventions for the chosen framework, integration patterns
@@ -42,13 +42,12 @@ official quickstarts for anything unfamiliar. Then write
 - Build order: the walking-skeleton slice first (recorded in the
   architecture interview), then backend capabilities in logic-scenario
   priority order, then frontend screens in mockup order, each
-  implementing its `design/screens/` chapter and
-  `design/02-system.md`'s Implementation constraints; when the
-  `impeccable` skill is installed, the frontend pass also honors its
-  craft floor and finish-review flow.
+  implementing its `uiux/screens/` chapter and
+  `uiux/02-system.md`'s Implementation constraints, which carry
+  `../uiux-craft.md` §8's build-time checklist.
 - Per step: how to verify it works before moving on.
 - **Coverage**, the closing section: a table mapping every `logic/`
-  scenario, every `mockup/` and `design/screens/` screen, and every
+  scenario, every `mockup/` and `uiux/screens/` screen, and every
   component in the index's module map to the build-order step that
   implements it. Anything deliberately excluded gets a row naming the
   recorded decision that excludes it. A row with no step is a gap in
@@ -56,7 +55,8 @@ official quickstarts for anything unfamiliar. Then write
 
 Every code decision follows `code-prefs.md`, and every plan step and
 line of code obeys `../code-craft.md` (TDD + YAGNI, earned
-interfaces; code-prefs wins on conflict): the layout and sketches
+interfaces, and its Git section for every branch and commit this
+stage makes; code-prefs wins on conflict): the layout and sketches
 carry no layer, file, or abstraction the ladder didn't earn.
 
 **Review, then re-review.** A drafted `implementation.md` is not
@@ -64,7 +64,7 @@ presentable until it survives full passes of this check, repeated
 until a pass finds nothing to fix:
 
 1. Re-open the source lists fresh (the index's module map, `logic/`'s
-   scenario list, the `mockup/` and `design/screens/` file lists, the
+   scenario list, the `mockup/` and `uiux/screens/` file lists, the
    stack chapter's picks) and walk the Coverage table against them:
    every item has a step or a recorded exclusion.
 2. Walk the build order: every step's dependencies (the components,
@@ -95,24 +95,33 @@ against it.
 
 ## Phase C - write the code
 
-**If the superpowers plugin is available** (its skills appear in your
-skill list; missing on an interactive run, offer its install per
-core.md's Delegation installs first): hand off. Invoke
-`superpowers:writing-plans` with `implementation.md` plus the
-reference as the spec (capstone's docs ARE the spec; skip superpowers'
-brainstorming). The plan it writes must carry every
-`implementation.md` step, in the same dependency order, with each
-step's code sketches and verification intact: writing-plans expands
-steps into tasks; it never merges, summarizes, or drops them. Before
-executing, walk `implementation.md` step by step against the produced
-plan and fix any step that was dropped, thinned, or reordered;
-re-walk after fixes until a pass finds no gap. Then execute the plan
-via whichever superpowers execution flow the user picks
-(subagent-driven or inline).
+**Ask the mode once, before the first step**, and record it as
+`execution: subagent | inline` in `build-interview.md`'s frontmatter
+so a resumed run never re-asks:
 
-**Otherwise**: execute `implementation.md` directly: smallest testable
-steps, backend first, frontend second, verifying each step as the plan
-specifies, honoring `code-prefs.md` throughout.
+> "Run the build steps in subagents (fresh context per step,
+> recommended) or inline in this session?"
+
+Then execute `implementation.md` directly: its build-order steps in
+order, the walking-skeleton slice first, backend before the frontend
+that calls it, verifying each step as the plan specifies before
+starting the next. Commits follow `../code-craft.md`'s Git section,
+one per step.
+
+**Subagent mode** works exactly as `implement.md`'s Phase B describes
+it: one subagent per build-order step, dispatched fresh and never in
+parallel, with the step's full text, its code sketches, the verified
+commands, `code-prefs.md`'s rules, and `../code-craft.md`'s ladder,
+TDD scoping, and Git section **copied into the prompt** rather than
+referenced. Nothing else crosses into a subagent's context, so a
+pointer to a file it will never open buys nothing. The main session
+verifies each step's report before dispatching the next.
+
+**Inline mode** runs the same steps in this session, same order, same
+verification, same commits.
+
+Either mode: a harness without subagents takes inline, said out loud
+rather than asked.
 
 Either way, code lands in the repository's source tree (never under
 the docs area). Append the changelog entry per core.md's ledger, key
@@ -120,8 +129,7 @@ the docs area). Append the changelog entry per core.md's ledger, key
 complete, the source paths created, the dependencies installed, and
 the divergences from `implementation.md`. Then set
 `status: formalized` only when the walking-skeleton slice actually
-runs, and run `changelog` to record the architecture-level delta
-(mandatory; outside git it writes nothing and says so).
+runs.
 
 ## After
 

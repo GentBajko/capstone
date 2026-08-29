@@ -5,7 +5,7 @@ description: Use when a groomed feature spec needs an implementation plan - stud
 
 # Capstone: plan
 
-From this skill's base directory, read `../core/references/core.md`, then
-execute
+From this skill's base directory, read `../core/references/core.md`
+and `../core/references/core-authoring.md`, then execute
 `../core/references/protocols/plan.md`
 exactly.

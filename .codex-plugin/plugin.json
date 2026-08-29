@@ -1,7 +1,7 @@
 {
   "name": "capstone",
-  "version": "3.2.0",
-  "description": "Architecture reference docs: DESIGN.md + docs/capstone/ topic files stamped to commits, kept current by generate/sync (formerly docs/check-docs), plus doctor/ask/changelog/be-review/fe-review/guides/onboarding, a greenfield pipeline from product mockup to running code with a frontend-design stage, and a doc-grounded feature chain.",
+  "version": "4.0.0",
+  "description": "Architecture reference docs: a docs/capstone/ index plus topic files stamped to commits, kept current by generate/sync (formerly docs/check-docs), plus doctor/review, a greenfield pipeline from product mockup to running code with a frontend-design stage, and a doc-grounded feature chain.",
   "author": {
     "name": "Gent Bajko",
     "email": "gent.bajko@gmail.com",
@@ -15,14 +15,14 @@
     "documentation",
     "design-docs",
     "codebase-map",
-    "onboarding",
+    "architecture-docs",
     "skills"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Capstone",
     "shortDescription": "Living architecture reference docs for any codebase",
-    "longDescription": "Generates and maintains a descriptive architecture reference: a lean DESIGN.md index plus per-topic files (architecture, models, conventions, data-flow, dependencies, testing, operations, glossary), each stamped with the git commit it was derived at and refreshed only when its covered paths change. Companion skills keep the docs fresh, answer cited questions, keep an architectural changelog, write runbooks and onboarding tours, run an exhaustive greenfield design interview, and turn product ideas into traceable markdown mockups.",
+    "longDescription": "Generates and maintains a descriptive architecture reference: a lean docs/capstone/ index plus per-topic files (architecture, models, conventions, data-flow, dependencies, testing, operations, glossary), each stamped with the git commit it was derived at and refreshed only when its covered paths change. Companion skills keep the docs fresh, repair the docs area, run one opt-in review with architecture and UI sides, carry an exhaustive greenfield design interview from product mockup to running code, and take a single feature from idea to merged code against the docs.",
     "developerName": "Gent Bajko",
     "category": "Coding",
     "capabilities": [

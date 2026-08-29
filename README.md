@@ -6,9 +6,9 @@ moved. For new projects, an interview pipeline that designs the whole
 thing before building it.
 
 ```
-existing repo ──▶ generate ──▶ DESIGN.md + 8 chapters ──▶ sync keeps them current
+existing repo ──▶ generate ──▶ docs/capstone/ index + 8 chapters ──▶ sync keeps them current
                                                             ▲
-new project ──▶ mockup → logic → design → architecture → code-prefs → stack → build
+new project ──▶ mockup → logic → uiux → architecture → code-prefs → stack → build
                                                                               │
 feature idea ──▶ groom → plan → implement ──▶ shipped code, absorbed into docs ◀┘
 ```
@@ -30,23 +30,19 @@ OpenCode. Plain `SKILL.md` files, MIT.
 
 | Command | What it does |
 | --- | --- |
-| `/capstone:start` | The pipeline: mockup → logic → design → architecture → code-prefs → stack → build, resuming at the first unfinished stage |
+| `/capstone:start` | The pipeline: mockup → logic → uiux → architecture → code-prefs → stack → build, resuming at the first unfinished stage |
 | `/capstone:generate` | Build the reference from scratch (`rebuild` forces, a topic name targets one chapter) |
-| `/capstone:sync` | Refresh what drifted and extract `logic/` scenarios the map is missing; `sync check` is the read-only trust report |
+| `/capstone:sync` | Refresh what drifted and extract the `logic/` scenarios and `uiux/` surfaces the map is missing; `sync check` is the read-only trust report |
 | `/capstone:doctor` | Diagnose and repair the docs area: torn writes, index drift, voided approvals, absorption gaps |
-| `/capstone:ask <question>` | Answer from the docs, with citations |
-| `/capstone:changelog [<ref>]` | Architecture-level change history since a ref, plus the append-only ledger every writing command records itself in |
-| `/capstone:be-review` | The opt-in judgment: architecture and backend findings, ranked with evidence |
-| `/capstone:fe-review` | The opt-in UI judgment: improvements graded against your own design docs, via impeccable/design-taste when installed |
-| `/capstone:guides [<task>]` | Runbooks: run locally, deploy, plus workflows mined from your repo's patterns |
-| `/capstone:onboarding` | A reading path for someone's first day in the codebase |
+| `docs/capstone/changelog.md` | Not a command: the append-only ledger every writing command records itself in, before it sets its done marker |
+| `/capstone:review [be\|fe]` | The opt-in judgment, into one `review.md`: no argument reviews both sides, `backend` takes architecture and `frontend` grades the UI against your own design docs |
 | `/capstone:mockup` | Interview 1, standalone |
 | `/capstone:logic` | Interview 2, standalone |
-| `/capstone:design` | Interview 3, standalone: the frontend design (direction, tokens, per-screen chapters) |
+| `/capstone:uiux` | Interview 3, standalone: the frontend design (direction, tokens, per-screen chapters) |
 | `/capstone:architecture` | Interview 4, standalone |
 | `/capstone:code-prefs` | Interview 5, standalone |
 | `/capstone:stack` | Research libraries and services per capability, with pros/cons and pricing; you pick (`refresh` re-vets recorded picks) |
-| `/capstone:build` | Implementation plan (backend, then frontend), your approval, then working code, via superpowers when installed |
+| `/capstone:build` | Implementation plan (backend, then frontend), your approval, then working code in subagents or inline (you pick) |
 | `/capstone:groom <feature>` | Doc-grounded feature interview → a traceable spec in `docs/capstone/features/` |
 | `/capstone:plan <feature>` | Task-by-task TDD plan from the groomed spec; you approve before any code |
 | `/capstone:implement <feature>` | Execute the approved plan into code, review until dry, then refresh the affected chapters |
@@ -58,8 +54,8 @@ OpenCode. Plain `SKILL.md` files, MIT.
 <details>
 <summary>What do the generated docs look like?</summary>
 
-`/capstone:generate` produces a `DESIGN.md` index, eight numbered
-chapters in `docs/capstone/`, and a `logic/` folder mapping the
+`/capstone:generate` produces a `00-index.md`, eight numbered chapters
+beside it in `docs/capstone/`, and a `logic/` folder mapping the
 observed business logic scenario by scenario:
 
 ```
@@ -77,11 +73,11 @@ Everything is facts with `file:line` citations, never advice.
 `/capstone:sync` refreshes only what drifted and extracts any
 business-logic scenarios the map is missing; `sync check` reports
 staleness, citation drift, logic-coverage gaps, and unabsorbed
-features without writing a byte. `/capstone:ask` answers questions from the docs instead of
-re-reading your source. `/capstone:doctor` repairs the docs area's
-own wounds. Every command declares exactly what it reads before
+features without writing a byte. `/capstone:doctor` repairs the docs
+area's own wounds. Every command declares exactly what it reads before
 acting, so re-runs don't burn tokens re-exploring what the docs
-already know.
+already know, and a command that needs the reference and finds none
+builds it first instead of sending you off to run `generate`.
 
 </details>
 
@@ -92,14 +88,14 @@ Type `capstone` and it runs the stages in order, resuming wherever you
 stopped. Every answer is written to disk before the next question, so
 a dead session loses nothing. Each interview takes an optional
 artifact (a PRD, screenshots) and pre-fills what it answers. On
-existing codebases, `logic` and `design` run in reverse: they draft
+existing codebases, `logic` and `uiux` run in reverse: they draft
 from the observed code and you confirm.
 
 **mockup**. Product discovery. Three fixed questions, then every
 question after that is generated from your answers until nothing is
 left to invent. One file per screen: ASCII wireframe, exact copy and
 behavior, the empty/error/success states. No visual UI? It records
-your surfaces (api, cli) and the design stage skips itself.
+your surfaces (api, cli) and the uiux stage skips itself.
 
 **logic**. One scenario at a time, walked until a developer could
 implement it without inventing a single rule: exact steps, real
@@ -107,11 +103,11 @@ formulas, what happens when the payment fails or the user clicks
 twice. The part of a spec everyone skips and then pays for.
 
 **design**. How it looks and feels: a design read, the visual world,
-the tokens, each screen's composition and states. Runs the
-`impeccable` and `design-taste-frontend` skills when installed,
-vendored distillations of both otherwise. Output: a direction
-contract, a design-system chapter `stack` honors, one file per screen
-for `build` to implement.
+the tokens, each screen's composition and states. The method is
+vendored, distilled from `impeccable` (Apache-2.0) and
+`design-taste-frontend` (MIT), so the same product designs the same
+way on any machine. Output: a direction contract, a design-system
+chapter `stack` honors, one file per screen for `build` to implement.
 
 **architecture**. The big interview. Done only when every section of
 the future docs is answerable from your recorded decisions. Writes
@@ -125,8 +121,9 @@ in your repo. Also a decent starting point for a CLAUDE.md.
 **stack, then build**. `stack` researches real options per
 capability, licenses and prices included; you pick, and
 `stack refresh` re-vets the picks months later. `build` writes an
-implementation plan, stops for your approval, then writes the code,
-via superpowers when installed.
+implementation plan, stops for your approval, then writes the code:
+one subagent per step with fresh context, or inline in the session,
+whichever you pick when it starts.
 
 </details>
 
@@ -145,17 +142,26 @@ mid-chain.
 </details>
 
 <details>
-<summary>What are fe-review and be-review?</summary>
+<summary>What is review?</summary>
 
-The two commands allowed opinions, only when invoked. `fe-review`
-judges the UI against your own design docs first, then a vendored
-craft floor, then each screen's mode, screenshotting the live app
-when it can. `be-review` covers architecture and backend: shallow
-modules by the deletion test, change-smells in the git hot paths,
-security, stack currency. Both delegate to installed skills
-(impeccable, design-taste-frontend, mattpocock/skills,
-security-review) and carry vendored fallbacks. One rule binds every
-source: your recorded decisions outrank generic best practice.
+The one command allowed opinions, only when invoked. It has two
+sides and writes both into a single `docs/capstone/review.md`, each
+section carrying its own stamp so you can tell how old each half is.
+
+The **frontend** side judges the UI against your own design docs
+first, then a vendored craft floor, then each screen's mode,
+screenshotting the live app when it can. The **backend** side covers
+architecture and backend: shallow modules by the deletion test,
+change-smells in the git hot paths, security, stack currency.
+
+Bare `review` runs both. `review backend` or `review frontend` runs
+one and rewrites only that section, leaving the other untouched.
+Both sides judge by capstone's own vendored craft files, so the same
+codebase is judged the same way on any machine. A security-review
+command or a live browser, where the harness has them, supply extra
+evidence but never change the standard. One rule outranks the craft
+baseline: your recorded decisions beat generic best practice. The file
+is gitignored by default: it is judgment, not reference.
 
 </details>
 
@@ -186,7 +192,7 @@ user, shared by every project:
   "expertise": null,
   "teaching_mode": false,
   "docs_dir": "docs/capstone",
-  "index_file": "DESIGN.md",
+  "index_file": "docs/capstone/00-index.md",
   "subagent_threshold": 150,
   "docs_in_git": "ask",
   "language": "en"
@@ -206,7 +212,7 @@ record; any global key set there overrides the global file for that
 repo, `pipeline` records the one-time
 pipeline-or-generate choice on repos that already have code, and
 `workspaces` gives each monorepo workspace its own docs area with the
-root `DESIGN.md` as an index-of-indexes.
+root project's `00-index.md` as an index-of-indexes.
 
 </details>
 
@@ -250,8 +256,8 @@ argument-hint: [command] [args...]
 ---
 
 No arguments: invoke the capstone:start skill. If the first argument
-matches a capstone skill (generate, sync, doctor, ask, changelog,
-be-review, fe-review, guides, onboarding, mockup, logic, design, architecture, code-prefs,
+matches a capstone skill (generate, sync, doctor, review,
+mockup, logic, uiux, architecture, code-prefs,
 stack, build, groom, plan, implement, implementation, start, help),
 invoke capstone:<that skill> with the remaining arguments.
 

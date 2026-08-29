@@ -3,21 +3,24 @@
 **Reads:** config → `<index_file>` → every stamped file's
 frontmatter (stamps and globs; the full body only when regenerating
 it) → `../topics.md` (template drift) → the `logic/` scenario list
-against the code's entry points (coverage) → for `check`
+against the code's entry points and the `uiux/screens/` list against
+its surfaces (coverage) → for `check`
 additionally: `changelog.md` (absorption drift), `05-dependencies.md`
 plus the manifests and lockfile (re-vetting).
 
 Brings the generated docs back in line with the code, rewriting only
-what drifted: topic chapters, stamped guides, and extraction-mode
-`logic/` and `design/` files, every stamped file the plugin owns that
-carries `paths_covered`. The business-logic map is part of the
-reference, so a refresh also fills gaps in `logic/`, not only
-staleness. `sync check` is the read-only twin: it reports what a
+what drifted: topic chapters and extraction-mode `logic/` and
+`uiux/` files, every stamped file the plugin owns that carries
+`paths_covered`. The business-logic map is part of the
+reference, so a refresh also fills gaps in `logic/` and `uiux/`,
+not only staleness. `sync check` is the read-only twin: it reports what a
 refresh would touch, and whether the reference can be trusted,
 without writing anything.
 
 No stamped index on disk → say so in one line and execute
-`generate.md` instead; there is nothing to sync yet.
+`generate.md` instead; there is nothing to sync yet. This is also what
+core.md's Missing reference rule leans on when another protocol
+delegates here, so the fallback must stay unconditional.
 
 ## Refresh
 
@@ -45,8 +48,8 @@ For each stamped file with `paths_covered`:
 4. **No changes** → skip; leave the file and its stamp untouched.
    **Changes** → regenerate per the file's owning protocol: a topic
    chapter re-runs its generate.md Phase 2 deep-dive and Phase 3
-   compose rules; a stale guide regenerates per `guides.md`'s format;
-   a stale extraction-mode `logic/` or `design/` file regenerates per
+   compose rules;
+   a stale extraction-mode `logic/` or `uiux/` file regenerates per
    its protocol's extraction mode. Template drift overrides the skip:
    a chapter missing a required section that `../topics.md` now
    defines (the template changed after the chapter was stamped) is
@@ -66,16 +69,29 @@ For each stamped file with `paths_covered`:
    cited `file:line`, stamped with `paths_covered` so later refreshes
    keep them current. Interview-derived scenario files are not
    touched here; they absorb shipped features through `implement`.
-7. If any file was rewritten or created in this run, append the
+7. **Design coverage.** Applicable when the repo has a frontend.
+   Build the surface inventory per design.md's extraction mode: every
+   route or view a user reaches, from the chapters' route tables and
+   the module map. Every surface must be claimed by a chapter in
+   `uiux/screens/` (one chapter may cover a surface family);
+   `uiux/` absent counts as every surface missing. Run design.md's
+   extraction mode for the missing ones, stamped with `paths_covered`
+   so later refreshes keep them current. **Interview-derived `uiux/`
+   files are never touched here**: a committed direction is the user's
+   decision, and extraction must not quietly overwrite it with what
+   the code happens to do. Where extraction and a committed chapter
+   disagree, that is drift for `review` to judge, not for `sync` to
+   resolve.
+8. If any file was rewritten or created in this run, append the
    changelog entry per core.md's ledger, key `sync/<scope>@<the
    run's stamp>` (`<scope>` = the topic name for a single file, `all`
    otherwise); record the files regenerated or created and each one's
    trigger (covered paths changed, `mode: prescriptive` with code now
-   present, template drift, newly applicable topic, logic coverage
-   gap), the divergences recorded, and the files skipped as current.
+   present, template drift, newly applicable topic, logic or design
+   coverage gap), the divergences recorded, and the files skipped as current.
    A run where every file was current writes nothing.
-8. Always re-verify the index's module map and rows.
-9. Fall back to `generate` when the stamped commit is unreachable
+9. Always re-verify the index's module map and rows.
+10. Fall back to `generate` when the stamped commit is unreachable
    (rebase, shallow clone) or there is no git repo; the user asking
    for a from-scratch rebuild is `generate rebuild`'s job.
 
@@ -85,7 +101,7 @@ targets one) and re-verify the root index-of-indexes' workspace table.
 ## check - the read-only trust report
 
 No writes, and no changelog entry: nothing was done, only read.
-Five parts:
+Six parts:
 
 1. **Staleness**: for each stamped file with `paths_covered`, read
    its stamp and globs, then from the repo root run
@@ -100,7 +116,7 @@ Five parts:
    topic files, check each against the source, and report hits and
    misses with the drifted lines' new locations when findable.
 3. **Absorption drift**: interview-derived `logic/`, `mockup/`, and
-   `design/` files carry no globs; their staleness signal is shipped
+   `uiux/` files carry no globs; their staleness signal is shipped
    features they never absorbed. From `changelog.md`, list
    `implement/*` keys newer than each folder's newest stamp whose
    entry's outputs name that folder; report "logic/ missed N absorbed
@@ -115,6 +131,11 @@ Five parts:
    entry points no `logic/` scenario claims. Report "logic/ missing
    N scenarios", naming the unclaimed entry points (repair: `sync`,
    which extracts them).
+6. **Design coverage**: the Refresh step 7 inventory, read-only:
+   surfaces no `uiux/screens/` chapter claims. Report "design/
+   missing N surfaces", naming them (repair: `sync`, which extracts
+   them). A repo with no frontend reports the section as not
+   applicable rather than as a gap.
 
 End with one sentence (whether the reference can be trusted as-is,
 needs `sync`, or needs `generate rebuild`) followed by the machine

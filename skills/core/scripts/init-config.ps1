@@ -42,7 +42,7 @@ if (-not (Test-Path $GlobalFile)) {
   "expertise": null,
   "teaching_mode": false,
   "docs_dir": "docs/capstone",
-  "index_file": "DESIGN.md",
+  "index_file": "docs/capstone/00-index.md",
   "subagent_threshold": 150,
   "docs_in_git": "ask",
   "language": "en"
@@ -52,6 +52,11 @@ if (-not (Test-Path $GlobalFile)) {
   Write-Output "created: $GlobalFile"
 }
 if ($Global) { exit 0 }
+
+# git may be absent (a plain download, or simply not on PATH). Every
+# call below is guarded by this, so the migrations fall back to plain
+# moves instead of spraying not-recognized errors at the user.
+$HasGit = [bool](Get-Command git -ErrorAction SilentlyContinue)
 
 # 1. Retroactive migration. Only when the new tree does not exist yet;
 #    if both are present this is not a stale layout and nothing is merged.
@@ -87,6 +92,70 @@ if ((Test-Path $Legacy) -and -not (Test-Path $Target)) {
   Write-Output "note: both $Legacy and $Target exist - not merging; $Target wins"
 }
 
+# 1b. The index moved out of the repository root into the docs area as
+#     chapter zero. Only fires for the old default (a custom index_file
+#     is left alone) and only when the new location is still free; both
+#     present is not a stale layout, so nothing is merged.
+$OldIdx = "DESIGN.md"
+$NewIdx = Join-Path $DocsDir "00-index.md"
+$CfgIdx = ""
+$ProjCfg = Join-Path $DocsDir "capstone.json"
+if (Test-Path $ProjCfg) {
+  if ((Get-Content $ProjCfg -Raw) -match '"index_file"\s*:\s*"([^"]+)"') { $CfgIdx = $Matches[1] }
+}
+if ((Test-Path $OldIdx) -and (-not (Test-Path $NewIdx)) -and
+    (($CfgIdx -eq "") -or ($CfgIdx -eq $OldIdx))) {
+  New-Item -ItemType Directory -Force -Path $DocsDir | Out-Null
+  $tracked = if ($HasGit) { & git ls-files $OldIdx 2>$null } else { $null }
+  if ($tracked) { & git mv $OldIdx $NewIdx 2>$null; if ($LASTEXITCODE -ne 0) { Move-Item $OldIdx $NewIdx } }
+  else { Move-Item $OldIdx $NewIdx }
+  Write-Output "migrated: $OldIdx -> $NewIdx"
+
+  # The index's own rows were relative to the repo root; the chapters
+  # now sit beside it. Repoint both directions, plus any docs-area
+  # reference to the old root path.
+  $t = (Get-Content $NewIdx -Raw) `
+    -replace [regex]::Escape("($DocsDir/"), "(" `
+    -replace [regex]::Escape("[$DocsDir/"), "[" `
+    -replace '\]\(\./', ']('
+  Write-Utf8NoBom $NewIdx $t
+  Get-ChildItem -Path $DocsDir -Recurse -File -Filter *.md | ForEach-Object {
+    $c = (Get-Content $_.FullName -Raw) -replace 'DESIGN\.md', '00-index.md'
+    Write-Utf8NoBom $_.FullName $c
+  }
+  if ($CfgIdx -ne "") {
+    Write-Utf8NoBom $ProjCfg ((Get-Content $ProjCfg -Raw) -replace [regex]::Escape("`"$OldIdx`""), "`"$NewIdx`"")
+  }
+  Write-Output "repointed: $NewIdx and $DocsDir/**/*.md"
+  Write-Output "note: drop the Commit/Generated columns from $NewIdx; freshness lives in each file's frontmatter"
+} elseif ((Test-Path $OldIdx) -and (Test-Path $NewIdx)) {
+  Write-Output "note: both $OldIdx and $NewIdx exist - not merging; $NewIdx wins"
+}
+
+# 1c. The uiux stage used to be called design, and wrote docs/capstone/
+#     design/ plus design-interview.md. Move both when the new names are
+#     still free; both present is not a stale layout, so nothing merges.
+foreach ($pair in @(@('design', 'uiux'), @('design-interview.md', 'uiux-interview.md'))) {
+  $old = Join-Path $DocsDir $pair[0]
+  $new = Join-Path $DocsDir $pair[1]
+  if ((Test-Path $old) -and (-not (Test-Path $new))) {
+    $tracked = if ($HasGit) { & git ls-files $old 2>$null } else { $null }
+    if ($tracked) { & git mv $old $new 2>$null; if ($LASTEXITCODE -ne 0) { Move-Item $old $new } }
+    else { Move-Item $old $new }
+    Write-Output "migrated: $old -> $new"
+  } elseif ((Test-Path $old) -and (Test-Path $new)) {
+    Write-Output "note: both $old and $new exist - not merging; $new wins"
+  }
+}
+if ((Test-Path (Join-Path $DocsDir 'uiux')) -or (Test-Path (Join-Path $DocsDir 'uiux-interview.md'))) {
+  Get-ChildItem -Path $DocsDir -Recurse -File -Filter *.md | ForEach-Object {
+    $c = (Get-Content $_.FullName -Raw) `
+      -replace 'docs/capstone/design/', 'docs/capstone/uiux/' `
+      -replace 'design-interview\.md', 'uiux-interview.md'
+    Write-Utf8NoBom $_.FullName $c
+  }
+}
+
 # 2. the docs area's ignore list
 New-Item -ItemType Directory -Force -Path $DocsDir | Out-Null
 $Ignore = Join-Path $DocsDir ".gitignore"
@@ -118,6 +187,8 @@ capstone.json
 
 # Opinionated and personal outputs
 review.md
+
+# Superseded by review.md; listed so older repos stay ignored
 be-review.md
 fe-review.md
 '@

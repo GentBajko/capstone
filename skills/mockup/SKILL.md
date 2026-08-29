@@ -5,7 +5,7 @@ description: Use when defining a new product idea - adaptive purpose/business-pl
 
 # Capstone: mockup
 
-From this skill's base directory, read `../core/references/core.md`, then
-execute
+From this skill's base directory, read `../core/references/core.md`
+and `../core/references/core-authoring.md`, then execute
 `../core/references/protocols/mockup.md`
 exactly.

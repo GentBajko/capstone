@@ -5,6 +5,11 @@ Topics are written as numbered chapters in this reading order:
 `04-data-flow.md`, `05-dependencies.md`, `06-testing.md`,
 `07-operations.md`, `08-glossary.md`. The headings below use the
 logical topic names; the chapter number is a filename prefix only.
+`logic/`'s per-scenario files join the same topic index (core.md's
+Index maintenance rule) under the `logic` topic name, one row per
+scenario file; their required sections live in `protocols/logic.md`
+(Phase B), not here, since they're generated scenario-by-scenario
+rather than by a single deep-dive per chapter.
 
 Every topic file uses the frontmatter defined in SKILL.md Phase 3 and the
 exact headings shown here. A deep-dive (inline or subagent) must return
@@ -112,14 +117,12 @@ and uncaught propagation stated as such.
 
 Required sections:
 
-- `## Runtime dependencies`: table: package, version constraint, what it
-  is used for, where it is integrated.
 - `## Dev and tooling`: table: package, role.
 - `## External services`: databases, APIs, brokers: connection setup
   sites and config sources.
 
-Checklist: derived from manifests cross-checked against imports; declared
-but unimported packages recorded as facts.
+Checklist: dev/tooling packages derived from manifests; every external
+service's connection setup site cited `file:line`.
 
 ## operations.md
 
@@ -156,7 +159,7 @@ not just location.
 
 ## testing.md
 
-**Applicable:** a test suite exists. If absent, the DESIGN.md index
+**Applicable:** a test suite exists. If absent, the index
 records: "testing: absent (no test suite found under <paths checked>)".
 
 Required sections:
