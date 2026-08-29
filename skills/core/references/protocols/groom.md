@@ -6,7 +6,7 @@ pass) → the `logic/` scenarios and `mockup/` screens it extends, plus
 the `uiux/` chapters for UI features → `code-prefs.md`.
 
 First stage of the feature chain (`groom` → `plan` → `implement`,
-chained by `implementation`): turns a feature idea into a spec a
+chained by `feature`): turns a feature idea into a spec a
 planner could work from, grounded in the existing reference instead of
 re-exploring the repo. The superpowers brainstorming discipline,
 adapted to capstone: the chapters are the context, every answer
@@ -124,7 +124,7 @@ alternatives and the out-of-scope rulings. Add or refresh the
 `features/` Companion docs row, set `status: formalized` (only now,
 outputs on disk), and hand the
 user the `spec.md` path to review: a standalone run stops here; an
-`implementation` chain run announces the stage and continues.
+`feature` chain run announces the stage and continues.
 
 **Consumer:** `plan` turns the spec into a task-by-task implementation
 plan; suggest it as the next step.

@@ -1,4 +1,4 @@
-# implementation - the feature chain, one stage at a time
+# feature - the feature chain, one stage at a time
 
 **Reads:** config → `features/*/feature-interview.md` frontmatter and
 each feature's outputs' presence; the stage protocols read the rest.
@@ -53,4 +53,4 @@ an existing feature's slug.
 5. When a stage completes, announce it in one line and continue
    ("spec approved; planning next; say stop to pause"). Stopping is
    always safe: every stage persists its state, and the next
-   `implementation` run resumes exactly here.
+   `feature` run resumes exactly here.

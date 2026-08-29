@@ -46,7 +46,7 @@ OpenCode. Plain `SKILL.md` files, MIT.
 | `/capstone:groom <feature>` | Doc-grounded feature interview → a traceable spec in `docs/capstone/features/` |
 | `/capstone:plan <feature>` | Task-by-task TDD plan from the groomed spec; you approve before any code |
 | `/capstone:implement <feature>` | Execute the approved plan into code, review until dry, then refresh the affected chapters |
-| `/capstone:implementation <desc>` | The feature chain: groom → plan → implement, resuming at the first unfinished stage |
+| `/capstone:feature <desc>` | The feature chain: groom → plan → implement, resuming at the first unfinished stage |
 | `/capstone:help` | Usage. In Claude Code a hook answers this before the model is invoked, so it costs zero tokens |
 
 </details>
@@ -130,7 +130,7 @@ whichever you pick when it starts.
 <details>
 <summary>How do features get added after v1?</summary>
 
-`/capstone:implementation add CSV export` grows a finished project one
+`/capstone:feature add CSV export` grows a finished project one
 feature at a time. `groom` interviews a spec out of you against the
 reference. `plan` turns it into a task-by-task TDD plan; a vendored
 TDD + YAGNI ladder trims every task, and your code-prefs outrank the
@@ -258,7 +258,7 @@ argument-hint: [command] [args...]
 No arguments: invoke the capstone:start skill. If the first argument
 matches a capstone skill (generate, sync, doctor, review,
 mockup, logic, uiux, architecture, code-prefs,
-stack, build, groom, plan, implement, implementation, start, help),
+stack, build, groom, plan, implement, feature, start, help),
 invoke capstone:<that skill> with the remaining arguments.
 
 ARGUMENTS: $ARGUMENTS

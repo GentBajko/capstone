@@ -202,7 +202,7 @@ foreach ($d in Get-ChildItem skills -Directory) {
   if (-not (Select-String -Path $s -Pattern 'references/core\.md' -Quiet)) {
     Err "skills/$n/SKILL.md does not wire core.md"
   }
-  if ($n -in @('start', 'implementation')) {
+  if ($n -in @('start', 'feature')) {
     if (-not (Select-String -Path $s -Pattern 'core-authoring\.md` is not' -Quiet)) {
       Err "router $n should read core.md alone and say why"
     }
