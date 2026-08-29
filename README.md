@@ -35,8 +35,7 @@ OpenCode. Plain `SKILL.md` files, MIT.
 | `/capstone:sync` | Refresh what drifted and extract `logic/` scenarios the map is missing; `sync check` is the read-only trust report |
 | `/capstone:doctor` | Diagnose and repair the docs area: torn writes, index drift, voided approvals, absorption gaps |
 | `docs/capstone/changelog.md` | Not a command: the append-only ledger every writing command records itself in, before it sets its done marker |
-| `/capstone:be-review` | The opt-in judgment: architecture and backend findings, ranked with evidence |
-| `/capstone:fe-review` | The opt-in UI judgment: improvements graded against your own design docs, via impeccable/design-taste when installed |
+| `/capstone:review [be\|fe]` | The opt-in judgment, into one `review.md`: no argument reviews both sides, `backend` takes architecture and `frontend` grades the UI against your own design docs |
 | `/capstone:mockup` | Interview 1, standalone |
 | `/capstone:logic` | Interview 2, standalone |
 | `/capstone:design` | Interview 3, standalone: the frontend design (direction, tokens, per-screen chapters) |
@@ -143,17 +142,25 @@ mid-chain.
 </details>
 
 <details>
-<summary>What are fe-review and be-review?</summary>
+<summary>What is review?</summary>
 
-The two commands allowed opinions, only when invoked. `fe-review`
-judges the UI against your own design docs first, then a vendored
-craft floor, then each screen's mode, screenshotting the live app
-when it can. `be-review` covers architecture and backend: shallow
-modules by the deletion test, change-smells in the git hot paths,
-security, stack currency. Both delegate to installed skills
-(impeccable, design-taste-frontend, mattpocock/skills,
-security-review) and carry vendored fallbacks. One rule binds every
-source: your recorded decisions outrank generic best practice.
+The one command allowed opinions, only when invoked. It has two
+sides and writes both into a single `docs/capstone/review.md`, each
+section carrying its own stamp so you can tell how old each half is.
+
+The **frontend** side judges the UI against your own design docs
+first, then a vendored craft floor, then each screen's mode,
+screenshotting the live app when it can. The **backend** side covers
+architecture and backend: shallow modules by the deletion test,
+change-smells in the git hot paths, security, stack currency.
+
+Bare `review` runs both. `review backend` or `review frontend` runs
+one and rewrites only that section, leaving the other untouched.
+Either side delegates to installed skills (impeccable,
+design-taste-frontend, mattpocock/skills, security-review) and carries
+vendored fallbacks. One rule binds every source: your recorded
+decisions outrank generic best practice. The file is gitignored by
+default: it is judgment, not reference.
 
 </details>
 
@@ -248,8 +255,8 @@ argument-hint: [command] [args...]
 ---
 
 No arguments: invoke the capstone:start skill. If the first argument
-matches a capstone skill (generate, sync, doctor, be-review,
-fe-review, mockup, logic, design, architecture, code-prefs,
+matches a capstone skill (generate, sync, doctor, review,
+mockup, logic, design, architecture, code-prefs,
 stack, build, groom, plan, implement, implementation, start, help),
 invoke capstone:<that skill> with the remaining arguments.
 

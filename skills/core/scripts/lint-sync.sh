@@ -185,7 +185,7 @@ if [ "$IN_GIT" -eq 1 ]; then
   fi
   # 10b. the removed commands must not be routable again by accident:
   #      no protocol file, no wrapper, no help line, no dispatcher word.
-  for n in ask changelog guides onboarding; do
+  for n in ask changelog guides onboarding be-review fe-review; do
     [ -e "skills/$n" ] && err "removed skill skills/$n/ is back"
     [ -e "skills/core/references/protocols/$n.md" ] \
       && err "removed protocol $n.md is back"
@@ -214,7 +214,7 @@ fi
 #     ones say so, and the old opt-in is gone (core.md hard rule 5 is
 #     only as good as its sites)
 for n in groom plan implement mockup logic design architecture \
-         code-prefs stack build be-review fe-review \
+         code-prefs stack build review \
          generate sync doctor; do
   grep -q 'changelog entry' "skills/core/references/protocols/$n.md" \
     || err "protocol $n.md has no changelog-entry step"
@@ -274,6 +274,26 @@ if grep -rl 'superpowers:' skills/core/references/protocols/ >/dev/null 2>&1; th
 fi
 grep -q 'superpowers' skills/core/references/core-authoring.md \
   && err "core-authoring.md still lists superpowers as an installable delegation"
+
+# 12d. review is one command with two sides, one output file, ignored
+grep -q '^# review \[backend|frontend\]' skills/core/references/protocols/review.md \
+  || err "review.md H1 does not declare its backend|frontend argument"
+for s in backend frontend; do
+  grep -q "^## $(echo $s | tr '[:lower:]' '[:upper:]' | cut -c1)$(echo $s | cut -c2-)\$" \
+    skills/core/references/protocols/review.md \
+    || grep -q "### $(echo $s | tr '[:lower:]' '[:upper:]' | cut -c1)$(echo $s | cut -c2-)\$" \
+    skills/core/references/protocols/review.md \
+    || err "review.md has no $s method-source section"
+done
+grep -q 'docs/capstone/review\.md' skills/core/references/protocols/review.md \
+  || err "review.md does not name its output file"
+grep -q 'rewrites only its own section' skills/core/references/protocols/review.md \
+  || err "review.md does not state that a one-sided run preserves the other side"
+for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
+  grep -q '^review\.md$' "$f" || err "$f ignore template does not cover review.md"
+done
+grep -q 'sole opinionated output' skills/core/references/core.md \
+  || err "core.md does not name review as the sole opinionated output"
 
 # 13. bash syntax of every .sh
 for s in skills/core/scripts/*.sh; do

@@ -110,7 +110,7 @@ is conversation only; the generated docs stay dense per style.md. When
 `false`, no teaching narration: report per your level and move on.
 
 If `expertise` is null or missing and the task is interactive (any
-interview, `be-review`, `fe-review`), ask ONE
+interview, `review`), ask ONE
 question ("How technical should I be with you?" with the five levels),
 write the answer into the global config file (creating it with all
 keys if needed), and never ask again. Non-interactive runs behave as
@@ -120,8 +120,7 @@ level 3 without asking and leave `expertise` null.
 
 1. **Describe, never judge**: facts with `file:line` pointers; no
    recommendations, grades, or comparisons. Sole exceptions:
-   `be-review` and `fe-review`, and only because the user explicitly
-   invoked them.
+   `review`, and only because the user explicitly invoked it.
 2. **Write only the configured docs area**: `<docs_dir>/*` plus the
    index `<index_file>` (default `docs/capstone/00-index.md`, inside
    the docs area)
@@ -169,7 +168,7 @@ Every subcommand reads in the same order, before doing anything else:
 
 1. **Own state first.** A protocol with an interview or state file
    reads it before anything else; a protocol whose prior outputs
-   exist (`design/`, `logic/`, `spec.md`, `be-review.md`, ...) reads
+   exist (`design/`, `logic/`, `spec.md`, `review.md`, ...) reads
    them before regenerating or extending. Never write blind over your
    own docs.
 2. **Discovery through the index, never by globbing.**
@@ -180,7 +179,7 @@ Every subcommand reads in the same order, before doing anything else:
    where and how; open source only where a chapter is stamped stale,
    labels its coverage shallow, or exact lines must be named.
 4. **Refresh-before-trust only where the protocol says so** (groom's
-   staleness pass, be-review's step 1); everywhere else read as-is and
+   staleness pass, review's step 1); everywhere else read as-is and
    note the stamps.
 5. **Never re-read** what is already in context this session unless
    it changed on disk.
@@ -288,8 +287,8 @@ straight to `formalized` once every listed scenario is `written` or
 ## Voice per output
 
 `sync check` is facts only, as are the changelog entries every
-stage appends, the two reviews' among them. `be-review` and
-`fe-review` are the opinionated outputs. `code-prefs`, `logic`,
+stage appends, `review`'s among them.
+`review` is the sole opinionated output. `code-prefs`, `logic`,
 `design`, `stack`, and `groom`'s `spec.md` are normative but only
 record the user's own stated decisions (`logic` and `design` in
 extraction mode are descriptive like the chapters: observed fact, hard

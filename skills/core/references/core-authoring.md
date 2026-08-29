@@ -10,8 +10,9 @@ only `core.md`; everything else reads both.
 Some outputs are personal working state and are **never committed**,
 whatever `docs_in_git` says: `features/` (the whole feature chain:
 interviews, specs, plans, review ledgers), every `*-interview.md`,
-`capstone.json`, `be-review.md`, and `fe-review.md` (plus any legacy
-`review.md`). `changelog.md` is NOT on this list: it is part of the
+`capstone.json`, and `review.md` (plus the legacy `be-review.md` and
+`fe-review.md` older versions wrote). `changelog.md` is NOT on this
+list: it is part of the
 reference and follows `docs_in_git` like the chapters. The
 initializer's per-project run writes `<docs_dir>/.gitignore` listing
 exactly those, and deletes the `changelog.md` line older versions
@@ -86,7 +87,7 @@ writes under `<docs_dir>` must be listed there:
   chapters). Topics that do not apply get a row naming the reason:
   an absence is a fact, and no file can record it.
 - **Companion docs**, a `| File | What it is |` table: everything else
-  (be-review, fe-review, changelog, code-prefs, implementation,
+  (review, changelog, code-prefs, implementation,
   mockup/, design/, features/).
 
 **The index carries no stamps.** Freshness lives in each file's own

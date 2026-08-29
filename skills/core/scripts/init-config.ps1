@@ -158,6 +158,8 @@ capstone.json
 
 # Opinionated and personal outputs
 review.md
+
+# Superseded by review.md; listed so older repos stay ignored
 be-review.md
 fe-review.md
 '@

@@ -16,7 +16,7 @@ project-level):
 ```
 
 Restart OpenCode. The plugin registers all capstone skills (generate,
-sync, doctor, be-review, fe-review, mockup, logic, design,
+sync, doctor, review, mockup, logic, design,
 architecture, code-prefs, stack, build, groom, plan, implement,
 implementation, start, help).
 

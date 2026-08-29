@@ -152,7 +152,7 @@ if ($InGit) {
   # 10b. the removed commands must not be routable again by accident
   $help = & bash skills/core/scripts/help.sh
   $route = (Get-Content skills/core/references/dispatcher.md -Raw)
-  foreach ($n in @('ask', 'changelog', 'guides', 'onboarding')) {
+  foreach ($n in @('ask', 'changelog', 'guides', 'onboarding', 'be-review', 'fe-review')) {
     if (Test-Path "skills/$n") { Err "removed skill skills/$n/ is back" }
     if (Test-Path "skills/core/references/protocols/$n.md") { Err "removed protocol $n.md is back" }
     if ($help -match "(?m)^  $n( |`$)") { Err "help.sh advertises removed command $n" }
@@ -180,7 +180,7 @@ if ($InGit) {
 # 11. every writing protocol carries its changelog pointer, the exempt
 #     ones say so, and the old opt-in is gone
 foreach ($n in @('groom', 'plan', 'implement', 'mockup', 'logic', 'design',
-    'architecture', 'code-prefs', 'stack', 'build', 'be-review', 'fe-review',
+    'architecture', 'code-prefs', 'stack', 'build', 'review',
     'generate', 'sync', 'doctor')) {
   if (-not (Select-String -Path "skills/core/references/protocols/$n.md" -Pattern 'changelog entry' -SimpleMatch -Quiet)) {
     Err "protocol $n.md has no changelog-entry step"

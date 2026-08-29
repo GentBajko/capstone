@@ -144,8 +144,8 @@ paths_covered:
      (the monorepo split mechanic below, applied to a subfolder
      instead of the root); a repo with no scenarios yet records
      `logic` absent here with its reason instead.
-   - If companion docs exist (`be-review.md`, `fe-review.md`,
-     `changelog.md`, `code-prefs.md`, `implementation.md`, `mockup/`,
+   - If companion docs exist (`review.md`, `changelog.md`,
+     `code-prefs.md`, `implementation.md`, `mockup/`,
      `design/`, `features/`), a `| File | What it is |` table below
      the topic table; the factual reference and the
      opinionated/instructional outputs stay visibly distinct.
@@ -164,8 +164,8 @@ paths_covered:
    against the actual source.
 3. Report to the user: files written, topics skipped or absent and
    why.
-4. The local-only outputs (`features/`, interviews, `be-review.md`,
-   `fe-review.md`, `capstone.json`) are already covered by
+4. The local-only outputs (`features/`, interviews, `review.md`,
+   `capstone.json`) are already covered by
    `<docs_dir>/.gitignore`; this question is only about the factual
    reference (`changelog.md` included). If those generated files are
    untracked and not covered by `.gitignore`: honor the `docs_in_git`

@@ -19,8 +19,8 @@ Usage: /capstone:<command>
                        absorption drift, logic coverage, stack re-vetting
   doctor               Verify and repair the docs area: torn writes, index
                        drift, voided approvals, absorption gaps
-  be-review            Opt-in judgment: architecture/backend findings -> be-review.md
-  fe-review            Opt-in judgment: UI improvements vs your own design docs -> fe-review.md
+  review [be|fe]       Opt-in judgment -> review.md; no arg does both sides,
+                       backend (architecture) and frontend (UI vs your design docs)
   mockup               Product discovery: seed + adaptive interview -> traceable markdown mockup
   logic                Business-logic interview, scenario by scenario -> docs/capstone/logic/
   design               Frontend design from the mockup + logic -> docs/capstone/design/
@@ -43,7 +43,7 @@ Output: everything lands in docs/capstone/ - 00-index.md, the numbered
 topic chapters, and the logic/ scenario map. Chapters carry the commit
 they were derived at; the index carries none, so there is one copy of
 freshness and `sync` refreshes only what drifted.
-Docs are strictly descriptive; only be-review and fe-review judge.
+Docs are strictly descriptive; only review judges.
 Every command that writes records itself in docs/capstone/changelog.md.
 A command that needs the reference and finds none builds it first.
 

@@ -95,5 +95,5 @@ core.md's Interview lifecycle), and suggest (never do unasked)
 seeding the project's `AGENTS.md`/`CLAUDE.md` from it.
 
 **Consumers:** the `architecture` interview pre-fills its conventions answers
-from this file and never re-asks; `be-review` gains a
+from this file and never re-asks; `review`'s backend side gains a
 preference-divergence dimension when this file exists.

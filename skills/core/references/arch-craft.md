@@ -1,6 +1,6 @@
-# Architecture craft - be-review's fallback method
+# Architecture craft - review's backend fallback method
 
-Read by `protocols/be-review.md` when the deep-module skills
+Read by `protocols/review.md` when the deep-module skills
 (`improve-codebase-architecture`, `codebase-design`) are not
 installed; when they are, their own text wins and this file stays
 closed except §5's rulings, which bind always. Adapted from
