@@ -53,25 +53,6 @@ remains. One-way doors (irreversible decisions per `interview.md`'s
 conduct rules) are never taken from an artifact silently: each is
 re-confirmed individually.
 
-## Delegation installs
-
-When a protocol names an optional
-method-source skill that is not installed, offer (once per run,
-interactive runs only) to install it before falling back: name the
-skill, the one-line gain, and the exact command; on yes, run it,
-confirm the skill list picks it up, and proceed delegated. On no (or
-non-interactive), take the protocol's fallback without comment.
-Verified installers:
-
-- `impeccable`: `npx skills add pbakaus/impeccable`
-- `design-taste-frontend`: `npx skills add Leonxlnx/taste-skill`
-- `improve-codebase-architecture` / `codebase-design` /
-  `code-review`: `npx skills add mattpocock/skills -s <skill> -g -y`
-- anything else: resolve the source via `npx skills find <name>` or
-  the skill's documented installer and show the user what was found.
-  Never guess an install command; a wrong source runs someone else's
-  code.
-
 ## Index maintenance
 
 The index is `<index_file>`, default

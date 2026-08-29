@@ -222,7 +222,7 @@ foreach ($h in @('Changelog ledger', 'Interview lifecycle', 'Hard rules', 'Read 
   if (-not (Select-String -Path skills/core/references/core.md -Pattern "^## .*$h" -Quiet)) { Err "core.md lost section: $h" }
   if (Select-String -Path skills/core/references/core-authoring.md -Pattern "^## .*$h" -Quiet) { Err "core-authoring.md duplicates core.md section: $h" }
 }
-foreach ($h in @('Local-only outputs', 'Artifact seeding', 'Delegation installs', 'Index maintenance')) {
+foreach ($h in @('Local-only outputs', 'Artifact seeding', 'Index maintenance')) {
   if (-not (Select-String -Path skills/core/references/core-authoring.md -Pattern "^## .*$h" -Quiet)) { Err "core-authoring.md lost section: $h" }
   if (Select-String -Path skills/core/references/core.md -Pattern "^## .*$h" -Quiet) { Err "core.md duplicates core-authoring.md section: $h" }
 }

@@ -43,9 +43,8 @@ official quickstarts for anything unfamiliar. Then write
   architecture interview), then backend capabilities in logic-scenario
   priority order, then frontend screens in mockup order, each
   implementing its `design/screens/` chapter and
-  `design/02-system.md`'s Implementation constraints; when the
-  `impeccable` skill is installed, the frontend pass also honors its
-  craft floor and finish-review flow.
+  `design/02-system.md`'s Implementation constraints, which carry
+  `../design-craft.md` §8's build-time checklist.
 - Per step: how to verify it works before moving on.
 - **Coverage**, the closing section: a table mapping every `logic/`
   scenario, every `mockup/` and `design/screens/` screen, and every

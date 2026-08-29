@@ -87,7 +87,7 @@ for h in 'Changelog ledger' 'Interview lifecycle' 'Hard rules' 'Read discipline'
   grep -q "^## .*$h" skills/core/references/core-authoring.md \
     && err "core-authoring.md duplicates core.md section: $h"
 done
-for h in 'Local-only outputs' 'Artifact seeding' 'Delegation installs' 'Index maintenance'; do
+for h in 'Local-only outputs' 'Artifact seeding' 'Index maintenance'; do
   grep -q "^## .*$h" skills/core/references/core-authoring.md \
     || err "core-authoring.md lost section: $h"
   grep -q "^## .*$h" skills/core/references/core.md \
@@ -294,6 +294,30 @@ for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1;
 done
 grep -q 'sole opinionated output' skills/core/references/core.md \
   || err "core.md does not name review as the sole opinionated output"
+
+# 12e. the craft files are the method, not a fallback: no protocol may
+#      route method to an installed skill, and each craft file must
+#      carry its upstream attribution (Apache-2.0 and MIT both require
+#      it, and both files are modified derivatives)
+for n in design review build; do
+  grep -Eq 'impeccable|design-taste|improve-codebase-architecture|codebase-design' \
+    "skills/core/references/protocols/$n.md" \
+    && err "protocol $n.md still routes method to an installed skill"
+done
+grep -q 'Delegation installs' skills/core/references/core-authoring.md \
+  && err "core-authoring.md still carries the Delegation installs section"
+for f in design-craft arch-craft; do
+  grep -q '^\*\*Attribution\.\*\*' "skills/core/references/$f.md" \
+    || err "$f.md has no Attribution block"
+  grep -q 'This file is the method' "skills/core/references/$f.md" \
+    || err "$f.md does not declare itself the method"
+done
+grep -q 'Apache License 2.0' skills/core/references/design-craft.md \
+  || err "design-craft.md does not name impeccable's Apache-2.0 licence"
+grep -q 'Copyright (c) 2026 Leonxlnx' skills/core/references/design-craft.md \
+  || err "design-craft.md does not carry taste-skill's MIT copyright line"
+grep -q '© Matt Pocock' skills/core/references/arch-craft.md \
+  || err "arch-craft.md lost its MIT copyright line"
 
 # 13. bash syntax of every .sh
 for s in skills/core/scripts/*.sh; do

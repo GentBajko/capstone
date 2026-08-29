@@ -130,11 +130,7 @@ level 3 without asking and leave `expertise` null.
    and the `implement` protocol (invoked directly or as
    `implementation`'s final stage) write source code and their
    implementation-plan artifacts, which is their purpose, and only
-   after their plan gates. The `design` protocol may invoke the
-   installed `impeccable` / `design-taste-frontend` skills; their own
-   working artifacts (`PRODUCT.md`, `.impeccable/`, surface briefs)
-   are those skills' to write per their own rules: outside the docs
-   area, never indexed or maintained by this plugin.
+   after their plan gates.
 3. **Docs are skill-owned**: re-runs may rewrite any generated
    section; manual edits are not preserved. Sole exception:
    `changelog.md` is append-only; re-runs add entries and never

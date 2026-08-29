@@ -3,13 +3,13 @@
 **Reads:** config → `<index_file>` → the existing `review.md` (its
 per-side stamps, before overwriting either side). Then per side.
 **Backend:** every current topic chapter (after the refresh) →
-`code-prefs.md`, `../code-craft.md`, `../arch-craft.md` (the fallback
-method and always-on rulings) → source spot-checks where evidence
+`code-prefs.md`, `../code-craft.md`, `../arch-craft.md` (the method
+and its rulings) → source spot-checks where evidence
 needs exact lines. **Frontend:** `docs/capstone/design/` (the
 committed bar) → `mockup/` and `logic/` (what each screen must do) →
-the frontend source via the chapters → `07-operations.md` (the
-verified run commands) and the live app when the harness can drive a
-browser.
+`../design-craft.md` (§7-8) → the frontend source via the chapters →
+`07-operations.md` (the verified run commands) and the live app when
+the harness can drive a browser.
 
 The plugin's **only** opinionated output (core.md hard rule 1), and
 only because the user invoked it. Never edits code.
@@ -28,55 +28,38 @@ frontend (the mockup records no visual surface, or there is no
 `design/` and no client code) skips the frontend side on a bare run,
 saying so, and records the section as not applicable.
 
-## Method sources
+## Method
 
-Detected fresh every session from the skill list, never cached;
-referenced by flow name, never file path. Whatever the source, **the
-project's own recorded decisions outrank generic best practice**: a
-divergence from a delegated skill's opinion is a finding only when the
-reference and interviews don't already justify the choice: show both
-and let the user rule. A named skill missing on an interactive run →
-offer its install per core-authoring.md's Delegation installs before
-falling back.
+The vendored craft files are the method, in full and on both sides:
+`../arch-craft.md` for backend (vocabulary, the deletion test,
+dependency categories, the smell baseline, the hot-spot walk) and
+`../design-craft.md` for frontend (§7's refuse list and rulings, §8's
+build-time checklist, and the Grading bars below). No installed skill
+substitutes for either, so the same codebase is judged the same way on
+any machine.
 
-### Backend
+**One rule outranks both files:** the project's own recorded decisions
+beat generic best practice. A divergence from the craft baseline is a
+finding only when the reference and interviews don't already justify
+the choice: show both and let the user rule. `arch-craft.md` §5 states
+the same thing from the backend side, along with the rule to skip what
+tooling already enforces.
 
-- **`improve-codebase-architecture` installed** (with its companion
-  `codebase-design` vocabulary, the deep-module school): its flow
-  is the architecture dimension's method: hot spots from the git
-  history, a friction walk, the deletion test on anything shallow,
-  candidates ranked by recommendation strength, existing ADRs
-  respected rather than re-litigated. Use its vocabulary exactly
-  (module, interface, depth, seam, adapter, leverage, locality) and
-  fold its candidates in as findings.
-- **`security-review` installed** (or a harness security-review
-  command): run it as the security dimension's method; fold its
-  findings into the ranked output with their evidence.
-- **A diff-review skill installed** (`code-review`, two-axis
-  standards-vs-spec with a smell baseline, or equivalent): offer
-  it when the user's concern is recent changes rather than the whole
-  architecture; its findings fold in like the others.
-- **A stack best-practices skill installed** (the user's own or a
-  maintained one): it may serve as the stack-currency bar when the
-  user names it; never adopt one silently.
-- **None**: `../arch-craft.md` is the method (vocabulary, deletion
-  test, dependency categories, smell baseline, the hot-spot walk);
-  the dimensions below are its checklist. Its §5 rulings (recorded
-  decisions override the baseline; skip what tooling enforces) bind
-  whichever source is active.
+**Capabilities, not method.** Three things the harness may or may not
+have change what this command can *do*, never how it judges:
 
-### Frontend
+- **A live browser**: run the app per `07-operations.md`'s verified
+  command and screenshot each surface in every shipped theme at
+  desktop and mobile widths. Absent, judge from source and say so.
+- **A security-review command or skill**: run it and fold its findings
+  into the backend section with their evidence, ranked alongside the
+  rest. Absent, spot-check the security dimension directly against the
+  trust boundaries the chapters name.
+- **A diff-review command**: when the user's concern is recent changes
+  rather than the whole codebase, its output folds in the same way.
 
-- **`impeccable` installed**: run its `critique` flow (UX review with
-  heuristic scoring) as the method; offer its `audit` when the user
-  wants the technical layer (a11y, perf, responsive). Its browser
-  machinery applies when the harness has one.
-- **`design-taste-frontend` installed**: its pre-flight checklist
-  audits the Persuade, Read, and Experience surfaces (its declared
-  scope).
-- **Neither**: `../design-craft.md` §7-8 is the checklist; the scoring
-  method is the Grading section below.
-- Always: §7's rulings bind whichever source is active.
+None of these decide severity or override a recorded decision; they
+supply evidence the ranking then treats like any other.
 
 ## Procedure
 

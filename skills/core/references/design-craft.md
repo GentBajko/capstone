@@ -1,16 +1,32 @@
-# Design craft - method fallback and the always-on floor
+# Design craft - the frontend method and the always-on floor
 
-Read by `protocols/design.md`. Sections 1-6 are the method source for
-any surface no installed skill covers, and that skill's own text wins
-wherever it does cover one: `impeccable` covers every mode, so its
-presence closes §1-6 entirely; `design-taste-frontend` covers Persuade,
-Read, and Experience, so with only Taste installed §1-6 still governs
-the Operate screens it declines. Sections 7-8 load in every mode: §7 is
-the merged refuse list plus the rulings where the two skills disagree,
-§8 the pre-flight both paths run. Distilled from impeccable and
-design-taste-frontend ("Taste"). Every ban here binds the shipped
-interface (its copy, composition, and code), never capstone's own
-documentation prose.
+Read by `protocols/design.md` and `protocols/review.md`.
+**This file is the method**, for every surface and every mode: no
+installed skill substitutes for it, so the same project designs the
+same way on any machine. Sections 1-6 carry the method, §7 the refuse
+list and the rulings, §8 the pre-flight both the design-time and
+build-time passes run, §9 the extraction pass for documenting an
+incumbent design.
+
+Every ban here binds the shipped interface (its copy, composition, and
+code), never capstone's own documentation prose.
+
+**Attribution.** This file is a distillation, condensed and modified,
+of two skills capstone does not bundle or invoke:
+
+- `impeccable` by Paul Bakaus, Apache License 2.0
+  (<https://github.com/pbakaus/impeccable>). Modified: its flows are
+  condensed into the prose method below, its mode taxonomy and colour
+  strategy kept, its procedural choreography rewritten to run inside
+  capstone's own interview.
+- `design-taste-frontend` ("Taste") by Leonxlnx, MIT License,
+  Copyright (c) 2026 Leonxlnx
+  (<https://github.com/Leonxlnx/taste-skill>). Modified: its dials,
+  layout discipline, and pre-flight are folded into §3, §6, and §8.
+
+Where the two disagreed, §7 records the ruling capstone took. Neither
+project endorses this distillation, and neither is required for any
+capstone command to run.
 
 ## 1. Posture
 
@@ -94,6 +110,42 @@ The anti-convergence method, run before any token is picked:
    soften the committed direction. If the user takes it, ask which two
    or three products it should sit alongside, make their craft level
    the bar, and execute the convention at full fidelity, without irony.
+
+### Running the direction session
+
+The five steps above are a session, not a checklist to summarise. Run
+them in order, one exchange per step, recording each in the interview
+file before the next:
+
+1. **The four sentences** (mechanism, scene, cultural home, what the
+   flagship must prove) are drafted by you from the mockup and logic
+   docs, then confirmed or corrected by the user. Never asked cold:
+   the docs already answer them, and asking re-opens settled product
+   truth.
+2. **The rut and its opposite**, named out loud and struck from the
+   list, so the user can see what is being refused rather than
+   discovering it missing.
+3. **The candidate worlds**, presented together, three material
+   families minimum, one line each on why it resonates and how it
+   carries the mechanism. Present them as a set; a candidate revealed
+   after the user has started choosing is a new session, not a
+   refinement.
+4. **The commitment**, one direction presented in full: its world, the
+   flagship first viewport, the visitor path, the signature
+   interaction, and its honest risk. The others follow as named
+   alternates, one line each. Never a ranked menu: a menu invites the
+   safest card, and the point of committing is to make the bold option
+   arguable.
+5. **The standing exit**, offered last and every time: the category
+   standard, played straight. Never recommended, never used to soften
+   the committed direction. Taken, it triggers its own follow-up (which
+   two or three products should this sit alongside?), their craft level
+   becomes the bar, and the convention is executed at full fidelity
+   without irony.
+
+The user may stop at any step; what is recorded stands, and what is
+not is recorded as still open. A direction the user has not explicitly
+chosen is never treated as chosen.
 
 **Color strategy**, picked before any color: Restrained (neutrals plus
 one accent; the floor for Operate and Read), Committed (one saturated
@@ -281,21 +333,21 @@ softening it:
 - Sparklines, progress rings, and soft-shadowed rounded rectangles
   standing in for content.
 
-Rulings where the sources disagree (these bind in every mode,
-delegated or not):
+Four rulings, kept as rulings because the two source skills
+disagreed and the reasoning is worth preserving:
 
-- **Eyebrows/kickers above headings: banned outright.** Impeccable's
-  ban supersedes Taste's one-per-three-sections ration; no brief earns
-  it back.
+- **Eyebrows/kickers above headings: banned outright.** The stricter
+  of the two bans wins over a one-per-three-sections ration; no brief
+  earns it back.
 - **Theme: the use-scene rule wins.** Derived from who/where/under
   what light, never "dual-mode by default", never category default.
   When both themes ship, hierarchy parity and contrast floors hold in
   both.
-- **Color: impeccable's strategy framework governs** (Restrained /
-  Committed / Full / Drenched, Operate floors at Restrained), with
-  Taste's locks inside it (one accent, consistency, palette bans).
-- **Faces: the union anti-default list in §4 applies**, whichever
-  source is active.
+- **Color: the strategy framework governs** (Restrained / Committed /
+  Full / Drenched, Operate floors at Restrained), with the per-project
+  locks inside it (one accent, consistency, palette bans).
+- **Faces: the union anti-default list in §4 applies**, in every
+  mode.
 
 ## 8. Pre-flight
 
@@ -340,3 +392,39 @@ delegated or not):
   labels at desktop.
 - `prefers-reduced-motion` and keyboard focus honored; focus states
   visible on every interactive element.
+
+## 9. Extraction: documenting an incumbent design
+
+Brownfield, where a frontend already exists and the job is to record
+the design it has rather than choose a new one. Descriptive
+throughout: this pass reports what is, never what should be, so §1-6's
+opinions do not apply to it. §7's refuse list still names the
+divergences worth *recording*, but a refuse-list hit found in existing
+code is a fact for the review to judge, never a finding here.
+
+Read in this order, and confirm only the surface inventory with the
+user (which routes are the screens):
+
+1. **Tokens and theme**: the variable, theme, or config files that
+   define colour, type scale, spacing, radius, and motion. Record the
+   values as they are, with `file:line`, including the ones that
+   contradict each other: two accents in a codebase is the fact.
+2. **The component language**: the shared primitives (button, field,
+   card, dialog) and, per primitive, which states it actually
+   implements. A missing hover or error state is recorded as absent,
+   per style.md.
+3. **Routes and views**: the surface inventory, each mapped to its
+   mode (§2) as observed. A route whose mode is genuinely ambiguous is
+   recorded as ambiguous, never forced into one.
+4. **The composition of each surface**: layout family, focal moment,
+   and the states the code actually renders.
+
+What you cannot find is a finding of its own: no token file means the
+values live inline, and that is what gets recorded, with examples. Do
+not reconstruct a design system that the code does not have.
+
+Every extracted file carries `paths_covered` (the frontend globs it
+was read from) so `sync` refreshes it as the code moves. The direction
+contract (§5) is **not** invented for an incumbent design: record the
+world as found, and leave the contract blocks out rather than
+back-filling a thesis nobody chose.

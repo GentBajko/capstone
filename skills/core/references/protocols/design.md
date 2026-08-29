@@ -3,10 +3,9 @@
 **Reads:** config → `design-interview.md` (resume) →
 `docs/capstone/mockup/` and `mockup-interview.md` (the brief) →
 `docs/capstone/logic/` (states, unhappy paths) → the existing
-`design/` outputs when re-entering → `../design-craft.md` (§7-8
-always; §1-6 only without the installed skills) → in extraction mode:
-the conventions and architecture chapters, then the frontend token,
-component, and route sources.
+`design/` outputs when re-entering → `../design-craft.md` (the method,
+in full) → in extraction mode: the conventions and architecture
+chapters, then the frontend token, component, and route sources.
 
 Sits between `logic` and `architecture`: turns the mockup's screens
 and the logic's rules into a committed frontend design (direction,
@@ -14,49 +13,27 @@ design system, one design chapter per screen) that `stack` honors and
 `build` implements. Docs only, never code. Like `code-prefs`, the
 output is normative but records only decisions the user has confirmed.
 
-## Method sources
+## Method
 
-Detected fresh every session from the skill list, never cached; a
-resume on another machine degrades gracefully, and decisions already
-recorded in the interview file stand whichever source asked them:
+`../design-craft.md` is the method, in full and for every surface:
+§1-3 the posture, modes, and dials; §4 the visual world and the
+direction session's five steps; §5 the direction contract; §6 the
+craft rules; §7 the refuse list and rulings; §8 the pre-flight; §9 the
+extraction pass. No installed skill substitutes for it, so the same
+project designs the same way on any machine and a resume elsewhere
+reaches the same questions.
 
-- **`impeccable` installed**: invoke it and follow its flows by name,
-  never by file path: `shape`'s discovery for what the capstone docs
-  leave open; `new-work` for the visual world (visual authority, the
-  cultural-world candidates, its concept roll, challenger cards, the
-  standing exit, its decision page and sketches when available); its
-  visualize step when image generation exists. Feed it
-  `docs/capstone/mockup/`, `docs/capstone/logic/`, and
-  `mockup-interview.md` as the brief: impeccable's first rule is that
-  the brief wins, so the user is never re-asked product truth.
-  Impeccable may write its own working artifacts (`PRODUCT.md`,
-  `.impeccable/`, surface briefs) per its own rules: core.md hard
-  rule 2's stated exception; they are not capstone outputs and are
-  never indexed.
-- **`design-taste-frontend` installed**: load it for the Persuade,
-  Read, and Experience surfaces the mockup implies: landing, marketing,
-  editorial, and showcase screens are its declared scope. Its dials,
-  design-system map, layout discipline, and pre-flight bind those
-  surfaces; record its dial values as decisions. It declares itself out
-  of scope for Operate surfaces (dashboards, dense product UI, data
-  tables, wizards); say so rather than stretching it over them.
-- **Any surface no installed skill covers**: `../design-craft.md`
-  §1-6 is the method source: with neither skill installed, that is
-  every surface; with only Taste installed, it is the Operate screens
-  Taste declines. Impeccable covers every mode, so its presence closes
-  §1-6 entirely.
-- **Always, delegated or not**: `../design-craft.md` §7 (refuse list
-  and the rulings where the two skills disagree) and §8 (the split
-  pre-flight) apply.
+**Capabilities, not method.** Two things the harness may or may not
+have change what this stage can *do*, never how it decides: image
+generation (the direction's sketches, offered when it exists and
+skipped in one line when it does not) and a live browser (screenshots
+of an existing frontend in extraction mode). Their absence never
+changes a design decision.
 
-A named skill missing on an interactive run → offer its install per
-core-authoring.md's Delegation installs before taking the fallback.
-
-Conversation cadence is capstone's whatever the source: one question
-per turn, expertise-calibrated per core.md (level 1 hears "calm or
-bold?", never "what DESIGN_VARIANCE?"); impeccable's decision page
-counts as one question. Every decision, whichever skill produced it,
-is appended to the interview file before the next question.
+Conversation cadence: one question per turn, expertise-calibrated per
+core.md (level 1 hears "calm or bold?", never "what
+DESIGN_VARIANCE?"). Every decision is appended to the interview file
+before the next question.
 
 ## Phase A - setup / resume
 
@@ -88,10 +65,12 @@ leans on the mockup's `## States` sections only.
 
 With no mockup but existing frontend code, this stage documents the
 incumbent design as observed fact instead of interviewing a new one.
-With `impeccable` installed, its `document` flow is the method;
-otherwise extract guided by `../design-craft.md`'s §6 categories. Read
-the conventions and architecture chapters first, then the frontend
-sources of visual truth (tokens, theme, components, routes/views).
+`../design-craft.md` §9 is the method: its read order (tokens and
+theme, the component language and the states each primitive actually
+implements, routes and their observed modes, each surface's
+composition), and its rule that what you cannot find is itself a
+finding. Read the conventions and architecture chapters first, then
+those frontend sources of visual truth.
 Confirm only the surface inventory with the user (which routes are the
 screens), then write `design/` as observed: `01-direction.md` records
 the incumbent world as found (no contract blocks are invented for
@@ -136,11 +115,12 @@ lay out every screen right now, what design decision would I have to
 invent?"** The next question is whatever tops that list, routed
 through the method source:
 
-- **Direction** (the visual world): with impeccable, run new-work's
-  process faithfully, including its roll and its standing exit (the
-  category standard, always offered, never recommended), recording
-  the assignment, the challengers, the canon option, and the user's
-  choice; without it, follow design-craft §4-5. Then the color
+- **Direction** (the visual world): run design-craft §4's direction
+  session, all five steps in order (the four sentences, the rut struck
+  out, the candidate worlds as a set, one commitment presented in full
+  with its alternates, and the standing exit offered last), recording
+  the candidates, the commitment, the alternates declined, and the
+  user's choice. Then §5's contract, the color
   strategy (Restrained / Committed / Full palette / Drenched; Operate
   surfaces floor at Restrained), faces chosen past the anti-default
   list, and the calibration self-check: guessable from the category
@@ -225,5 +205,4 @@ Interview lifecycle).
 automatically) next is `architecture`: its inputs are unchanged
 (mockup and logic). `stack` honors `02-system.md`'s committed picks;
 `build` implements `screens/` and enforces the Implementation
-constraints, honoring impeccable's craft floor and finish-review flow
-when that skill is installed.
+constraints, which carry design-craft §8's build-time checklist.

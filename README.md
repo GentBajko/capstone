@@ -103,11 +103,11 @@ formulas, what happens when the payment fails or the user clicks
 twice. The part of a spec everyone skips and then pays for.
 
 **design**. How it looks and feels: a design read, the visual world,
-the tokens, each screen's composition and states. Runs the
-`impeccable` and `design-taste-frontend` skills when installed,
-vendored distillations of both otherwise. Output: a direction
-contract, a design-system chapter `stack` honors, one file per screen
-for `build` to implement.
+the tokens, each screen's composition and states. The method is
+vendored, distilled from `impeccable` (Apache-2.0) and
+`design-taste-frontend` (MIT), so the same product designs the same
+way on any machine. Output: a direction contract, a design-system
+chapter `stack` honors, one file per screen for `build` to implement.
 
 **architecture**. The big interview. Done only when every section of
 the future docs is answerable from your recorded decisions. Writes
@@ -156,11 +156,12 @@ change-smells in the git hot paths, security, stack currency.
 
 Bare `review` runs both. `review backend` or `review frontend` runs
 one and rewrites only that section, leaving the other untouched.
-Either side delegates to installed skills (impeccable,
-design-taste-frontend, mattpocock/skills, security-review) and carries
-vendored fallbacks. One rule binds every source: your recorded
-decisions outrank generic best practice. The file is gitignored by
-default: it is judgment, not reference.
+Both sides judge by capstone's own vendored craft files, so the same
+codebase is judged the same way on any machine. A security-review
+command or a live browser, where the harness has them, supply extra
+evidence but never change the standard. One rule outranks the craft
+baseline: your recorded decisions beat generic best practice. The file
+is gitignored by default: it is judgment, not reference.
 
 </details>
 

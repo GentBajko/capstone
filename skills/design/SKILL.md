@@ -1,6 +1,6 @@
 ---
 name: design
-description: Use when designing the product's frontend from the mockup and logic docs - visual direction, design system, and per-screen design chapters via an interview, delegating to the impeccable and design-taste-frontend skills when installed.
+description: Use when designing the product's frontend from the mockup and logic docs - visual direction, design system, and per-screen design chapters via an interview, using capstone's own vendored design method.
 ---
 
 # Capstone: design
