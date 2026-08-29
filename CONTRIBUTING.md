@@ -18,7 +18,7 @@ after any surface change; CI runs it on every push.
 `core-authoring.md` holds what a run needs only to produce an output
 (local-only outputs, the legacy migrations, artifact seeding,
 delegation installs, index maintenance). Every wrapper reads both,
-except `start` and `implementation`, which route rather than write and
+except `start` and `feature`, which route rather than write and
 read `core.md` alone. A rule added to the wrong file either costs every
 command tokens it cannot use, or goes unread by a command that needs
 it; `lint-sync` asserts the wiring, not the placement, so think about

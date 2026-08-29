@@ -63,7 +63,7 @@ for d in skills/*/; do
   # the shared rules are split: writers read both files, the two chain
   # runners route rather than write and read core.md alone
   case "$n" in
-    start|implementation)
+    start|feature)
       grep -q 'core-authoring\.md` is not' "skills/$n/SKILL.md" \
         || err "router $n should read core.md alone and say why" ;;
     *)

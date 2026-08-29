@@ -2,7 +2,7 @@
 
 The companion to `core.md`: how a stage seeds itself, delegates
 method to an installed skill, and lands its output in the docs area.
-`start` and `implementation` route rather than write, so they read
+`start` and `feature` route rather than write, so they read
 only `core.md`; everything else reads both.
 
 ## Local-only outputs: `<docs_dir>/.gitignore`

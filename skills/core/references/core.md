@@ -128,7 +128,7 @@ level 3 without asking and leave `expertise` null.
    source code, `openspec/`, or human-authored docs. Sole exceptions:
    the `build` protocol (invoked directly or as `start`'s final stage)
    and the `implement` protocol (invoked directly or as
-   `implementation`'s final stage) write source code and their
+   `feature`'s final stage) write source code and their
    implementation-plan artifacts, which is their purpose, and only
    after their plan gates.
 3. **Docs are skill-owned**: re-runs may rewrite any generated
@@ -147,7 +147,7 @@ level 3 without asking and leave `expertise` null.
 At the start of every run, create a visible task list with the
 harness's todo/task tool: one task per phase or numbered step of the
 protocol being executed; the chain runners (`start`,
-`implementation`) hold one task per stage. Mark a task in progress
+`feature`) hold one task per stage. Mark a task in progress
 when it starts and completed the moment its outputs are on disk,
 never in batches at the end: the list is how the user follows where
 everything stands. Work discovered mid-run (a repair, a missing
@@ -225,7 +225,7 @@ Four bounds on it:
 there: one entry per done marker, appended before that marker is
 set.** The entry is an output like any other; the run is not finished
 until it is on disk. Protocols that only read (`help`, `sync`'s check
-mode) or only route (`start`, `implementation`) write no entry; a
+mode) or only route (`start`, `feature`) write no entry; a
 refresh one of them delegates is recorded by the protocol that
 performs it.
 
