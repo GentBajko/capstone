@@ -96,24 +96,33 @@ against it.
 
 ## Phase C - write the code
 
-**If the superpowers plugin is available** (its skills appear in your
-skill list; missing on an interactive run, offer its install per
-core-authoring.md's Delegation installs first): hand off. Invoke
-`superpowers:writing-plans` with `implementation.md` plus the
-reference as the spec (capstone's docs ARE the spec; skip superpowers'
-brainstorming). The plan it writes must carry every
-`implementation.md` step, in the same dependency order, with each
-step's code sketches and verification intact: writing-plans expands
-steps into tasks; it never merges, summarizes, or drops them. Before
-executing, walk `implementation.md` step by step against the produced
-plan and fix any step that was dropped, thinned, or reordered;
-re-walk after fixes until a pass finds no gap. Then execute the plan
-via whichever superpowers execution flow the user picks
-(subagent-driven or inline).
+**Ask the mode once, before the first step**, and record it as
+`execution: subagent | inline` in `build-interview.md`'s frontmatter
+so a resumed run never re-asks:
 
-**Otherwise**: execute `implementation.md` directly: smallest testable
-steps, backend first, frontend second, verifying each step as the plan
-specifies, honoring `code-prefs.md` throughout.
+> "Run the build steps in subagents (fresh context per step,
+> recommended) or inline in this session?"
+
+Then execute `implementation.md` directly: its build-order steps in
+order, the walking-skeleton slice first, backend before the frontend
+that calls it, verifying each step as the plan specifies before
+starting the next. Commits follow `../code-craft.md`'s Git section,
+one per step.
+
+**Subagent mode** works exactly as `implement.md`'s Phase B describes
+it: one subagent per build-order step, dispatched fresh and never in
+parallel, with the step's full text, its code sketches, the verified
+commands, `code-prefs.md`'s rules, and `../code-craft.md`'s ladder,
+TDD scoping, and Git section **copied into the prompt** rather than
+referenced. Nothing else crosses into a subagent's context, so a
+pointer to a file it will never open buys nothing. The main session
+verifies each step's report before dispatching the next.
+
+**Inline mode** runs the same steps in this session, same order, same
+verification, same commits.
+
+Either mode: a harness without subagents takes inline, said out loud
+rather than asked.
 
 Either way, code lands in the repository's source tree (never under
 the docs area). Append the changelog entry per core.md's ledger, key

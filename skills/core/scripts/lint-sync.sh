@@ -259,6 +259,22 @@ grep -q '^## Git: branches, commits' skills/core/references/code-craft.md \
 grep -q "Git section" skills/core/references/protocols/implement.md \
   || err "implement.md does not cite code-craft's Git section"
 
+# 12c. execution is capstone's own: the two code-writing stages ask the
+#      user for subagent-vs-inline and record it, and no protocol
+#      invokes a superpowers skill at runtime (prose attribution in
+#      groom/plan is fine; a `superpowers:<skill>` call is not)
+for n in implement build; do
+  grep -q 'execution: subagent | inline' "skills/core/references/protocols/$n.md" \
+    || err "protocol $n.md does not record the execution mode"
+  grep -q 'Ask the mode once' "skills/core/references/protocols/$n.md" \
+    || err "protocol $n.md does not ask subagent-vs-inline before executing"
+done
+if grep -rl 'superpowers:' skills/core/references/protocols/ >/dev/null 2>&1; then
+  err "a protocol invokes a superpowers skill: $(grep -rl 'superpowers:' skills/core/references/protocols/ | tr '\n' ' ')"
+fi
+grep -q 'superpowers' skills/core/references/core-authoring.md \
+  && err "core-authoring.md still lists superpowers as an installable delegation"
+
 # 13. bash syntax of every .sh
 for s in skills/core/scripts/*.sh; do
   bash -n "$s" 2>/dev/null || err "bash syntax error in $s"

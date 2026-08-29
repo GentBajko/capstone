@@ -66,9 +66,6 @@ Verified installers:
 - `design-taste-frontend`: `npx skills add Leonxlnx/taste-skill`
 - `improve-codebase-architecture` / `codebase-design` /
   `code-review`: `npx skills add mattpocock/skills -s <skill> -g -y`
-- superpowers (a plugin, not a skill):
-  `claude plugin marketplace add obra/superpowers-marketplace`, then
-  `claude plugin install superpowers@superpowers-marketplace`
 - anything else: resolve the source via `npx skills find <name>` or
   the skill's documented installer and show the user what was found.
   Never guess an install command; a wrong source runs someone else's

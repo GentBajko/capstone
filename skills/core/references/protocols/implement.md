@@ -53,30 +53,65 @@ user before Task 1, batched, not one interrupt per discovery mid-run.
 
 ## Phase B - execute
 
-**If the superpowers plugin is available** (its skills appear in your
-skill list; missing on an interactive run, offer its install per
-core-authoring.md's Delegation installs first): hand off; the spec and plan
-ARE superpowers' spec and
-plan, so skip its brainstorming and writing-plans stages and execute
-`plan.md` via `superpowers:subagent-driven-development` (recommended)
-or `superpowers:executing-plans`, whichever the user picks. As each
-task completes there, check its boxes off in `plan.md` yourself: the
-chain's stage detection reads them, whichever flow executes. Stop the
-handoff short of superpowers' finishing-a-development-branch step:
-when its tasks (and, in the subagent-driven flow, its final
-whole-branch review) are done, return here: Phase C loops the
-review until dry, and only Phase D finishes the branch.
+**Ask the mode once, before Task 1**, and record it as
+`execution: subagent | inline` in the feature-interview frontmatter
+so a resumed run never re-asks:
 
-**Otherwise**: execute inline: tasks in order, steps exactly as
-written, every verification run and passing before its box is checked
-off in `plan.md`, one commit per task per `../code-craft.md`'s Git
-section (its density, message format, and never-a-broken-commit rule;
-a task is exactly the "one reviewable idea" that section names),
-never `git add`-ing the docs area or the index. Stop and ask instead of
-guessing when a dependency is missing, a verification keeps failing,
-or an instruction can be read two ways. The checked boxes in `plan.md`
-are the durable progress record: check each as it passes, not in
-batches, so a dead session resumes mid-task.
+> "Run the tasks in subagents (fresh context per task, recommended) or
+> inline in this session?"
+
+Subagent is the recommendation: a task executed in its own context
+cannot drift on the previous task's leftovers, and the plan was
+written so each task carries everything its executor needs. Inline is
+the right pick for a short plan, a harness without subagents (state
+that and take it, don't ask), or a user who wants to watch each step.
+
+Both modes obey the same rules: tasks in dependency order, steps
+exactly as written, every verification run and **passing** before its
+box is checked off in `plan.md`, one commit per task per
+`../code-craft.md`'s Git section (its density, message format, and
+never-a-broken-commit rule; a task is exactly the "one reviewable
+idea" that section names), never `git add`-ing the docs area or the
+index. Stop and ask instead of guessing when a dependency is missing,
+a verification keeps failing, or an instruction can be read two ways.
+The checked boxes in `plan.md` are the durable progress record: check
+each as it passes, never in batches, so a dead session resumes
+mid-task.
+
+### Subagent mode
+
+One subagent per task, dispatched fresh, in plan order. Never two at
+once: each task consumes what the previous one defined.
+
+**The subagent's prompt carries everything, because nothing else
+crosses into its context.** Copy in, verbatim rather than by
+reference:
+
+1. The task's full text from `plan.md`: its `Create:`/`Modify:`/
+   `Test:` paths, the interfaces it consumes and produces, and every
+   checkbox step with its code and exact commands.
+2. `code-prefs.md`'s rules, and `../code-craft.md`'s ladder, TDD
+   scoping, and **Git section in full**. A pointer to a file is
+   useless here: a subagent that never reads `code-craft.md` commits
+   however it likes.
+3. The conventions chapter's paradigm, typing, and error-handling
+   rules, plus the operations chapter's verified commands.
+4. The rules: execute only this task; run every verification and do
+   not report success until it passes; commit exactly once, in the
+   given format; touch no path outside the task's list; never
+   `git add` the docs area; report the verification output, the
+   commit subject, and anything ambiguous rather than deciding it.
+
+Then, in the main session: check the task's boxes off yourself against
+the reported verification, and dispatch the next. A subagent reporting
+a failure it could not resolve, or an instruction it read two ways,
+stops the run and goes to the user: never re-dispatch the same task
+hoping for a better roll.
+
+### Inline mode
+
+Execute the tasks yourself in the same order, under the same rules,
+checking each box as its verification passes.
 
 Either way, code lands in the repository's source tree (never under
 the docs area), and every code decision follows `code-prefs.md` and
@@ -119,10 +154,11 @@ restarting at round one.
    round after a fix wave exists to review the fixes. Record the dry
    verdict in the ledger; Phase D resumes read it.
 
-In the subagent-driven handoff, that flow's final whole-branch review
-counts as round one (record its findings in the ledger); the
-executing-plans handoff has no final review, so start at round one
-yourself. Keep looping until dry either way.
+Both execution modes start this loop at round one: neither performs a
+whole-branch review of its own, and a per-task subagent has seen only
+its own task, so nothing it reported counts as a review of the diff.
+In subagent mode the round's lenses may themselves be dispatched in
+parallel, one reviewer per lens, each reading the full diff.
 
 ## Phase D - wrap
 
@@ -163,10 +199,10 @@ Entered when Phase C goes dry.
    outputs (a crash can't strand a "done" feature with a stale
    reference). The lifecycle `status` has been `formalized` since the
    spec landed.
-5. Finish the branch, the step Phase B deferred: superpowers'
-   finishing-a-development-branch when installed, the repo's own
-   merge flow otherwise (on a consented main run there is no branch
-   to finish, just the repo's push conventions).
+5. Finish the branch: the repo's own merge flow, following whatever
+   `git log` shows it uses (on a consented main run there is no branch
+   to finish, just the repo's push conventions). Ask before opening a
+   PR or pushing; neither is implied by the plan's approval.
 6. **Delete `features/<NN>-<slug>/`**, last, once step 3's entry is on
    disk and the branch is finished. The folder was scaffolding: the
    spec is absorbed into `logic/`, `mockup/`, and `design/`, the plan

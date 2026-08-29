@@ -33,7 +33,7 @@ Usage: /capstone:<command>
 
   groom <feature>      Feature interview against the existing docs -> features/<NN>-<slug>/spec.md
   plan <feature>       Task-by-task TDD plan from a groomed spec; gated on your approval
-  implement <feature>  Execute the approved plan into code, via superpowers when installed
+  implement <feature>  Execute the approved plan into code, in subagents or inline (you pick)
   implementation <desc>
                        Chain groom -> plan -> implement, resuming at the first unfinished stage
 

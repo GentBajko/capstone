@@ -292,3 +292,20 @@ if (-not (Select-String -Path README.md -Pattern $pipeReadme -SimpleMatch -Quiet
 
 if ($Fail -eq 0) { Write-Output "lint-sync: all invariants hold" } else { Write-Output "lint-sync: FAILURES above" }
 exit $Fail
+
+# 12c. execution is capstone's own: the two code-writing stages ask the
+#      user for subagent-vs-inline, and no protocol invokes superpowers
+foreach ($n in @('implement', 'build')) {
+  if (-not (Select-String -Path "skills/core/references/protocols/$n.md" -Pattern 'execution: subagent | inline' -SimpleMatch -Quiet)) {
+    Err "protocol $n.md does not record the execution mode"
+  }
+  if (-not (Select-String -Path "skills/core/references/protocols/$n.md" -Pattern 'Ask the mode once' -SimpleMatch -Quiet)) {
+    Err "protocol $n.md does not ask subagent-vs-inline before executing"
+  }
+}
+$sp = Get-ChildItem skills/core/references/protocols -Filter *.md |
+  Where-Object { Select-String -Path $_.FullName -Pattern 'superpowers:' -SimpleMatch -Quiet }
+if ($sp) { Err "a protocol invokes a superpowers skill: $($sp.Name -join ' ')" }
+if (Select-String -Path skills/core/references/core-authoring.md -Pattern 'superpowers' -SimpleMatch -Quiet) {
+  Err "core-authoring.md still lists superpowers as an installable delegation"
+}

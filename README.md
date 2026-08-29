@@ -43,7 +43,7 @@ OpenCode. Plain `SKILL.md` files, MIT.
 | `/capstone:architecture` | Interview 4, standalone |
 | `/capstone:code-prefs` | Interview 5, standalone |
 | `/capstone:stack` | Research libraries and services per capability, with pros/cons and pricing; you pick (`refresh` re-vets recorded picks) |
-| `/capstone:build` | Implementation plan (backend, then frontend), your approval, then working code, via superpowers when installed |
+| `/capstone:build` | Implementation plan (backend, then frontend), your approval, then working code in subagents or inline (you pick) |
 | `/capstone:groom <feature>` | Doc-grounded feature interview → a traceable spec in `docs/capstone/features/` |
 | `/capstone:plan <feature>` | Task-by-task TDD plan from the groomed spec; you approve before any code |
 | `/capstone:implement <feature>` | Execute the approved plan into code, review until dry, then refresh the affected chapters |
@@ -122,8 +122,9 @@ in your repo. Also a decent starting point for a CLAUDE.md.
 **stack, then build**. `stack` researches real options per
 capability, licenses and prices included; you pick, and
 `stack refresh` re-vets the picks months later. `build` writes an
-implementation plan, stops for your approval, then writes the code,
-via superpowers when installed.
+implementation plan, stops for your approval, then writes the code:
+one subagent per step with fresh context, or inline in the session,
+whichever you pick when it starts.
 
 </details>
 
