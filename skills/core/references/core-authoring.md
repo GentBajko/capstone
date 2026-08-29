@@ -41,6 +41,16 @@ ignore list below now covers. Say what it reported. If both
 directories exist it merges nothing and `docs/capstone` wins; resolve
 that with the user.
 
+## Legacy folder: `design/`
+
+The uiux stage used to write `docs/capstone/design/` and
+`design-interview.md`, back when it was called `design`. The
+initializer's per-project run migrates both idempotently: `design/`
+present with no `uiux/` → move the tree (`git mv` when tracked),
+likewise the interview file, then repoint the moved docs'
+cross-references. Both present → nothing is merged, `uiux/` wins;
+resolve that with the user. Say what it reported.
+
 ## Artifact seeding
 
 Every interview stage accepts an optional
@@ -81,7 +91,7 @@ The index does not list itself, and is never a topic. All indexes and
 outputs are markdown; never generate HTML, for anything. Never
 indexed: the interview Q&A files (`architecture-interview.md`,
 `mockup-interview.md`, `code-prefs-interview.md`,
-`logic-interview.md`, `design-interview.md`, `stack-interview.md`,
+`logic-interview.md`, `uiux-interview.md`, `stack-interview.md`,
 `build-interview.md`, `features/*/feature-interview.md`,
 `features/*/review-ledger.md`) and `capstone.json`.
 

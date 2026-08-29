@@ -5,9 +5,9 @@ per-side stamps, before overwriting either side). Then per side.
 **Backend:** every current topic chapter (after the refresh) →
 `code-prefs.md`, `../code-craft.md`, `../arch-craft.md` (the method
 and its rulings) → source spot-checks where evidence
-needs exact lines. **Frontend:** `docs/capstone/design/` (the
+needs exact lines. **Frontend:** `docs/capstone/uiux/` (the
 committed bar) → `mockup/` and `logic/` (what each screen must do) →
-`../design-craft.md` (§7-8) → the frontend source via the chapters →
+`../uiux-craft.md` (§7-8) → the frontend source via the chapters →
 `07-operations.md` (the verified run commands) and the live app when
 the harness can drive a browser.
 
@@ -25,7 +25,7 @@ Bare `review` runs **both** sides, backend first. An argument runs one:
 A one-sided run **rewrites only its own section** of `review.md` and
 leaves the other side's section and stamp untouched. A project with no
 frontend (the mockup records no visual surface, or there is no
-`design/` and no client code) skips the frontend side on a bare run,
+`uiux/` and no client code) skips the frontend side on a bare run,
 saying so, and records the section as not applicable.
 
 ## Method
@@ -33,7 +33,7 @@ saying so, and records the section as not applicable.
 The vendored craft files are the method, in full and on both sides:
 `../arch-craft.md` for backend (vocabulary, the deletion test,
 dependency categories, the smell baseline, the hot-spot walk) and
-`../design-craft.md` for frontend (§7's refuse list and rulings, §8's
+`../uiux-craft.md` for frontend (§7's refuse list and rulings, §8's
 build-time checklist, and the Grading bars below). No installed skill
 substitutes for either, so the same codebase is judged the same way on
 any machine.
@@ -67,8 +67,8 @@ supply evidence the ranking then treats like any other.
    Backend: the reference must be current (run the refresh path first
    if stale; no index at all → core.md's Missing reference rule builds
    one before this run continues): judgments must rest on verified
-   facts. Frontend: without `docs/capstone/design/`, say so (findings
-   then rest on the craft floor alone) and suggest `design`'s
+   facts. Frontend: without `docs/capstone/uiux/`, say so (findings
+   then rest on the craft floor alone) and suggest `uiux`'s
    extraction mode first, so there is an incumbent standard to hold
    the code to. Never block on it.
 2. **Preserve the evidence you are about to overwrite.** Before
@@ -96,7 +96,7 @@ supply evidence the ranking then treats like any other.
    per `../code-craft.md`), and, when `docs/capstone/code-prefs.md`
    exists, divergence between the user's stated preferences and the
    observed conventions.
-4. **Frontend side**: inventory the surfaces from `design/screens/`
+4. **Frontend side**: inventory the surfaces from `uiux/screens/`
    (or the mockup, or the route table when neither exists). When
    `07-operations.md` carries a verified run command and the harness
    can drive a browser, run the app and screenshot the key screens in
@@ -170,12 +170,15 @@ call.
 ## Grading - the frontend's three bars, in confidence order
 
 1. **The project's own commitments**: drift from `02-system.md`'s
-   locks (accent, radius, type scale, icon family, motion rules) and
-   from each screen's `design/screens/` chapter. Highest confidence:
+   locks (accent, radius, type scale, icon family, motion rules),
+   from `03-experience.md`'s interaction rules (confirmation and undo
+   policy, feedback thresholds, error recovery, input burden, the
+   accessibility floor), and from each screen's `uiux/screens/`
+   chapter. Highest confidence:
    the user already decided this standard; the critique only holds
    the code to it. Cite the commitment beside the violation.
 2. **The craft floor**: violations of the refuse list and the
-   build-time checklist (design-craft §7-8, or the installed skill's
+   build-time checklist (uiux-craft §7-8, or the installed skill's
    own floor). State which rule.
 3. **Mode-appropriateness**: each surface judged by its mode from
    `01-direction.md`'s mode map: Operate on scanability, consistency,

@@ -122,7 +122,7 @@ discovered; surface them as questions, not verdicts. If the user
 stops earlier, leave status as `interviewing`; the pipeline treats
 pending scenarios as in-progress.
 
-**Consumers:** `design` reads `docs/capstone/logic/` to style each
+**Consumers:** `uiux` reads `docs/capstone/logic/` to style each
 screen's states and unhappy paths. `architecture` reads
 `docs/capstone/logic/` to pre-fill models (entities, invariants,
 consistency needs), data-flow (lifecycles), and quality-attribute

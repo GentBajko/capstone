@@ -173,8 +173,8 @@ Entered when Phase C goes dry.
    `NN-<scenario>.md` for a new scenario, amendments inside the named
    files otherwise; as built, divergences from the spec recorded as
    the shipped rule); update the `mockup/` screens the feature
-   changed; update the touched `design/screens/` chapters, and
-   `design/02-system.md` only when the spec recorded a token or lock
+   changed; update the touched `uiux/screens/` chapters, and
+   `uiux/02-system.md` only when the spec recorded a token or lock
    change. Every absorbed or created file gains
    `absorbed_from: features/<NN>-<slug>@<date>` in frontmatter;
    refresh the folders' README indexes and Companion docs rows.
@@ -205,7 +205,7 @@ Entered when Phase C goes dry.
    PR or pushing; neither is implied by the plan's approval.
 6. **Delete `features/<NN>-<slug>/`**, last, once step 3's entry is on
    disk and the branch is finished. The folder was scaffolding: the
-   spec is absorbed into `logic/`, `mockup/`, and `design/`, the plan
+   spec is absorbed into `logic/`, `mockup/`, and `uiux/`, the plan
    is spent, the ledger's counts are in the changelog entry, and
    `features/` is gitignored so nothing here is recoverable from
    history anyway. Deleting it keeps the folder to features actually

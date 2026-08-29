@@ -3,7 +3,7 @@
 **Reads:** config → `stack-interview.md` (resume) → the reference
 (`05-dependencies.md`, `01-architecture.md`, `04-data-flow.md`,
 `07-operations.md`) → `logic/` → `code-prefs.md` →
-`design/02-system.md` when it exists.
+`uiux/02-system.md` when it exists.
 
 Sits after `code-prefs`, before `build`. Turns the reference's abstract
 needs into concrete, user-picked libraries, packages, and paid
@@ -29,7 +29,7 @@ stack, hosting/deploy target, CI, monitoring) plus anything the
 architecture interview left open. Confirm the list with the user and
 seed the ledger with it. Capabilities `code-prefs.md` already pins are
 recorded as derived decisions, not re-asked. So are the commitments
-`docs/capstone/design/02-system.md` records when it exists; the
+`docs/capstone/uiux/02-system.md` records when it exists; the
 design system / component kit, faces, icon family are user decisions:
 research within them, never silently re-open them.
 
@@ -73,7 +73,7 @@ already records (maintenance activity, license changes, pricing,
 newer majors), presents the deltas (unchanged picks in one line
 each), and records re-confirmations or changes as new `§Q` entries,
 updating the chapter rows touched. Changelog key `stack/refresh@Q<n>`.
-It never re-opens the capability list or the design stage's
+It never re-opens the capability list or the uiux stage's
 commitments; a changed pick flows into `05-dependencies.md` like any
 formalization. `sync check`'s dependency section is what suggests it.
 

@@ -41,7 +41,7 @@ Artifact seeding rule.
 As soon as the answers imply it (asking directly if still unclear
 after the seeds), record the product's interaction surfaces in the
 interview frontmatter: `surfaces: [web|mobile|cli|api|none]`, any
-combination. `design` keys on it (no visual surface → that stage
+combination. `uiux` keys on it (no visual surface → that stage
 records itself skipped), and for non-visual surfaces Phase E's
 "screens" are the surface's units (endpoints, commands, message
 flows): same files, same sections, the wireframe replaced by the
@@ -101,7 +101,7 @@ in the interview file (per core.md's Interview lifecycle).
 **Handoff:** (when running inside the `start` pipeline, it continues
 automatically) the natural next step is the `logic` skill: it takes the
 scenarios this mockup depicts and lays their business rules bare, one
-by one; `design` then turns the screens into a committed frontend
+by one; `uiux` then turns the screens into a committed frontend
 design, before any architecture. `architecture` (run after these) reads
 `mockup-interview.md` and never re-asks what it answers: its framing
 section (§0 of `../interview.md`) is largely pre-filled by this

@@ -63,7 +63,7 @@ asking when ambiguous.
 
 `docs_in_git` (`"commit" | "ignore" | "ask"`) pre-answers the
 commit-or-gitignore question **for the factual reference only**: the
-index and the topic chapters, plus `logic/`, `mockup/`, `design/`,
+index and the topic chapters, plus `logic/`, `mockup/`, `uiux/`,
 `code-prefs.md`, and `changelog.md`.
 `language` sets the generated docs' language. The user can change any
 key by editing the files or just telling you.
@@ -164,7 +164,7 @@ Every subcommand reads in the same order, before doing anything else:
 
 1. **Own state first.** A protocol with an interview or state file
    reads it before anything else; a protocol whose prior outputs
-   exist (`design/`, `logic/`, `spec.md`, `review.md`, ...) reads
+   exist (`uiux/`, `logic/`, `spec.md`, `review.md`, ...) reads
    them before regenerating or extending. Never write blind over your
    own docs.
 2. **Discovery through the index, never by globbing.**
@@ -205,10 +205,10 @@ Four bounds on it:
 - **Once per run.** If `sync` produces no index either (`generate`'s
   empty-repo stop: no source files, no entry points, no manifests),
   say so and stop. Never loop.
-- **The greenfield stages are exempt** (`mockup`, `logic`, `design`,
+- **The greenfield stages are exempt** (`mockup`, `logic`, `uiux`,
   `architecture`, `code-prefs`, `stack`, `build`): they build the
   reference from interviews rather than reading one, and their
-  prerequisites are upstream *interviews*, not the index. `design`
+  prerequisites are upstream *interviews*, not the index. `uiux`
   without a mockup still points at `mockup`; `build` without a
   formalized stack still runs `stack`.
 - **`generate`, `sync`, and `doctor` are exempt.** The first two are
@@ -285,8 +285,8 @@ straight to `formalized` once every listed scenario is `written` or
 `sync check` is facts only, as are the changelog entries every
 stage appends, `review`'s among them.
 `review` is the sole opinionated output. `code-prefs`, `logic`,
-`design`, `stack`, and `groom`'s `spec.md` are normative but only
-record the user's own stated decisions (`logic` and `design` in
+`uiux`, `stack`, and `groom`'s `spec.md` are normative but only
+record the user's own stated decisions (`logic` and `uiux` in
 extraction mode are descriptive like the chapters: observed fact, hard
 rule 1 in full); `build`'s `implementation.md` and `plan`'s `plan.md`
 are instructional: they may use imperative voice, but every command

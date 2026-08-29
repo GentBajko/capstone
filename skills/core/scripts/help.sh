@@ -7,7 +7,7 @@ capstone - codebase architecture reference generator
 Usage: /capstone:<command>
 
   start                Run the greenfield pipeline stage by stage:
-                       mockup -> logic -> design -> architecture -> code-prefs -> stack -> build
+                       mockup -> logic -> uiux -> architecture -> code-prefs -> stack -> build
                        (resumes at the first incomplete stage; also
                         triggers on a bare "capstone" prompt)
 
@@ -16,16 +16,17 @@ Usage: /capstone:<command>
                        (architecture, models, conventions, data-flow,
                         dependencies, testing, operations, glossary)
   sync                 Refresh the stamped files that drifted; extract the
-                       logic/ scenarios the business-logic map is missing
-  sync check           Read-only trust report: staleness, pointer drift,
-                       absorption drift, logic coverage, stack re-vetting
+                       logic/ scenarios and design/ surfaces the map is missing
+  sync check           Read-only trust report: staleness, pointer drift, absorption
+                       drift, logic and design coverage, stack re-vetting
   doctor               Verify and repair the docs area: torn writes, index
                        drift, voided approvals, absorption gaps
   review [be|fe]       Opt-in judgment -> review.md; no arg does both sides,
                        backend (architecture) and frontend (UI vs your design docs)
   mockup               Product discovery: seed + adaptive interview -> traceable markdown mockup
   logic                Business-logic interview, scenario by scenario -> docs/capstone/logic/
-  design               Frontend design from the mockup + logic -> docs/capstone/design/
+  uiux                 How the UI looks and the UX behaves, from the mockup + logic
+                       -> docs/capstone/uiux/
   architecture         Greenfield: exhaustive architecture interview -> prescriptive reference
   code-prefs           Code-preferences interview -> normative code-prefs.md
   stack                Research libraries/services per capability, you pick -> 05-dependencies.md

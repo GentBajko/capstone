@@ -127,6 +127,30 @@ if ((Test-Path $OldIdx) -and (-not (Test-Path $NewIdx)) -and
   Write-Output "note: both $OldIdx and $NewIdx exist - not merging; $NewIdx wins"
 }
 
+# 1c. The uiux stage used to be called design, and wrote docs/capstone/
+#     design/ plus design-interview.md. Move both when the new names are
+#     still free; both present is not a stale layout, so nothing merges.
+foreach ($pair in @(@('design', 'uiux'), @('design-interview.md', 'uiux-interview.md'))) {
+  $old = Join-Path $DocsDir $pair[0]
+  $new = Join-Path $DocsDir $pair[1]
+  if ((Test-Path $old) -and (-not (Test-Path $new))) {
+    $tracked = & git ls-files $old 2>$null
+    if ($tracked) { & git mv $old $new 2>$null; if ($LASTEXITCODE -ne 0) { Move-Item $old $new } }
+    else { Move-Item $old $new }
+    Write-Output "migrated: $old -> $new"
+  } elseif ((Test-Path $old) -and (Test-Path $new)) {
+    Write-Output "note: both $old and $new exist - not merging; $new wins"
+  }
+}
+if ((Test-Path (Join-Path $DocsDir 'uiux')) -or (Test-Path (Join-Path $DocsDir 'uiux-interview.md'))) {
+  Get-ChildItem -Path $DocsDir -Recurse -File -Filter *.md | ForEach-Object {
+    $c = (Get-Content $_.FullName -Raw) `
+      -replace 'docs/capstone/design/', 'docs/capstone/uiux/' `
+      -replace 'design-interview\.md', 'uiux-interview.md'
+    Write-Utf8NoBom $_.FullName $c
+  }
+}
+
 # 2. the docs area's ignore list
 New-Item -ItemType Directory -Force -Path $DocsDir | Out-Null
 $Ignore = Join-Path $DocsDir ".gitignore"

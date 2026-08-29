@@ -122,14 +122,31 @@ paths_covered:
    points records `logic` absent in the topic index with that reason.
    Existing `logic/` files are left alone; extraction fills only the
    scenarios the map is missing.
-5. Append the changelog entry per core.md's Changelog ledger, key
+5. **Design extraction**: applicable when the repo has a frontend
+   (client entry points, routes or views, or token/theme files: the
+   same evidence `01-architecture.md`'s Frontend section reports).
+   Build `docs/capstone/uiux/` per design.md's extraction mode,
+   invoked as its "Invoked by `generate` or `sync`" rules say: the
+   surface inventory from the module map and the route table, one
+   `screens/NN-<route>.md` per surface covering what the code actually
+   renders, `02-system.md` from the observed tokens and component
+   language with `file:line` cites, and `01-direction.md` only where a
+   direction is genuinely observable (uiux-craft §9). Every file
+   stamped with `paths_covered` over the frontend globs it was read
+   from. Above the subagent threshold, dispatch per surface like
+   Phase 2's per-topic dispatch, same rules. A repo with no frontend
+   records `uiux` absent in the Companion docs table with that
+   reason. Existing `uiux/` files are left alone: extraction fills
+   only the surfaces the map is missing, and never overwrites a
+   committed design the `uiux` interview produced.
+6. Append the changelog entry per core.md's Changelog ledger, key
    `generate/<topic|all>@<the run's stamp>`; one bullet per chapter
    and logic scenario written **this run** (every one, never only
    those you judge materially changed; that judgment is the escape
    hatch), the topics recorded absent with their reasons, and whether
    the index was created or refreshed. Nothing written (Phase 1 step
    9's empty-repo stop) → no entry.
-6. Write `<index_file>` **last**, so the index reflects what was
+7. Write `<index_file>` **last**, so the index reflects what was
    actually generated. It is chapter zero of the docs area
    (`docs/capstone/00-index.md` by default), and it carries no stamps:
    freshness lives in each file's own frontmatter, which is what
@@ -146,12 +163,12 @@ paths_covered:
      `logic` absent here with its reason instead.
    - If companion docs exist (`review.md`, `changelog.md`,
      `code-prefs.md`, `implementation.md`, `mockup/`,
-     `design/`, `features/`), a `| File | What it is |` table below
+     `uiux/`, `features/`), a `| File | What it is |` table below
      the topic table; the factual reference and the
      opinionated/instructional outputs stay visibly distinct.
      Interview Q&A files are never indexed, and the index never lists
      itself.
-7. Monorepos: split a topic per subsystem while keeping the parent
+8. Monorepos: split a topic per subsystem while keeping the parent
    chapter's number (`01-architecture-frontend.md`,
    `01-architecture-backend.md`) when one file would be unwieldy; the
    index shows the split.

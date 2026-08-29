@@ -8,7 +8,7 @@ thing before building it.
 ```
 existing repo ──▶ generate ──▶ docs/capstone/ index + 8 chapters ──▶ sync keeps them current
                                                             ▲
-new project ──▶ mockup → logic → design → architecture → code-prefs → stack → build
+new project ──▶ mockup → logic → uiux → architecture → code-prefs → stack → build
                                                                               │
 feature idea ──▶ groom → plan → implement ──▶ shipped code, absorbed into docs ◀┘
 ```
@@ -30,15 +30,15 @@ OpenCode. Plain `SKILL.md` files, MIT.
 
 | Command | What it does |
 | --- | --- |
-| `/capstone:start` | The pipeline: mockup → logic → design → architecture → code-prefs → stack → build, resuming at the first unfinished stage |
+| `/capstone:start` | The pipeline: mockup → logic → uiux → architecture → code-prefs → stack → build, resuming at the first unfinished stage |
 | `/capstone:generate` | Build the reference from scratch (`rebuild` forces, a topic name targets one chapter) |
-| `/capstone:sync` | Refresh what drifted and extract `logic/` scenarios the map is missing; `sync check` is the read-only trust report |
+| `/capstone:sync` | Refresh what drifted and extract the `logic/` scenarios and `uiux/` surfaces the map is missing; `sync check` is the read-only trust report |
 | `/capstone:doctor` | Diagnose and repair the docs area: torn writes, index drift, voided approvals, absorption gaps |
 | `docs/capstone/changelog.md` | Not a command: the append-only ledger every writing command records itself in, before it sets its done marker |
 | `/capstone:review [be\|fe]` | The opt-in judgment, into one `review.md`: no argument reviews both sides, `backend` takes architecture and `frontend` grades the UI against your own design docs |
 | `/capstone:mockup` | Interview 1, standalone |
 | `/capstone:logic` | Interview 2, standalone |
-| `/capstone:design` | Interview 3, standalone: the frontend design (direction, tokens, per-screen chapters) |
+| `/capstone:uiux` | Interview 3, standalone: the frontend design (direction, tokens, per-screen chapters) |
 | `/capstone:architecture` | Interview 4, standalone |
 | `/capstone:code-prefs` | Interview 5, standalone |
 | `/capstone:stack` | Research libraries and services per capability, with pros/cons and pricing; you pick (`refresh` re-vets recorded picks) |
@@ -88,14 +88,14 @@ Type `capstone` and it runs the stages in order, resuming wherever you
 stopped. Every answer is written to disk before the next question, so
 a dead session loses nothing. Each interview takes an optional
 artifact (a PRD, screenshots) and pre-fills what it answers. On
-existing codebases, `logic` and `design` run in reverse: they draft
+existing codebases, `logic` and `uiux` run in reverse: they draft
 from the observed code and you confirm.
 
 **mockup**. Product discovery. Three fixed questions, then every
 question after that is generated from your answers until nothing is
 left to invent. One file per screen: ASCII wireframe, exact copy and
 behavior, the empty/error/success states. No visual UI? It records
-your surfaces (api, cli) and the design stage skips itself.
+your surfaces (api, cli) and the uiux stage skips itself.
 
 **logic**. One scenario at a time, walked until a developer could
 implement it without inventing a single rule: exact steps, real
@@ -257,7 +257,7 @@ argument-hint: [command] [args...]
 
 No arguments: invoke the capstone:start skill. If the first argument
 matches a capstone skill (generate, sync, doctor, review,
-mockup, logic, design, architecture, code-prefs,
+mockup, logic, uiux, architecture, code-prefs,
 stack, build, groom, plan, implement, implementation, start, help),
 invoke capstone:<that skill> with the remaining arguments.
 

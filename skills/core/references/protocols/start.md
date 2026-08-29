@@ -10,7 +10,7 @@ wherever it stopped:
 
 1. `mockup` → `docs/capstone/mockup/` (+ `mockup-interview.md`)
 2. `logic` → `docs/capstone/logic/` (+ `logic-interview.md`)
-3. `design` → `docs/capstone/design/` (+ `design-interview.md`)
+3. `uiux` → `docs/capstone/uiux/` (+ `uiux-interview.md`)
 4. `architecture` → the prescriptive reference
    (+ `architecture-interview.md`)
 5. `code-prefs` → `docs/capstone/code-prefs.md`
@@ -42,7 +42,7 @@ wherever it stopped:
      the outputs from the recorded decisions, without re-interviewing.
 3. Hold the pipeline as progress tasks per core.md's Progress tasks
    rule, one per stage, so the user sees where they are; the running
-   stage's protocol adds its own tasks beneath. `design` formalized
+   stage's protocol adds its own tasks beneath. `uiux` formalized
    with `skipped: no-ui` shows as "skipped (no UI)".
 4. The generate-vs-pipeline fork, asked at most once ever:
    - Skip it entirely when config `pipeline` is `true`/`false`, or when

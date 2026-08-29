@@ -124,6 +124,31 @@ elif [ -f "$OLD_IDX" ] && [ -f "$NEW_IDX" ]; then
   echo "note: both $OLD_IDX and $NEW_IDX exist - not merging; $NEW_IDX wins"
 fi
 
+# 1c. The uiux stage used to be called design, and wrote docs/capstone/
+#     design/ plus design-interview.md. Move both when the new names are
+#     still free; both present is not a stale layout, so nothing merges.
+for pair in "design:uiux" "design-interview.md:uiux-interview.md"; do
+  old="$DOCS_DIR/${pair%%:*}"; new="$DOCS_DIR/${pair##*:}"
+  if [ -e "$old" ] && [ ! -e "$new" ]; then
+    if [ -n "$(git ls-files "$old" 2>/dev/null | head -1)" ]; then
+      git mv "$old" "$new" 2>/dev/null || mv "$old" "$new"
+    else
+      mv "$old" "$new"
+    fi
+    echo "migrated: $old -> $new"
+  elif [ -e "$old" ] && [ -e "$new" ]; then
+    echo "note: both $old and $new exist - not merging; $new wins"
+  fi
+done
+if [ -d "$DOCS_DIR/uiux" ] || [ -f "$DOCS_DIR/uiux-interview.md" ]; then
+  find "$DOCS_DIR" -type f -name '*.md' -exec sh -c '
+    for f do
+      sed -e "s|docs/capstone/design/|docs/capstone/uiux/|g" \
+          -e "s|design-interview\.md|uiux-interview.md|g" \
+          "$f" > "$f.capstone-tmp" && mv "$f.capstone-tmp" "$f"
+    done' sh {} +
+fi
+
 # 2. the docs area's ignore list
 mkdir -p "$DOCS_DIR"
 IGNORE="$DOCS_DIR/.gitignore"

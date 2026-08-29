@@ -1,7 +1,7 @@
 # build - implementation research, then working code
 
 **Reads:** config → `build-interview.md` (resume) → the index and
-chapters → `logic/`, `mockup/`, `design/`, `code-prefs.md`,
+chapters → `logic/`, `mockup/`, `uiux/`, `code-prefs.md`,
 `../code-craft.md` → the stack chapter → the existing
 `implementation.md` (resume).
 
@@ -26,7 +26,7 @@ finished steps.
 ## Phase A - implementation research
 
 Read everything: the index and chapters, `docs/capstone/logic/`,
-`docs/capstone/mockup/`, `docs/capstone/design/`,
+`docs/capstone/mockup/`, `docs/capstone/uiux/`,
 `docs/capstone/code-prefs.md`, and the stack chapter. Research (web
 search when available) how the chosen pieces actually connect:
 scaffold conventions for the chosen framework, integration patterns
@@ -42,12 +42,12 @@ official quickstarts for anything unfamiliar. Then write
 - Build order: the walking-skeleton slice first (recorded in the
   architecture interview), then backend capabilities in logic-scenario
   priority order, then frontend screens in mockup order, each
-  implementing its `design/screens/` chapter and
-  `design/02-system.md`'s Implementation constraints, which carry
-  `../design-craft.md` §8's build-time checklist.
+  implementing its `uiux/screens/` chapter and
+  `uiux/02-system.md`'s Implementation constraints, which carry
+  `../uiux-craft.md` §8's build-time checklist.
 - Per step: how to verify it works before moving on.
 - **Coverage**, the closing section: a table mapping every `logic/`
-  scenario, every `mockup/` and `design/screens/` screen, and every
+  scenario, every `mockup/` and `uiux/screens/` screen, and every
   component in the index's module map to the build-order step that
   implements it. Anything deliberately excluded gets a row naming the
   recorded decision that excludes it. A row with no step is a gap in
@@ -64,7 +64,7 @@ presentable until it survives full passes of this check, repeated
 until a pass finds nothing to fix:
 
 1. Re-open the source lists fresh (the index's module map, `logic/`'s
-   scenario list, the `mockup/` and `design/screens/` file lists, the
+   scenario list, the `mockup/` and `uiux/screens/` file lists, the
    stack chapter's picks) and walk the Coverage table against them:
    every item has a step or a recorded exclusion.
 2. Walk the build order: every step's dependencies (the components,

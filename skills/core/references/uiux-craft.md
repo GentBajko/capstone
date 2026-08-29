@@ -1,6 +1,6 @@
-# Design craft - the frontend method and the always-on floor
+# UI/UX craft - the frontend method and the always-on floor
 
-Read by `protocols/design.md` and `protocols/review.md`.
+Read by `protocols/uiux.md` and `protocols/review.md`.
 **This file is the method**, for every surface and every mode: no
 installed skill substitutes for it, so the same project designs the
 same way on any machine. Sections 1-6 carry the method, §7 the refuse

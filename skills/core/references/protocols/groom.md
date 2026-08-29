@@ -3,7 +3,7 @@
 **Reads:** config → the feature's `feature-interview.md` (resume) →
 `<index_file>` → the touched topic chapters (after the staleness
 pass) → the `logic/` scenarios and `mockup/` screens it extends, plus
-the `design/` chapters for UI features → `code-prefs.md`.
+the `uiux/` chapters for UI features → `code-prefs.md`.
 
 First stage of the feature chain (`groom` → `plan` → `implement`,
 chained by `implementation`): turns a feature idea into a spec a
@@ -68,7 +68,7 @@ recorded `§Q` decisions, without re-interviewing.
    exists → stale by definition, refresh first.
 3. Read the picked chapters, plus whichever companion docs bear on the
    feature: the `logic/` scenarios it extends, the `mockup/` screens
-   it changes, the `design/` chapters it touches, `code-prefs.md`.
+   it changes, the `uiux/` chapters it touches, `code-prefs.md`.
    Never ask what these already answer.
 4. An artifact argument (a ticket, a PRD, notes) seeds the interview
    per core-authoring.md's Artifact seeding rule.
@@ -109,7 +109,7 @@ edge-case posture, what's out of scope) and set
 - **Reference impact**: which chapters this will change once built,
   AND the scenario docs to absorb into after implementation: the
   `logic/` scenarios it adds or amends, the `mockup/` screens it
-  changes, the `design/` chapters it touches (`plan` reads this to
+  changes, the `uiux/` chapters it touches (`plan` reads this to
   scope its study; `implement`'s wrap performs the absorption; the
   `sync` refresh settles the chapters).
 - **Out of scope**: non-goals, recorded as decisions.

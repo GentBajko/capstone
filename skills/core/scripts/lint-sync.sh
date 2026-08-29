@@ -205,6 +205,7 @@ if [ "$IN_GIT" -eq 1 ]; then
     && err "generate.md still specifies stamp columns in the index table"
   for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
     grep -q '00-index.md' "$f" || err "$f lost the root-DESIGN.md index migration"
+    grep -q 'uiux-interview.md' "$f" || err "$f lost the design->uiux migration"
   done
 else
   echo "note: dead-name check skipped (not a git checkout)"
@@ -213,7 +214,7 @@ fi
 # 11. every writing protocol carries its changelog pointer, the exempt
 #     ones say so, and the old opt-in is gone (core.md hard rule 5 is
 #     only as good as its sites)
-for n in groom plan implement mockup logic design architecture \
+for n in groom plan implement mockup logic uiux architecture \
          code-prefs stack build review \
          generate sync doctor; do
   grep -q 'changelog entry' "skills/core/references/protocols/$n.md" \
@@ -299,25 +300,42 @@ grep -q 'sole opinionated output' skills/core/references/core.md \
 #      route method to an installed skill, and each craft file must
 #      carry its upstream attribution (Apache-2.0 and MIT both require
 #      it, and both files are modified derivatives)
-for n in design review build; do
+for n in uiux review build; do
   grep -Eq 'impeccable|design-taste|improve-codebase-architecture|codebase-design' \
     "skills/core/references/protocols/$n.md" \
     && err "protocol $n.md still routes method to an installed skill"
 done
 grep -q 'Delegation installs' skills/core/references/core-authoring.md \
   && err "core-authoring.md still carries the Delegation installs section"
-for f in design-craft arch-craft; do
+for f in uiux-craft arch-craft; do
   grep -q '^\*\*Attribution\.\*\*' "skills/core/references/$f.md" \
     || err "$f.md has no Attribution block"
   grep -q 'This file is the method' "skills/core/references/$f.md" \
     || err "$f.md does not declare itself the method"
 done
-grep -q 'Apache License 2.0' skills/core/references/design-craft.md \
-  || err "design-craft.md does not name impeccable's Apache-2.0 licence"
-grep -q 'Copyright (c) 2026 Leonxlnx' skills/core/references/design-craft.md \
-  || err "design-craft.md does not carry taste-skill's MIT copyright line"
+grep -q 'Apache License 2.0' skills/core/references/uiux-craft.md \
+  || err "uiux-craft.md does not name impeccable's Apache-2.0 licence"
+grep -q 'Copyright (c) 2026 Leonxlnx' skills/core/references/uiux-craft.md \
+  || err "uiux-craft.md does not carry taste-skill's MIT copyright line"
 grep -q '© Matt Pocock' skills/core/references/arch-craft.md \
   || err "arch-craft.md lost its MIT copyright line"
+
+# 12f. design/ gets the same generate+sync extraction logic/ has: a
+#      brownfield repo must end up with a frontend design record, not
+#      only a business-logic one
+grep -q '\*\*Design extraction\*\*' skills/core/references/protocols/generate.md \
+  || err "generate.md has no design-extraction step"
+grep -q '\*\*Design coverage\.\*\*' skills/core/references/protocols/sync.md \
+  || err "sync.md refresh has no design-coverage step"
+grep -q '\*\*Design coverage\*\*' skills/core/references/protocols/sync.md \
+  || err "sync check has no design-coverage report"
+grep -q 'Invoked by `generate` or `sync`' skills/core/references/protocols/uiux.md \
+  || err "design.md has no headless extraction block for generate/sync"
+grep -q 'Invoked by `generate` or `sync`' skills/core/references/protocols/logic.md \
+  || err "logic.md lost its headless extraction block"
+# extraction must never clobber a committed design
+grep -q 'never touched here' skills/core/references/protocols/sync.md \
+  || err "sync.md does not protect interview-derived design/ files from extraction"
 
 # 13. bash syntax of every .sh
 for s in skills/core/scripts/*.sh; do
@@ -326,11 +344,11 @@ done
 
 
 # 14. the pipeline order is spelled identically everywhere it appears
-PIPE='mockup -> logic -> design -> architecture -> code-prefs -> stack -> build'
+PIPE='mockup -> logic -> uiux -> architecture -> code-prefs -> stack -> build'
 for f in skills/core/scripts/help.sh skills/core/scripts/help.ps1 skills/start/SKILL.md; do
   grep -qF "$PIPE" "$f" || err "$f missing the pipeline-order string"
 done
-grep -qF 'mockup → logic → design → architecture → code-prefs → stack → build' README.md \
+grep -qF 'mockup → logic → uiux → architecture → code-prefs → stack → build' README.md \
   || err "README.md missing the pipeline-order string"
 
 [ "$FAIL" -eq 0 ] && echo "lint-sync: all invariants hold" || echo "lint-sync: FAILURES above"

@@ -172,6 +172,9 @@ if ($InGit) {
     if (-not (Select-String -Path $f -Pattern '00-index.md' -SimpleMatch -Quiet)) {
       Err "$f lost the root-DESIGN.md index migration"
     }
+    if (-not (Select-String -Path $f -Pattern 'uiux-interview.md' -SimpleMatch -Quiet)) {
+      Err "$f lost the design->uiux migration"
+    }
   }
 } else {
   Write-Output "note: dead-name check skipped (not a git checkout)"
@@ -179,7 +182,7 @@ if ($InGit) {
 
 # 11. every writing protocol carries its changelog pointer, the exempt
 #     ones say so, and the old opt-in is gone
-foreach ($n in @('groom', 'plan', 'implement', 'mockup', 'logic', 'design',
+foreach ($n in @('groom', 'plan', 'implement', 'mockup', 'logic', 'uiux',
     'architecture', 'code-prefs', 'stack', 'build', 'review',
     'generate', 'sync', 'doctor')) {
   if (-not (Select-String -Path "skills/core/references/protocols/$n.md" -Pattern 'changelog entry' -SimpleMatch -Quiet)) {
@@ -278,7 +281,7 @@ foreach ($f in @('skills/core/scripts/init-config.sh', 'skills/core/scripts/init
 
 
 # 14. the pipeline order is spelled identically everywhere it appears
-$pipe = 'mockup -> logic -> design -> architecture -> code-prefs -> stack -> build'
+$pipe = 'mockup -> logic -> uiux -> architecture -> code-prefs -> stack -> build'
 foreach ($f in @('skills/core/scripts/help.sh', 'skills/core/scripts/help.ps1', 'skills/start/SKILL.md')) {
   if (-not (Select-String -Path $f -Pattern $pipe -SimpleMatch -Quiet)) {
     Err "$f missing the pipeline-order string"
