@@ -31,7 +31,7 @@ both and let the user rule.
   maintained one): it may serve as the stack-currency bar when the
   user names it; never adopt one silently.
 - A named skill missing on an interactive run → offer its install
-  per core.md's Delegation installs before falling back.
+  per core-authoring.md's Delegation installs before falling back.
 - **None**: `../arch-craft.md` is the method (vocabulary, deletion
   test, dependency categories, smell baseline, the hot-spot walk);
   the dimensions below are its checklist. Its §5 rulings (recorded
@@ -44,8 +44,10 @@ both and let the user rule.
 `../arch-craft.md` (the fallback method and always-on rulings) →
 source spot-checks where evidence needs exact lines.
 
-1. Ensure the reference is current (run the refresh path first if stale):
-   judgments must rest on verified facts. Before overwriting an existing
+1. Ensure the reference is current (run the refresh path first if stale;
+   no index at all → core.md's Missing reference rule builds one before
+   this run continues): judgments must rest on verified facts. Before
+   overwriting an existing
    `be-review.md`, read its stamp: if no changelog entry carries it, append
    that catch-up entry first; the rewrite destroys the only other
    evidence the earlier run happened.
@@ -83,4 +85,4 @@ source spot-checks where evidence needs exact lines.
    band, and the dimensions exercised. The opinions stay in
    `be-review.md`.
 5. Never edit code. Each rerun replaces the file. List it only under
-   DESIGN.md's Companion docs table, never in the topic index.
+   the index's Companion docs table, never in the topic index.

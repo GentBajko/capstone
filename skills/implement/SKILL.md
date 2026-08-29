@@ -5,7 +5,7 @@ description: Use when an approved feature plan is ready to become code - execute
 
 # Capstone: implement
 
-From this skill's base directory, read `../core/references/core.md`, then
-execute
+From this skill's base directory, read `../core/references/core.md`
+and `../core/references/core-authoring.md`, then execute
 `../core/references/protocols/implement.md`
 exactly.

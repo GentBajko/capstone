@@ -2,9 +2,9 @@
 
 **Reads:** config → `docs/capstone/design/` (the committed bar) →
 `mockup/` and `logic/` (what each screen must do) → the frontend
-source via the chapters → `guides/run-locally.md` and the live app
-when the harness can drive a browser → the existing `fe-review.md`
-stamp before overwriting.
+source via the chapters → `07-operations.md` (the verified run
+commands) and the live app when the harness can drive a browser → the
+existing `fe-review.md` stamp before overwriting.
 
 With `be-review`, one of the two opinionated outputs (core.md hard
 rule 1), and only because the user invoked it. Suggests UI
@@ -26,7 +26,7 @@ referenced by flow name, never file path:
   scoring method is this protocol's Grading section.
 - Always: §7's rulings bind whichever source is active.
 - A named skill missing on an interactive run → offer its install
-  per core.md's Delegation installs before taking the fallback.
+  per core-authoring.md's Delegation installs before taking the fallback.
 
 ## Procedure
 
@@ -35,8 +35,8 @@ referenced by flow name, never file path:
    `design`'s extraction mode first, so there is an incumbent
    standard to hold the code to. Never block on it.
 2. Inventory the surfaces from `design/screens/` (or the mockup, or
-   the route table when neither exists). When
-   `guides/run-locally.md` exists and the harness can drive a
+   the route table when neither exists). When `07-operations.md`
+   carries a verified run command and the harness can drive a
    browser, run the app and screenshot the key screens in each
    shipped theme at desktop and mobile widths; otherwise judge from
    source, saying so.
@@ -56,8 +56,8 @@ referenced by flow name, never file path:
    whether the run had a live browser. The opinions stay in
    `fe-review.md`. Before overwriting an earlier `fe-review.md`, read
    its stamp and append the catch-up entry if none carries it.
-6. Each rerun replaces the file. List it only under DESIGN.md's
-   Companion docs table; it is local-only (core.md's ignore list),
+6. Each rerun replaces the file. List it only under the index's
+   Companion docs table; it is local-only (core-authoring.md's ignore list),
    like `review.md`.
 
 ## Grading - the three bars, in confidence order

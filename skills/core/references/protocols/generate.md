@@ -7,7 +7,7 @@ deep-dive reads source per topic, and the logic extraction reads the
 composed chapters (per logic.md); nothing else unprompted.
 
 Builds the descriptive reference for the current project: a lean
-`DESIGN.md` index at the project root, chapterized topic files in
+`00-index.md` index and chapterized topic files in
 `docs/capstone/`, and the `logic/` business-logic map. The audience is
 future AI sessions; they read these docs instead of re-exploring the
 repository. Incremental upkeep is `sync`'s job; `generate` is the
@@ -109,8 +109,8 @@ paths_covered:
    either):
    `init-config.sh <docs_dir>` via bash on macOS/Linux/Git Bash, or
    `init-config.ps1 <docs_dir>` via powershell on Windows. If neither
-   shell is available, write the global JSON template and the ignore
-   list from core.md yourself.
+   shell is available, write the global JSON template from core.md and
+   the ignore list from core-authoring.md yourself.
 4. **Logic extraction**: build `docs/capstone/logic/` per logic.md's
    extraction mode, invoked as its "Invoked by `generate` or `sync`"
    rules say: the entry-point inventory from the module map and the
@@ -119,7 +119,7 @@ paths_covered:
    `file:line`, stamped with `paths_covered`. Above the subagent
    threshold, dispatch extraction per scenario like Phase 2's
    per-topic dispatch, same rules. A repo with no observable entry
-   points records `logic/` absent in the index with that reason.
+   points records `logic` absent in the topic index with that reason.
    Existing `logic/` files are left alone; extraction fills only the
    scenarios the map is missing.
 5. Append the changelog entry per core.md's Changelog ledger, key
@@ -130,19 +130,27 @@ paths_covered:
    the index was created or refreshed. Nothing written (Phase 1 step
    9's empty-repo stop) → no entry.
 6. Write `<index_file>` **last**, so the index reflects what was
-   actually generated. Structure:
+   actually generated. It is chapter zero of the docs area
+   (`docs/capstone/00-index.md` by default), and it carries no stamps:
+   freshness lives in each file's own frontmatter, which is what
+   `sync` reads (core-authoring.md's Index maintenance). Four parts, nothing
+   else:
    - Project one-liner, tech stack, and paradigm summary in a few
      lines.
    - Module map with `file:line` entry-point pointers.
-   - Index table `| Topic | File | Commit | Generated |`, plus absent
-     topics with their reasons.
+   - Topic table `| Topic | File |`, plus absent topics with their
+     reasons in place of a file. `logic/` gets one row per scenario
+     file in this same table, `Topic` reading `logic` for every row
+     (the monorepo split mechanic below, applied to a subfolder
+     instead of the root); a repo with no scenarios yet records
+     `logic` absent here with its reason instead.
    - If companion docs exist (`be-review.md`, `fe-review.md`,
-     `changelog.md`, `onboarding.md`, `code-prefs.md`,
-     `implementation.md`, `guides/`, `logic/`, `mockup/`, `design/`,
-     `features/`), list them in a separate "Companion docs" table
-     below the topic index; the factual reference and the
+     `changelog.md`, `code-prefs.md`, `implementation.md`, `mockup/`,
+     `design/`, `features/`), a `| File | What it is |` table below
+     the topic table; the factual reference and the
      opinionated/instructional outputs stay visibly distinct.
-     Interview Q&A files are never indexed.
+     Interview Q&A files are never indexed, and the index never lists
+     itself.
 7. Monorepos: split a topic per subsystem while keeping the parent
    chapter's number (`01-architecture-frontend.md`,
    `01-architecture-backend.md`) when one file would be unwieldy; the
@@ -150,8 +158,8 @@ paths_covered:
 
 ## Phase 4 - verify
 
-1. Re-read the index: every topic link resolves to an existing file;
-   every listed stamp matches that file's frontmatter.
+1. Re-read the index: every topic link resolves to an existing file,
+   and every file written this run has a row.
 2. Spot-check three `file:line` pointers across topic and logic files
    against the actual source.
 3. Report to the user: files written, topics skipped or absent and
@@ -162,7 +170,7 @@ paths_covered:
    reference (`changelog.md` included). If those generated files are
    untracked and not covered by `.gitignore`: honor the `docs_in_git`
    config key when set (`commit` or `ignore`); when it is `ask` or
-   unset, ask the user whether to commit them or add `/DESIGN.md` and
+   unset, ask the user whether to commit them or add
    `/docs/capstone/` to `.gitignore`; never decide unilaterally. On
    later runs, respect whichever choice is in place.
 

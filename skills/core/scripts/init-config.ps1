@@ -42,7 +42,7 @@ if (-not (Test-Path $GlobalFile)) {
   "expertise": null,
   "teaching_mode": false,
   "docs_dir": "docs/capstone",
-  "index_file": "DESIGN.md",
+  "index_file": "docs/capstone/00-index.md",
   "subagent_threshold": 150,
   "docs_in_git": "ask",
   "language": "en"
@@ -85,6 +85,46 @@ if ((Test-Path $Legacy) -and -not (Test-Path $Target)) {
   if ($DocsDir -eq 'docs/design') { $DocsDir = 'docs/capstone' }
 } elseif ((Test-Path $Legacy) -and (Test-Path $Target)) {
   Write-Output "note: both $Legacy and $Target exist - not merging; $Target wins"
+}
+
+# 1b. The index moved out of the repository root into the docs area as
+#     chapter zero. Only fires for the old default (a custom index_file
+#     is left alone) and only when the new location is still free; both
+#     present is not a stale layout, so nothing is merged.
+$OldIdx = "DESIGN.md"
+$NewIdx = Join-Path $DocsDir "00-index.md"
+$CfgIdx = ""
+$ProjCfg = Join-Path $DocsDir "capstone.json"
+if (Test-Path $ProjCfg) {
+  if ((Get-Content $ProjCfg -Raw) -match '"index_file"\s*:\s*"([^"]+)"') { $CfgIdx = $Matches[1] }
+}
+if ((Test-Path $OldIdx) -and (-not (Test-Path $NewIdx)) -and
+    (($CfgIdx -eq "") -or ($CfgIdx -eq $OldIdx))) {
+  New-Item -ItemType Directory -Force -Path $DocsDir | Out-Null
+  $tracked = & git ls-files $OldIdx 2>$null
+  if ($tracked) { & git mv $OldIdx $NewIdx 2>$null; if ($LASTEXITCODE -ne 0) { Move-Item $OldIdx $NewIdx } }
+  else { Move-Item $OldIdx $NewIdx }
+  Write-Output "migrated: $OldIdx -> $NewIdx"
+
+  # The index's own rows were relative to the repo root; the chapters
+  # now sit beside it. Repoint both directions, plus any docs-area
+  # reference to the old root path.
+  $t = (Get-Content $NewIdx -Raw) `
+    -replace [regex]::Escape("($DocsDir/"), "(" `
+    -replace [regex]::Escape("[$DocsDir/"), "[" `
+    -replace '\]\(\./', ']('
+  Write-Utf8NoBom $NewIdx $t
+  Get-ChildItem -Path $DocsDir -Recurse -File -Filter *.md | ForEach-Object {
+    $c = (Get-Content $_.FullName -Raw) -replace 'DESIGN\.md', '00-index.md'
+    Write-Utf8NoBom $_.FullName $c
+  }
+  if ($CfgIdx -ne "") {
+    Write-Utf8NoBom $ProjCfg ((Get-Content $ProjCfg -Raw) -replace [regex]::Escape("`"$OldIdx`""), "`"$NewIdx`"")
+  }
+  Write-Output "repointed: $NewIdx and $DocsDir/**/*.md"
+  Write-Output "note: drop the Commit/Generated columns from $NewIdx; freshness lives in each file's frontmatter"
+} elseif ((Test-Path $OldIdx) -and (Test-Path $NewIdx)) {
+  Write-Output "note: both $OldIdx and $NewIdx exist - not merging; $NewIdx wins"
 }
 
 # 2. the docs area's ignore list

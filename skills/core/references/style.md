@@ -19,7 +19,7 @@ architecture questions without exploring the repo.
   prose only for relationships a table cannot show.
 - No filler: delete any sentence that does not help the reader locate or
   understand code. No introductions, no summaries of summaries.
-- `DESIGN.md` stays under ~2 pages. Topic files have no hard cap but must
+- The index (`<index_file>`) stays under ~2 pages. Topic files have no hard cap but must
   earn their length: if a section repeats the index, cut it.
 - `changelog.md` is exempt from every length rule: it is never
   condensed, summarized, or pruned.

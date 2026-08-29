@@ -5,7 +5,7 @@ description: Use when asked to review the UI, suggest interface improvements, or
 
 # Capstone: fe-review
 
-From this skill's base directory, read `../core/references/core.md`, then
-execute
+From this skill's base directory, read `../core/references/core.md`
+and `../core/references/core-authoring.md`, then execute
 `../core/references/protocols/fe-review.md`
 exactly.

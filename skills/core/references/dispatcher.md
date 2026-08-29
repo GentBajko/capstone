@@ -6,13 +6,13 @@ individual wrapper skills instead; both paths land on the same
 protocol files.
 
 1. Read `core.md` (same directory) first: hard rules, voice, and
-   user config.
+   user config. Then `core-authoring.md`, unless the route below lands
+   on `start` or `implementation`, which route rather than write.
 2. Route on the first argument. The reserved subcommand words
-   (`generate`, `sync`, `doctor`, `ask`, `changelog`, `be-review`,
-   `fe-review`, `guides`,
-   `onboarding`, `mockup`, `logic`, `design`, `architecture`,
-   `code-prefs`, `stack`, `build`, `groom`, `plan`, `implement`,
-   `implementation`, `start`) each route to `protocols/<name>.md`:
+   (`generate`, `sync`, `doctor`, `be-review`, `fe-review`, `mockup`,
+   `logic`, `design`, `architecture`, `code-prefs`, `stack`, `build`,
+   `groom`, `plan`, `implement`, `implementation`, `start`) each route
+   to `protocols/<name>.md`:
    execute that one protocol exactly; behaviors live there, not here.
 3. Exception: when invoked as `generate`, topic names win over
    subcommand words: `generate architecture` regenerates

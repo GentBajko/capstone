@@ -5,8 +5,8 @@ description: Use when designing a new/greenfield project's architecture - exhaus
 
 # Capstone: architecture
 
-From this skill's base directory, read `../core/references/core.md`, then
-execute
+From this skill's base directory, read `../core/references/core.md`
+and `../core/references/core-authoring.md`, then execute
 `../core/references/protocols/architecture.md`
 exactly, including reading
 `../core/references/interview.md` in full

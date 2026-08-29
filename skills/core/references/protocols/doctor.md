@@ -23,9 +23,17 @@ documented rules it proposes, never applies.
    then re-gate); `approved_spec` no longer matching a checksum of
    the current `spec.md` (a voided approval; plan.md's Resume rule:
    drop the stale keys, re-plan).
+2b. **Torn wrap**: a `features/<NN>-<slug>/` folder still on disk
+   while `changelog.md` carries its `implement/<NN>-<slug>` key: the
+   wrap died between recording and deleting. Repair = finish the
+   delete (implement.md Phase D step 6), never re-run the stage. The
+   inverse (`implemented: true` with no key) is a torn write, check 1.
 3. **Index ↔ disk**: index rows pointing at missing files; files
-   under `<docs_dir>` with no row (core.md's Index maintenance);
-   stamp drift between an index row and its file's frontmatter.
+   under `<docs_dir>` with no row (core-authoring.md's Index maintenance); an
+   index still at the legacy root `DESIGN.md` (repair = the legacy
+   move in core-authoring.md's Index maintenance), or one still carrying stamp
+   columns (repair = drop them; freshness lives in each file's
+   frontmatter, and a second copy only drifts).
 4. **Lifecycle validity**: interview `status` values outside
    core.md's lifecycle; `formalized` with outputs absent; a `logic`
    checklist holding scenarios neither `written` nor `dropped` while

@@ -15,12 +15,13 @@ only the user's own stated decisions.
 Interview state: `docs/capstone/logic-interview.md` (same resumable
 format; never indexed). Output: `docs/capstone/logic/`, one
 chapterized file per scenario (`01-<scenario>.md`, `02-...`), the
-folder indexed under Companion docs.
+folder indexed under the topic index (core-authoring.md's Index maintenance
+rule): one row per scenario file, `Topic` reading `logic`.
 
 ## Phase A - setup / resume
 
 Resume from the interview file if present. An artifact argument
-seeds the interview per core.md's Artifact seeding rule. Build the
+seeds the interview per core-authoring.md's Artifact seeding rule. Build the
 scenario list: from `docs/capstone/mockup/README.md` and
 `mockup-interview.md` if they exist (each journey/screen flow is a
 candidate scenario; confirm the list with the user); otherwise elicit
@@ -113,7 +114,8 @@ changelog entry naming the scenario and that reason.
 ## Phase C - wrap
 
 When every listed scenario is `written` or `dropped`, update the index
-per core.md (one Companion docs row for `logic/`), set
+per core.md (one topic-index row per written scenario file, `Topic`
+reading `logic`), set
 `status: formalized` in the interview file (only now, per core.md's
 Interview lifecycle), and note any cross-scenario contradictions
 discovered; surface them as questions, not verdicts. If the user

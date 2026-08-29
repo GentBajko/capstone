@@ -6,7 +6,7 @@ moved. For new projects, an interview pipeline that designs the whole
 thing before building it.
 
 ```
-existing repo ──▶ generate ──▶ DESIGN.md + 8 chapters ──▶ sync keeps them current
+existing repo ──▶ generate ──▶ docs/capstone/ index + 8 chapters ──▶ sync keeps them current
                                                             ▲
 new project ──▶ mockup → logic → design → architecture → code-prefs → stack → build
                                                                               │
@@ -34,12 +34,9 @@ OpenCode. Plain `SKILL.md` files, MIT.
 | `/capstone:generate` | Build the reference from scratch (`rebuild` forces, a topic name targets one chapter) |
 | `/capstone:sync` | Refresh what drifted and extract `logic/` scenarios the map is missing; `sync check` is the read-only trust report |
 | `/capstone:doctor` | Diagnose and repair the docs area: torn writes, index drift, voided approvals, absorption gaps |
-| `/capstone:ask <question>` | Answer from the docs, with citations |
-| `/capstone:changelog [<ref>]` | Architecture-level change history since a ref, plus the append-only ledger every writing command records itself in |
+| `docs/capstone/changelog.md` | Not a command: the append-only ledger every writing command records itself in, before it sets its done marker |
 | `/capstone:be-review` | The opt-in judgment: architecture and backend findings, ranked with evidence |
 | `/capstone:fe-review` | The opt-in UI judgment: improvements graded against your own design docs, via impeccable/design-taste when installed |
-| `/capstone:guides [<task>]` | Runbooks: run locally, deploy, plus workflows mined from your repo's patterns |
-| `/capstone:onboarding` | A reading path for someone's first day in the codebase |
 | `/capstone:mockup` | Interview 1, standalone |
 | `/capstone:logic` | Interview 2, standalone |
 | `/capstone:design` | Interview 3, standalone: the frontend design (direction, tokens, per-screen chapters) |
@@ -58,8 +55,8 @@ OpenCode. Plain `SKILL.md` files, MIT.
 <details>
 <summary>What do the generated docs look like?</summary>
 
-`/capstone:generate` produces a `DESIGN.md` index, eight numbered
-chapters in `docs/capstone/`, and a `logic/` folder mapping the
+`/capstone:generate` produces a `00-index.md`, eight numbered chapters
+beside it in `docs/capstone/`, and a `logic/` folder mapping the
 observed business logic scenario by scenario:
 
 ```
@@ -77,11 +74,11 @@ Everything is facts with `file:line` citations, never advice.
 `/capstone:sync` refreshes only what drifted and extracts any
 business-logic scenarios the map is missing; `sync check` reports
 staleness, citation drift, logic-coverage gaps, and unabsorbed
-features without writing a byte. `/capstone:ask` answers questions from the docs instead of
-re-reading your source. `/capstone:doctor` repairs the docs area's
-own wounds. Every command declares exactly what it reads before
+features without writing a byte. `/capstone:doctor` repairs the docs
+area's own wounds. Every command declares exactly what it reads before
 acting, so re-runs don't burn tokens re-exploring what the docs
-already know.
+already know, and a command that needs the reference and finds none
+builds it first instead of sending you off to run `generate`.
 
 </details>
 
@@ -186,7 +183,7 @@ user, shared by every project:
   "expertise": null,
   "teaching_mode": false,
   "docs_dir": "docs/capstone",
-  "index_file": "DESIGN.md",
+  "index_file": "docs/capstone/00-index.md",
   "subagent_threshold": 150,
   "docs_in_git": "ask",
   "language": "en"
@@ -206,7 +203,7 @@ record; any global key set there overrides the global file for that
 repo, `pipeline` records the one-time
 pipeline-or-generate choice on repos that already have code, and
 `workspaces` gives each monorepo workspace its own docs area with the
-root `DESIGN.md` as an index-of-indexes.
+root project's `00-index.md` as an index-of-indexes.
 
 </details>
 
@@ -250,8 +247,8 @@ argument-hint: [command] [args...]
 ---
 
 No arguments: invoke the capstone:start skill. If the first argument
-matches a capstone skill (generate, sync, doctor, ask, changelog,
-be-review, fe-review, guides, onboarding, mockup, logic, design, architecture, code-prefs,
+matches a capstone skill (generate, sync, doctor, be-review,
+fe-review, mockup, logic, design, architecture, code-prefs,
 stack, build, groom, plan, implement, implementation, start, help),
 invoke capstone:<that skill> with the remaining arguments.
 

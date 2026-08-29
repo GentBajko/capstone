@@ -13,7 +13,7 @@ from memory.
 Interview state: `docs/capstone/stack-interview.md` (standard lifecycle
 per core.md, ledger seeded with the capability list; an artifact
 argument (a preferred-vendor list, an infra doc) seeds it per
-core.md's Artifact seeding rule). Output:
+core-authoring.md's Artifact seeding rule). Output:
 `05-dependencies.md` written or updated (`mode: prescriptive` while no
 code exists) with the chosen stack.
 

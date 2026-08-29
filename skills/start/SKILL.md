@@ -5,7 +5,8 @@ description: Use when the user says just "capstone" with nothing else, or asks t
 
 # Capstone: start
 
-From this skill's base directory, read `../core/references/core.md`, then
-execute
+From this skill's base directory, read `../core/references/core.md`
+(this command routes rather than writes, so `core-authoring.md` is not
+needed), then execute
 `../core/references/protocols/start.md`
 exactly.

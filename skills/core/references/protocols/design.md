@@ -50,7 +50,7 @@ recorded in the interview file stand whichever source asked them:
   pre-flight) apply.
 
 A named skill missing on an interactive run → offer its install per
-core.md's Delegation installs before taking the fallback.
+core-authoring.md's Delegation installs before taking the fallback.
 
 Conversation cadence is capstone's whatever the source: one question
 per turn, expertise-calibrated per core.md (level 1 hears "calm or
@@ -66,7 +66,7 @@ answer as given, and normalized decision, plus an `## Open threads`
 ledger seeded once with three areas: direction, system, screens).
 Resume = read the file, never re-ask. An artifact argument (brand
 book, Figma export, reference screenshots) seeds the interview per
-core.md's Artifact seeding rule.
+core-authoring.md's Artifact seeding rule.
 
 Prerequisite: either `mockup-interview.md` is `formalized` with
 `docs/capstone/mockup/` on disk (greenfield: the screens are this

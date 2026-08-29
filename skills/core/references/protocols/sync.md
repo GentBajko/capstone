@@ -8,16 +8,18 @@ additionally: `changelog.md` (absorption drift), `05-dependencies.md`
 plus the manifests and lockfile (re-vetting).
 
 Brings the generated docs back in line with the code, rewriting only
-what drifted: topic chapters, stamped guides, and extraction-mode
-`logic/` and `design/` files, every stamped file the plugin owns that
-carries `paths_covered`. The business-logic map is part of the
+what drifted: topic chapters and extraction-mode `logic/` and
+`design/` files, every stamped file the plugin owns that carries
+`paths_covered`. The business-logic map is part of the
 reference, so a refresh also fills gaps in `logic/`, not only
 staleness. `sync check` is the read-only twin: it reports what a
 refresh would touch, and whether the reference can be trusted,
 without writing anything.
 
 No stamped index on disk → say so in one line and execute
-`generate.md` instead; there is nothing to sync yet.
+`generate.md` instead; there is nothing to sync yet. This is also what
+core.md's Missing reference rule leans on when another protocol
+delegates here, so the fallback must stay unconditional.
 
 ## Refresh
 
@@ -45,7 +47,7 @@ For each stamped file with `paths_covered`:
 4. **No changes** → skip; leave the file and its stamp untouched.
    **Changes** → regenerate per the file's owning protocol: a topic
    chapter re-runs its generate.md Phase 2 deep-dive and Phase 3
-   compose rules; a stale guide regenerates per `guides.md`'s format;
+   compose rules;
    a stale extraction-mode `logic/` or `design/` file regenerates per
    its protocol's extraction mode. Template drift overrides the skip:
    a chapter missing a required section that `../topics.md` now

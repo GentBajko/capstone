@@ -22,7 +22,7 @@ never whole-file rewrites). Interview files are never indexed. Output:
 
 Read the interview file if it exists and resume; never re-ask. An
 artifact argument (a style guide, an existing CLAUDE.md) seeds the
-interview per core.md's Artifact seeding rule. Then
+interview per core-authoring.md's Artifact seeding rule. Then
 ground the interview in whatever already exists, each source read
 lazily, only when the current question domain touches it, and only if
 present:
@@ -64,7 +64,10 @@ immediately. Walk these domains, skipping any the user rules out:
 - **Testing**: TDD or not; fakes vs mocks; coverage philosophy; what
   must always have tests.
 - **Tooling**: formatter, linter and strictness, type-checker config.
-- **Process**: commit message style; PR conventions (keep light).
+- **Process**: commit message style, branch naming, and commit
+  density; PR conventions (keep light). `../code-craft.md`'s Git
+  section is the default: ask what the user changes about it, not
+  the whole convention from scratch.
 - **Agent rules**: anything an AI assistant must always or never do in
   this codebase.
 
@@ -86,7 +89,7 @@ code."; rules organized by the domains above, each traceable to its
 Then append the changelog entry per core.md's ledger: key
 `code-prefs/all@Q<n>` from the interview's highest `### Q<n>`; record
 the rules decided per domain and the domains the user ruled out. Update
-the DESIGN.md index per core.md, set `status: formalized`
+the index per core.md, set `status: formalized`
 in the interview file (only now that the output is on disk, per
 core.md's Interview lifecycle), and suggest (never do unasked)
 seeding the project's `AGENTS.md`/`CLAUDE.md` from it.

@@ -56,7 +56,8 @@ official quickstarts for anything unfamiliar. Then write
 
 Every code decision follows `code-prefs.md`, and every plan step and
 line of code obeys `../code-craft.md` (TDD + YAGNI, earned
-interfaces; code-prefs wins on conflict): the layout and sketches
+interfaces, and its Git section for every branch and commit this
+stage makes; code-prefs wins on conflict): the layout and sketches
 carry no layer, file, or abstraction the ladder didn't earn.
 
 **Review, then re-review.** A drafted `implementation.md` is not
@@ -97,7 +98,7 @@ against it.
 
 **If the superpowers plugin is available** (its skills appear in your
 skill list; missing on an interactive run, offer its install per
-core.md's Delegation installs first): hand off. Invoke
+core-authoring.md's Delegation installs first): hand off. Invoke
 `superpowers:writing-plans` with `implementation.md` plus the
 reference as the spec (capstone's docs ARE the spec; skip superpowers'
 brainstorming). The plan it writes must carry every
@@ -120,8 +121,7 @@ the docs area). Append the changelog entry per core.md's ledger, key
 complete, the source paths created, the dependencies installed, and
 the divergences from `implementation.md`. Then set
 `status: formalized` only when the walking-skeleton slice actually
-runs, and run `changelog` to record the architecture-level delta
-(mandatory; outside git it writes nothing and says so).
+runs.
 
 ## After
 

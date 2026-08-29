@@ -5,7 +5,7 @@ description: Use when asked for an opinionated architecture review - severity-ra
 
 # Capstone: be-review
 
-From this skill's base directory, read `../core/references/core.md`, then
-execute
+From this skill's base directory, read `../core/references/core.md`
+and `../core/references/core-authoring.md`, then execute
 `../core/references/protocols/be-review.md`
 exactly (review is core.md's sole judgment exception).

@@ -149,6 +149,30 @@ if ($InGit) {
 if ($InGit) {
   $stale = git grep -l 'archdesign' -- . ':!skills/core/scripts/lint-sync.*' 2>$null
   if ($stale) { Err "stale 'archdesign' references: $stale" }
+  # 10b. the removed commands must not be routable again by accident
+  $help = & bash skills/core/scripts/help.sh
+  $route = (Get-Content skills/core/references/dispatcher.md -Raw)
+  foreach ($n in @('ask', 'changelog', 'guides', 'onboarding')) {
+    if (Test-Path "skills/$n") { Err "removed skill skills/$n/ is back" }
+    if (Test-Path "skills/core/references/protocols/$n.md") { Err "removed protocol $n.md is back" }
+    if ($help -match "(?m)^  $n( |`$)") { Err "help.sh advertises removed command $n" }
+    if ($route -match "reserved subcommand words[\s\S]*?``$n``[\s\S]*?each route to") { Err "dispatcher.md still routes removed command $n" }
+  }
+  # 10c. the index lives in the docs area and carries no stamp columns
+  foreach ($f in @('skills/core/scripts/init-config.sh', 'skills/core/scripts/init-config.ps1',
+                   'skills/core/references/core.md', 'README.md')) {
+    if (-not (Select-String -Path $f -Pattern '"index_file": "docs/capstone/00-index.md"' -SimpleMatch -Quiet)) {
+      Err "$f does not carry the docs-area index_file default"
+    }
+  }
+  if (Select-String -Path skills/core/references/protocols/generate.md -Pattern 'Topic | File | Commit' -SimpleMatch -Quiet) {
+    Err "generate.md still specifies stamp columns in the index table"
+  }
+  foreach ($f in @('skills/core/scripts/init-config.sh', 'skills/core/scripts/init-config.ps1')) {
+    if (-not (Select-String -Path $f -Pattern '00-index.md' -SimpleMatch -Quiet)) {
+      Err "$f lost the root-DESIGN.md index migration"
+    }
+  }
 } else {
   Write-Output "note: dead-name check skipped (not a git checkout)"
 }
@@ -156,8 +180,8 @@ if ($InGit) {
 # 11. every writing protocol carries its changelog pointer, the exempt
 #     ones say so, and the old opt-in is gone
 foreach ($n in @('groom', 'plan', 'implement', 'mockup', 'logic', 'design',
-    'architecture', 'code-prefs', 'stack', 'build', 'be-review', 'fe-review', 'guides',
-    'onboarding', 'generate', 'sync', 'doctor')) {
+    'architecture', 'code-prefs', 'stack', 'build', 'be-review', 'fe-review',
+    'generate', 'sync', 'doctor')) {
   if (-not (Select-String -Path "skills/core/references/protocols/$n.md" -Pattern 'changelog entry' -SimpleMatch -Quiet)) {
     Err "protocol $n.md has no changelog-entry step"
   }
@@ -165,13 +189,63 @@ foreach ($n in @('groom', 'plan', 'implement', 'mockup', 'logic', 'design',
 if (-not (Select-String -Path skills/core/references/core.md -Pattern 'Changelog ledger' -SimpleMatch -Quiet)) {
   Err "core.md has no Changelog ledger section"
 }
+
+# 3c. the shared rules are split across core.md and core-authoring.md
+foreach ($d in Get-ChildItem skills -Directory) {
+  $n = $d.Name
+  if ($n -in @('core', 'help')) { continue }
+  $s = "skills/$n/SKILL.md"
+  if (-not (Test-Path $s)) { continue }
+  if (-not (Select-String -Path $s -Pattern 'references/core\.md' -Quiet)) {
+    Err "skills/$n/SKILL.md does not wire core.md"
+  }
+  if ($n -in @('start', 'implementation')) {
+    if (-not (Select-String -Path $s -Pattern 'core-authoring\.md` is not' -Quiet)) {
+      Err "router $n should read core.md alone and say why"
+    }
+  } elseif (-not (Select-String -Path $s -Pattern 'and `\.\./core/references/core-authoring\.md`' -Quiet)) {
+    Err "skills/$n/SKILL.md does not wire core-authoring.md"
+  }
+}
+if (-not (Test-Path skills/core/references/core-authoring.md)) { Err "core-authoring.md is missing" }
+if (-not (Select-String -Path skills/core/references/core.md -Pattern 'core-authoring.md' -SimpleMatch -Quiet)) {
+  Err "core.md does not point at core-authoring.md"
+}
+if (-not (Select-String -Path skills/core/references/dispatcher.md -Pattern 'core-authoring.md' -SimpleMatch -Quiet)) {
+  Err "dispatcher.md does not load core-authoring.md"
+}
+if (Select-String -Path skills/core/references/core.md -Pattern '^Maintenance: each subcommand' -Quiet) {
+  Err "core.md still carries the contributor Maintenance block (belongs in CONTRIBUTING.md)"
+}
+if (-not (Test-Path CONTRIBUTING.md)) { Err "CONTRIBUTING.md is missing" }
+foreach ($h in @('Changelog ledger', 'Interview lifecycle', 'Hard rules', 'Read discipline')) {
+  if (-not (Select-String -Path skills/core/references/core.md -Pattern "^## .*$h" -Quiet)) { Err "core.md lost section: $h" }
+  if (Select-String -Path skills/core/references/core-authoring.md -Pattern "^## .*$h" -Quiet) { Err "core-authoring.md duplicates core.md section: $h" }
+}
+foreach ($h in @('Local-only outputs', 'Artifact seeding', 'Delegation installs', 'Index maintenance')) {
+  if (-not (Select-String -Path skills/core/references/core-authoring.md -Pattern "^## .*$h" -Quiet)) { Err "core-authoring.md lost section: $h" }
+  if (Select-String -Path skills/core/references/core.md -Pattern "^## .*$h" -Quiet) { Err "core.md duplicates core-authoring.md section: $h" }
+}
+
+# 3d. the git standards code-craft.md defines are wired where code lands
+foreach ($n in @('plan', 'build', 'implement')) {
+  if (-not (Select-String -Path "skills/core/references/protocols/$n.md" -Pattern 'code-craft' -SimpleMatch -Quiet)) {
+    Err "protocol $n.md does not reference code-craft.md"
+  }
+}
+if (-not (Select-String -Path skills/core/references/code-craft.md -Pattern '^## Git: branches, commits' -Quiet)) {
+  Err "code-craft.md has no Git section"
+}
+if (-not (Select-String -Path skills/core/references/protocols/implement.md -Pattern 'Git section' -SimpleMatch -Quiet)) {
+  Err "implement.md does not cite code-craft's Git section"
+}
 if (Select-String -Path skills/core/references/protocols/implement.md -Pattern 'Offer `changelog' -SimpleMatch -Quiet) {
   Err "implement.md still carries the old opt-in changelog offer"
 }
-foreach ($n in @('ask')) {
-  if (-not (Select-String -Path "skills/core/references/protocols/$n.md" -Pattern 'no changelog entry|never appends a changelog' -Quiet)) {
-    Err "protocol $n.md lacks its explicit changelog exemption"
-  }
+# the ledger outlived the `changelog` command: changelog.md is still
+# written by every stage, but nothing may route to a protocol for it
+if (-not (Select-String -Path skills/core/references/core.md -Pattern 'Merges:' -SimpleMatch -Quiet)) {
+  Err "core.md lost the changelog merge-resolution rule"
 }
 
 # 12. the local-only ignore list is identical in both initializers and
@@ -193,8 +267,8 @@ foreach ($f in @('skills/core/scripts/init-config.sh', 'skills/core/scripts/init
     Err "$f lost the changelog.md unignore migration"
   }
 }
-if (-not (Select-String -Path skills/core/references/core.md -Pattern 'Local-only outputs' -SimpleMatch -Quiet)) {
-  Err "core.md has no Local-only outputs section"
+if (-not (Select-String -Path skills/core/references/core-authoring.md -Pattern 'Local-only outputs' -SimpleMatch -Quiet)) {
+  Err "core-authoring.md has no Local-only outputs section"
 }
 foreach ($f in @('skills/core/scripts/init-config.sh', 'skills/core/scripts/init-config.ps1')) {
   if (-not (Select-String -Path $f -Pattern 'docs/design' -SimpleMatch -Quiet)) {

@@ -58,6 +58,40 @@ for d in skills/*/; do
   [ -f "skills/core/references/protocols/$n.md" ] || err "skill $n has no protocol file"
   grep -q "protocols/$n\.md" "skills/$n/SKILL.md" \
     || err "skills/$n/SKILL.md does not wire protocols/$n.md"
+  grep -q 'references/core\.md' "skills/$n/SKILL.md" \
+    || err "skills/$n/SKILL.md does not wire core.md"
+  # the shared rules are split: writers read both files, the two chain
+  # runners route rather than write and read core.md alone
+  case "$n" in
+    start|implementation)
+      grep -q 'core-authoring\.md` is not' "skills/$n/SKILL.md" \
+        || err "router $n should read core.md alone and say why" ;;
+    *)
+      grep -q 'and `\.\./core/references/core-authoring\.md`' "skills/$n/SKILL.md" \
+        || err "skills/$n/SKILL.md does not wire core-authoring.md" ;;
+  esac
+done
+[ -f skills/core/references/core-authoring.md ] || err "core-authoring.md is missing"
+grep -q 'core-authoring\.md' skills/core/references/core.md \
+  || err "core.md does not point at core-authoring.md"
+grep -q 'core-authoring\.md' skills/core/references/dispatcher.md \
+  || err "dispatcher.md does not load core-authoring.md"
+# contributor-only material must not sit in the runtime path
+grep -q '^Maintenance: each subcommand' skills/core/references/core.md \
+  && err "core.md still carries the contributor Maintenance block (belongs in CONTRIBUTING.md)"
+[ -f CONTRIBUTING.md ] || err "CONTRIBUTING.md is missing"
+# each shared-rules section lives in exactly one of the two files
+for h in 'Changelog ledger' 'Interview lifecycle' 'Hard rules' 'Read discipline'; do
+  grep -q "^## .*$h" skills/core/references/core.md \
+    || err "core.md lost section: $h"
+  grep -q "^## .*$h" skills/core/references/core-authoring.md \
+    && err "core-authoring.md duplicates core.md section: $h"
+done
+for h in 'Local-only outputs' 'Artifact seeding' 'Delegation installs' 'Index maintenance'; do
+  grep -q "^## .*$h" skills/core/references/core-authoring.md \
+    || err "core-authoring.md lost section: $h"
+  grep -q "^## .*$h" skills/core/references/core.md \
+    && err "core.md duplicates core-authoring.md section: $h"
 done
 
 # 3b. every protocol declares its inputs (core.md Read discipline)
@@ -149,6 +183,29 @@ if [ "$IN_GIT" -eq 1 ]; then
   if git grep -l 'archdesign' -- . ':!skills/core/scripts/lint-sync.*' >/dev/null 2>&1; then
     err "stale 'archdesign' references: $(git grep -l 'archdesign' -- . ':!skills/core/scripts/lint-sync.*' | tr '\n' ' ')"
   fi
+  # 10b. the removed commands must not be routable again by accident:
+  #      no protocol file, no wrapper, no help line, no dispatcher word.
+  for n in ask changelog guides onboarding; do
+    [ -e "skills/$n" ] && err "removed skill skills/$n/ is back"
+    [ -e "skills/core/references/protocols/$n.md" ] \
+      && err "removed protocol $n.md is back"
+    bash skills/core/scripts/help.sh | grep -Eq "^  $n( |$)" \
+      && err "help.sh advertises removed command $n"
+    sed -n '/The reserved subcommand words/,/each route to/p' \
+      skills/core/references/dispatcher.md | grep -q "\`$n\`" \
+      && err "dispatcher.md still routes removed command $n"
+  done
+  # 10c. the index lives in the docs area and carries no stamp columns
+  for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1 \
+           skills/core/references/core.md README.md; do
+    grep -q '"index_file": "docs/capstone/00-index.md"' "$f" \
+      || err "$f does not carry the docs-area index_file default"
+  done
+  grep -q 'Topic | File | Commit' skills/core/references/protocols/generate.md \
+    && err "generate.md still specifies stamp columns in the index table"
+  for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
+    grep -q '00-index.md' "$f" || err "$f lost the root-DESIGN.md index migration"
+  done
 else
   echo "note: dead-name check skipped (not a git checkout)"
 fi
@@ -157,7 +214,7 @@ fi
 #     ones say so, and the old opt-in is gone (core.md hard rule 5 is
 #     only as good as its sites)
 for n in groom plan implement mockup logic design architecture \
-         code-prefs stack build be-review fe-review guides onboarding \
+         code-prefs stack build be-review fe-review \
          generate sync doctor; do
   grep -q 'changelog entry' "skills/core/references/protocols/$n.md" \
     || err "protocol $n.md has no changelog-entry step"
@@ -167,11 +224,10 @@ grep -q 'Changelog ledger' skills/core/references/core.md \
 if grep -q 'Offer `changelog' skills/core/references/protocols/implement.md; then
   err "implement.md still carries the old opt-in changelog offer"
 fi
-for n in ask; do
-  grep -Eq 'no changelog entry|never appends a changelog' \
-    "skills/core/references/protocols/$n.md" \
-    || err "protocol $n.md lacks its explicit changelog exemption"
-done
+# the ledger outlived the `changelog` command: changelog.md is still
+# written by every stage, but nothing may route to a protocol for it
+grep -q 'Merges:' skills/core/references/core.md \
+  || err "core.md lost the changelog merge-resolution rule"
 
 # 12. the local-only ignore list is identical in both initializers and
 #     documented in core.md (hand-synced across three files); changelog.md
@@ -186,11 +242,22 @@ for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1;
   grep -q "^changelog\.md$" "$f" && err "$f ignore template still lists changelog.md (it follows docs_in_git now)"
   grep -q "unignored: changelog.md" "$f" || err "$f lost the changelog.md unignore migration"
 done
-grep -q 'Local-only outputs' skills/core/references/core.md \
-  || err "core.md has no Local-only outputs section"
+grep -q 'Local-only outputs' skills/core/references/core-authoring.md \
+  || err "core-authoring.md has no Local-only outputs section"
 for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
   grep -q 'docs/design' "$f" || err "$f dropped the legacy docs/design migration"
 done
+
+# 12b. the git standards code-craft.md defines are wired at every site
+#      that branches or commits
+for n in plan build implement; do
+  grep -q 'code-craft' "skills/core/references/protocols/$n.md" \
+    || err "protocol $n.md does not reference code-craft.md"
+done
+grep -q '^## Git: branches, commits' skills/core/references/code-craft.md \
+  || err "code-craft.md has no Git section"
+grep -q "Git section" skills/core/references/protocols/implement.md \
+  || err "implement.md does not cite code-craft's Git section"
 
 # 13. bash syntax of every .sh
 for s in skills/core/scripts/*.sh; do

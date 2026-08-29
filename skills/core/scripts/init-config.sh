@@ -32,7 +32,7 @@ if [ ! -f "$GLOBAL_FILE" ]; then
   "expertise": null,
   "teaching_mode": false,
   "docs_dir": "docs/capstone",
-  "index_file": "DESIGN.md",
+  "index_file": "docs/capstone/00-index.md",
   "subagent_threshold": 150,
   "docs_in_git": "ask",
   "language": "en"
@@ -79,6 +79,49 @@ if [ -d "$LEGACY" ] && [ ! -d "$TARGET" ]; then
   if [ "$DOCS_DIR" = "$LEGACY" ]; then DOCS_DIR="$TARGET"; fi
 elif [ -d "$LEGACY" ] && [ -d "$TARGET" ]; then
   echo "note: both $LEGACY and $TARGET exist - not merging; $TARGET wins"
+fi
+
+# 1b. The index moved out of the repository root into the docs area as
+#     chapter zero. Only fires for the old default (a custom index_file
+#     is left alone) and only when the new location is still free; both
+#     present is not a stale layout, so nothing is merged.
+OLD_IDX="DESIGN.md"
+NEW_IDX="$DOCS_DIR/00-index.md"
+CFG_IDX=""
+if [ -f "$DOCS_DIR/capstone.json" ]; then
+  CFG_IDX=$(sed -n 's/.*"index_file"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' \
+    "$DOCS_DIR/capstone.json" | head -1)
+fi
+if [ -f "$OLD_IDX" ] && [ ! -f "$NEW_IDX" ] \
+   && { [ -z "$CFG_IDX" ] || [ "$CFG_IDX" = "$OLD_IDX" ]; }; then
+  mkdir -p "$DOCS_DIR"
+  if [ -n "$(git ls-files "$OLD_IDX" 2>/dev/null | head -1)" ]; then
+    git mv "$OLD_IDX" "$NEW_IDX" 2>/dev/null || mv "$OLD_IDX" "$NEW_IDX"
+  else
+    mv "$OLD_IDX" "$NEW_IDX"
+  fi
+  echo "migrated: $OLD_IDX -> $NEW_IDX"
+
+  # The index's own rows were relative to the repo root; the chapters
+  # now sit beside it. Repoint both link targets and link text, then
+  # every docs-area reference to the old root path. POSIX regex only
+  # (no \b): "DESIGN.md" is specific enough to replace unanchored.
+  sed -e "s|($DOCS_DIR/|(|g" -e "s|\[$DOCS_DIR/|[|g" -e "s|\](\./|](|g" \
+    "$NEW_IDX" > "$NEW_IDX.capstone-tmp" && mv "$NEW_IDX.capstone-tmp" "$NEW_IDX"
+  find "$DOCS_DIR" -type f -name '*.md' -exec sh -c '
+    for f do
+      sed -e "s|/DESIGN\.md|/00-index.md|g" -e "s|DESIGN\.md|00-index.md|g" \
+        "$f" > "$f.capstone-tmp" && mv "$f.capstone-tmp" "$f"
+    done' sh {} +
+  if [ -n "$CFG_IDX" ]; then
+    sed "s|\"$OLD_IDX\"|\"$NEW_IDX\"|" "$DOCS_DIR/capstone.json" \
+      > "$DOCS_DIR/capstone.json.capstone-tmp" \
+      && mv "$DOCS_DIR/capstone.json.capstone-tmp" "$DOCS_DIR/capstone.json"
+  fi
+  echo "repointed: $NEW_IDX and $DOCS_DIR/**/*.md"
+  echo "note: drop the Commit/Generated columns from $NEW_IDX; freshness lives in each file's frontmatter"
+elif [ -f "$OLD_IDX" ] && [ -f "$NEW_IDX" ]; then
+  echo "note: both $OLD_IDX and $NEW_IDX exist - not merging; $NEW_IDX wins"
 fi
 
 # 2. the docs area's ignore list

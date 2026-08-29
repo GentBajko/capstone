@@ -13,7 +13,7 @@
     {
       "name": "capstone",
       "source": "./",
-      "description": "Architecture reference generator: DESIGN.md + docs/capstone/ stamped to commits, kept current by generate/sync, with doctor/ask/changelog/be-review/fe-review/guides/onboarding commands, a greenfield pipeline with a frontend-design stage, and a doc-grounded feature chain.",
+      "description": "Architecture reference generator: a docs/capstone/ index plus chapters stamped to commits, kept current by generate/sync, with doctor/be-review/fe-review commands, a greenfield pipeline with a frontend-design stage, and a doc-grounded feature chain.",
       "strict": true
     }
   ]

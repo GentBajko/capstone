@@ -5,7 +5,7 @@ description: Use when designing the product's frontend from the mockup and logic
 
 # Capstone: design
 
-From this skill's base directory, read `../core/references/core.md`, then
-execute
+From this skill's base directory, read `../core/references/core.md`
+and `../core/references/core-authoring.md`, then execute
 `../core/references/protocols/design.md`
 exactly.

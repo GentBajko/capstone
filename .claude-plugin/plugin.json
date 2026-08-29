@@ -1,7 +1,7 @@
 {
   "name": "capstone",
   "displayName": "Capstone",
-  "description": "Architecture reference generator: a lean DESIGN.md index plus docs/capstone/ topic files stamped to the commit they were derived at, kept current by generate/sync (formerly docs/check-docs). Companion commands: doctor, cited Q&A, changelogs, opt-in review, runbooks, onboarding tours, a greenfield pipeline from mockup to running code with a frontend-design stage, and a doc-grounded feature chain.",
+  "description": "Architecture reference generator: a lean docs/capstone/ index plus topic files stamped to the commit they were derived at, kept current by generate/sync (formerly docs/check-docs). Companion commands: doctor, opt-in review, a greenfield pipeline from mockup to running code with a frontend-design stage, and a doc-grounded feature chain.",
   "version": "3.2.0",
   "author": {
     "name": "Gent Bajko",
@@ -15,7 +15,7 @@
     "documentation",
     "design-docs",
     "codebase-map",
-    "onboarding",
+    "architecture-docs",
     "skills"
   ]
 }

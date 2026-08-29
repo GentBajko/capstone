@@ -12,20 +12,28 @@ an existing feature's slug.
 
 1. Per core.md: read the config.
 2. Resolve the feature: match the argument against
-   `docs/capstone/features/*/` slugs and spec titles. No match → a new
-   feature: next `<NN>`, a short kebab slug derived from the
-   description. No argument → list existing features with their stage
-   and ask which to continue (or offer a new one).
+   `docs/capstone/features/*/` slugs and spec titles **and against the
+   `implement/<NN>-<slug>` keys in `changelog.md`** (shipped features,
+   whose folders `implement` deleted). No match → a new feature: the
+   next `<NN>` above every number either source shows, so a retired
+   one is never reused, and a short kebab slug derived from the
+   description. No argument → list existing features with their stage,
+   plus the shipped ones from their keys, and ask which to continue
+   (or offer a new one).
 3. Determine the stage from the feature's `feature-interview.md` and
    outputs, per core.md's Interview lifecycle:
-   - no directory, or status `interviewing` /
+   - **folder absent with an `implement/<NN>-<slug>` key present →
+     shipped**, checked before every row below; say so and show the
+     entry. A change request against it is a new feature per `groom`'s
+     Resume rule, never a reopening: there is no folder left to reopen.
+   - folder present with `implemented: true` → done but the wrap tore
+     before its delete (implement.md Phase D step 6); finish the
+     delete, say so, and stop. Never re-run the stage.
+   - no directory and no key, or status `interviewing` /
      `awaiting-formalization` → `groom` (its Resume rules govern:
      `awaiting-formalization` re-presents the gate, never generating
      without approval, and `formalized` with `spec.md` missing is a
      crash groom regenerates from the recorded `§Q` decisions);
-   - `implemented: true` → done, checked before the rows below; say
-     so (a change request on a done feature reopens it via `groom`'s
-     Resume rule);
    - `formalized` without a valid plan approval → `plan`; valid
      means `plan_approved: true` AND `approved_spec` matching a
      checksum of the current `spec.md`, and a mismatch is a voided
