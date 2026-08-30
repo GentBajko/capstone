@@ -14,9 +14,10 @@ persists before the next question, and the spec traces each
 requirement to a recorded decision.
 
 Prerequisite: a stamped index. Without one, build it first per core.md's
-Missing reference rule (run `sync`, which falls back to `generate`),
-then groom against it: grooming against no reference is guessing, and
-`sync` producing no index either is the one case that stops the run.
+Missing reference rule (run `map`, which builds one when none
+exists), then groom against it: grooming against no reference is
+guessing, and `map` producing no index either - an empty repo - is
+the one case that stops the run.
 
 State: `docs/capstone/features/<NN>-<slug>/feature-interview.md`, same
 resumable format as the other interviews (frontmatter with `status`,
@@ -60,7 +61,7 @@ recorded `§Q` decisions, without re-interviewing.
 1. Per core.md: read the config; expertise governs the conversation.
 2. From the index, pick the topics the feature touches:
    architecture and models almost always; the rest as the idea
-   implies. Run `sync check`'s staleness test on just those topics
+   implies. Run `map check`'s staleness test on just those topics
    and refresh any stale ones first (as `ask` does): a spec groomed
    against a stale reference is stale on arrival. For
    `mode: prescriptive` chapters the refresh protocol's verdict
@@ -111,7 +112,7 @@ edge-case posture, what's out of scope) and set
   `logic/` scenarios it adds or amends, the `mockup/` screens it
   changes, the `uiux/` chapters it touches (`plan` reads this to
   scope its study; `implement`'s wrap performs the absorption; the
-  `sync` refresh settles the chapters).
+  `map` refresh settles the chapters).
 - **Out of scope**: non-goals, recorded as decisions.
 
 Self-review before handing the file over (fix inline, don't re-gate):

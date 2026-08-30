@@ -47,15 +47,15 @@ wherever it stopped:
 4. The generate-vs-pipeline fork, asked at most once ever:
    - Skip it entirely when config `pipeline` is `true`/`false`, or when
      a stamped descriptive index already exists (an index without
-     `mode: prescriptive` files proves the user chose `generate`), or
+     `mode: prescriptive` files proves the user chose `map`), or
      when any stage has started.
    - Otherwise, if the project has source code (≥1 tracked source
-     file, the same measurement as `generate`'s Phase 1 step 8), ask
-     whether they want this greenfield pipeline or `generate`, and
+     file, the same measurement as `map`'s Phase 1 step 8), ask
+     whether they want this greenfield pipeline or `map`, and
      write the answer to the project config's `pipeline` key (per
      core.md, creating `docs/capstone/capstone.json` holding just
      that key if absent).
-   - On a `generate` answer: execute `protocols/generate.md` now and
+   - On a `map` answer: execute `protocols/map.md` now and
      end the pipeline run.
 5. Run the first non-done stage by executing its protocol file
    (`mockup.md`, `logic.md`, `uiux.md`, `architecture.md`,
@@ -66,5 +66,5 @@ wherever it stopped:
    Stopping is always safe: every stage persists its interview file,
    and the next `start` resumes exactly here.
 7. After `build`, close out: the project runs. Point at everything
-   generated, and note that from now on plain `sync` runs replace
+   generated, and note that from now on plain `map` runs replace
    prescriptive intent with observed fact as the code evolves.

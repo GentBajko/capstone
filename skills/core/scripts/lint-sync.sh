@@ -200,7 +200,7 @@ if [ "$IN_GIT" -eq 1 ]; then
   fi
   # 10b. the removed commands must not be routable again by accident:
   #      no protocol file, no wrapper, no help line, no dispatcher word.
-  for n in ask changelog guides onboarding be-review fe-review; do
+  for n in ask changelog guides onboarding be-review fe-review generate sync; do
     [ -e "skills/$n" ] && err "removed skill skills/$n/ is back"
     [ -e "skills/core/references/protocols/$n.md" ] \
       && err "removed protocol $n.md is back"
@@ -216,8 +216,8 @@ if [ "$IN_GIT" -eq 1 ]; then
     grep -q '"index_file": "docs/capstone/00-index.md"' "$f" \
       || err "$f does not carry the docs-area index_file default"
   done
-  grep -q 'Topic | File | Commit' skills/core/references/protocols/generate.md \
-    && err "generate.md still specifies stamp columns in the index table"
+  grep -q 'Topic | File | Commit' skills/core/references/protocols/map.md \
+    && err "map.md still specifies stamp columns in the index table"
   for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
     grep -q '00-index.md' "$f" || err "$f lost the root-DESIGN.md index migration"
     grep -q 'uiux-interview.md' "$f" || err "$f lost the design->uiux migration"
@@ -233,7 +233,7 @@ fi
 #      a description only makes claims about wiring). Referential forms
 #      only: the bare words are legitimate prose ("design a feature" is
 #      one of groom's triggers, changelog.md is a real file).
-DEAD_NAMES='ask|changelog|guides|onboarding|be-review|fe-review|implementation|design'
+DEAD_NAMES='ask|changelog|guides|onboarding|be-review|fe-review|implementation|design|generate|sync'
 for f in skills/*/SKILL.md; do
   d=$(sed -n 's/^description: *//p' "$f")
   [ -n "$d" ] || continue
@@ -255,7 +255,7 @@ hit=$(grep -Eo "^\*\*($DEAD_NAMES)\*\*" README.md | head -1)
 #     only as good as its sites)
 for n in groom plan implement mockup logic uiux architecture \
          code-prefs stack build review \
-         generate sync doctor; do
+         map doctor; do
   grep -q 'changelog entry' "skills/core/references/protocols/$n.md" \
     || err "protocol $n.md has no changelog-entry step"
 done
@@ -289,7 +289,7 @@ grep -q 'Ledger size' skills/core/references/protocols/doctor.md \
 # 11c. the version stamp: template drift sees a section go missing, never
 #      one whose meaning moved, so migrations need to know what wrote a file
 for f in skills/core/references/core.md skills/core/references/core-authoring.md \
-         skills/core/references/protocols/sync.md; do
+         skills/core/references/protocols/map.md; do
   grep -q 'capstone_version' "$f" \
     || err "$f does not carry the capstone_version stamp"
 done
@@ -387,19 +387,44 @@ grep -q '© Matt Pocock' skills/core/references/arch-craft.md \
 # 12f. design/ gets the same generate+sync extraction logic/ has: a
 #      brownfield repo must end up with a frontend design record, not
 #      only a business-logic one
-grep -q '\*\*Design extraction\*\*' skills/core/references/protocols/generate.md \
-  || err "generate.md has no design-extraction step"
-grep -q '\*\*Design coverage\.\*\*' skills/core/references/protocols/sync.md \
-  || err "sync.md refresh has no design-coverage step"
-grep -q '\*\*Design coverage\*\*' skills/core/references/protocols/sync.md \
-  || err "sync check has no design-coverage report"
-grep -q 'Invoked by `generate` or `sync`' skills/core/references/protocols/uiux.md \
-  || err "design.md has no headless extraction block for generate/sync"
-grep -q 'Invoked by `generate` or `sync`' skills/core/references/protocols/logic.md \
+grep -q '\*\*Design extraction\*\*' skills/core/references/protocols/map.md \
+  || err "map.md has no design-extraction step"
+grep -q '\*\*Design coverage\.\*\*' skills/core/references/protocols/map.md \
+  || err "map.md refresh has no design-coverage step"
+grep -q '\*\*Design coverage\*\*' skills/core/references/protocols/map.md \
+  || err "map check has no design-coverage report"
+grep -q 'Invoked by `map`' skills/core/references/protocols/uiux.md \
+  || err "uiux.md has no headless extraction block for map"
+grep -q 'Invoked by `map`' skills/core/references/protocols/logic.md \
   || err "logic.md lost its headless extraction block"
 # extraction must never clobber a committed design
-grep -q 'never touched here' skills/core/references/protocols/sync.md \
-  || err "sync.md does not protect interview-derived design/ files from extraction"
+grep -q 'never touched here' skills/core/references/protocols/map.md \
+  || err "map.md does not protect interview-derived uiux/ files from extraction"
+
+# 12g. the machine verdict line is a contract between map.md (which
+#      promises it) and the CI template (which greps for it). A reworded
+#      verdict silently turns every downstream CI job green.
+grep -q 'MAP CHECK: current' skills/core/references/protocols/map.md \
+  || err "map.md lost the MAP CHECK verdict line"
+grep -q 'MAP CHECK: stale' skills/core/references/protocols/map.md \
+  || err "map.md lost the stale MAP CHECK verdict line"
+[ -f templates/capstone-map-check.yml ] \
+  || err "templates/capstone-map-check.yml is missing"
+grep -q 'MAP CHECK: ' templates/capstone-map-check.yml \
+  || err "CI template does not parse the MAP CHECK verdict line"
+grep -q 'capstone:map check' templates/capstone-map-check.yml \
+  || err "CI template does not invoke map check"
+grep -q 'templates/capstone-map-check.yml' README.md \
+  || err "README does not point at the CI template by its current name"
+
+# 12h. generate and sync merged into map: one verb, because the branch is
+#      readable off disk. Both old names must stay unroutable, and map must
+#      still carry both halves - the builder and the selector.
+for h in 'Phase 1 - inline recon' 'Phase 2 - deep-dive' 'Phase 3 - compose' \
+         'Refresh - rewrite only what drifted' 'check - the read-only trust report'; do
+  grep -q "^## $h" skills/core/references/protocols/map.md \
+    || err "map.md lost section: $h"
+done
 
 # 13. bash syntax of every .sh
 for s in skills/core/scripts/*.sh; do

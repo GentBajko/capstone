@@ -9,13 +9,14 @@ Usage: /capstone:<command>
                        (resumes at the first incomplete stage; also
                         triggers on a bare "capstone" prompt)
 
-  generate             Build the reference docs from scratch; `rebuild` forces,
-                       a topic name regenerates one chapter
-                       (architecture, models, conventions, data-flow,
-                        dependencies, testing, operations, glossary)
-  sync                 Refresh the stamped files that drifted; extract the
-                       logic/ scenarios and design/ surfaces the map is missing
-  sync check           Read-only trust report: staleness, pointer drift, absorption
+  map                  Build the reference docs, or refresh what drifted: no
+                       reference yet builds one, an existing one gets only its
+                       stale files rewritten, plus the logic/ scenarios and
+                       uiux/ surfaces the map is missing
+  map rebuild          Force a full rewrite of a reference that looks current
+  map <topic>          Rebuild one chapter (architecture, models, conventions,
+                        data-flow, dependencies, testing, operations, glossary)
+  map check            Read-only trust report: staleness, pointer drift, absorption
                        drift, logic and design coverage, stack re-vetting
   doctor               Verify and repair the docs area: torn writes, index
                        drift, voided approvals, absorption gaps
@@ -42,7 +43,7 @@ Usage: /capstone:<command>
 Output: everything lands in docs/capstone/ - 00-index.md, the numbered
 topic chapters, and the logic/ scenario map. Chapters carry the commit
 they were derived at; the index carries none, so there is one copy of
-freshness and `sync` refreshes only what drifted.
+freshness and `map` refreshes only what drifted.
 Docs are strictly descriptive; only review judges.
 Every command that writes records itself in docs/capstone/changelog.md.
 A command that needs the reference and finds none builds it first.

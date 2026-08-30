@@ -133,6 +133,6 @@ runs.
 
 ## After
 
-Point the user at the `sync` skill: as real code lands, refresh runs
+Point the user at the `map` skill: as real code lands, refresh runs
 flip the reference from prescriptive to observed, recording
 divergences between the design and what was actually built.

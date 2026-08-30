@@ -105,7 +105,7 @@ formalizes.
 ## Phase D - generation
 
 On the user's approval, write the full reference (the index plus every
-applicable topic file) exactly as a normal `generate` run would,
+applicable topic file) exactly as a normal `map` run would,
 with
 these differences:
 
@@ -124,14 +124,14 @@ Append the changelog entry per core.md's ledger: key
 carry `mode: prescriptive`, the one-way-door choices with the
 alternatives rejected, the walking-skeleton slice, the deferred
 decisions with their triggers, and the topics recorded not-applicable
-with their reasons. A later `sync` refresh of these chapters is a
-`sync` run and records itself as `sync`, never as an architecture
-entry.
+with their reasons. A later `map` refresh of these chapters is a
+`map` run and records itself under a `map/` changelog key, never as
+an architecture entry.
 
 Only after every output is on disk, set `status: formalized` (per
 core.md's Interview lifecycle, never before generation).
 
-**Lifecycle:** once code exists, `sync`'s refresh protocol
+**Lifecycle:** once code exists, `map`'s refresh protocol
 treats every `mode: prescriptive` file as stale by definition: it
 rewrites them descriptively and records designed-vs-implemented
 divergences as facts ("designed as X (architecture-interview.md §Q7),

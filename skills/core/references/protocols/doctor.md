@@ -45,13 +45,13 @@ documented rules it proposes, never applies.
    core.md; repair = stage it, and report it loudly: every shipped
    feature's reasoning was one disk away from gone);
    `capstone.json` invalid JSON or keys outside their ranges.
-6. **Absorption drift**: `sync check`'s absorption count; repair =
+6. **Absorption drift**: `map check`'s absorption count; repair =
    re-run `implement`'s absorb step (its Phase D step 2) per missed
    feature, reading that feature's `spec.md` if still on disk; a
    spec already deleted is reported unrecoverable, never guessed.
-7. **Logic coverage**: `sync check`'s entry-point inventory: entry
-   points no `logic/` scenario claims; repair = the `sync` refresh's
-   logic-coverage step (extraction per missing scenario, sync.md).
+7. **Logic coverage**: `map check`'s entry-point inventory: entry
+   points no `logic/` scenario claims; repair = the `map` refresh's
+   logic-coverage step (extraction per missing scenario, map.md).
 8. **Ledger size**: `changelog.md` past 200 entries; repair = the
    rotation in core.md's ledger rule (archive all but the newest 100
    into `changelog-archive-<YYYY>.md`, leaving every archived entry's

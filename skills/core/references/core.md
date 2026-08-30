@@ -56,7 +56,7 @@ absent means a single-rooted project. When set, each workspace carries
 its own docs area at `<path>/docs/capstone/` (config keys inherit from
 the root project file, then the global file), the root `<index_file>`
 becomes an index-of-indexes (a workspace table linking each
-workspace's index), `generate` and `sync` iterate the workspaces (an
+workspace's index), `map` iterates the workspaces (an
 argument targets one), and other
 commands operate on the workspace whose paths the request touches,
 asking when ambiguous.
@@ -203,17 +203,17 @@ rather than inventing one; a wrong version is worse than none.
 ## Missing reference: build it, don't refuse
 
 **A protocol that consumes the reference and finds no `<index_file>`
-runs `sync` first, then continues its own work.** `sync` refreshes an
-index that exists and falls back to `generate` when none does, so the
-one rule covers both the never-generated repo and the abandoned one.
+runs `map` first, then continues its own work.** `map` builds when
+there is no index and refreshes when there is, so one delegation
+covers both the never-mapped repo and the abandoned one.
 Announce it in one line ("no reference yet; building it first"), run
 it, then resume the protocol that was invoked. This replaces refusing
-with a pointer at `generate` or `start`: a user who asked for a
+with a pointer at `map` or `start`: a user who asked for a
 feature spec wants the spec, not an errand.
 
 Five bounds on it:
 
-- **Once per run.** If `sync` produces no index either (`generate`'s
+- **Once per run.** If `map` produces no index either (its
   empty-repo stop: no source files, no entry points, no manifests),
   say so and stop. Never loop.
 - **The greenfield stages are exempt** (`mockup`, `logic`, `uiux`,
@@ -222,17 +222,17 @@ Five bounds on it:
   prerequisites are upstream *interviews*, not the index. `uiux`
   without a mockup still points at `mockup`; `build` without a
   formalized stack still runs `stack`.
-- **`generate`, `sync`, and `doctor` are exempt.** The first two are
-  what the rule delegates to; `doctor` diagnoses the docs area, so a
+- **`map` and `doctor` are exempt.** `map` is what the rule
+  delegates to; `doctor` diagnoses the docs area, so a
   missing index is a finding it reports, never a thing it silently
   builds.
 - **Interview prerequisites are untouched.** This rule fires only on
   a missing index, never to skip a gate or invent a decision the user
   has not made.
-- **A big repo is asked, not told.** Do `generate`'s Phase 1 step 8
+- **A big repo is asked, not told.** Do `map`'s Phase 1 step 8
   sizing first (count tracked source files). Above
   `subagent_threshold` (default 150), say what it will cost - a full
-  `generate` across N files, before the thing they actually asked for
+  `map` across N files, before the thing they actually asked for
   - and wait for a yes. Announcing is enough below the threshold;
   above it, a silent full read of someone's monorepo is a bill they
   did not agree to. Declined → do not fall back to working without a
@@ -243,7 +243,7 @@ Five bounds on it:
 **Every run that writes or changes a durable output records itself
 there: one entry per done marker, appended before that marker is
 set.** The entry is an output like any other; the run is not finished
-until it is on disk. Protocols that only read (`help`, `sync`'s check
+until it is on disk. Protocols that only read (`help`, `map`'s check
 mode) or only route (`start`, `feature`) write no entry; a
 refresh one of them delegates is recorded by the protocol that
 performs it.
@@ -297,7 +297,7 @@ re-sort the conflicted block by date, newest first: resolving by
 picking a side drops a recorded event.
 
 **Rotation:** the file is append-only and read whole by `doctor` and
-`sync check`, so it cannot grow without bound. Past **200 entries**,
+`map check`, so it cannot grow without bound. Past **200 entries**,
 `doctor` moves all but the newest 100 into
 `changelog-archive-<YYYY>.md` beside it (same entry format, same
 newest-first order, its own Companion docs row, never rewritten
@@ -312,7 +312,7 @@ that drops a key retires an `<NN>` into reuse and makes a shipped
 feature look unstarted.
 
 **One writer at a time.** Nothing here locks: two sessions writing
-the docs area at once (two terminals, or a `sync` landing mid-wrap)
+the docs area at once (two terminals, or a `map` landing mid-wrap)
 interleave into the same chapters and the same insert offset. Append-
 only limits the damage to a conflict rather than a lost entry, and
 the Merges rule resolves it, but the reference is single-writer by
@@ -336,7 +336,7 @@ straight to `formalized` once every listed scenario is `written` or
 
 ## Voice per output
 
-`sync check` is facts only, as are the changelog entries every
+`map check` is facts only, as are the changelog entries every
 stage appends, `review`'s among them.
 `review` is the sole opinionated output. `code-prefs`, `logic`,
 `uiux`, `stack`, and `groom`'s `spec.md` are normative but only
