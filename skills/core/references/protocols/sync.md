@@ -54,7 +54,14 @@ For each stamped file with `paths_covered`:
    a chapter missing a required section that `../topics.md` now
    defines (the template changed after the chapter was stamped) is
    stale regardless of `git diff`; regenerate it against the current
-   template.
+   template. So does a **version gap**: a `capstone_version` older
+   than the running plugin's marks a file written by an earlier
+   template generation. Drift catches a section that went missing; it
+   cannot catch one whose meaning moved under it, or a rename, which
+   is what the version stamp is for. Re-read such a file against the
+   current `../topics.md` and regenerate when they disagree in shape
+   or meaning (not merely in wording). A file carrying no
+   `capstone_version` predates the stamp: same treatment.
 5. Re-run the **Applicable** test from `../topics.md` for every topic
    the index lists as absent; generate any newly applicable topic at
    its fixed chapter number and update its index row.
@@ -107,8 +114,10 @@ Six parts:
    its stamp and globs, then from the repo root run
    `git diff --stat <stamp> -- <globs>` (commit vs **working tree**,
    so uncommitted work counts) plus `git status --porcelain --
-   <globs>` for untracked files. Report a table: file | stamp | files
-   changed since | verdict (current / stale / stamp unreachable /
+   <globs>` for untracked files. Report a table: file | stamp |
+   capstone_version | files changed since | verdict (current / stale /
+   stamp unreachable / written by an older capstone, for a
+   `capstone_version` behind the running plugin's or absent /
    prescriptive, pending first observation, for any file whose
    frontmatter still has `mode: prescriptive` while tracked source
    exists).

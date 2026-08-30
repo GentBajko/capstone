@@ -90,6 +90,7 @@ Do this in the main session with cheap reads only:
 ---
 generated_at_commit: <12-char sha of HEAD>   # omit outside git
 generated_date: <YYYY-MM-DD>
+capstone_version: <this plugin's manifest version>  # omit if unreadable
 paths_covered:
   - "<glob>"
 ---

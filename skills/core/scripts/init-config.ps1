@@ -175,6 +175,9 @@ if (Test-Path $Ignore) {
 # Capstone's local-only outputs. Committed docs are the factual
 # reference; everything listed here is personal working state.
 # The feature chain (groom -> plan -> implement) never commits.
+# changelog.md is deliberately NOT here and must never be added: the
+# ledger is always committed, whatever docs_in_git says, because
+# implement deletes each feature folder on the strength of its entry.
 
 # Feature working files: interviews, specs, plans, review ledgers
 features/

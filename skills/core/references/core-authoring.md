@@ -12,8 +12,11 @@ whatever `docs_in_git` says: `features/` (the whole feature chain:
 interviews, specs, plans, review ledgers), every `*-interview.md`,
 `capstone.json`, and `review.md` (plus the legacy `be-review.md` and
 `fe-review.md` older versions wrote). `changelog.md` is NOT on this
-list: it is part of the
-reference and follows `docs_in_git` like the chapters. The
+list, and unlike the chapters it does not follow `docs_in_git`
+either: **the ledger is always committed** (core.md's Changelog
+ledger says why - `implement` deletes each feature's folder on the
+strength of its entry, so an untracked ledger makes that deletion
+permanent loss). The
 initializer's per-project run writes `<docs_dir>/.gitignore` listing
 exactly those, and deletes the `changelog.md` line older versions
 wrote; whenever you write into `<docs_dir>` and that file is absent,
@@ -79,11 +82,12 @@ writes under `<docs_dir>` must be listed there:
   an absence is a fact, and no file can record it.
 - **Companion docs**, a `| File | What it is |` table: everything else
   (review, changelog, code-prefs, implementation,
-  mockup/, design/, features/).
+  mockup/, uiux/, features/).
 
 **The index carries no stamps.** Freshness lives in each file's own
 frontmatter (`generated_at_commit`, `generated_date`,
-`paths_covered`), which is what `sync` reads; copying it into the
+`capstone_version`, `paths_covered`), which is what `sync` reads;
+copying it into the
 index would only create a second copy to drift. The index answers what
 exists and where, never how fresh it is.
 

@@ -40,8 +40,11 @@ documented rules it proposes, never applies.
    the file says `formalized`.
 5. **Housekeeping**: `<docs_dir>/.gitignore` or config keys missing,
    or the ignore file still listing `changelog.md` (repair = run the
-   initializer, core.md's rule); `capstone.json` invalid JSON or keys
-   outside their ranges.
+   initializer, core.md's rule); `changelog.md` untracked inside a git
+   repo whatever `docs_in_git` says (the ledger is always committed,
+   core.md; repair = stage it, and report it loudly: every shipped
+   feature's reasoning was one disk away from gone);
+   `capstone.json` invalid JSON or keys outside their ranges.
 6. **Absorption drift**: `sync check`'s absorption count; repair =
    re-run `implement`'s absorb step (its Phase D step 2) per missed
    feature, reading that feature's `spec.md` if still on disk; a
@@ -49,6 +52,13 @@ documented rules it proposes, never applies.
 7. **Logic coverage**: `sync check`'s entry-point inventory: entry
    points no `logic/` scenario claims; repair = the `sync` refresh's
    logic-coverage step (extraction per missing scenario, sync.md).
+8. **Ledger size**: `changelog.md` past 200 entries; repair = the
+   rotation in core.md's ledger rule (archive all but the newest 100
+   into `changelog-archive-<YYYY>.md`, leaving every archived entry's
+   `## <date>` heading and `key:` line behind under `## Archived`).
+   Dropping a key is never part of it: `feature` allocates the next
+   `<NN>` from those keys, so a dropped one is a reused number and a
+   shipped feature that reads as unstarted.
 
 ## Report, then repair
 
