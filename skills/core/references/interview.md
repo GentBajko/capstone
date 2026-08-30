@@ -25,6 +25,10 @@ from recorded decisions.
   validation idea.
 - Skip whole sections that don't apply (record why); expand any answer
   that surprises you with follow-ups before moving on.
+- **Push back on an answer that breaks something**, per core.md's
+  Pushback rule: name the conflict, offer the alternative, at most two
+  rounds, then it is the user's call and both the decision and your
+  objection go into the `### Q<n>` entry.
 
 ## 0. Framing (always first)
 

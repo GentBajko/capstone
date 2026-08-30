@@ -3,6 +3,7 @@
 **Reads:** config → `stack-interview.md` (resume) → the reference
 (`05-dependencies.md`, `01-architecture.md`, `04-data-flow.md`,
 `07-operations.md`) → `logic/` → `standards.md` →
+`../code-craft.md` (the ladder, before any vendor research) →
 `uiux/02-system.md` when it exists.
 
 Sits after `standards`, before `build`. Turns the reference's abstract
@@ -35,6 +36,17 @@ research within them, never silently re-open them.
 
 ## Phase B - research and pick, one capability at a time
 
+0. **Climb the ladder first** (`../code-craft.md`). A capability is
+   not automatically a dependency, and this is the last stage that can
+   decide it never becomes one. Does it need to exist at all (rung 1)?
+   Does the standard library cover it (rung 3)? A native platform
+   feature (rung 4)? A dependency already picked for another
+   capability (rung 5)? If a rung holds, record the capability as
+   **no dependency**, naming the rung that answered it, and move to
+   the next one. Never research vendors for a need the platform
+   already meets: rung 5 is explicit that you never add a new
+   dependency for what a few lines can do. Every pick below is
+   therefore a capability that survived the ladder.
 1. **Research current options**: web search when the harness has it:
    OSS packages, hosted services, paidware. Check maintenance activity,
    license, and real pricing. Without web access, use model knowledge

@@ -269,6 +269,24 @@ later release can migrate by version rather than guessing from shape.
 never recommendations. `review` is the sole opinionated output, and
 only on request.
 
+**TDD + YAGNI runs through everything.** `code-craft.md`'s ladder —
+does this need to exist at all, is it already here, does the stdlib
+or platform cover it, can it be one line — is climbed by every stage
+that decides what will exist, not only the ones that write code.
+`architecture` climbs it before agreeing a layer, `stack` before
+researching a single vendor, `plan`/`build`/`implement` before writing
+a line, and `review` judges against it. Your `standards.md` outranks
+it, but only by a decision that names what it overrides; a silent
+conflict resolves to the ladder.
+
+**Interviews push back.** An answer that contradicts a recorded
+decision, a craft rule, an earlier answer, or a number you already
+gave gets challenged — with the specific consequence and an
+alternative, at most twice, and only a second time if there is a new
+argument. Then it is your call: your answer stands, and the interview
+records both the decision and the objection so a later reader can tell
+a considered trade-off from an oversight.
+
 ## CI
 
 Copy `templates/capstone-map-check.yml` into `.github/workflows/` and

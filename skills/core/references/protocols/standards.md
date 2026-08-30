@@ -57,18 +57,25 @@ immediately. Walk these domains, skipping any the user rules out:
 - **Typing**: strict or loose; escape-hatch policy (`Any`, casts,
   ignores); structural (protocols/interfaces) vs nominal; enums vs raw
   strings; annotation coverage expectations.
-- **Libraries vs reinventing**: default posture (buy/adopt vs build);
-  preferred libraries per capability (HTTP, validation, ORM, testing,
-  state, CLI, ...); the vetting bar (maturity, license, bus factor);
-  dependency budget and when hand-rolling is preferred.
+- **Libraries vs reinventing**: `../code-craft.md`'s ladder is the
+  default posture (stdlib and native platform features before a
+  dependency; never a new one for what a few lines can do). Ask what
+  the user changes about it: preferred libraries per capability (HTTP,
+  validation, ORM, testing, state, CLI, ...), the vetting bar
+  (maturity, license, bus factor), the dependency budget, and where
+  hand-rolling wins instead.
 - **Paradigm**: OO / functional / procedural mix; immutability stance;
   inheritance policy; dependency-injection style.
 - **Error handling**: exceptions vs result types; error taxonomy;
   logging rules; what must never be swallowed.
 - **Organization**: package-by-feature vs by-layer; file-size
   discipline; naming conventions; comment and docstring policy.
-- **Testing**: TDD or not; fakes vs mocks; coverage philosophy; what
-  must always have tests.
+- **Testing**: `../code-craft.md`'s TDD, YAGNI-scoped, is the default
+  (failing test → minimum code to green → verify → commit; non-trivial
+  logic always leaves its check behind, trivial one-liners need none).
+  Ask what the user changes about it: fakes vs mocks, coverage
+  philosophy, what must always have tests. Dropping test-first is an
+  override, recorded as one.
 - **Tooling**: formatter, linter and strictness, type-checker config.
 - **Process**: commit message style, branch naming, and commit
   density; PR conventions (keep light). `../code-craft.md`'s Git
@@ -76,6 +83,15 @@ immediately. Walk these domains, skipping any the user rules out:
   the whole convention from scratch.
 - **Agent rules**: anything an AI assistant must always or never do in
   this codebase.
+
+**Overriding the craft file.** `../code-craft.md` governs everything
+these domains leave open, and this file outranks it - but only by a
+decision that *names what it overrides* (code-craft's Precedence
+rule). When an answer contradicts the ladder, the TDD cycle, or the
+earned-interfaces rule, record the rung or rule it replaces in the
+same `### Q<n>` entry, so a later reader can tell a considered
+departure from an accident. An answer that merely conflicts, without
+saying so, is not an override: the ladder still stands.
 
 ## Phase C - the gate
 

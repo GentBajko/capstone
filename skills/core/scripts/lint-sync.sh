@@ -428,6 +428,37 @@ for h in 'Phase 1 - inline recon' 'Phase 2 - deep-dive' 'Phase 3 - compose' \
     || err "map.md lost section: $h"
 done
 
+# 12i. TDD + YAGNI is the centre of gravity, not a plan-time footnote.
+#      The stages that DECIDE what will exist (architecture, stack) must
+#      climb the ladder too: a layer agreed at design time and a
+#      dependency agreed at stack time are code no later rung can stop.
+for n in architecture stack plan build implement review standards; do
+  grep -q 'code-craft\.md' "skills/core/references/protocols/$n.md" \
+    || err "protocol $n.md does not read code-craft.md (TDD + YAGNI)"
+done
+grep -q 'Climb the ladder first' skills/core/references/protocols/stack.md \
+  || err "stack.md lost its ladder gate before vendor research"
+grep -q 'YAGNI bounds the design' skills/core/references/protocols/architecture.md \
+  || err "architecture.md lost the rule that YAGNI bounds the design"
+# the override is deliberate or it is not an override
+grep -q 'deliberate and recorded' skills/core/references/code-craft.md \
+  || err "code-craft.md lost the explicit-override precedence rule"
+grep -q 'Overriding the craft file' skills/core/references/protocols/standards.md \
+  || err "standards.md has no place to record a craft-file override"
+# the ceiling marker names itself; ponytail is not a bundled skill
+grep -q 'ponytail:' skills/core/references/code-craft.md \
+  && err "code-craft.md still uses the ponytail: marker (use ceiling:)"
+
+# 12j. interviews challenge a bad decision, twice, then defer. The cap
+#      is the load-bearing half: without it a stage relitigates, and
+#      capstone's rule is that recorded user decisions win.
+grep -q '^## Pushback' skills/core/references/core.md \
+  || err "core.md lost the interview Pushback rule"
+grep -q 'never more than' skills/core/references/core.md \
+  || err "core.md's Pushback rule lost its two-round cap"
+grep -q 'Pushback rule' skills/core/references/interview.md \
+  || err "interview.md conduct rules do not point at core.md's Pushback rule"
+
 # 13. bash syntax of every .sh
 for s in skills/core/scripts/*.sh; do
   bash -n "$s" 2>/dev/null || err "bash syntax error in $s"

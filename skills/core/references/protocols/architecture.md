@@ -4,11 +4,22 @@
 `../interview.md` in full before the first question → upstream
 artifacts if present: `standards.md`, `logic/`,
 `mockup-interview.md`, `mockup/README.md` (screens as questions touch
-them) → `../topics.md` at generation.
+them) → `../code-craft.md` (the ladder bounds the design) →
+`../topics.md` at generation.
 
 Design-time mode: there is no code to describe, so the reference is
 built from an exhaustive interview instead. Three strict phases with a
 user gate between the last two.
+
+**YAGNI bounds the design, not just the code** (`../code-craft.md`).
+This stage decides what will exist before anything does, so a layer,
+boundary, service, queue, or abstraction agreed here is code the
+ladder never gets a chance to stop later. Every structural element
+needs a recorded reason it is needed **now**, traceable to a `§Q`
+answer or a logic scenario; "we'll need it when we scale" is a
+deferred decision with a trigger, recorded as such, not a thing you
+build. Exhaustive means every question answered - it does not mean
+every part designed in.
 
 **The exhaustiveness criterion is twofold.** The interview is complete
 only when (a) every applicable item in `../interview.md`, the merged
