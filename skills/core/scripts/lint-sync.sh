@@ -459,6 +459,21 @@ grep -q 'never more than' skills/core/references/core.md \
 grep -q 'Pushback rule' skills/core/references/interview.md \
   || err "interview.md conduct rules do not point at core.md's Pushback rule"
 
+# 12k. README's jump-to nav must resolve. GitHub renders a dead anchor
+#      without complaint, so a renamed section breaks navigation
+#      silently - the same class as a stale SKILL.md description.
+HEADS=$(grep -E '^#{2,3} ' README.md \
+  | sed -e 's/^#\{2,3\} //' -e 's/[`*_]//g' \
+        -e 's/[^[:alnum:][:space:]-]//g' \
+        -e 's/[[:space:]]\{1,\}/-/g' \
+  | tr '[:upper:]' '[:lower:]')
+for a in $(grep -o '](#[^)]*)' README.md | sed -e 's/](#//' -e 's/)//'); do
+  printf '%s\n' "$HEADS" | grep -qx "$a" \
+    || err "README jump-to link #$a matches no heading"
+done
+grep -q '^\*\*Jump to:\*\*' README.md \
+  || err "README lost its jump-to nav under the diagram"
+
 # 13. bash syntax of every .sh
 for s in skills/core/scripts/*.sh; do
   bash -n "$s" 2>/dev/null || err "bash syntax error in $s"

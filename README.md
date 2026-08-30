@@ -15,6 +15,14 @@ flowchart LR
   C --> D
 ```
 
+**Jump to:**
+[Install](#install) · [Update](#update) · [Where to start](#where-to-start) ·
+[What you get](#what-you-get) · [Commands](#commands) ·
+[The greenfield pipeline](#the-greenfield-pipeline) ·
+[The feature chain](#the-feature-chain) · [What `review` is](#what-review-is) ·
+[Not technical?](#not-technical-still-yours) ·
+[Full command reference](docs/commands.md)
+
 Works in Claude Code, Copilot CLI, Gemini CLI, Antigravity, and
 OpenCode. Plain `SKILL.md` files, MIT.
 
