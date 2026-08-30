@@ -12,5 +12,5 @@ initializer, lint). Every other capstone skill resolves it as
 a lone capstone skill without `core` cannot run.
 
 Invoked directly, print the usage: run `scripts/help.sh` via bash
-(or `scripts\help.ps1` via powershell on Windows) from this skill's
-base directory and output its stdout verbatim; nothing else.
+from this skill's base directory and output its stdout verbatim;
+nothing else.

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Asserts every keep-in-sync-by-hand invariant in this plugin.
 # Run from the repo root. Exit non-zero listing each failure.
-# Two scripts are exempt from the .sh/.ps1 pair rule. help-hook.sh:
-# hooks.json invokes bash explicitly, so it is bash-only by design.
-# This file: it never runs on a user machine, only in CI and on
-# contributor machines, and Git Bash covers Windows there (contributing
-# needs git, and Git for Windows ships bash). A hand-mirrored twin of
-# this file drifts silently - a missing check still reports success -
-# so there is deliberately only one implementation.
+# Every script here is bash, on every platform: on Windows that means
+# Git Bash, which ships with Git for Windows and which hooks.json has
+# always required anyway (its SessionStart command is an unconditional
+# `bash`). The PowerShell twins were hand-mirrored, never executed in
+# CI after the Windows runner went, and every defect they ever had was
+# a sync defect rather than a logic one. One implementation cannot
+# drift; check 8 fails if a .ps1 reappears.
 # POSIX-portable regex only: no GNU-only \| or \b, so this runs on
 # macOS/BSD grep as well as GNU.
 set -u
@@ -21,12 +21,6 @@ MANIFESTS=".claude-plugin/plugin.json .claude-plugin/marketplace.json
 
 IN_GIT=0
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 && IN_GIT=1
-
-# 1. help.sh body == help.ps1 body
-if ! diff <(bash skills/core/scripts/help.sh) \
-          <(grep -Ev "^Write-Output @'|^'@|^# Prints" skills/core/scripts/help.ps1) >/dev/null 2>&1; then
-  err "help.sh and help.ps1 texts differ"
-fi
 
 # 2. exactly one version string per manifest, and one distinct value overall
 VERSIONS=""
@@ -126,6 +120,18 @@ for d in skills/*/; do
   echo "$ROUTE" | grep -Eq "(^|[ (])$n[,)]" || err "README routing snippet missing $n"
 done
 
+# 5c. docs/commands.md documents every command. A command reference that
+#      silently omits a command is worse than none: it reads as complete.
+[ -f docs/commands.md ] || err "docs/commands.md is missing"
+for d in skills/*/; do
+  n=$(basename "$d")
+  case "$n" in core) continue;; esac
+  grep -q "\`$n\`\|\`$n " docs/commands.md \
+    || err "docs/commands.md does not document $n"
+done
+grep -q 'MAP CHECK: current' docs/commands.md \
+  || err "docs/commands.md does not show the MAP CHECK verdict line"
+
 # 5b. the dispatcher's reserved-word list carries every routable
 #     subcommand (on Gemini, skills/core/references/dispatcher.md is the only entry point)
 # both anchors must be present: without the end anchor sed runs to EOF
@@ -154,7 +160,7 @@ grep -q 'init-config.sh --global' hooks/hooks.json || err "hooks.json SessionSta
 #    template's keys in both initializers, core.md, and README; the
 #    project-scoped keys (never in the global template) documented in
 #    core.md and README
-for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1 \
+for f in skills/core/scripts/init-config.sh \
          skills/core/references/core.md README.md; do
   for k in expertise teaching_mode docs_dir index_file subagent_threshold docs_in_git language; do
     grep -q "\"$k\"" "$f" || err "$f config template missing key $k"
@@ -169,17 +175,12 @@ for f in skills/core/references/core.md README.md; do
   done
 done
 
-# 8. .sh/.ps1 pairing. Exempt: help-hook.sh and lint-sync.sh (see header).
-for s in skills/core/scripts/*.sh; do
-  b=$(basename "$s" .sh)
-  case "$b" in help-hook|lint-sync) continue;; esac
-  [ -f "skills/core/scripts/$b.ps1" ] || err "$b.sh has no $b.ps1 twin"
+# 8. no .ps1 anywhere: the scripts are bash-only by design (see header).
+#    A returning twin means someone re-created the hand-mirroring that
+#    shipped silently-missing checks three times.
+for f in skills/core/scripts/*.ps1; do
+  [ -e "$f" ] && err "PowerShell script is back: $f (scripts are bash-only)"
 done
-# 8b. ...and the lint twin must not come back by reflex. Every defect the
-#     mirror ever had was a sync defect: blocks silently absent, or placed
-#     after the exit so they never ran. One implementation cannot drift.
-[ -e "skills/core/scripts/lint-sync.ps1" ] \
-  && err "lint-sync.ps1 is back; the lint is bash-only by design (see header)"
 
 # 9. every tracked .json parses (a stray comma in marketplace.json breaks
 #    installation for every user, and no grep-based check would see it)
@@ -211,14 +212,14 @@ if [ "$IN_GIT" -eq 1 ]; then
       && err "dispatcher.md still routes removed command $n"
   done
   # 10c. the index lives in the docs area and carries no stamp columns
-  for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1 \
+  for f in skills/core/scripts/init-config.sh \
            skills/core/references/core.md README.md; do
     grep -q '"index_file": "docs/capstone/00-index.md"' "$f" \
       || err "$f does not carry the docs-area index_file default"
   done
   grep -q 'Topic | File | Commit' skills/core/references/protocols/map.md \
     && err "map.md still specifies stamp columns in the index table"
-  for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
+  for f in skills/core/scripts/init-config.sh; do
     grep -q '00-index.md' "$f" || err "$f lost the root-DESIGN.md index migration"
     grep -q 'uiux-interview.md' "$f" || err "$f lost the design->uiux migration"
   done
@@ -299,17 +300,17 @@ done
 #     is part of the reference and must never reappear in the templates,
 #     and both initializers must carry the unignore migration for it
 for r in 'features/' '\*-interview.md' 'capstone.json' 'review.md' 'be-review.md' 'fe-review.md'; do
-  for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
+  for f in skills/core/scripts/init-config.sh; do
     grep -q "^$r$" "$f" || err "$f ignore template missing rule $r"
   done
 done
-for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
+for f in skills/core/scripts/init-config.sh; do
   grep -q "^changelog\.md$" "$f" && err "$f ignore template still lists changelog.md (it follows docs_in_git now)"
   grep -q "unignored: changelog.md" "$f" || err "$f lost the changelog.md unignore migration"
 done
 grep -q 'Local-only outputs' skills/core/references/core-authoring.md \
   || err "core-authoring.md has no Local-only outputs section"
-for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
+for f in skills/core/scripts/init-config.sh; do
   grep -q 'docs/design' "$f" || err "$f dropped the legacy docs/design migration"
 done
 
@@ -354,7 +355,7 @@ grep -q 'docs/capstone/review\.md' skills/core/references/protocols/review.md \
   || err "review.md does not name its output file"
 grep -q 'rewrites only its own section' skills/core/references/protocols/review.md \
   || err "review.md does not state that a one-sided run preserves the other side"
-for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
+for f in skills/core/scripts/init-config.sh; do
   grep -q '^review\.md$' "$f" || err "$f ignore template does not cover review.md"
 done
 grep -q 'sole opinionated output' skills/core/references/core.md \
@@ -434,7 +435,7 @@ done
 
 # 14. the pipeline order is spelled identically everywhere it appears
 PIPE='mockup -> logic -> uiux -> architecture -> code-prefs -> stack -> build'
-for f in skills/core/scripts/help.sh skills/core/scripts/help.ps1 skills/start/SKILL.md; do
+for f in skills/core/scripts/help.sh skills/start/SKILL.md; do
   grep -qF "$PIPE" "$f" || err "$f missing the pipeline-order string"
 done
 grep -qF 'mockup → logic → uiux → architecture → code-prefs → stack → build' README.md \

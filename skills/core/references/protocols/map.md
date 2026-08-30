@@ -128,10 +128,9 @@ paths_covered:
    running the platform-appropriate initializer from the `core`
    skill's `scripts/` directory (idempotent, never overwrites
    either):
-   `init-config.sh <docs_dir>` via bash on macOS/Linux/Git Bash, or
-   `init-config.ps1 <docs_dir>` via powershell on Windows. If neither
-   shell is available, write the global JSON template from core.md and
-   the ignore list from core-authoring.md yourself.
+   `init-config.sh <docs_dir>` via bash (Git Bash on Windows). If
+   bash is unavailable, write the global JSON template from core.md
+   and the ignore list from core-authoring.md yourself.
 4. **Logic extraction**: build `docs/capstone/logic/` per logic.md's
    extraction mode, invoked as its "Invoked by `map`" rules say: the
    entry-point inventory from the module map and the just-written

@@ -4,12 +4,10 @@
 
 Each subcommand = `references/protocols/<name>.md` + a
 wrapper skill at `skills/<name>/`; update both when the surface
-changes, plus the core skill's `scripts/help.sh` AND
-`scripts/help.ps1` (same usage text, kept in sync: one per platform).
-Every script that runs on a *user's* machine ships as .sh (Unix/Git
-Bash) and .ps1 (Windows) pairs. Two are bash-only: `help-hook.sh`,
-because `hooks.json` invokes bash explicitly, and `lint-sync.sh`,
-below.
+changes, plus the core skill's `scripts/help.sh` and
+`docs/commands.md`. Check 5c fails when a command is missing from
+the reference: a command doc that silently omits a command is worse
+than none, because it reads as complete.
 
 ## Running the lint
 
@@ -20,15 +18,19 @@ after any surface change; CI runs it on every push:
 bash skills/core/scripts/lint-sync.sh
 ```
 
-**It is bash-only, deliberately, and has no `.ps1` twin.** It never
-runs on a user machine - only here and in CI - and Windows is covered
-by Git Bash, which ships with Git for Windows and is therefore already
-present on any machine that can clone this repo. The twin it used to
-have was hand-mirrored, and every defect it ever had was a sync
-defect rather than a logic one: checks silently absent, or appended
-after the `exit` where they never ran. A lint that reports success
-while skipping its own checks is worse than no lint, so there is one
-implementation. `lint-sync` fails if the `.ps1` reappears.
+## Every script is bash
+
+There are no PowerShell twins, and check 8 fails if one reappears.
+Windows is covered by Git Bash, which ships with Git for Windows and
+is therefore present on any machine that can clone this repo - and
+which `hooks.json` has always required anyway, since its SessionStart
+command is an unconditional `bash`.
+
+The twins were hand-mirrored, and every defect they ever had was a
+sync defect rather than a logic one: checks silently absent, a block
+appended after the `exit` where it could never run, unguarded `git`
+calls. A lint that reports success while skipping its own checks is
+worse than no lint. One implementation cannot drift.
 
 ## The shared rules are two files
 

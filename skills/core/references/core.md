@@ -16,10 +16,9 @@ installation, not per project: the plugin's SessionStart hook runs the
 idempotent initializer from the `core` skill's `scripts/` directory
 (`init-config.sh --global` via bash) on the first session after
 install. When the file is missing anyway (an agent without hook
-support), run that initializer yourself, `init-config.sh --global`
-via bash (macOS/Linux/Git Bash) or `init-config.ps1 -Global` via
-powershell (Windows); if neither shell is available, write this
-template yourself:
+support), run that initializer yourself: `init-config.sh --global`
+via bash, which on Windows means Git Bash. If bash is unavailable,
+write this template yourself:
 
 ```json
 {

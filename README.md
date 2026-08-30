@@ -87,6 +87,9 @@ Marketplaces → capstone-marketplace → Enable auto-update.
 | `/capstone:feature <desc>` | The feature chain: groom → plan → implement, resuming at the first unfinished stage |
 | `/capstone:help` | Usage. In Claude Code a hook answers this before the model is invoked, so it costs zero tokens |
 
+**[Full command reference →](docs/commands.md)** — every argument,
+output, prerequisite, ledger key, and the shared mechanics.
+
 </details>
 
 <details>
@@ -331,9 +334,10 @@ replace it with the template above. Existing `generate/` and `sync/`
 keys in `changelog.md` are history and stay as they are; nothing
 reads them.
 
-The zero-token help trick is Claude Code only. The PowerShell twins
-are syntax-checked in CI but never executed there, and Windows
-field-testing is thin: that is the softest spot in the project. Budget an afternoon for the `logic` interview on a real app;
+The zero-token help trick is Claude Code only. Every script is bash,
+so Windows needs Git Bash (which ships with Git for Windows, and
+which the SessionStart hook has always required); Windows
+field-testing is thin either way. Budget an afternoon for the `logic` interview on a real app;
 the depth is the point. Retrieval is grep over eight markdown files,
 plenty at this scale and unproven on giant monorepos.
 

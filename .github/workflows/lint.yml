@@ -28,16 +28,3 @@ jobs:
           case "$out" in *"unignored: changelog.md"*) ;; *) echo "unignore migration did not report: $out"; exit 1;; esac
           if grep -q '^changelog\.md$' docs/capstone/.gitignore; then echo "stale changelog.md rule not removed"; exit 1; fi
           if ! grep -q '^features/$' docs/capstone/.gitignore; then echo "migration dropped other rules"; exit 1; fi
-      # Parse only. The .ps1 twins are not executed anywhere in CI:
-      # the Windows job was dropped deliberately, so a syntax error is
-      # caught here but a runtime one reaches Windows users.
-      - name: PowerShell scripts parse
-        shell: pwsh
-        run: |
-          $failed = $false
-          Get-ChildItem skills/core/scripts/*.ps1 | ForEach-Object {
-            $errs = $null
-            [void][System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$errs)
-            if ($errs) { Write-Output "PARSE ERRORS in $($_.Name):"; $errs; $failed = $true }
-          }
-          if ($failed) { exit 1 }

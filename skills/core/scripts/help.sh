@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Prints capstone usage. Single source of truth for the help text.
-# Keep in sync with help.ps1 (same text; lint-sync.sh asserts it).
+# Bash only: no PowerShell twin (lint-sync.sh check 8 enforces that).
 cat <<'EOF'
 capstone - codebase architecture reference generator
 

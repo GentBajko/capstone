@@ -21,7 +21,7 @@ initializer's per-project run writes `<docs_dir>/.gitignore` listing
 exactly those, and deletes the `changelog.md` line older versions
 wrote; whenever you write into `<docs_dir>` and that file is absent,
 create it: the same idempotent initializer without the global flag
-(`init-config.sh [docs_dir]` / `init-config.ps1 [docs_dir]`) does
+(`init-config.sh [docs_dir]`, via bash on every platform) does
 that, the legacy migration below, and the retroactive untracking. The
 `.gitignore` itself is committed, so the rules travel with the repo.
 
