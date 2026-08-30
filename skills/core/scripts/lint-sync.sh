@@ -242,6 +242,13 @@ for f in skills/*/SKILL.md; do
   [ -n "$hit" ] \
     && err "$f description advertises a removed/renamed command: $hit"
 done
+# 10e. README's stage-by-stage prose names each stage as a bold lead-in.
+#      Check 5 reads only the command table and the routing snippet, which
+#      is how `**design**.` survived the uiux rename in that prose: a whole
+#      paragraph describing a stage no longer reachable by that name.
+hit=$(grep -Eo "^\*\*($DEAD_NAMES)\*\*" README.md | head -1)
+[ -n "$hit" ] \
+  && err "README prose still describes a removed/renamed stage: $hit"
 
 # 11. every writing protocol carries its changelog pointer, the exempt
 #     ones say so, and the old opt-in is gone (core.md hard rule 5 is

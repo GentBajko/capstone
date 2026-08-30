@@ -5,7 +5,7 @@ every session. Stamped to commits, refreshed only where the code
 moved. For new projects, an interview pipeline that designs the whole
 thing before building it.
 
-```
+```text
 existing repo ──▶ generate ──▶ docs/capstone/ index + 8 chapters ──▶ sync keeps them current
                                                             ▲
 new project ──▶ mockup → logic → uiux → architecture → code-prefs → stack → build
@@ -13,17 +13,55 @@ new project ──▶ mockup → logic → uiux → architecture → code-prefs 
 feature idea ──▶ groom → plan → implement ──▶ shipped code, absorbed into docs ◀┘
 ```
 
-Install in Claude Code:
+## Install
 
-```
+### Claude Code
+
+```text
 /plugin marketplace add GentBajko/capstone
 /plugin install capstone@capstone-marketplace
 ```
 
-Any other agent (70+ via the skills CLI): `npx skills add GentBajko/capstone`
+### GitHub Copilot
+
+```bash
+gh skill install GentBajko/capstone --all --agent github-copilot
+```
+
+### Any other agent
+
+70+ editors and CLIs via the skills CLI:
+
+```bash
+npx skills add GentBajko/capstone
+```
 
 Works in Claude Code, Copilot CLI, Gemini CLI, Antigravity, and
-OpenCode. Plain `SKILL.md` files, MIT.
+OpenCode. Plain `SKILL.md` files, MIT. Per-agent commands and the
+bare-`/capstone` alias are under "Installing on other agents" below.
+
+## Update
+
+No reinstall needed. Update in place:
+
+| Installed with | Update with |
+| --- | --- |
+| Claude Code plugin | `claude plugin marketplace update capstone-marketplace`<br>then `claude plugin update capstone@capstone-marketplace` |
+| `gh skill` | `gh skill update capstone` |
+| `npx skills` | `npx skills update` |
+
+The Claude Code pair is two steps on purpose: the first refreshes the
+marketplace clone, the second moves your install onto it. Restart to
+apply. To skip it entirely, turn on auto-update: `/plugin` →
+Marketplaces → capstone-marketplace → Enable auto-update.
+
+> [!IMPORTANT]
+> **Updates are additive.** `gh skill update` and `npx skills update`
+> refresh files but never delete a skill that capstone has retired, so
+> a removed command lingers on disk and keeps being offered to your
+> agent. After any release that drops commands, compare
+> `gh skill list` or `npx skills list` against the command table below
+> and remove whatever is no longer there.
 
 <details>
 <summary>All commands</summary>
@@ -58,7 +96,7 @@ OpenCode. Plain `SKILL.md` files, MIT.
 beside it in `docs/capstone/`, and a `logic/` folder mapping the
 observed business logic scenario by scenario:
 
-```
+```text
 01-architecture.md   layers, boundaries, entry points, dispatch tables
 02-models.md         entities, relationships, schema DDL, validation
 03-conventions.md    paradigm, typing level, error handling, DI
@@ -102,7 +140,7 @@ implement it without inventing a single rule: exact steps, real
 formulas, what happens when the payment fails or the user clicks
 twice. The part of a spec everyone skips and then pays for.
 
-**design**. How it looks and feels: a design read, the visual world,
+**uiux**. How it looks and feels: a design read, the visual world,
 the tokens, each screen's composition and states. The method is
 vendored, distilled from `impeccable` (Apache-2.0) and
 `design-taste-frontend` (MIT), so the same product designs the same
@@ -221,32 +259,41 @@ root project's `00-index.md` as an index-of-indexes.
 <details>
 <summary>Installing on other agents</summary>
 
-The skills CLI installer covers 70+ agents (install ALL capstone
-skills; `core` carries the shared rules the others read):
+Whichever installer you use, take **all** capstone skills: `core`
+carries the shared rules every other command reads, so a partial
+install fails at the first command that needs it. `--all` and
+`--skill '*'` do that; so does accepting the default.
+
+**GitHub Copilot**, via the GitHub CLI:
 
 ```bash
-npx skills add GentBajko/capstone
+gh skill install GentBajko/capstone --all --agent github-copilot
 ```
 
-Copilot CLI uses the marketplace format:
+`gh skill` also installs to Claude, Cursor, Gemini, Antigravity and
+others — swap `--agent`, or drop the flag to be asked. Copilot CLI's
+own marketplace format works too:
 
 ```bash
 copilot plugin marketplace add GentBajko/capstone
 copilot plugin install capstone@capstone-marketplace
 ```
 
-Gemini CLI: `gemini extensions install https://github.com/GentBajko/capstone`
+**The skills CLI**, covering 70+ agents:
 
-Antigravity: `agy plugin install https://github.com/GentBajko/capstone`
+```bash
+npx skills add GentBajko/capstone
+```
 
-OpenCode, in `opencode.json`:
+**Gemini CLI**: `gemini extensions install https://github.com/GentBajko/capstone`
+
+**Antigravity**: `agy plugin install https://github.com/GentBajko/capstone`
+
+**OpenCode**, in `opencode.json`:
 
 ```json
 { "plugin": ["capstone@git+https://github.com/GentBajko/capstone.git"] }
 ```
-
-Claude Code auto-updates: `/plugin` → Marketplaces →
-capstone-marketplace → Enable auto-update.
 
 Commands come out namespaced (`/capstone:generate`). For a bare
 `/capstone` in Claude Code, drop this in `~/.claude/commands/capstone.md`:
