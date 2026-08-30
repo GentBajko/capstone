@@ -476,6 +476,28 @@ for doc in README.md docs/commands.md; do
     || err "$doc lost its jump-to nav"
 done
 
+# 12l. the licence is stated in seven places and must agree. Apache-2.0
+#      is load-bearing here: NOTICE is what makes a derivative point
+#      back at this repo (section 4(d)), so a manifest still claiming MIT
+#      would hand someone the wrong terms.
+grep -q 'Apache License' LICENSE || err "LICENSE is not the Apache License"
+grep -q 'Copyright 2026 Gent Bajko' LICENSE \
+  || err "LICENSE appendix still has the placeholder copyright line"
+[ -f NOTICE ] || err "NOTICE is missing (Apache-2.0 section 4(d) attribution)"
+grep -q 'github.com/GentBajko/capstone' NOTICE \
+  || err "NOTICE does not name the repository derivatives must reference"
+for f in .claude-plugin/plugin.json .codex-plugin/plugin.json \
+         .cursor-plugin/plugin.json .kimi-plugin/plugin.json; do
+  grep -q '"license": "Apache-2.0"' "$f" \
+    || err "$f does not declare license Apache-2.0"
+done
+grep -q 'files, Apache-2.0' README.md \
+  || err "README does not state the project licence as Apache-2.0"
+# every vendored work keeps its own notice
+for w in 'impeccable' 'design-taste-frontend' 'mattpocock/skills'; do
+  grep -q "$w" NOTICE || err "NOTICE lost the attribution for $w"
+done
+
 # 13. bash syntax of every .sh
 for s in skills/core/scripts/*.sh; do
   bash -n "$s" 2>/dev/null || err "bash syntax error in $s"

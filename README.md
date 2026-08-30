@@ -30,7 +30,7 @@ flowchart LR
 Full detail on every command: **[docs/commands.md](docs/commands.md)**.
 
 Works in Claude Code, Copilot CLI, Gemini CLI, Antigravity, and
-OpenCode. Plain `SKILL.md` files, MIT.
+OpenCode. Plain `SKILL.md` files, Apache-2.0.
 
 ---
 
@@ -394,4 +394,18 @@ unproven on giant monorepos.
 
 ---
 
-MIT. Issues and PRs welcome.
+## License
+
+[Apache-2.0](LICENSE). Free to use, fork, and build on, commercially
+or otherwise. Two conditions come with it: a file you modify carries a
+notice saying you changed it (§4(b)), and any derivative you
+distribute reproduces the attribution in [NOTICE](NOTICE), which names
+this repository (§4(d)).
+
+Contributions welcome — issues and PRs. See
+[CONTRIBUTING](CONTRIBUTING.md); by opening a PR you license your
+contribution under the same terms (§5).
+
+`NOTICE` also records the third-party work vendored here: `impeccable`
+(Apache-2.0), `design-taste-frontend` (MIT), and `mattpocock/skills`
+(MIT).
