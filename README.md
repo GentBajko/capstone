@@ -13,6 +13,11 @@ new project ──▶ mockup → logic → uiux → architecture → code-prefs 
 feature idea ──▶ groom → plan → implement ──▶ shipped code, absorbed into docs ◀┘
 ```
 
+Works in Claude Code, Copilot CLI, Gemini CLI, Antigravity, and
+OpenCode. Plain `SKILL.md` files, MIT.
+
+---
+
 ## Install
 
 ### Claude Code
@@ -36,9 +41,8 @@ gh skill install GentBajko/capstone --all --agent github-copilot
 npx skills add GentBajko/capstone
 ```
 
-Works in Claude Code, Copilot CLI, Gemini CLI, Antigravity, and
-OpenCode. Plain `SKILL.md` files, MIT. Per-agent commands and the
-bare-`/capstone` alias are under "Installing on other agents" below.
+Per-agent commands and the bare-`/capstone` alias are under
+"Installing on other agents" below.
 
 ## Update
 
@@ -60,40 +64,23 @@ Marketplaces → capstone-marketplace → Enable auto-update.
 > refresh files but never delete a skill that capstone has retired, so
 > a removed command lingers on disk and keeps being offered to your
 > agent. After any release that drops commands, compare
-> `gh skill list` or `npx skills list` against the command table below
-> and remove whatever is no longer there.
+> `gh skill list` or `npx skills list` against the command tables
+> below and remove whatever is no longer there.
 
-<details>
-<summary>All commands</summary>
+---
 
-| Command | What it does |
+## Where to start
+
+| Situation | Command |
 | --- | --- |
-| `/capstone:start` | The pipeline: mockup → logic → uiux → architecture → code-prefs → stack → build, resuming at the first unfinished stage |
-| `/capstone:map` | Build the reference, or refresh only what drifted — no docs yet builds them, existing docs get just the stale files rewritten (`rebuild` forces a full rewrite, a topic name targets one chapter) |
-| `/capstone:map check` | Read-only trust report: staleness, pointer drift, absorption drift, logic and design coverage, stack re-vetting. Writes nothing |
-| `/capstone:doctor` | Diagnose and repair the docs area: torn writes, index drift, voided approvals, absorption gaps |
-| `docs/capstone/changelog.md` | Not a command: the append-only ledger every writing command records itself in, before it sets its done marker |
-| `/capstone:review [be\|fe]` | The opt-in judgment, into one `review.md`: no argument reviews both sides, `backend` takes architecture and `frontend` grades the UI against your own design docs |
-| `/capstone:mockup` | Interview 1, standalone |
-| `/capstone:logic` | Interview 2, standalone |
-| `/capstone:uiux` | Interview 3, standalone: the frontend design (direction, tokens, per-screen chapters) |
-| `/capstone:architecture` | Interview 4, standalone |
-| `/capstone:code-prefs` | Interview 5, standalone |
-| `/capstone:stack` | Research libraries and services per capability, with pros/cons and pricing; you pick (`refresh` re-vets recorded picks) |
-| `/capstone:build` | Implementation plan (backend, then frontend), your approval, then working code in subagents or inline (you pick) |
-| `/capstone:groom <feature>` | Doc-grounded feature interview → a traceable spec in `docs/capstone/features/` |
-| `/capstone:plan <feature>` | Task-by-task TDD plan from the groomed spec; you approve before any code |
-| `/capstone:implement <feature>` | Execute the approved plan into code, review until dry, then refresh the affected chapters |
-| `/capstone:feature <desc>` | The feature chain: groom → plan → implement, resuming at the first unfinished stage |
-| `/capstone:help` | Usage. In Claude Code a hook answers this before the model is invoked, so it costs zero tokens |
+| A repo that already has code | `/capstone:map` |
+| A product that doesn't exist yet | `/capstone:start` |
+| One change to a mapped project | `/capstone:feature add CSV export` |
 
-**[Full command reference →](docs/commands.md)** — every argument,
-output, prerequisite, ledger key, and the shared mechanics.
+Everything else is a stage one of those runs, invocable on its own
+when you want to enter mid-chain.
 
-</details>
-
-<details>
-<summary>What do the generated docs look like?</summary>
+## What you get
 
 `/capstone:map` produces a `00-index.md`, eight numbered chapters
 beside it in `docs/capstone/`, and a `logic/` folder mapping the
@@ -110,20 +97,59 @@ observed business logic scenario by scenario:
 08-glossary.md       the domain words your codebase invented
 ```
 
-Everything is facts with `file:line` citations, never advice.
-A later `/capstone:map` refreshes only what drifted and extracts any
-business-logic scenarios the map is missing; `map check` reports
-staleness, citation drift, logic-coverage gaps, and unabsorbed
-features without writing a byte. `/capstone:doctor` repairs the docs
-area's own wounds. Every command declares exactly what it reads before
-acting, so re-runs don't burn tokens re-exploring what the docs
-already know, and a command that needs the reference and finds none
-builds it first instead of sending you off to run another command.
+Everything is facts with `file:line` citations, never advice. Every
+file records the commit it was derived at and the globs it covers, so
+a later run rewrites only what actually moved — and every command
+declares what it reads before acting, so re-runs don't burn tokens
+re-exploring what the docs already know.
 
-</details>
+A command that needs the reference and finds none builds it first
+instead of sending you off to run something else.
 
-<details>
-<summary>How does the pipeline work, stage by stage?</summary>
+## Commands
+
+**Reference**
+
+| Command | What it does |
+| --- | --- |
+| `/capstone:map` | Build the reference, or refresh only what drifted. `rebuild` forces a full rewrite; a topic name targets one chapter |
+| `/capstone:map check` | Read-only trust report: staleness, pointer drift, absorption drift, coverage gaps, stack re-vetting. Writes nothing |
+| `/capstone:doctor` | Diagnose and repair the docs area: torn writes, index drift, voided approvals, absorption gaps |
+| `/capstone:review [be\|fe]` | The opt-in judgment → `review.md`. No argument does both sides; `backend` takes architecture, `frontend` grades the UI against your own design docs |
+
+**Greenfield pipeline** — `/capstone:start` runs these in order
+
+| Command | What it does |
+| --- | --- |
+| `/capstone:mockup` | Product discovery → one file per screen |
+| `/capstone:logic` | Business logic, scenario by scenario |
+| `/capstone:uiux` | How the UI looks and the UX behaves |
+| `/capstone:architecture` | The big design interview → prescriptive chapters |
+| `/capstone:code-prefs` | How code should be written here |
+| `/capstone:stack` | Research libraries and services per capability; you pick |
+| `/capstone:build` | Implementation plan, your approval, then working code |
+
+**Feature chain** — `/capstone:feature` runs these in order
+
+| Command | What it does |
+| --- | --- |
+| `/capstone:groom <feature>` | Doc-grounded feature interview → a traceable spec |
+| `/capstone:plan <feature>` | Task-by-task TDD plan; you approve before any code |
+| `/capstone:implement <feature>` | Execute the plan, review until dry, absorb back into the docs |
+
+Plus `/capstone:help` for usage — in Claude Code a hook answers it
+before the model is invoked, so it costs zero tokens.
+
+Not a command: `docs/capstone/changelog.md`, the append-only ledger
+every writing command records itself in before it sets its done
+marker.
+
+**[Full command reference →](docs/commands.md)** — every argument,
+output, prerequisite, ledger key, and the shared mechanics.
+
+---
+
+## The greenfield pipeline
 
 Type `capstone` and it runs the stages in order, resuming wherever you
 stopped. Every answer is written to disk before the next question, so
@@ -147,29 +173,25 @@ twice. The part of a spec everyone skips and then pays for.
 the tokens, each screen's composition and states. The method is
 vendored, distilled from `impeccable` (Apache-2.0) and
 `design-taste-frontend` (MIT), so the same product designs the same
-way on any machine. Output: a direction contract, a design-system
-chapter `stack` honors, one file per screen for `build` to implement.
+way on any machine.
 
 **architecture**. The big interview. Done only when every section of
 the future docs is answerable from your recorded decisions. Writes
 the same eight chapters, marked prescriptive; once code exists,
 `map` replaces intent with observation.
 
-**code-prefs**. How you want code written: typing strictness,
-library versus hand-rolled, error handling, what an AI must never do
-in your repo. Also a decent starting point for a CLAUDE.md.
+**code-prefs**. Typing strictness, library versus hand-rolled, error
+handling, what an AI must never do in your repo. Also a decent
+starting point for a CLAUDE.md.
 
 **stack, then build**. `stack` researches real options per
 capability, licenses and prices included; you pick, and
 `stack refresh` re-vets the picks months later. `build` writes an
 implementation plan, stops for your approval, then writes the code:
-one subagent per step with fresh context, or inline in the session,
-whichever you pick when it starts.
+one subagent per step with fresh context, or inline, whichever you
+pick when it starts.
 
-</details>
-
-<details>
-<summary>How do features get added after v1?</summary>
+## The feature chain
 
 `/capstone:feature add CSV export` grows a finished project one
 feature at a time. `groom` interviews a spec out of you against the
@@ -180,14 +202,11 @@ consecutive rounds find nothing new, then absorbs the shipped
 behavior back into the scenario docs. A dead session resumes
 mid-chain.
 
-</details>
+## What `review` is
 
-<details>
-<summary>What is review?</summary>
-
-The one command allowed opinions, only when invoked. It has two
-sides and writes both into a single `docs/capstone/review.md`, each
-section carrying its own stamp so you can tell how old each half is.
+The one command allowed opinions, only when invoked. Two sides, one
+`docs/capstone/review.md`, each section carrying its own stamp so you
+can tell how old each half is.
 
 The **frontend** side judges the UI against your own design docs
 first, then a vendored craft floor, then each screen's mode,
@@ -195,38 +214,32 @@ screenshotting the live app when it can. The **backend** side covers
 architecture and backend: shallow modules by the deletion test,
 change-smells in the git hot paths, security, stack currency.
 
-Bare `review` runs both. `review backend` or `review frontend` runs
-one and rewrites only that section, leaving the other untouched.
-Both sides judge by capstone's own vendored craft files, so the same
-codebase is judged the same way on any machine. A security-review
-command or a live browser, where the harness has them, supply extra
-evidence but never change the standard. One rule outranks the craft
-baseline: your recorded decisions beat generic best practice. The file
-is gitignored by default: it is judgment, not reference.
+Bare `review` runs both; one argument runs one side and rewrites only
+that section. Both judge by capstone's own vendored craft files, so
+the same codebase is judged the same way on any machine. One rule
+outranks the craft baseline: **your recorded decisions beat generic
+best practice.** Gitignored by default — it is judgment, not
+reference.
 
-</details>
+## Not technical? Still yours
 
-<details>
-<summary>I'm not technical. Can I use this?</summary>
+Set `expertise: 1` and everything happens in plain language: capstone
+asks how many people might use the thing rather than what your p99
+latency budget is, derives the technical targets itself, and confirms
+them in words you can sanity-check. Set `teaching_mode: true` and it
+narrates what it's doing and why as it works, naming the proper term
+for each concept, one per step, so you learn the craft along the way.
+The output stays rigorous either way. Engineers set `expertise: 5` for
+terse questions and trade-off tables.
 
-Yes. Set `expertise: 1` and everything happens in plain language:
-capstone asks how many people might use the thing rather than what
-your p99 latency budget is, derives the technical targets itself, and
-confirms them in words you can sanity-check. Set
-`teaching_mode: true` and it also narrates what it's doing and why as
-it works, naming the proper term for each concept, one per step, so
-you learn the craft along the way. The output stays
-rigorous either way. Engineers set `expertise: 5` for terse questions
-and trade-off tables.
-
-</details>
+---
 
 <details>
 <summary>Settings</summary>
 
 Installing creates `~/.claude/capstone.json` (the first session after
 install runs the plugin's SessionStart hook): one config for the
-user, shared by every project:
+user, shared by every project.
 
 ```json
 {
@@ -240,23 +253,29 @@ user, shared by every project:
 }
 ```
 
-`expertise` (1 to 5) is asked once and saved. `teaching_mode: true`
-makes capstone narrate and teach as it works, at any expertise level.
-`docs_in_git` governs
-the factual reference; interviews, `features/`, and the two reviews
-stay local via a generated `.gitignore`. `changelog.md` is the one
-exception and is always committed: `implement` deletes a feature's
-folder once its ledger entry is written, so the ledger is the only
-surviving record of why the feature was built that way.
-`subagent_threshold` is the source-file count above which `map`
-fans out subagents, and above which an unrequested full build asks
-first. Project-scoped state lives in an optional
+| Key | What it does |
+| --- | --- |
+| `expertise` | 1–5, asked once and saved. Calibrates the conversation only, never the docs |
+| `teaching_mode` | Narrate and teach while working, at any expertise level |
+| `docs_dir` | Where generated docs live. Relocates outputs only — the project config's own path never moves |
+| `index_file` | Chapter zero of the docs area |
+| `subagent_threshold` | Source-file count above which `map` fans out subagents, and above which an unrequested full build asks first |
+| `docs_in_git` | `commit`, `ignore`, or `ask`, for the factual reference |
+| `language` | The generated docs' language |
+
+Interviews, `features/`, and `review.md` stay local via a generated
+`.gitignore`. **`changelog.md` is the one exception and is always
+committed**: `implement` deletes a feature's folder once its ledger
+entry is written, so the ledger is the only surviving record of why
+the feature was built that way.
+
+Project-scoped state lives in an optional
 `docs/capstone/capstone.json`, created only when there is something to
 record; any global key set there overrides the global file for that
-repo, `pipeline` records the one-time
-pipeline-or-map choice on repos that already have code, and
-`workspaces` gives each monorepo workspace its own docs area with the
-root project's `00-index.md` as an index-of-indexes.
+repo. `pipeline` records the one-time pipeline-or-map choice on repos
+that already have code, and `workspaces` gives each monorepo workspace
+its own docs area with the root project's `00-index.md` as an
+index-of-indexes.
 
 </details>
 
@@ -320,7 +339,7 @@ ARGUMENTS: $ARGUMENTS
 </details>
 
 <details>
-<summary>CI and rough edges</summary>
+<summary>CI</summary>
 
 Copy `templates/capstone-map-check.yml` into `.github/workflows/`,
 add an `ANTHROPIC_API_KEY` secret, and every PR fails when the
@@ -334,13 +353,25 @@ replace it with the template above. Existing `generate/` and `sync/`
 keys in `changelog.md` are history and stay as they are; nothing
 reads them.
 
-The zero-token help trick is Claude Code only. Every script is bash,
-so Windows needs Git Bash (which ships with Git for Windows, and
-which the SessionStart hook has always required); Windows
-field-testing is thin either way. Budget an afternoon for the `logic` interview on a real app;
-the depth is the point. Retrieval is grep over eight markdown files,
-plenty at this scale and unproven on giant monorepos.
+</details>
+
+<details>
+<summary>Rough edges</summary>
+
+The zero-token help trick is Claude Code only.
+
+Every script is bash, so Windows needs Git Bash (which ships with Git
+for Windows, and which the SessionStart hook has always required);
+Windows field-testing is thin either way.
+
+Budget an afternoon for the `logic` interview on a real app; the depth
+is the point.
+
+Retrieval is grep over eight markdown files — plenty at this scale,
+unproven on giant monorepos.
 
 </details>
+
+---
 
 MIT. Issues and PRs welcome.
