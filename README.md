@@ -115,7 +115,7 @@ observed business logic scenario by scenario:
 
 Everything is facts with `file:line` citations, never advice. Every
 file records the commit it was derived at and the globs it covers, so
-a later run rewrites only what actually moved — and every command
+a later run rewrites only what actually moved - and every command
 declares what it reads before acting, so re-runs don't burn tokens
 re-exploring what the docs already know.
 
@@ -133,7 +133,7 @@ instead of sending you off to run something else.
 | `/capstone:doctor` | Diagnose and repair the docs area: torn writes, index drift, voided approvals, absorption gaps |
 | `/capstone:review [be\|fe]` | The opt-in judgment → `review.md`. No argument does both sides; `backend` takes architecture, `frontend` grades the UI against your own design docs |
 
-**Greenfield pipeline** — `/capstone:start` runs these in order
+**Greenfield pipeline** - `/capstone:start` runs these in order
 
 | Command | What it does |
 | --- | --- |
@@ -145,7 +145,7 @@ instead of sending you off to run something else.
 | `/capstone:stack` | Research libraries and services per capability; you pick |
 | `/capstone:build` | Implementation plan, your approval, then working code |
 
-**Feature chain** — `/capstone:feature` runs these in order
+**Feature chain** - `/capstone:feature` runs these in order
 
 | Command | What it does |
 | --- | --- |
@@ -153,14 +153,14 @@ instead of sending you off to run something else.
 | `/capstone:plan <feature>` | Task-by-task TDD plan; you approve before any code |
 | `/capstone:implement <feature>` | Execute the plan, review until dry, absorb back into the docs |
 
-Plus `/capstone:help` for usage — in Claude Code a hook answers it
+Plus `/capstone:help` for usage - in Claude Code a hook answers it
 before the model is invoked, so it costs zero tokens.
 
 Not a command: `docs/capstone/changelog.md`, the append-only ledger
 every writing command records itself in before it sets its done
 marker.
 
-**[Full command reference →](docs/commands.md)** — every argument,
+**[Full command reference →](docs/commands.md)** - every argument,
 output, prerequisite, ledger key, and the shared mechanics.
 
 ---
@@ -238,7 +238,7 @@ Bare `review` runs both; one argument runs one side and rewrites only
 that section. Both judge by capstone's own vendored craft files, so
 the same codebase is judged the same way on any machine. One rule
 outranks the craft baseline: **your recorded decisions beat generic
-best practice.** Gitignored by default — it is judgment, not
+best practice.** Gitignored by default - it is judgment, not
 reference.
 
 ## Not technical? Still yours
@@ -277,7 +277,7 @@ user, shared by every project.
 | --- | --- |
 | `expertise` | 1–5, asked once and saved. Calibrates the conversation only, never the docs |
 | `teaching_mode` | Narrate and teach while working, at any expertise level |
-| `docs_dir` | Where generated docs live. Relocates outputs only — the project config's own path never moves |
+| `docs_dir` | Where generated docs live. Relocates outputs only - the project config's own path never moves |
 | `index_file` | Chapter zero of the docs area |
 | `subagent_threshold` | Source-file count above which `map` fans out subagents, and above which an unrequested full build asks first |
 | `docs_in_git` | `commit`, `ignore`, or `ask`, for the factual reference |
@@ -314,7 +314,7 @@ gh skill install GentBajko/capstone --all --agent github-copilot
 ```
 
 `gh skill` also installs to Claude, Cursor, Gemini, Antigravity and
-others — swap `--agent`, or drop the flag to be asked. Copilot CLI's
+others - swap `--agent`, or drop the flag to be asked. Copilot CLI's
 own marketplace format works too:
 
 ```bash
@@ -387,7 +387,7 @@ Windows field-testing is thin either way.
 Budget an afternoon for the `logic` interview on a real app; the depth
 is the point.
 
-Retrieval is grep over eight markdown files — plenty at this scale,
+Retrieval is grep over eight markdown files - plenty at this scale,
 unproven on giant monorepos.
 
 </details>

@@ -5,6 +5,18 @@ must exist first. For installation and updating see the
 [README](../README.md); for contributing see
 [CONTRIBUTING](../CONTRIBUTING.md).
 
+**Jump to:**
+
+1. [Invocation](#invocation)
+2. [Three entry points](#three-entry-points)
+3. [Reference commands](#reference-commands) — [`map`](#map) · [`doctor`](#doctor) · [`review`](#review)
+4. [The greenfield pipeline](#the-greenfield-pipeline) — [`start`](#start)
+5. [The feature chain](#the-feature-chain) — [`feature`](#feature-description)
+6. [`help`](#help) and [`core`](#core)
+7. [What lands where](#what-lands-where)
+8. [Shared mechanics](#shared-mechanics)
+9. [CI](#ci)
+
 ## Invocation
 
 Commands are namespaced: `/capstone:map`, `/capstone:review`. On
@@ -58,8 +70,8 @@ what a later refresh diffs against.
 claims get extracted. Interview-derived files in either folder are
 never overwritten by extraction.
 
-`map check` reports six things — staleness, pointer drift, absorption
-drift, dependency re-vetting, logic coverage, design coverage — and
+`map check` reports six things - staleness, pointer drift, absorption
+drift, dependency re-vetting, logic coverage, design coverage - and
 ends with a machine-parseable verdict:
 
 ```text
@@ -87,7 +99,7 @@ after its entry landed), index ↔ disk drift, lifecycle validity,
 housekeeping (missing `.gitignore` or config keys, an untracked
 ledger), absorption drift, logic coverage, and ledger size.
 
-**Ledger key** `doctor/<scope>@<stamp>` — only when something was
+**Ledger key** `doctor/<scope>@<stamp>` - only when something was
 actually repaired.
 
 ### `review`
@@ -100,7 +112,7 @@ The one command allowed opinions, and only when you ask for them.
 | `backend`, `be` | Architecture and backend judgment only. |
 | `frontend`, `fe` | UI judged against the project's own design docs. |
 
-**Writes** `docs/capstone/review.md` — one file, one section per side,
+**Writes** `docs/capstone/review.md` - one file, one section per side,
 each with its own stamp. A one-sided run rewrites only its own
 section. **Gitignored by default:** it is judgment, not reference.
 
@@ -127,8 +139,8 @@ dead session loses nothing, and re-running never re-asks.
 
 | Stage | Produces | State file |
 | --- | --- | --- |
-| `mockup` | `mockup/` — one file per screen: wireframe, copy, behavior, empty/error/success states | `mockup-interview.md` |
-| `logic` | `logic/` — one file per scenario: triggers, exact rules, branches, unhappy paths, invariants | `logic-interview.md` |
+| `mockup` | `mockup/` - one file per screen: wireframe, copy, behavior, empty/error/success states | `mockup-interview.md` |
+| `logic` | `logic/` - one file per scenario: triggers, exact rules, branches, unhappy paths, invariants | `logic-interview.md` |
 | `uiux` | `uiux/01-direction.md`, `02-system.md`, `03-experience.md`, `screens/` | `uiux-interview.md` |
 | `architecture` | The eight numbered chapters, marked `mode: prescriptive` | `architecture-interview.md` |
 | `standards` | `standards.md` | `standards-interview.md` |
@@ -147,7 +159,7 @@ dead session loses nothing, and re-running never re-asks.
   pricing; you pick. `stack refresh` re-vets recorded picks later.
   Ledger keys `stack/all@Q<n>` and `stack/refresh@Q<n>`.
 - **`build`** requires a formalized `stack`. It writes an
-  implementation plan, **stops for your approval**, then writes code —
+  implementation plan, **stops for your approval**, then writes code -
   in subagents (fresh context per step) or inline, asked once before
   the first step. Ledger keys `build/plan@Q<n>` and `build/code@Q<n>`.
 
@@ -173,7 +185,7 @@ groom → plan → implement
 | --- | --- | --- |
 | `groom <feature>` | `features/<NN>-<slug>/spec.md` | Spec approval |
 | `plan <feature>` | `features/<NN>-<slug>/plan.md` | **Plan approval, before any code** |
-| `implement <feature>` | Source code, then reference updates | — |
+| `implement <feature>` | Source code, then reference updates | - |
 
 **`groom`** requires a stamped index; without one it builds the
 reference first rather than refusing. It interviews a spec out of you
@@ -192,7 +204,7 @@ and **deletes the feature folder**.
 
 > The whole `features/` tree is gitignored working state. Once
 > `implement` finishes, its `changelog.md` entry is the only surviving
-> record of why the feature was built that way — which is why the
+> record of why the feature was built that way - which is why the
 > ledger is always committed.
 
 **Ledger key** `implement/<NN>-<slug>@Q<n>`. That key is also the done
@@ -208,7 +220,7 @@ model is invoked, so it costs zero tokens.
 ## `core`
 
 Not a command. It carries the shared rules and scripts every other
-skill reads. Install the whole suite — a capstone skill without
+skill reads. Install the whole suite - a capstone skill without
 `core` cannot run.
 
 ---
@@ -229,7 +241,7 @@ docs/capstone/
 ├── logic/                 business logic, one file per scenario
 ├── mockup/                one file per screen
 ├── uiux/                  direction, design system, per-screen chapters
-├── changelog.md           append-only ledger — always committed
+├── changelog.md           append-only ledger - always committed
 ├── standards.md           how code should be written here
 ├── implementation.md      build's plan
 ├── review.md              opinionated findings          (gitignored)
@@ -246,7 +258,7 @@ moves, so a custom location stays discoverable.
 **Config.** `~/.claude/capstone.json`, created on first session by a
 hook. `expertise` (1–5) calibrates the conversation only, never the
 docs. `teaching_mode` narrates what is happening and why.
-`docs_in_git` governs whether the reference is committed —
+`docs_in_git` governs whether the reference is committed -
 `changelog.md` is the sole exception and is always committed.
 `subagent_threshold` (default 150 source files) is where `map` fans
 out to subagents, and where an unrequested full build asks first.
@@ -261,7 +273,7 @@ setting its done marker. Newest first, bullets only, append-only.
 
 **Staleness.** Each generated file records the commit it was derived
 at plus the globs it covers. A refresh diffs those globs against the
-working tree — uncommitted changes count — and rewrites only what
+working tree - uncommitted changes count - and rewrites only what
 moved. `capstone_version` records which capstone wrote a file, so a
 later release can migrate by version rather than guessing from shape.
 
@@ -269,9 +281,9 @@ later release can migrate by version rather than guessing from shape.
 never recommendations. `review` is the sole opinionated output, and
 only on request.
 
-**TDD + YAGNI runs through everything.** `code-craft.md`'s ladder —
+**TDD + YAGNI runs through everything.** `code-craft.md`'s ladder -
 does this need to exist at all, is it already here, does the stdlib
-or platform cover it, can it be one line — is climbed by every stage
+or platform cover it, can it be one line - is climbed by every stage
 that decides what will exist, not only the ones that write code.
 `architecture` climbs it before agreeing a layer, `stack` before
 researching a single vendor, `plan`/`build`/`implement` before writing
@@ -281,7 +293,7 @@ conflict resolves to the ladder.
 
 **Interviews push back.** An answer that contradicts a recorded
 decision, a craft rule, an earlier answer, or a number you already
-gave gets challenged — with the specific consequence and an
+gave gets challenged - with the specific consequence and an
 alternative, at most twice, and only a second time if there is a new
 argument. Then it is your call: your answer stands, and the interview
 records both the decision and the objection so a later reader can tell
