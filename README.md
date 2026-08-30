@@ -16,12 +16,18 @@ flowchart LR
 ```
 
 **Jump to:**
-[Install](#install) · [Update](#update) · [Where to start](#where-to-start) ·
-[What you get](#what-you-get) · [Commands](#commands) ·
-[The greenfield pipeline](#the-greenfield-pipeline) ·
-[The feature chain](#the-feature-chain) · [What `review` is](#what-review-is) ·
-[Not technical?](#not-technical-still-yours) ·
-[Full command reference](docs/commands.md)
+
+1. [Install](#install)
+2. [Update](#update)
+3. [Where to start](#where-to-start)
+4. [What you get](#what-you-get)
+5. [Commands](#commands)
+6. [The greenfield pipeline](#the-greenfield-pipeline)
+7. [The feature chain](#the-feature-chain)
+8. [What `review` is](#what-review-is)
+9. [Not technical? Still yours](#not-technical-still-yours)
+
+Full detail on every command: **[docs/commands.md](docs/commands.md)**.
 
 Works in Claude Code, Copilot CLI, Gemini CLI, Antigravity, and
 OpenCode. Plain `SKILL.md` files, MIT.
