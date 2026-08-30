@@ -16,10 +16,12 @@ This stage decides what will exist before anything does, so a layer,
 boundary, service, queue, or abstraction agreed here is code the
 ladder never gets a chance to stop later. Every structural element
 needs a recorded reason it is needed **now**, traceable to a `§Q`
-answer or a logic scenario; "we'll need it when we scale" is a
-deferred decision with a trigger, recorded as such, not a thing you
-build. Exhaustive means every question answered - it does not mean
-every part designed in.
+answer or a logic scenario; "we'll need it when we scale" is offered
+as a deferred decision with a trigger rather than built. Exhaustive
+means every question answered - it does not mean every part designed
+in. This is a position you argue, not a veto: per core.md's Pushback
+rule you make the case at most twice, and a user who still wants it
+now gets it, with the exchange recorded.
 
 **The exhaustiveness criterion is twofold.** The interview is complete
 only when (a) every applicable item in `../interview.md`, the merged

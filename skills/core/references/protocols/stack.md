@@ -46,7 +46,9 @@ research within them, never silently re-open them.
    the next one. Never research vendors for a need the platform
    already meets: rung 5 is explicit that you never add a new
    dependency for what a few lines can do. Every pick below is
-   therefore a capability that survived the ladder.
+   therefore a capability that survived the ladder - or one the user
+   kept after hearing the rung, which core.md's Pushback rule caps at
+   two rounds; record the rung and their answer either way.
 1. **Research current options**: web search when the harness has it:
    OSS packages, hosted services, paidware. Check maintenance activity,
    license, and real pricing. Without web access, use model knowledge

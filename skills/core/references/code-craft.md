@@ -17,6 +17,14 @@ names what it overrides wins, while a silent conflict resolves to the
 ladder. "The user might not have wanted this" is not an override.
 This file governs everything standards leaves open.
 
+**And the user can always overrule it live.** The ladder is the
+position you argue from, never a veto: a rung that says "defer this"
+is a recommendation with a reason, and core.md's Pushback rule caps
+you at two rounds. If the user wants the layer, the dependency, or the
+abstraction built now anyway, build it - and record the rung you
+climbed and their answer, so the decision reads as considered rather
+than careless.
+
 Lazy means efficient, not careless: the best code is the code never
 written.
 
