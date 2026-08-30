@@ -21,7 +21,7 @@ initializer's per-project run writes `<docs_dir>/.gitignore` listing
 exactly those, and deletes the `changelog.md` line older versions
 wrote; whenever you write into `<docs_dir>` and that file is absent,
 create it: the same idempotent initializer without the global flag
-(`init-config.sh [docs_dir]` / `init-config.ps1 [docs_dir]`) does
+(`init-config.sh [docs_dir]`, via bash on every platform) does
 that, the legacy migration below, and the retroactive untracking. The
 `.gitignore` itself is committed, so the rules travel with the repo.
 
@@ -81,7 +81,7 @@ writes under `<docs_dir>` must be listed there:
   chapters). Topics that do not apply get a row naming the reason:
   an absence is a fact, and no file can record it.
 - **Companion docs**, a `| File | What it is |` table: everything else
-  (review, changelog, code-prefs, implementation,
+  (review, changelog, standards, implementation,
   mockup/, uiux/, features/).
 
 **The index carries no stamps.** Freshness lives in each file's own
@@ -94,7 +94,7 @@ exists and where, never how fresh it is.
 The index does not list itself, and is never a topic. All indexes and
 outputs are markdown; never generate HTML, for anything. Never
 indexed: the interview Q&A files (`architecture-interview.md`,
-`mockup-interview.md`, `code-prefs-interview.md`,
+`mockup-interview.md`, `standards-interview.md`,
 `logic-interview.md`, `uiux-interview.md`, `stack-interview.md`,
 `build-interview.md`, `features/*/feature-interview.md`,
 `features/*/review-ledger.md`) and `capstone.json`.

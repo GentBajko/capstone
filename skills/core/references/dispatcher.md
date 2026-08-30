@@ -10,15 +10,14 @@ protocol files.
    on `start` or `feature`, which route rather than write.
 2. Route on the first argument. The reserved subcommand words
    (`map`, `doctor`, `review`, `mockup`,
-   `logic`, `uiux`, `architecture`, `code-prefs`, `stack`, `build`,
+   `logic`, `uiux`, `architecture`, `standards`, `stack`, `build`,
    `groom`, `plan`, `implement`, `feature`, `start`)
    each route to `protocols/<name>.md`: execute that one protocol
    exactly; behaviors live there, not here.
 3. Exception: when invoked as `map`, topic names win over
    subcommand words: `map architecture` regenerates
    `01-architecture.md` and never starts the architecture interview.
-4. `help`: run `../scripts/help.sh` via bash (or `..\scripts\help.ps1`
-   via powershell on Windows) and output its stdout verbatim; nothing
-   else.
+4. `help`: run `../scripts/help.sh` via bash and output its stdout
+   verbatim; nothing else.
 5. No argument at all → `protocols/start.md`, the bare-"capstone"
    entry.

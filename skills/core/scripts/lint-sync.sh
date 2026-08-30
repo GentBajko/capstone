@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Asserts every keep-in-sync-by-hand invariant in this plugin.
 # Run from the repo root. Exit non-zero listing each failure.
-# Two scripts are exempt from the .sh/.ps1 pair rule. help-hook.sh:
-# hooks.json invokes bash explicitly, so it is bash-only by design.
-# This file: it never runs on a user machine, only in CI and on
-# contributor machines, and Git Bash covers Windows there (contributing
-# needs git, and Git for Windows ships bash). A hand-mirrored twin of
-# this file drifts silently - a missing check still reports success -
-# so there is deliberately only one implementation.
+# Every script here is bash, on every platform: on Windows that means
+# Git Bash, which ships with Git for Windows and which hooks.json has
+# always required anyway (its SessionStart command is an unconditional
+# `bash`). The PowerShell twins were hand-mirrored, never executed in
+# CI after the Windows runner went, and every defect they ever had was
+# a sync defect rather than a logic one. One implementation cannot
+# drift; check 8 fails if a .ps1 reappears.
 # POSIX-portable regex only: no GNU-only \| or \b, so this runs on
 # macOS/BSD grep as well as GNU.
 set -u
@@ -21,12 +21,6 @@ MANIFESTS=".claude-plugin/plugin.json .claude-plugin/marketplace.json
 
 IN_GIT=0
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 && IN_GIT=1
-
-# 1. help.sh body == help.ps1 body
-if ! diff <(bash skills/core/scripts/help.sh) \
-          <(grep -Ev "^Write-Output @'|^'@|^# Prints" skills/core/scripts/help.ps1) >/dev/null 2>&1; then
-  err "help.sh and help.ps1 texts differ"
-fi
 
 # 2. exactly one version string per manifest, and one distinct value overall
 VERSIONS=""
@@ -126,6 +120,18 @@ for d in skills/*/; do
   echo "$ROUTE" | grep -Eq "(^|[ (])$n[,)]" || err "README routing snippet missing $n"
 done
 
+# 5c. docs/commands.md documents every command. A command reference that
+#      silently omits a command is worse than none: it reads as complete.
+[ -f docs/commands.md ] || err "docs/commands.md is missing"
+for d in skills/*/; do
+  n=$(basename "$d")
+  case "$n" in core) continue;; esac
+  grep -q "\`$n\`\|\`$n " docs/commands.md \
+    || err "docs/commands.md does not document $n"
+done
+grep -q 'MAP CHECK: current' docs/commands.md \
+  || err "docs/commands.md does not show the MAP CHECK verdict line"
+
 # 5b. the dispatcher's reserved-word list carries every routable
 #     subcommand (on Gemini, skills/core/references/dispatcher.md is the only entry point)
 # both anchors must be present: without the end anchor sed runs to EOF
@@ -154,7 +160,7 @@ grep -q 'init-config.sh --global' hooks/hooks.json || err "hooks.json SessionSta
 #    template's keys in both initializers, core.md, and README; the
 #    project-scoped keys (never in the global template) documented in
 #    core.md and README
-for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1 \
+for f in skills/core/scripts/init-config.sh \
          skills/core/references/core.md README.md; do
   for k in expertise teaching_mode docs_dir index_file subagent_threshold docs_in_git language; do
     grep -q "\"$k\"" "$f" || err "$f config template missing key $k"
@@ -169,17 +175,12 @@ for f in skills/core/references/core.md README.md; do
   done
 done
 
-# 8. .sh/.ps1 pairing. Exempt: help-hook.sh and lint-sync.sh (see header).
-for s in skills/core/scripts/*.sh; do
-  b=$(basename "$s" .sh)
-  case "$b" in help-hook|lint-sync) continue;; esac
-  [ -f "skills/core/scripts/$b.ps1" ] || err "$b.sh has no $b.ps1 twin"
+# 8. no .ps1 anywhere: the scripts are bash-only by design (see header).
+#    A returning twin means someone re-created the hand-mirroring that
+#    shipped silently-missing checks three times.
+for f in skills/core/scripts/*.ps1; do
+  [ -e "$f" ] && err "PowerShell script is back: $f (scripts are bash-only)"
 done
-# 8b. ...and the lint twin must not come back by reflex. Every defect the
-#     mirror ever had was a sync defect: blocks silently absent, or placed
-#     after the exit so they never ran. One implementation cannot drift.
-[ -e "skills/core/scripts/lint-sync.ps1" ] \
-  && err "lint-sync.ps1 is back; the lint is bash-only by design (see header)"
 
 # 9. every tracked .json parses (a stray comma in marketplace.json breaks
 #    installation for every user, and no grep-based check would see it)
@@ -200,7 +201,8 @@ if [ "$IN_GIT" -eq 1 ]; then
   fi
   # 10b. the removed commands must not be routable again by accident:
   #      no protocol file, no wrapper, no help line, no dispatcher word.
-  for n in ask changelog guides onboarding be-review fe-review generate sync; do
+  for n in ask changelog guides onboarding be-review fe-review generate sync \
+         code-prefs; do
     [ -e "skills/$n" ] && err "removed skill skills/$n/ is back"
     [ -e "skills/core/references/protocols/$n.md" ] \
       && err "removed protocol $n.md is back"
@@ -211,14 +213,14 @@ if [ "$IN_GIT" -eq 1 ]; then
       && err "dispatcher.md still routes removed command $n"
   done
   # 10c. the index lives in the docs area and carries no stamp columns
-  for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1 \
+  for f in skills/core/scripts/init-config.sh \
            skills/core/references/core.md README.md; do
     grep -q '"index_file": "docs/capstone/00-index.md"' "$f" \
       || err "$f does not carry the docs-area index_file default"
   done
   grep -q 'Topic | File | Commit' skills/core/references/protocols/map.md \
     && err "map.md still specifies stamp columns in the index table"
-  for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
+  for f in skills/core/scripts/init-config.sh; do
     grep -q '00-index.md' "$f" || err "$f lost the root-DESIGN.md index migration"
     grep -q 'uiux-interview.md' "$f" || err "$f lost the design->uiux migration"
   done
@@ -233,7 +235,7 @@ fi
 #      a description only makes claims about wiring). Referential forms
 #      only: the bare words are legitimate prose ("design a feature" is
 #      one of groom's triggers, changelog.md is a real file).
-DEAD_NAMES='ask|changelog|guides|onboarding|be-review|fe-review|implementation|design|generate|sync'
+DEAD_NAMES='ask|changelog|guides|onboarding|be-review|fe-review|implementation|design|generate|sync|code-prefs'
 for f in skills/*/SKILL.md; do
   d=$(sed -n 's/^description: *//p' "$f")
   [ -n "$d" ] || continue
@@ -254,7 +256,7 @@ hit=$(grep -Eo "^\*\*($DEAD_NAMES)\*\*" README.md | head -1)
 #     ones say so, and the old opt-in is gone (core.md hard rule 5 is
 #     only as good as its sites)
 for n in groom plan implement mockup logic uiux architecture \
-         code-prefs stack build review \
+         standards stack build review \
          map doctor; do
   grep -q 'changelog entry' "skills/core/references/protocols/$n.md" \
     || err "protocol $n.md has no changelog-entry step"
@@ -299,17 +301,17 @@ done
 #     is part of the reference and must never reappear in the templates,
 #     and both initializers must carry the unignore migration for it
 for r in 'features/' '\*-interview.md' 'capstone.json' 'review.md' 'be-review.md' 'fe-review.md'; do
-  for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
+  for f in skills/core/scripts/init-config.sh; do
     grep -q "^$r$" "$f" || err "$f ignore template missing rule $r"
   done
 done
-for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
+for f in skills/core/scripts/init-config.sh; do
   grep -q "^changelog\.md$" "$f" && err "$f ignore template still lists changelog.md (it follows docs_in_git now)"
   grep -q "unignored: changelog.md" "$f" || err "$f lost the changelog.md unignore migration"
 done
 grep -q 'Local-only outputs' skills/core/references/core-authoring.md \
   || err "core-authoring.md has no Local-only outputs section"
-for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
+for f in skills/core/scripts/init-config.sh; do
   grep -q 'docs/design' "$f" || err "$f dropped the legacy docs/design migration"
 done
 
@@ -354,7 +356,7 @@ grep -q 'docs/capstone/review\.md' skills/core/references/protocols/review.md \
   || err "review.md does not name its output file"
 grep -q 'rewrites only its own section' skills/core/references/protocols/review.md \
   || err "review.md does not state that a one-sided run preserves the other side"
-for f in skills/core/scripts/init-config.sh skills/core/scripts/init-config.ps1; do
+for f in skills/core/scripts/init-config.sh; do
   grep -q '^review\.md$' "$f" || err "$f ignore template does not cover review.md"
 done
 grep -q 'sole opinionated output' skills/core/references/core.md \
@@ -426,6 +428,76 @@ for h in 'Phase 1 - inline recon' 'Phase 2 - deep-dive' 'Phase 3 - compose' \
     || err "map.md lost section: $h"
 done
 
+# 12i. TDD + YAGNI is the centre of gravity, not a plan-time footnote.
+#      The stages that DECIDE what will exist (architecture, stack) must
+#      climb the ladder too: a layer agreed at design time and a
+#      dependency agreed at stack time are code no later rung can stop.
+for n in architecture stack plan build implement review standards; do
+  grep -q 'code-craft\.md' "skills/core/references/protocols/$n.md" \
+    || err "protocol $n.md does not read code-craft.md (TDD + YAGNI)"
+done
+grep -q 'Climb the ladder first' skills/core/references/protocols/stack.md \
+  || err "stack.md lost its ladder gate before vendor research"
+grep -q 'YAGNI bounds the design' skills/core/references/protocols/architecture.md \
+  || err "architecture.md lost the rule that YAGNI bounds the design"
+# the override is deliberate or it is not an override
+grep -q 'deliberate and recorded' skills/core/references/code-craft.md \
+  || err "code-craft.md lost the explicit-override precedence rule"
+grep -q 'Overriding the craft file' skills/core/references/protocols/standards.md \
+  || err "standards.md has no place to record a craft-file override"
+# the ceiling marker names itself; ponytail is not a bundled skill
+grep -q 'ponytail:' skills/core/references/code-craft.md \
+  && err "code-craft.md still uses the ponytail: marker (use ceiling:)"
+
+# 12j. interviews challenge a bad decision, twice, then defer. The cap
+#      is the load-bearing half: without it a stage relitigates, and
+#      capstone's rule is that recorded user decisions win.
+grep -q '^## Pushback' skills/core/references/core.md \
+  || err "core.md lost the interview Pushback rule"
+grep -q 'never more than' skills/core/references/core.md \
+  || err "core.md's Pushback rule lost its two-round cap"
+grep -q 'Pushback rule' skills/core/references/interview.md \
+  || err "interview.md conduct rules do not point at core.md's Pushback rule"
+
+# 12k. README's jump-to nav must resolve. GitHub renders a dead anchor
+#      without complaint, so a renamed section breaks navigation
+#      silently - the same class as a stale SKILL.md description.
+for doc in README.md docs/commands.md; do
+  HEADS=$(grep -E '^#{2,3} ' "$doc" \
+    | sed -e 's/^#\{2,3\} //' -e 's/[`*_]//g' \
+          -e 's/[^[:alnum:][:space:]-]//g' \
+          -e 's/[[:space:]]\{1,\}/-/g' \
+    | tr '[:upper:]' '[:lower:]')
+  for a in $(grep -o '](#[^)]*)' "$doc" | sed -e 's/](#//' -e 's/)//'); do
+    printf '%s\n' "$HEADS" | grep -qx "$a" \
+      || err "$doc jump-to link #$a matches no heading"
+  done
+  grep -q '^\*\*Jump to:\*\*' "$doc" \
+    || err "$doc lost its jump-to nav"
+done
+
+# 12l. the licence is stated in seven places and must agree. Apache-2.0
+#      is load-bearing here: NOTICE is what makes a derivative point
+#      back at this repo (section 4(d)), so a manifest still claiming MIT
+#      would hand someone the wrong terms.
+grep -q 'Apache License' LICENSE || err "LICENSE is not the Apache License"
+grep -q 'Copyright 2026 Gent Bajko' LICENSE \
+  || err "LICENSE appendix still has the placeholder copyright line"
+[ -f NOTICE ] || err "NOTICE is missing (Apache-2.0 section 4(d) attribution)"
+grep -q 'github.com/GentBajko/capstone' NOTICE \
+  || err "NOTICE does not name the repository derivatives must reference"
+for f in .claude-plugin/plugin.json .codex-plugin/plugin.json \
+         .cursor-plugin/plugin.json .kimi-plugin/plugin.json; do
+  grep -q '"license": "Apache-2.0"' "$f" \
+    || err "$f does not declare license Apache-2.0"
+done
+grep -q 'files, Apache-2.0' README.md \
+  || err "README does not state the project licence as Apache-2.0"
+# every vendored work keeps its own notice
+for w in 'impeccable' 'design-taste-frontend' 'mattpocock/skills'; do
+  grep -q "$w" NOTICE || err "NOTICE lost the attribution for $w"
+done
+
 # 13. bash syntax of every .sh
 for s in skills/core/scripts/*.sh; do
   bash -n "$s" 2>/dev/null || err "bash syntax error in $s"
@@ -433,11 +505,11 @@ done
 
 
 # 14. the pipeline order is spelled identically everywhere it appears
-PIPE='mockup -> logic -> uiux -> architecture -> code-prefs -> stack -> build'
-for f in skills/core/scripts/help.sh skills/core/scripts/help.ps1 skills/start/SKILL.md; do
+PIPE='mockup -> logic -> uiux -> architecture -> standards -> stack -> build'
+for f in skills/core/scripts/help.sh skills/start/SKILL.md; do
   grep -qF "$PIPE" "$f" || err "$f missing the pipeline-order string"
 done
-grep -qF 'mockup → logic → uiux → architecture → code-prefs → stack → build' README.md \
+grep -qF 'mockup → logic → uiux → architecture → standards → stack → build' README.md \
   || err "README.md missing the pipeline-order string"
 
 [ "$FAIL" -eq 0 ] && echo "lint-sync: all invariants hold" || echo "lint-sync: FAILURES above"

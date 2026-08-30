@@ -9,7 +9,7 @@
   },
   "homepage": "https://github.com/GentBajko/capstone",
   "repository": "https://github.com/GentBajko/capstone",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "keywords": [
     "architecture",
     "documentation",

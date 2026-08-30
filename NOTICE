@@ -1,0 +1,39 @@
+Capstone
+Copyright 2026 Gent Bajko
+
+https://github.com/GentBajko/capstone
+
+This product is licensed under the Apache License, Version 2.0 (see
+LICENSE). Per section 4(d) of that License, any Derivative Work you
+distribute must include a readable copy of the attribution notices in
+this file, and per section 4(b) any file you modify must carry a
+prominent notice stating that you changed it.
+
+--------------------------------------------------------------------
+Third-party material vendored into this work
+--------------------------------------------------------------------
+
+skills/core/references/uiux-craft.md is a distillation, condensed and
+modified, of two works this project does not bundle or invoke:
+
+  impeccable
+  Copyright Paul Bakaus
+  Licensed under the Apache License, Version 2.0
+  https://github.com/pbakaus/impeccable
+
+  design-taste-frontend ("Taste")
+  Copyright (c) 2026 Leonxlnx
+  Licensed under the MIT License
+  https://github.com/Leonxlnx/taste-skill
+
+skills/core/references/arch-craft.md is adapted from:
+
+  mattpocock/skills
+  Copyright (c) Matt Pocock
+  Licensed under the MIT License
+  https://github.com/mattpocock/skills
+
+skills/core/references/code-craft.md is adapted from a skill referred
+to as "ponytail". Its author, canonical location, and license terms
+are not recorded here and should be established and stated in this
+file before relying on the attribution above being complete.

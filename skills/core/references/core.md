@@ -16,10 +16,9 @@ installation, not per project: the plugin's SessionStart hook runs the
 idempotent initializer from the `core` skill's `scripts/` directory
 (`init-config.sh --global` via bash) on the first session after
 install. When the file is missing anyway (an agent without hook
-support), run that initializer yourself, `init-config.sh --global`
-via bash (macOS/Linux/Git Bash) or `init-config.ps1 -Global` via
-powershell (Windows); if neither shell is available, write this
-template yourself:
+support), run that initializer yourself: `init-config.sh --global`
+via bash, which on Windows means Git Bash. If bash is unavailable,
+write this template yourself:
 
 ```json
 {
@@ -64,7 +63,7 @@ asking when ambiguous.
 `docs_in_git` (`"commit" | "ignore" | "ask"`) pre-answers the
 commit-or-gitignore question **for the factual reference only**: the
 index and the topic chapters, plus `logic/`, `mockup/`, `uiux/`,
-`code-prefs.md`, and `changelog.md`.
+`standards.md`, and `changelog.md`.
 `language` sets the generated docs' language. The user can change any
 key by editing the files or just telling you.
 
@@ -90,8 +89,9 @@ docs serve AI sessions and stay dense per style.md at every level:
 4. **engineer**: terse; jargon unexplained; ask for numbers directly
    (percentiles, RTO/RPO); rationale only on request.
 5. **architect**: maximally terse; lead with trade-off matrices;
-   challenge weak or inconsistent answers; the user drives, you
-   record.
+   assume the vocabulary; the user drives, you record. (Challenging a
+   weak answer is not a level-5 behavior: see Pushback below, which
+   every level does, differing only in wording.)
 
 ## `teaching_mode` (boolean, default `false`)
 
@@ -217,7 +217,7 @@ Five bounds on it:
   empty-repo stop: no source files, no entry points, no manifests),
   say so and stop. Never loop.
 - **The greenfield stages are exempt** (`mockup`, `logic`, `uiux`,
-  `architecture`, `code-prefs`, `stack`, `build`): they build the
+  `architecture`, `standards`, `stack`, `build`): they build the
   reference from interviews rather than reading one, and their
   prerequisites are upstream *interviews*, not the index. `uiux`
   without a mockup still points at `mockup`; `build` without a
@@ -334,11 +334,66 @@ straight to `formalized` once every listed scenario is `written` or
 `dropped` and the index row exists. The pipeline runner
 (`protocols/start.md`) keys stage completion on these rules.
 
+## Pushback: challenge twice, then it is their call
+
+**An interview that records a bad decision without saying so has
+failed at its job.** Every interview stage challenges an answer that
+looks wrong - but on evidence, never on taste, and never more than
+twice.
+
+**Grounds.** Push back only when you can name the conflict:
+
+- it contradicts a decision already recorded in this project (cite the
+  file and `§Q`);
+- it contradicts a craft file the stage answers to (`code-craft.md`'s
+  ladder or TDD cycle, `arch-craft.md`, `uiux-craft.md`), which for
+  the ladder is the case core.md's precedence rule calls an override;
+- it contradicts an earlier answer in this same interview;
+- it cannot meet a number the user already gave (the stated load,
+  budget, deadline, or compliance constraint);
+- it is factually broken: an incompatible license, a deprecated or
+  unmaintained pick, a pattern that cannot do what they just asked of
+  it.
+
+"I would have chosen differently" is not grounds. Neither is a
+generic best practice with no stated consequence here.
+
+**The two rounds.**
+
+1. **First.** Say what breaks, concretely and in one short turn: the
+   specific consequence, where it conflicts, and the alternative you
+   would take instead. Then ask again.
+2. **Second, only with a new argument.** If they keep their answer,
+   push back once more *only if you have something they have not
+   heard* - a consequence you did not raise, or a fact their reply
+   revealed. Repeating the first objection louder is not a second
+   round; if you have nothing new, skip straight to accepting.
+
+**Then it is theirs.** After two rounds the user's answer stands, and
+you take it without further argument, sulking, or hedged compliance.
+Do not reopen it later in the interview, and do not relitigate it at
+the formalization gate.
+
+**Record both sides.** The `### Q<n>` entry records the decision *and*
+the objection: what you raised, what they chose, and the reason they
+gave if they gave one. The stage's changelog entry gets one bullet for
+it. This is the whole point of pushing back - a later reader, human or
+agent, can tell a considered trade-off from an oversight, and `review`
+will not re-raise a question already settled on purpose.
+
+Vocabulary follows `expertise`: level 1 hears the consequence in plain
+words ("that would slow down every page for your users - want me to
+use X instead?"), level 5 gets the trade-off flatly. The level never
+changes *whether* you push back, only how it sounds. This is
+conversation, never the generated docs: the outputs stay factual per
+hard rule 1, recording the decision and that it was challenged, never
+grading it.
+
 ## Voice per output
 
 `map check` is facts only, as are the changelog entries every
 stage appends, `review`'s among them.
-`review` is the sole opinionated output. `code-prefs`, `logic`,
+`review` is the sole opinionated output. `standards`, `logic`,
 `uiux`, `stack`, and `groom`'s `spec.md` are normative but only
 record the user's own stated decisions (`logic` and `uiux` in
 extraction mode are descriptive like the chapters: observed fact, hard

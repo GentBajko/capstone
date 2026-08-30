@@ -10,7 +10,7 @@ chapters, then the frontend token, component, and route sources.
 Sits between `logic` and `architecture`: turns the mockup's screens
 and the logic's rules into a committed frontend design (direction,
 design system, one design chapter per screen) that `stack` honors and
-`build` implements. Docs only, never code. Like `code-prefs`, the
+`build` implements. Docs only, never code. Like `standards`, the
 output is normative but records only decisions the user has confirmed.
 
 ## Method
@@ -55,7 +55,7 @@ If the mockup's `surfaces` frontmatter records no visual surface
 (`cli`/`api`/`none` only), there is nothing to design: write
 `uiux-interview.md` with `status: formalized` and `skipped: no-ui`
 in its frontmatter, append the changelog entry (key
-`design/skipped@<stamp>`, recording the surfaces that made it moot)
+`uiux/skipped@<stamp>`, recording the surfaces that made it moot)
 and hand back; inside `start` the pipeline continues.
 `docs/capstone/logic/` is read when present; absent or partial,
 proceed and record in the interview file that unhappy-path styling
@@ -82,7 +82,7 @@ what a slow request renders, what is remembered between visits), and
 Every file carries `paths_covered` (the frontend globs it was read
 from) so `map` refreshes it as the code moves. Voice: descriptive;
 this mode records what is, never what should be; the changelog key is
-`design/all@<stamp>` (no interview to number). The greenfield
+`uiux/all@<stamp>` (no interview to number). The greenfield
 interview phases below do not run.
 
 **Invoked by `map`** (its design-coverage steps):
@@ -248,7 +248,7 @@ implements, anything invented marked "assumed" inline):
   "assumed" item collected for the user to review.
 
 Only after every file is on disk, append the changelog entry per
-core.md's ledger (key `design/all@Q<n>`, `<n>` the highest `### Q<n>`
+core.md's ledger (key `uiux/all@Q<n>`, `<n>` the highest `### Q<n>`
 in `uiux-interview.md`), recording the committed direction, the
 alternates and canon declined, the dial and token decisions, the
 per-screen coverage, and what the gate left vague. Add the Companion

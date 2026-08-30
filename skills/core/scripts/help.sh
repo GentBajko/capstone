@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Prints capstone usage. Single source of truth for the help text.
-# Keep in sync with help.ps1 (same text; lint-sync.sh asserts it).
+# Bash only: no PowerShell twin (lint-sync.sh check 8 enforces that).
 cat <<'EOF'
 capstone - codebase architecture reference generator
 
 Usage: /capstone:<command>
 
   start                Run the greenfield pipeline stage by stage:
-                       mockup -> logic -> uiux -> architecture -> code-prefs -> stack -> build
+                       mockup -> logic -> uiux -> architecture -> standards -> stack -> build
                        (resumes at the first incomplete stage; also
                         triggers on a bare "capstone" prompt)
 
@@ -29,7 +29,7 @@ Usage: /capstone:<command>
   uiux                 How the UI looks and the UX behaves, from the mockup + logic
                        -> docs/capstone/uiux/
   architecture         Greenfield: exhaustive architecture interview -> prescriptive reference
-  code-prefs           Code-preferences interview -> normative code-prefs.md
+  standards            Coding-standards interview -> normative standards.md
   stack                Research libraries/services per capability, you pick -> 05-dependencies.md
   stack refresh        Re-vet the recorded picks: maintenance, license, pricing deltas
   build                Implementation plan (backend then frontend), gate, then working code

@@ -13,8 +13,8 @@ wherever it stopped:
 3. `uiux` → `docs/capstone/uiux/` (+ `uiux-interview.md`)
 4. `architecture` → the prescriptive reference
    (+ `architecture-interview.md`)
-5. `code-prefs` → `docs/capstone/code-prefs.md`
-   (+ `code-prefs-interview.md`)
+5. `standards` → `docs/capstone/standards.md`
+   (+ `standards-interview.md`)
 6. `stack` → the researched, user-picked stack in `05-dependencies.md`
    (+ `stack-interview.md`)
 7. `build` → `docs/capstone/implementation.md`, then working code
@@ -59,7 +59,7 @@ wherever it stopped:
      end the pipeline run.
 5. Run the first non-done stage by executing its protocol file
    (`mockup.md`, `logic.md`, `uiux.md`, `architecture.md`,
-   `code-prefs.md`, `stack.md`, `build.md`) exactly, including its
+   `standards.md`, `stack.md`, `build.md`) exactly, including its
    own formalization gate. Do not blend stages.
 6. When a stage formalizes, announce it in one line and continue to
    the next ("mockup done; moving to logic; say stop to pause").

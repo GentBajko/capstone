@@ -1,12 +1,32 @@
 # Code craft - TDD + YAGNI for every line this plugin writes
 
-Read by `protocols/plan.md`, `protocols/build.md`, and
-`protocols/implement.md`, the stages that write implementation plans
-and source code. Adapted from the ponytail skill. Precedence: the
-project's `code-prefs.md` records the user's own decisions and wins
-wherever the two conflict; this file governs everything code-prefs
-leaves open. Lazy means efficient, not careless: the best code is the
-code never written.
+**The discipline every stage that decides what gets built answers
+to.** Read by `protocols/architecture.md` and `protocols/stack.md`,
+which decide what will exist, and by `protocols/plan.md`,
+`protocols/build.md`, and `protocols/implement.md`, which write it.
+`review` judges against it. A layer agreed at design time and a
+dependency agreed at stack time are both code the ladder never gets
+to stop later, which is why the ladder runs there too, before a line
+exists. Adapted from the ponytail skill.
+
+**Precedence, and its one limit.** `standards.md` records the user's
+own decisions and outranks this file: capstone's rule everywhere is
+that your recorded decisions beat generic best practice. But the
+override must be **deliberate and recorded** - a standards rule that
+names what it overrides wins, while a silent conflict resolves to the
+ladder. "The user might not have wanted this" is not an override.
+This file governs everything standards leaves open.
+
+**And the user can always overrule it live.** The ladder is the
+position you argue from, never a veto: a rung that says "defer this"
+is a recommendation with a reason, and core.md's Pushback rule caps
+you at two rounds. If the user wants the layer, the dependency, or the
+abstraction built now anyway, build it - and record the rung you
+climbed and their answer, so the decision reads as considered rather
+than careless.
+
+Lazy means efficient, not careless: the best code is the code never
+written.
 
 ## The ladder
 
@@ -40,9 +60,9 @@ broken.
   in the wrong place is a second bug.
 - Two same-size options: take the one correct on edge cases. Less
   code, never a flimsier algorithm.
-- Mark deliberate ceilings with a `ponytail:` comment naming the
-  ceiling and upgrade path
-  (`# ponytail: global lock, per-account locks if throughput matters`).
+- Mark deliberate ceilings with a `ceiling:` comment naming the limit
+  and the upgrade path
+  (`# ceiling: global lock, per-account locks if throughput matters`).
 - Comments state only constraints the code can't show. No narration,
   no doc-comments nobody asked for.
 
@@ -82,14 +102,14 @@ behind. Trivial one-liners need no test: YAGNI applies to tests too.
 
 Understanding the problem (read fully, then be lazy); input validation
 at trust boundaries; error handling that prevents data loss; security;
-accessibility basics; typing per `code-prefs.md` (annotations, enums,
+accessibility basics; typing per `standards.md` (annotations, enums,
 Protocols are how minimal code is written, never bloat to cut);
 anything the spec or the user explicitly requires: the user insisting
 on the full version ends the argument.
 
 ## Git: branches, commits, and their density
 
-The default for every stage that writes code. `code-prefs.md`'s
+The default for every stage that writes code. `standards.md`'s
 Process domain records the user's own conventions and wins wherever
 the two conflict; a repo whose existing history plainly follows
 another convention wins too: match what `git log` shows rather than
