@@ -59,11 +59,11 @@ with the code answering instead of the user:
 - Present each draft; only the user's confirmation or correction
   makes it normative. Corrections are recorded as `### Q<n>` entries
   like any answer. Extraction outputs carry `paths_covered` (the
-  globs the scenario's rules were read from), so `sync` refreshes
+  globs the scenario's rules were read from), so `map` refreshes
   them as code moves; interview-derived files stay stamp-only and are
   absorbed by `implement` instead.
 
-**Invoked by `generate` or `sync`** (their logic-coverage steps):
+**Invoked by `map`** (its logic-coverage steps):
 run extraction exactly as above, scoped to the missing scenarios,
 with these differences: the files are written directly as descriptive
 observations (hard rule 1; no per-scenario confirmation gate), the
@@ -126,6 +126,6 @@ pending scenarios as in-progress.
 screen's states and unhappy paths. `architecture` reads
 `docs/capstone/logic/` to pre-fill models (entities, invariants,
 consistency needs), data-flow (lifecycles), and quality-attribute
-scenarios, never re-asking what a scenario file answers. `sync` keeps
+scenarios, never re-asking what a scenario file answers. `map` keeps
 extraction-mode files current and extracts scenarios the map is
 missing.

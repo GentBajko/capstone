@@ -6,10 +6,10 @@ moved. For new projects, an interview pipeline that designs the whole
 thing before building it.
 
 ```text
-existing repo ──▶ generate ──▶ docs/capstone/ index + 8 chapters ──▶ sync keeps them current
-                                                            ▲
+existing repo ──▶ map ──▶ docs/capstone/ index + 8 chapters ──▶ map keeps them current
+                                                                ▲
 new project ──▶ mockup → logic → uiux → architecture → code-prefs → stack → build
-                                                                              │
+                                                                                │
 feature idea ──▶ groom → plan → implement ──▶ shipped code, absorbed into docs ◀┘
 ```
 
@@ -69,8 +69,8 @@ Marketplaces → capstone-marketplace → Enable auto-update.
 | Command | What it does |
 | --- | --- |
 | `/capstone:start` | The pipeline: mockup → logic → uiux → architecture → code-prefs → stack → build, resuming at the first unfinished stage |
-| `/capstone:generate` | Build the reference from scratch (`rebuild` forces, a topic name targets one chapter) |
-| `/capstone:sync` | Refresh what drifted and extract the `logic/` scenarios and `uiux/` surfaces the map is missing; `sync check` is the read-only trust report |
+| `/capstone:map` | Build the reference, or refresh only what drifted — no docs yet builds them, existing docs get just the stale files rewritten (`rebuild` forces a full rewrite, a topic name targets one chapter) |
+| `/capstone:map check` | Read-only trust report: staleness, pointer drift, absorption drift, logic and design coverage, stack re-vetting. Writes nothing |
 | `/capstone:doctor` | Diagnose and repair the docs area: torn writes, index drift, voided approvals, absorption gaps |
 | `docs/capstone/changelog.md` | Not a command: the append-only ledger every writing command records itself in, before it sets its done marker |
 | `/capstone:review [be\|fe]` | The opt-in judgment, into one `review.md`: no argument reviews both sides, `backend` takes architecture and `frontend` grades the UI against your own design docs |
@@ -92,7 +92,7 @@ Marketplaces → capstone-marketplace → Enable auto-update.
 <details>
 <summary>What do the generated docs look like?</summary>
 
-`/capstone:generate` produces a `00-index.md`, eight numbered chapters
+`/capstone:map` produces a `00-index.md`, eight numbered chapters
 beside it in `docs/capstone/`, and a `logic/` folder mapping the
 observed business logic scenario by scenario:
 
@@ -108,14 +108,14 @@ observed business logic scenario by scenario:
 ```
 
 Everything is facts with `file:line` citations, never advice.
-`/capstone:sync` refreshes only what drifted and extracts any
-business-logic scenarios the map is missing; `sync check` reports
+A later `/capstone:map` refreshes only what drifted and extracts any
+business-logic scenarios the map is missing; `map check` reports
 staleness, citation drift, logic-coverage gaps, and unabsorbed
 features without writing a byte. `/capstone:doctor` repairs the docs
 area's own wounds. Every command declares exactly what it reads before
 acting, so re-runs don't burn tokens re-exploring what the docs
 already know, and a command that needs the reference and finds none
-builds it first instead of sending you off to run `generate`.
+builds it first instead of sending you off to run another command.
 
 </details>
 
@@ -150,7 +150,7 @@ chapter `stack` honors, one file per screen for `build` to implement.
 **architecture**. The big interview. Done only when every section of
 the future docs is answerable from your recorded decisions. Writes
 the same eight chapters, marked prescriptive; once code exists,
-`sync` replaces intent with observation.
+`map` replaces intent with observation.
 
 **code-prefs**. How you want code written: typing strictness,
 library versus hand-rolled, error handling, what an AI must never do
@@ -245,12 +245,13 @@ stay local via a generated `.gitignore`. `changelog.md` is the one
 exception and is always committed: `implement` deletes a feature's
 folder once its ledger entry is written, so the ledger is the only
 surviving record of why the feature was built that way.
-`subagent_threshold` is the source-file count above which `generate`
-fans out subagents. Project-scoped state lives in an optional
+`subagent_threshold` is the source-file count above which `map`
+fans out subagents, and above which an unrequested full build asks
+first. Project-scoped state lives in an optional
 `docs/capstone/capstone.json`, created only when there is something to
 record; any global key set there overrides the global file for that
 repo, `pipeline` records the one-time
-pipeline-or-generate choice on repos that already have code, and
+pipeline-or-map choice on repos that already have code, and
 `workspaces` gives each monorepo workspace its own docs area with the
 root project's `00-index.md` as an index-of-indexes.
 
@@ -295,7 +296,7 @@ npx skills add GentBajko/capstone
 { "plugin": ["capstone@git+https://github.com/GentBajko/capstone.git"] }
 ```
 
-Commands come out namespaced (`/capstone:generate`). For a bare
+Commands come out namespaced (`/capstone:map`). For a bare
 `/capstone` in Claude Code, drop this in `~/.claude/commands/capstone.md`:
 
 ```markdown
@@ -305,7 +306,7 @@ argument-hint: [command] [args...]
 ---
 
 No arguments: invoke the capstone:start skill. If the first argument
-matches a capstone skill (generate, sync, doctor, review,
+matches a capstone skill (map, doctor, review,
 mockup, logic, uiux, architecture, code-prefs,
 stack, build, groom, plan, implement, feature, start, help),
 invoke capstone:<that skill> with the remaining arguments.
@@ -318,9 +319,17 @@ ARGUMENTS: $ARGUMENTS
 <details>
 <summary>CI and rough edges</summary>
 
-Copy `templates/capstone-sync-check.yml` into `.github/workflows/`,
+Copy `templates/capstone-map-check.yml` into `.github/workflows/`,
 add an `ANTHROPIC_API_KEY` secret, and every PR fails when the
 reference is stale.
+
+**Upgrading from 4.x:** `generate` and `sync` merged into `map`, and
+the verdict line the CI job greps changed from `SYNC CHECK:` to
+`MAP CHECK:`. An old `capstone-sync-check.yml` fails loudly with
+"no SYNC CHECK verdict found" rather than passing silently, but
+replace it with the template above. Existing `generate/` and `sync/`
+keys in `changelog.md` are history and stay as they are; nothing
+reads them.
 
 The zero-token help trick is Claude Code only. The PowerShell twins
 run in CI on a real Windows runner, but broader Windows field-testing

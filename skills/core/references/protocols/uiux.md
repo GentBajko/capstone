@@ -80,12 +80,12 @@ code actually implements (what confirms, what undoes, what retries,
 what a slow request renders, what is remembered between visits), and
 `screens/NN-<route>.md` per confirmed surface.
 Every file carries `paths_covered` (the frontend globs it was read
-from) so `sync` refreshes it as the code moves. Voice: descriptive;
+from) so `map` refreshes it as the code moves. Voice: descriptive;
 this mode records what is, never what should be; the changelog key is
 `design/all@<stamp>` (no interview to number). The greenfield
 interview phases below do not run.
 
-**Invoked by `generate` or `sync`** (their design-coverage steps):
+**Invoked by `map`** (its design-coverage steps):
 run the extraction above, scoped to the surfaces no design chapter
 claims, with these differences: the files are written directly as
 descriptive observations (hard rule 1; no confirmation gate), the

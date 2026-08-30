@@ -77,7 +77,7 @@ writes under `<docs_dir>` must be listed there:
   filenames (`01-architecture.md` ... `08-glossary.md`, so the folder
   reads in order even without the index), plus `logic/`'s per-scenario
   files, one row per file under the `logic` topic name (the same
-  split-topic mechanic generate.md uses for a monorepo's per-subsystem
+  split-topic mechanic map.md uses for a monorepo's per-subsystem
   chapters). Topics that do not apply get a row naming the reason:
   an absence is a fact, and no file can record it.
 - **Companion docs**, a `| File | What it is |` table: everything else
@@ -86,7 +86,7 @@ writes under `<docs_dir>` must be listed there:
 
 **The index carries no stamps.** Freshness lives in each file's own
 frontmatter (`generated_at_commit`, `generated_date`,
-`capstone_version`, `paths_covered`), which is what `sync` reads;
+`capstone_version`, `paths_covered`), which is what `map` reads;
 copying it into the
 index would only create a second copy to drift. The index answers what
 exists and where, never how fresh it is.

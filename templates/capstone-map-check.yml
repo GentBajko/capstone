@@ -1,12 +1,12 @@
 # Capstone reference trust check, a TEMPLATE for your repo's CI.
 # Copy into .github/workflows/, add an ANTHROPIC_API_KEY repo secret.
 # Fails the job when the reference is stale, by parsing the report's
-# final "SYNC CHECK:" verdict line (sync.md guarantees that line).
-name: capstone-sync-check
+# final "MAP CHECK:" verdict line (map.md guarantees that line).
+name: capstone-map-check
 on:
   pull_request:
 jobs:
-  sync-check:
+  map-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,15 +17,15 @@ jobs:
           npm install -g @anthropic-ai/claude-code
           claude plugin marketplace add GentBajko/capstone
           claude plugin install capstone@capstone-marketplace
-      - name: Sync check
+      - name: Map check
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          out=$(claude -p "/capstone:sync check" 2>&1) || true
+          out=$(claude -p "/capstone:map check" 2>&1) || true
           printf '%s\n' "$out"
-          line=$(printf '%s\n' "$out" | grep -E '^SYNC CHECK: ' | tail -1)
-          if [ -z "$line" ]; then echo "no SYNC CHECK verdict found"; exit 1; fi
+          line=$(printf '%s\n' "$out" | grep -E '^MAP CHECK: ' | tail -1)
+          if [ -z "$line" ]; then echo "no MAP CHECK verdict found"; exit 1; fi
           case "$line" in
-            "SYNC CHECK: current") exit 0 ;;
+            "MAP CHECK: current") exit 0 ;;
             *) echo "reference stale: $line"; exit 1 ;;
           esac

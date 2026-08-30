@@ -62,7 +62,7 @@ Update the index; then set `status: formalized`. On a repo with no code the chap
 `mode: prescriptive`; on a repo that already has code, write the picks
 into the existing descriptive chapter as decision facts ("picked
 (stack-interview.md §Q4), not yet installed") without flipping its
-mode. Either way `sync`'s refresh protocol preserves
+mode. Either way `map`'s refresh protocol preserves
 unimplemented picks from `stack-interview.md`: the research never
 vanishes because the code hasn't caught up.
 
@@ -75,6 +75,6 @@ each), and records re-confirmations or changes as new `§Q` entries,
 updating the chapter rows touched. Changelog key `stack/refresh@Q<n>`.
 It never re-opens the capability list or the uiux stage's
 commitments; a changed pick flows into `05-dependencies.md` like any
-formalization. `sync check`'s dependency section is what suggests it.
+formalization. `map check`'s dependency section is what suggests it.
 
 **Consumers:** `build` reads this chapter as its bill of materials.

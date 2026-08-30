@@ -424,7 +424,7 @@ values live inline, and that is what gets recorded, with examples. Do
 not reconstruct a design system that the code does not have.
 
 Every extracted file carries `paths_covered` (the frontend globs it
-was read from) so `sync` refreshes it as the code moves. The direction
+was read from) so `map` refreshes it as the code moves. The direction
 contract (§5) is **not** invented for an incumbent design: record the
 world as found, and leave the contract blocks out rather than
 back-filling a thesis nobody chose.

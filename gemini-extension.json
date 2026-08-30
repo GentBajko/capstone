@@ -1,6 +1,6 @@
 {
   "name": "capstone",
-  "description": "Architecture reference docs: a docs/capstone/ index plus topic files stamped to commits, kept current by generate/sync (formerly docs/check-docs), plus doctor/review, a greenfield pipeline from product mockup to running code with a frontend-design stage, and a doc-grounded feature chain.",
-  "version": "4.1.0",
+  "description": "Architecture reference docs: a docs/capstone/ index plus topic files stamped to commits, built and kept current by one command, map, plus doctor/review, a greenfield pipeline from product mockup to running code with a frontend-design stage, and a doc-grounded feature chain.",
+  "version": "5.0.0",
   "contextFileName": "GEMINI.md"
 }

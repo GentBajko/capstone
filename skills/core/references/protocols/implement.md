@@ -165,7 +165,7 @@ parallel, one reviewer per lens, each reading the full diff.
 Entered when Phase C goes dry.
 
 1. The spec's Reference impact chapters are now stale by construction:
-   run the `sync` refresh on them so the reference records what was
+   run the `map` refresh on them so the reference records what was
    actually built, divergences included.
 2. **Absorb the spec**: `features/` is local-only, so this is where
    its knowledge becomes durable. Per the spec's Reference impact
