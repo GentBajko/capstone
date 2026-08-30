@@ -186,6 +186,10 @@ done
 #    installation for every user, and no grep-based check would see it)
 if [ "$IN_GIT" -eq 1 ] && command -v python3 >/dev/null 2>&1; then
   for f in $(git ls-files '*.json'); do
+    # git ls-files still lists a tracked file deleted from the worktree;
+    # that is a pending deletion, not a syntax error, and reporting it as
+    # "invalid JSON" sends the reader hunting for a stray comma.
+    [ -f "$f" ] || continue
     python3 -c 'import json,sys; json.load(open(sys.argv[1]))' "$f" 2>/dev/null \
       || err "invalid JSON: $f"
   done
@@ -496,6 +500,27 @@ grep -q 'files, Apache-2.0' README.md \
 # every vendored work keeps its own notice
 for w in 'impeccable' 'design-taste-frontend' 'mattpocock/skills'; do
   grep -q "$w" NOTICE || err "NOTICE lost the attribution for $w"
+done
+
+# 12m. every SKILL.md frontmatter must be valid YAML. Installers parse
+#      it: `gh skill install` refused a skill outright with "invalid
+#      frontmatter YAML" and left an empty directory behind, so a plain
+#      scalar containing ": " breaks installation while every grep-based
+#      check here still passes. Prefer ruby (macOS ships psych); fall
+#      back to python's yaml, then to a targeted scan for the traps.
+for f in skills/*/SKILL.md; do
+  fm=$(sed -n '/^---$/,/^---$/p' "$f" | sed '1d;$d')
+  if command -v ruby >/dev/null 2>&1; then
+    printf '%s\n' "$fm" | ruby -ryaml -e 'YAML.safe_load(STDIN.read)' >/dev/null 2>&1 \
+      || err "$f frontmatter is not valid YAML"
+  elif command -v python3 >/dev/null 2>&1 \
+       && python3 -c 'import yaml' >/dev/null 2>&1; then
+    printf '%s\n' "$fm" | python3 -c 'import yaml,sys; yaml.safe_load(sys.stdin)' >/dev/null 2>&1 \
+      || err "$f frontmatter is not valid YAML"
+  else
+    printf '%s\n' "$fm" | grep -q ': .*: ' \
+      && err "$f frontmatter has a plain scalar containing \": \" (breaks YAML)"
+  fi
 done
 
 # 13. bash syntax of every .sh
