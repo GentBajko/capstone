@@ -5,12 +5,14 @@ every session. Stamped to commits, refreshed only where the code
 moved. For new projects, an interview pipeline that designs the whole
 thing before building it.
 
-```text
-existing repo ──▶ map ──▶ docs/capstone/ index + 8 chapters ──▶ map keeps them current
-                                                                ▲
-new project ──▶ mockup → logic → uiux → architecture → code-prefs → stack → build
-                                                                                │
-feature idea ──▶ groom → plan → implement ──▶ shipped code, absorbed into docs ◀┘
+```mermaid
+flowchart LR
+  R["existing repo"] --> M["map"]
+  P["new product"] --> S["start<br/>mockup · logic · uiux · architecture<br/>code-prefs · stack · build"]
+  F["feature idea"] --> C["feature<br/>groom · plan · implement"]
+  M --> D[("docs/capstone/<br/>index · 8 chapters<br/>logic/ · uiux/")]
+  S --> D
+  C --> D
 ```
 
 Works in Claude Code, Copilot CLI, Gemini CLI, Antigravity, and
@@ -150,6 +152,10 @@ output, prerequisite, ledger key, and the shared mechanics.
 ---
 
 ## The greenfield pipeline
+
+```text
+mockup → logic → uiux → architecture → code-prefs → stack → build
+```
 
 Type `capstone` and it runs the stages in order, resuming wherever you
 stopped. Every answer is written to disk before the next question, so
