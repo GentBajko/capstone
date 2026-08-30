@@ -202,9 +202,11 @@ user, shared by every project:
 `expertise` (1 to 5) is asked once and saved. `teaching_mode: true`
 makes capstone narrate and teach as it works, at any expertise level.
 `docs_in_git` governs
-the factual reference, `changelog.md` included; interviews,
-`features/`, and the two reviews stay local via a generated
-`.gitignore`.
+the factual reference; interviews, `features/`, and the two reviews
+stay local via a generated `.gitignore`. `changelog.md` is the one
+exception and is always committed: `implement` deletes a feature's
+folder once its ledger entry is written, so the ledger is the only
+surviving record of why the feature was built that way.
 `subagent_threshold` is the source-file count above which `generate`
 fans out subagents. Project-scoped state lives in an optional
 `docs/capstone/capstone.json`, created only when there is something to

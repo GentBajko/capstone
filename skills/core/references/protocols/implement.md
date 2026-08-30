@@ -183,16 +183,23 @@ Entered when Phase C goes dry.
    none, so the key is stable across a resumed review loop).
    **Step 6 deletes the feature folder, so this entry is all that
    survives it: write it to be read without the spec beside it.**
-   Record the feature in one line (what it does, for whom), the chosen
-   approach with the alternatives the spec rejected and why, the
-   out-of-scope rulings, the completed task list, the files the
-   `base_commit`..HEAD diff touched, the chapters refreshed in step 1,
-   the scenario docs absorbed in step 2 (one bullet per file, naming
-   what the feature added or amended there), and the review-loop counts
-   from `review-ledger.md` (rounds run, findings confirmed, fixed,
-   refuted, and the dry verdict). None of that is recoverable once the
-   folder is gone; the shipped behavior lives in `logic/` and the
-   chapters, but the reasoning lives only here.
+   Bullets only, per the ledger's entry format. This is the longest
+   entry any stage writes and still never a narrative:
+
+   - **What**: the feature in one line, and for whom.
+   - **Approach**: the one taken; then one bullet per alternative the
+     spec rejected, each with its reason.
+   - **Out of scope**: one bullet per ruling.
+   - **Tasks**: the completed list, one line each.
+   - **Diff**: the paths `base_commit`..HEAD touched.
+   - **Chapters refreshed** (step 1) and **scenarios absorbed**
+     (step 2): one bullet per file, naming what it gained or amended.
+   - **Review loop**: rounds run, findings confirmed / fixed /
+     refuted, and the dry verdict, from `review-ledger.md`.
+
+   None of that is recoverable once the folder is gone; the shipped
+   behavior lives in `logic/` and the chapters, but the reasoning
+   lives only here.
 4. Only now record `implemented: true` in the feature-interview
    frontmatter: the chain's done marker, written after the refresh
    and the absorption for the same reason `formalized` waits for

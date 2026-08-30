@@ -226,6 +226,23 @@ else
   echo "note: dead-name check skipped (not a git checkout)"
 fi
 
+# 10d. a removed or renamed command must not be advertised in any skill
+#      description. The description IS the routing signal - an agent
+#      picks a command by reading it - so a dead name there is a routing
+#      defect, not a typo, and 10b cannot see it (it checks wiring, and
+#      a description only makes claims about wiring). Referential forms
+#      only: the bare words are legitimate prose ("design a feature" is
+#      one of groom's triggers, changelog.md is a real file).
+DEAD_NAMES='ask|changelog|guides|onboarding|be-review|fe-review|implementation|design'
+for f in skills/*/SKILL.md; do
+  d=$(sed -n 's/^description: *//p' "$f")
+  [ -n "$d" ] || continue
+  hit=$(printf '%s' "$d" \
+    | grep -Eo "\(($DEAD_NAMES)\)|use ($DEAD_NAMES)[^a-z]" | head -1)
+  [ -n "$hit" ] \
+    && err "$f description advertises a removed/renamed command: $hit"
+done
+
 # 11. every writing protocol carries its changelog pointer, the exempt
 #     ones say so, and the old opt-in is gone (core.md hard rule 5 is
 #     only as good as its sites)
@@ -244,6 +261,31 @@ fi
 # written by every stage, but nothing may route to a protocol for it
 grep -q 'Merges:' skills/core/references/core.md \
   || err "core.md lost the changelog merge-resolution rule"
+# 11b. the ledger's durability, shape, and bound. implement deletes each
+#      feature folder on the strength of its entry, so an untracked or
+#      rotated-away ledger is permanent data loss, and a rambling one is
+#      unreadable at the moment it is the only copy left.
+grep -q 'always committed' skills/core/references/core.md \
+  || err "core.md lost the always-committed rule for changelog.md"
+grep -q 'ledger is always committed' skills/core/references/core-authoring.md \
+  || err "core-authoring.md does not exempt changelog.md from docs_in_git"
+grep -q 'bullets only' skills/core/references/core.md \
+  || err "core.md lost the bullets-only rule for changelog entries"
+grep -q 'Rotation:' skills/core/references/core.md \
+  || err "core.md lost the changelog rotation rule"
+grep -q 'keys never leave' skills/core/references/core.md \
+  || err "core.md lost the rule keeping archived changelog keys in place"
+grep -q 'One writer at a time' skills/core/references/core.md \
+  || err "core.md lost the single-writer note"
+grep -q 'Ledger size' skills/core/references/protocols/doctor.md \
+  || err "doctor.md has no ledger-size check to perform the rotation"
+# 11c. the version stamp: template drift sees a section go missing, never
+#      one whose meaning moved, so migrations need to know what wrote a file
+for f in skills/core/references/core.md skills/core/references/core-authoring.md \
+         skills/core/references/protocols/sync.md; do
+  grep -q 'capstone_version' "$f" \
+    || err "$f does not carry the capstone_version stamp"
+done
 
 # 12. the local-only ignore list is identical in both initializers and
 #     documented in core.md (hand-synced across three files); changelog.md

@@ -186,8 +186,19 @@ Every subcommand reads in the same order, before doing anything else:
    justifying the read.
 
 Everything a subcommand writes carries the topic-file frontmatter
-stamps (`generated_at_commit`, `generated_date`, plus `paths_covered`
-where the refresh protocol applies; date-only outside git).
+stamps (`generated_at_commit`, `generated_date`, `capstone_version`,
+plus `paths_covered` where the refresh protocol applies; date-only
+outside git).
+
+`capstone_version` is this plugin's own version, read once per run
+from its manifest (`.claude-plugin/plugin.json` at the plugin root,
+two levels above the running skill's directory; every harness
+manifest carries the same value). It records **which capstone wrote
+the file**, which template drift cannot: drift detects a section that
+went missing, never a section whose meaning changed under it, and
+never a rename. A later release migrates an output by reading this
+key, not by guessing from shape. Unreadable manifest → omit the key
+rather than inventing one; a wrong version is worse than none.
 
 ## Missing reference: build it, don't refuse
 
@@ -200,7 +211,7 @@ it, then resume the protocol that was invoked. This replaces refusing
 with a pointer at `generate` or `start`: a user who asked for a
 feature spec wants the spec, not an errand.
 
-Four bounds on it:
+Five bounds on it:
 
 - **Once per run.** If `sync` produces no index either (`generate`'s
   empty-repo stop: no source files, no entry points, no manifests),
@@ -218,6 +229,14 @@ Four bounds on it:
 - **Interview prerequisites are untouched.** This rule fires only on
   a missing index, never to skip a gate or invent a decision the user
   has not made.
+- **A big repo is asked, not told.** Do `generate`'s Phase 1 step 8
+  sizing first (count tracked source files). Above
+  `subagent_threshold` (default 150), say what it will cost - a full
+  `generate` across N files, before the thing they actually asked for
+  - and wait for a yes. Announcing is enough below the threshold;
+  above it, a silent full read of someone's monorepo is a bill they
+  did not agree to. Declined → do not fall back to working without a
+  reference: say what is missing and stop.
 
 ## Changelog ledger: `<docs_dir>/changelog.md`
 
@@ -239,11 +258,17 @@ frontmatter. An entry is
     ## <date> - <stage>: <target>
     key: <stage>/<target>@<rev>
 
-followed by one bullet per output path, naming what changed about it,
-the decisions and rejected options recorded, and what was left open,
-deferred, dropped, or ruled out of scope: the facts a later rewrite of
-that output would erase. Never restate what the output already says;
-point at it. `<target>` is the thing acted on (`03-invite-links`,
+followed by **bullets only: no paragraphs, no preamble, no narration
+of how the run went.** One bullet per output path naming what changed
+about it, then one bullet each for a decision taken, an option
+rejected, or a thing left open, deferred, dropped, or ruled out of
+scope: the facts a later rewrite of that output would erase. One fact
+per bullet, one line where it fits and never more than three; a
+bullet needing a paragraph is several bullets. Never restate what the
+output already says; point at it. An entry that reads as a story is
+wrong even when every fact in it is right: this file is scanned by a
+later run hunting one key, never read start to finish.
+`<target>` is the thing acted on (`03-invite-links`,
 `02-models.md`; `all` for a run covering the whole
 project). `<rev>` is the highest interview question number the output
 traces to (`Q7`) for a stage with an interview file, otherwise the
@@ -257,13 +282,42 @@ Writes to `*-interview.md`, `features/*/review-ledger.md` and
 `capstone.json` are not reported. A run that produced little still
 records: a dropped scenario, a topic recorded absent, a capability
 left open are the entry's content, never a reason to skip it.
-`docs_in_git` and the absence of git change how an entry is stamped,
-never whether it is written.
+**The ledger is always committed, whatever `docs_in_git` says**, and
+is that setting's sole exception. It is the only durable record of
+why a feature was built the way it was: `implement` deletes the
+feature folder - spec, plan, and review ledger - on the strength of
+its entry here, so a local-only ledger would turn that deletion into
+permanent loss on one machine change. `docs_in_git` and the absence
+of git change how an entry is stamped, never whether it is written,
+and never whether it is tracked.
 
 **Merges:** every entry inserts at the same offset, directly below the
 frontmatter, so branches conflict there routinely. Keep both sides and
 re-sort the conflicted block by date, newest first: resolving by
 picking a side drops a recorded event.
+
+**Rotation:** the file is append-only and read whole by `doctor` and
+`sync check`, so it cannot grow without bound. Past **200 entries**,
+`doctor` moves all but the newest 100 into
+`changelog-archive-<YYYY>.md` beside it (same entry format, same
+newest-first order, its own Companion docs row, never rewritten
+afterwards).
+
+**The keys never leave.** `feature` resolves shipped features and
+allocates the next `<NN>` from the `implement/*` keys here, so
+rotation leaves every archived entry's `## <date>` heading and `key:`
+line in place, bullets removed, under a trailing `## Archived`
+section naming the archive file. Bodies move; keys stay. A rotation
+that drops a key retires an `<NN>` into reuse and makes a shipped
+feature look unstarted.
+
+**One writer at a time.** Nothing here locks: two sessions writing
+the docs area at once (two terminals, or a `sync` landing mid-wrap)
+interleave into the same chapters and the same insert offset. Append-
+only limits the damage to a conflict rather than a lost entry, and
+the Merges rule resolves it, but the reference is single-writer by
+assumption. When another capstone run may be live, say so and stop
+rather than racing it.
 
 ## Interview lifecycle (shared by all interviews)
 
