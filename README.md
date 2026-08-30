@@ -332,8 +332,8 @@ keys in `changelog.md` are history and stay as they are; nothing
 reads them.
 
 The zero-token help trick is Claude Code only. The PowerShell twins
-run in CI on a real Windows runner, but broader Windows field-testing
-is thin. Budget an afternoon for the `logic` interview on a real app;
+are syntax-checked in CI but never executed there, and Windows
+field-testing is thin: that is the softest spot in the project. Budget an afternoon for the `logic` interview on a real app;
 the depth is the point. Retrieval is grep over eight markdown files,
 plenty at this scale and unproven on giant monorepos.
 
