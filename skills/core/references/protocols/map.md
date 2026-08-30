@@ -11,7 +11,7 @@ additionally: `changelog.md` (absorption drift), `05-dependencies.md`
 plus the manifests and lockfile (re-vetting). Nothing else unprompted.
 
 The descriptive reference for the current project: a lean
-`00-index.md` index and chapterized topic files in `docs/capstone/`,
+`00-index.md` index and chapterized topic files in `<docs_dir>/`,
 the `logic/` business-logic map, and the `uiux/` surface map. The
 audience is future AI sessions; they read these docs instead of
 re-exploring the repository.
@@ -35,16 +35,27 @@ refresh.
 1. `check` → the read-only trust report at the end of this file.
    Writes nothing, not even a changelog entry.
 2. A single topic argument → run Phase 1 recon, then Phases 2-4 for
-   that topic only, regardless of staleness; a topic argument always
-   regenerates its chapter (and skips the extractions).
+   that topic only, regardless of staleness; it always regenerates
+   that chapter, and Phase 3's extractions (steps 4-5) do not run.
+   Confirm before overwriting a chapter that is current.
 3. `rebuild` → full build (Phases 1-4), overwriting what exists.
-4. No stamped `<index_file>` on disk → full build (Phases 1-4).
-   This branch is unconditional: core.md's Missing reference rule
-   leans on it when another protocol delegates here, so it must never
-   turn into a refusal or a pointer at another command.
-5. A stamped `<index_file>` exists → **Refresh** (below): rewrite only
-   what drifted. Never silently rewrite a current reference; a user
-   who wants everything redone says `rebuild`.
+   Confirm once first: it rewrites every chapter, and a plain `map`
+   would have refreshed only what drifted. In this mode Phase 3's
+   extractions regenerate existing **extraction-mode** `logic/` and
+   `uiux/` files too, rather than only filling gaps; interview-derived
+   files in those folders are still never touched, whatever the mode
+   (their provenance decides, not the verb).
+4. **No `<index_file>` on disk** → full build (Phases 1-4). This
+   branch is unconditional: core.md's Missing reference rule leans on
+   it when another protocol delegates here, so it must never turn
+   into a refusal or a pointer at another command.
+5. **An `<index_file>` exists** → **Refresh** (below): rewrite only
+   what drifted. The index itself carries no stamps (Phase 3 step 7),
+   so its presence is the whole test - the stamps the Refresh reads
+   live in the topic files. An index with no stamped topic file beside
+   it is a torn build, not a reference: say so and full-build.
+   Never silently rewrite a current reference; a user who wants
+   everything redone says `rebuild`.
 
 ## Phase 1 - inline recon
 
@@ -131,7 +142,9 @@ paths_covered:
    `init-config.sh <docs_dir>` via bash (Git Bash on Windows). If
    bash is unavailable, write the global JSON template from core.md
    and the ignore list from core-authoring.md yourself.
-4. **Logic extraction**: build `docs/capstone/logic/` per logic.md's
+4. **Logic extraction** (full build and refresh only; a topic
+   argument skips steps 4-5 per Phase 0 branch 2): build
+   `<docs_dir>/logic/` per logic.md's
    extraction mode, invoked as its "Invoked by `map`" rules say: the
    entry-point inventory from the module map and the just-written
    chapters, one descriptive scenario file per scenario covering
@@ -140,12 +153,14 @@ paths_covered:
    threshold, dispatch extraction per scenario like Phase 2's
    per-topic dispatch, same rules. A repo with no observable entry
    points records `logic` absent in the topic index with that reason.
-   Existing `logic/` files are left alone; extraction fills only the
-   scenarios the map is missing.
+   Existing `logic/` files are left alone and extraction fills only
+   the scenarios the map is missing - except under `rebuild`, which
+   regenerates the extraction-mode ones. Interview-derived scenario
+   files are never regenerated in any mode.
 5. **Design extraction**: applicable when the repo has a frontend
    (client entry points, routes or views, or token/theme files: the
    same evidence `01-architecture.md`'s Frontend section reports).
-   Build `docs/capstone/uiux/` per uiux.md's extraction mode,
+   Build `<docs_dir>/uiux/` per uiux.md's extraction mode,
    invoked as its "Invoked by `map`" rules say: the surface inventory
    from the module map and the route table, one
    `screens/NN-<route>.md` per surface covering what the code actually
@@ -156,9 +171,10 @@ paths_covered:
    from. Above the subagent threshold, dispatch per surface like
    Phase 2's per-topic dispatch, same rules. A repo with no frontend
    records `uiux` absent in the Companion docs table with that
-   reason. Existing `uiux/` files are left alone: extraction fills
-   only the surfaces the map is missing, and never overwrites a
-   committed design the `uiux` interview produced.
+   reason. Existing `uiux/` files are left alone and extraction fills
+   only the surfaces the map is missing - except under `rebuild`,
+   which regenerates the extraction-mode ones. A committed design the
+   `uiux` interview produced is never overwritten, in any mode.
 6. Append the changelog entry per core.md's Changelog ledger, key
    `map/<topic|all>@<the run's stamp>`; one bullet per chapter
    and logic scenario written **this run** (every one, never only
@@ -208,7 +224,7 @@ paths_covered:
    untracked and not covered by `.gitignore`: honor the `docs_in_git`
    config key when set (`commit` or `ignore`); when it is `ask` or
    unset, ask the user whether to commit them or add
-   `/docs/capstone/` to `.gitignore`; never decide unilaterally. On
+   `<docs_dir>/` to `.gitignore`; never decide unilaterally. On
    later runs, respect whichever choice is in place.
 
 ## Refresh - rewrite only what drifted
