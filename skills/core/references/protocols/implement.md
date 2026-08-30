@@ -1,7 +1,7 @@
 # implement - execute the approved feature plan
 
 **Reads:** config → the feature's `feature-interview.md` → `plan.md`
-→ `spec.md` → `code-prefs.md` → `../code-craft.md` → the operations
+→ `spec.md` → `standards.md` → `../code-craft.md` → the operations
 chapter its verifications rely on → `review-ledger.md` (resume).
 
 Last stage of the feature chain: turns the approved `plan.md` into
@@ -43,8 +43,8 @@ Git section (`<type>/<slug>`, the slug the feature's own). Record
 `base_commit` in the feature-interview frontmatter: the branch
 point, or HEAD before Task 1 on a consented main run; Phase C reviews
 the diff from it. Read
-`plan.md`, `spec.md`, `code-prefs.md`, `../code-craft.md` (the
-TDD + YAGNI discipline the code follows; code-prefs wins on
+`plan.md`, `spec.md`, `standards.md`, `../code-craft.md` (the
+TDD + YAGNI discipline the code follows; standards wins on
 conflict), and the operations chapter the plan's verification steps
 rely on (`07-operations.md`'s Processes and Developer workflow
 sections carry the verified commands). Review the plan critically:
@@ -90,7 +90,7 @@ reference:
 1. The task's full text from `plan.md`: its `Create:`/`Modify:`/
    `Test:` paths, the interfaces it consumes and produces, and every
    checkbox step with its code and exact commands.
-2. `code-prefs.md`'s rules, and `../code-craft.md`'s ladder, TDD
+2. `standards.md`'s rules, and `../code-craft.md`'s ladder, TDD
    scoping, and **Git section in full**. A pointer to a file is
    useless here: a subagent that never reads `code-craft.md` commits
    however it likes.
@@ -114,7 +114,7 @@ Execute the tasks yourself in the same order, under the same rules,
 checking each box as its verification passes.
 
 Either way, code lands in the repository's source tree (never under
-the docs area), and every code decision follows `code-prefs.md` and
+the docs area), and every code decision follows `standards.md` and
 `code-craft.md`.
 
 ## Phase C - review until dry
@@ -132,7 +132,7 @@ restarting at round one.
 
 1. **Round**: independent reviews of the diff, each through a
    different lens: spec compliance (every `spec.md` requirement
-   implemented, nothing extra), code quality per `code-prefs.md`,
+   implemented, nothing extra), code quality per `standards.md`,
    `code-craft.md` (unearned abstractions and unclimbed ladder rungs
    are findings), and
    the conventions chapter, and the spec's unhappy paths actually
@@ -148,7 +148,7 @@ restarting at round one.
 3. **Fix**: confirmed Critical/Important findings are fixed and
    their covering verifications re-run; fixes are new code and
    re-enter the next round. Minor findings: fix or record, per
-   `code-prefs.md`.
+   `standards.md`.
 4. **Dry**: a round with zero new confirmed findings. Two
    consecutive dry rounds end the loop; one is not enough: the
    round after a fix wave exists to review the fixes. Record the dry

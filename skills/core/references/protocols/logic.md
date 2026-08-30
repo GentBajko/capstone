@@ -9,7 +9,7 @@ where cited.
 Sits between `mockup` and `architecture`: takes every scenario the
 product has and lays its business logic bare, one scenario at a time,
 depth first, until a developer could implement it without inventing a
-single rule. Like `code-prefs`, the output is normative but records
+single rule. Like `standards`, the output is normative but records
 only the user's own stated decisions.
 
 Interview state: `docs/capstone/logic-interview.md` (same resumable

@@ -133,6 +133,6 @@ suppress the smell), and **skip anything tooling already enforces**.
    and say what deleting or merging it concentrates. Benefits are
    stated as leverage and locality, never as "cleaner".
 5. The project's recorded decisions (the reference, the interviews,
-   `code-prefs.md`) are ADR-equivalents: a candidate contradicting
+   `standards.md`) are ADR-equivalents: a candidate contradicting
    one is surfaced only when the friction justifies reopening the
    decision, and says so explicitly.

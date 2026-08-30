@@ -2,7 +2,7 @@
 
 **Reads:** config → `architecture-interview.md` (resume) →
 `../interview.md` in full before the first question → upstream
-artifacts if present: `code-prefs.md`, `logic/`,
+artifacts if present: `standards.md`, `logic/`,
 `mockup-interview.md`, `mockup/README.md` (screens as questions touch
 them) → `../topics.md` at generation.
 
@@ -21,7 +21,7 @@ as a question or an explicitly-confirmed default, not silently adopted.
 Read `../interview.md` in full before asking the first question; its
 Conduct rules section governs the whole interview. Then check for
 upstream artifacts, each read only if it exists:
-`docs/capstone/code-prefs.md`, `docs/capstone/logic/` (the business-logic
+`docs/capstone/standards.md`, `docs/capstone/logic/` (the business-logic
 scenario files; they pre-fill models: entities, invariants,
 consistency needs; data-flow: lifecycles; and quality-attribute
 scenarios), `docs/capstone/mockup-interview.md`, and the mockup itself

@@ -1,22 +1,28 @@
-# code-prefs - code-preferences interview, then a normative standards doc
+# standards - how code must be written here
 
-**Reads:** config → `code-prefs-interview.md` (resume) → lazily, per
+**Reads:** config → `standards-interview.md` (resume) → lazily, per
 domain: `03-conventions.md`; the index plus `01-architecture.md` and
 `05-dependencies.md` (or the architecture interview);
 `mockup/README.md`, never bulk-read upfront.
 
-Elicits how the user **wants** code written in this project, independent
-of what the code currently does. The output is normative (allowed,
-like the reviews, to say "do X, never Y", because every
-rule is the user's own recorded decision, not the skill's opinion).
+Elicits how code **must** be written in this project, independent of
+what the code currently does. The output is normative (allowed, like
+the reviews, to say "do X, never Y", because every rule is the user's
+own recorded decision, not the skill's opinion).
 
-Interview state: `docs/capstone/code-prefs-interview.md`, same resumable
+**Standards, not conventions.** `03-conventions.md` reports what this
+codebase habitually does, violations included, and `map` rewrites it
+whenever the code moves. This file records what the user decided it
+must do, and nothing regenerates it. Where they disagree, the code is
+wrong, not this file: that gap is what `review` reports.
+
+Interview state: `docs/capstone/standards-interview.md`, same resumable
 format as the other interviews (status frontmatter per core.md's
 Interview lifecycle, `### Q<n>` entries appended before the next
 question, and an `## Open questions` ledger seeded once with the nine
 Phase B domains as checkboxes, maintained by appends and toggles,
 never whole-file rewrites). Interview files are never indexed. Output:
-`docs/capstone/code-prefs.md`, indexed under Companion docs.
+`docs/capstone/standards.md`, indexed under Companion docs.
 
 ## Phase A - setup / resume
 
@@ -80,14 +86,14 @@ they do.
 
 ## Phase D - the output
 
-Write `docs/capstone/code-prefs.md`: frontmatter stamps (no
-`paths_covered`: preferences don't go stale with code); banner
-"User-stated preferences: normative, not a description of current
-code."; rules organized by the domains above, each traceable to its
-`§Q` entry; imperative voice.
+Write `docs/capstone/standards.md`: frontmatter stamps (no
+`paths_covered`: standards don't go stale with code, and no refresh
+path may regenerate them); banner "Standards the user set: binding,
+not a description of current code."; rules organized by the domains
+above, each traceable to its `§Q` entry; imperative voice.
 
 Then append the changelog entry per core.md's ledger: key
-`code-prefs/all@Q<n>` from the interview's highest `### Q<n>`; record
+`standards/all@Q<n>` from the interview's highest `### Q<n>`; record
 the rules decided per domain and the domains the user ruled out. Update
 the index per core.md, set `status: formalized`
 in the interview file (only now that the output is on disk, per
@@ -96,4 +102,5 @@ seeding the project's `AGENTS.md`/`CLAUDE.md` from it.
 
 **Consumers:** the `architecture` interview pre-fills its conventions answers
 from this file and never re-asks; `review`'s backend side gains a
-preference-divergence dimension when this file exists.
+standards-divergence dimension when this file exists (the conventions
+chapter measured against these rules).

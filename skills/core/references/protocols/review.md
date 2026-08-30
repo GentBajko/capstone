@@ -3,7 +3,7 @@
 **Reads:** config → `<index_file>` → the existing `review.md` (its
 per-side stamps, before overwriting either side). Then per side.
 **Backend:** every current topic chapter (after the refresh) →
-`code-prefs.md`, `../code-craft.md`, `../arch-craft.md` (the method
+`standards.md`, `../code-craft.md`, `../arch-craft.md` (the method
 and its rulings) → source spot-checks where evidence
 needs exact lines. **Frontend:** `docs/capstone/uiux/` (the
 committed bar) → `mockup/` and `logic/` (what each screen must do) →
@@ -93,7 +93,7 @@ supply evidence the ranking then treats like any other.
    directly), stack currency (dependencies and patterns against the
    dependencies chapter's own recorded floors and research dates),
    craft divergence (unearned abstractions and unclimbed ladder rungs
-   per `../code-craft.md`), and, when `docs/capstone/code-prefs.md`
+   per `../code-craft.md`), and, when `docs/capstone/standards.md`
    exists, divergence between the user's stated preferences and the
    observed conventions.
 4. **Frontend side**: inventory the surfaces from `uiux/screens/`

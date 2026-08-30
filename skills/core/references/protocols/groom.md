@@ -3,7 +3,7 @@
 **Reads:** config → the feature's `feature-interview.md` (resume) →
 `<index_file>` → the touched topic chapters (after the staleness
 pass) → the `logic/` scenarios and `mockup/` screens it extends, plus
-the `uiux/` chapters for UI features → `code-prefs.md`.
+the `uiux/` chapters for UI features → `standards.md`.
 
 First stage of the feature chain (`groom` → `plan` → `implement`,
 chained by `feature`): turns a feature idea into a spec a
@@ -69,7 +69,7 @@ recorded `§Q` decisions, without re-interviewing.
    exists → stale by definition, refresh first.
 3. Read the picked chapters, plus whichever companion docs bear on the
    feature: the `logic/` scenarios it extends, the `mockup/` screens
-   it changes, the `uiux/` chapters it touches, `code-prefs.md`.
+   it changes, the `uiux/` chapters it touches, `standards.md`.
    Never ask what these already answer.
 4. An artifact argument (a ticket, a PRD, notes) seeds the interview
    per core-authoring.md's Artifact seeding rule.

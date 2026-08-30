@@ -63,7 +63,7 @@ asking when ambiguous.
 `docs_in_git` (`"commit" | "ignore" | "ask"`) pre-answers the
 commit-or-gitignore question **for the factual reference only**: the
 index and the topic chapters, plus `logic/`, `mockup/`, `uiux/`,
-`code-prefs.md`, and `changelog.md`.
+`standards.md`, and `changelog.md`.
 `language` sets the generated docs' language. The user can change any
 key by editing the files or just telling you.
 
@@ -216,7 +216,7 @@ Five bounds on it:
   empty-repo stop: no source files, no entry points, no manifests),
   say so and stop. Never loop.
 - **The greenfield stages are exempt** (`mockup`, `logic`, `uiux`,
-  `architecture`, `code-prefs`, `stack`, `build`): they build the
+  `architecture`, `standards`, `stack`, `build`): they build the
   reference from interviews rather than reading one, and their
   prerequisites are upstream *interviews*, not the index. `uiux`
   without a mockup still points at `mockup`; `build` without a
@@ -337,7 +337,7 @@ straight to `formalized` once every listed scenario is `written` or
 
 `map check` is facts only, as are the changelog entries every
 stage appends, `review`'s among them.
-`review` is the sole opinionated output. `code-prefs`, `logic`,
+`review` is the sole opinionated output. `standards`, `logic`,
 `uiux`, `stack`, and `groom`'s `spec.md` are normative but only
 record the user's own stated decisions (`logic` and `uiux` in
 extraction mode are descriptive like the chapters: observed fact, hard

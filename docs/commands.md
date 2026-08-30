@@ -118,7 +118,7 @@ triggers. On a repo that already has code it asks once whether you
 want the pipeline or `map`, and records the answer.
 
 ```text
-mockup → logic → uiux → architecture → code-prefs → stack → build
+mockup → logic → uiux → architecture → standards → stack → build
 ```
 
 Each stage below is individually invocable. Every one is a resumable
@@ -131,7 +131,7 @@ dead session loses nothing, and re-running never re-asks.
 | `logic` | `logic/` — one file per scenario: triggers, exact rules, branches, unhappy paths, invariants | `logic-interview.md` |
 | `uiux` | `uiux/01-direction.md`, `02-system.md`, `03-experience.md`, `screens/` | `uiux-interview.md` |
 | `architecture` | The eight numbered chapters, marked `mode: prescriptive` | `architecture-interview.md` |
-| `code-prefs` | `code-prefs.md` and `03-conventions.md` | `code-prefs-interview.md` |
+| `standards` | `standards.md` | `standards-interview.md` |
 | `stack` | `05-dependencies.md` | `stack-interview.md` |
 | `build` | `implementation.md`, then source code | `build-interview.md` |
 
@@ -230,7 +230,7 @@ docs/capstone/
 ├── mockup/                one file per screen
 ├── uiux/                  direction, design system, per-screen chapters
 ├── changelog.md           append-only ledger — always committed
-├── code-prefs.md          how code should be written here
+├── standards.md           how code should be written here
 ├── implementation.md      build's plan
 ├── review.md              opinionated findings          (gitignored)
 ├── *-interview.md         interview transcripts         (gitignored)

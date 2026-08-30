@@ -81,7 +81,7 @@ writes under `<docs_dir>` must be listed there:
   chapters). Topics that do not apply get a row naming the reason:
   an absence is a fact, and no file can record it.
 - **Companion docs**, a `| File | What it is |` table: everything else
-  (review, changelog, code-prefs, implementation,
+  (review, changelog, standards, implementation,
   mockup/, uiux/, features/).
 
 **The index carries no stamps.** Freshness lives in each file's own
@@ -94,7 +94,7 @@ exists and where, never how fresh it is.
 The index does not list itself, and is never a topic. All indexes and
 outputs are markdown; never generate HTML, for anything. Never
 indexed: the interview Q&A files (`architecture-interview.md`,
-`mockup-interview.md`, `code-prefs-interview.md`,
+`mockup-interview.md`, `standards-interview.md`,
 `logic-interview.md`, `uiux-interview.md`, `stack-interview.md`,
 `build-interview.md`, `features/*/feature-interview.md`,
 `features/*/review-ledger.md`) and `capstone.json`.

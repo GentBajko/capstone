@@ -8,7 +8,7 @@ thing before building it.
 ```mermaid
 flowchart LR
   R["existing repo"] --> M["map"]
-  P["new product"] --> S["start<br/>mockup · logic · uiux · architecture<br/>code-prefs · stack · build"]
+  P["new product"] --> S["start<br/>mockup · logic · uiux · architecture<br/>standards · stack · build"]
   F["feature idea"] --> C["feature<br/>groom · plan · implement"]
   M --> D[("docs/capstone/<br/>index · 8 chapters<br/>logic/ · uiux/")]
   S --> D
@@ -127,7 +127,7 @@ instead of sending you off to run something else.
 | `/capstone:logic` | Business logic, scenario by scenario |
 | `/capstone:uiux` | How the UI looks and the UX behaves |
 | `/capstone:architecture` | The big design interview → prescriptive chapters |
-| `/capstone:code-prefs` | How code should be written here |
+| `/capstone:standards` | How code should be written here |
 | `/capstone:stack` | Research libraries and services per capability; you pick |
 | `/capstone:build` | Implementation plan, your approval, then working code |
 
@@ -154,7 +154,7 @@ output, prerequisite, ledger key, and the shared mechanics.
 ## The greenfield pipeline
 
 ```text
-mockup → logic → uiux → architecture → code-prefs → stack → build
+mockup → logic → uiux → architecture → standards → stack → build
 ```
 
 Type `capstone` and it runs the stages in order, resuming wherever you
@@ -186,7 +186,7 @@ the future docs is answerable from your recorded decisions. Writes
 the same eight chapters, marked prescriptive; once code exists,
 `map` replaces intent with observation.
 
-**code-prefs**. Typing strictness, library versus hand-rolled, error
+**standards**. Typing strictness, library versus hand-rolled, error
 handling, what an AI must never do in your repo. Also a decent
 starting point for a CLAUDE.md.
 
@@ -202,7 +202,7 @@ pick when it starts.
 `/capstone:feature add CSV export` grows a finished project one
 feature at a time. `groom` interviews a spec out of you against the
 reference. `plan` turns it into a task-by-task TDD plan; a vendored
-TDD + YAGNI ladder trims every task, and your code-prefs outrank the
+TDD + YAGNI ladder trims every task, and your standards outrank the
 ladder on conflict. `implement` executes, reviews the diff until two
 consecutive rounds find nothing new, then absorbs the shipped
 behavior back into the scenario docs. A dead session resumes
@@ -335,7 +335,7 @@ argument-hint: [command] [args...]
 
 No arguments: invoke the capstone:start skill. If the first argument
 matches a capstone skill (map, doctor, review,
-mockup, logic, uiux, architecture, code-prefs,
+mockup, logic, uiux, architecture, standards,
 stack, build, groom, plan, implement, feature, start, help),
 invoke capstone:<that skill> with the remaining arguments.
 

@@ -3,8 +3,8 @@
 Read by `protocols/plan.md`, `protocols/build.md`, and
 `protocols/implement.md`, the stages that write implementation plans
 and source code. Adapted from the ponytail skill. Precedence: the
-project's `code-prefs.md` records the user's own decisions and wins
-wherever the two conflict; this file governs everything code-prefs
+project's `standards.md` records the user's own decisions and wins
+wherever the two conflict; this file governs everything standards
 leaves open. Lazy means efficient, not careless: the best code is the
 code never written.
 
@@ -82,14 +82,14 @@ behind. Trivial one-liners need no test: YAGNI applies to tests too.
 
 Understanding the problem (read fully, then be lazy); input validation
 at trust boundaries; error handling that prevents data loss; security;
-accessibility basics; typing per `code-prefs.md` (annotations, enums,
+accessibility basics; typing per `standards.md` (annotations, enums,
 Protocols are how minimal code is written, never bloat to cut);
 anything the spec or the user explicitly requires: the user insisting
 on the full version ends the argument.
 
 ## Git: branches, commits, and their density
 
-The default for every stage that writes code. `code-prefs.md`'s
+The default for every stage that writes code. `standards.md`'s
 Process domain records the user's own conventions and wins wherever
 the two conflict; a repo whose existing history plainly follows
 another convention wins too: match what `git log` shows rather than

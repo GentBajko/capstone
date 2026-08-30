@@ -1,7 +1,7 @@
 # build - implementation research, then working code
 
 **Reads:** config → `build-interview.md` (resume) → the index and
-chapters → `logic/`, `mockup/`, `uiux/`, `code-prefs.md`,
+chapters → `logic/`, `mockup/`, `uiux/`, `standards.md`,
 `../code-craft.md` → the stack chapter → the existing
 `implementation.md` (resume).
 
@@ -27,7 +27,7 @@ finished steps.
 
 Read everything: the index and chapters, `docs/capstone/logic/`,
 `docs/capstone/mockup/`, `docs/capstone/uiux/`,
-`docs/capstone/code-prefs.md`, and the stack chapter. Research (web
+`docs/capstone/standards.md`, and the stack chapter. Research (web
 search when available) how the chosen pieces actually connect:
 scaffold conventions for the chosen framework, integration patterns
 between the picks (auth ↔ framework, ORM ↔ database, deploy target),
@@ -53,10 +53,10 @@ official quickstarts for anything unfamiliar. Then write
   recorded decision that excludes it. A row with no step is a gap in
   the plan; fix the plan, never the table.
 
-Every code decision follows `code-prefs.md`, and every plan step and
+Every code decision follows `standards.md`, and every plan step and
 line of code obeys `../code-craft.md` (TDD + YAGNI, earned
 interfaces, and its Git section for every branch and commit this
-stage makes; code-prefs wins on conflict): the layout and sketches
+stage makes; standards wins on conflict): the layout and sketches
 carry no layer, file, or abstraction the ladder didn't earn.
 
 **Review, then re-review.** A drafted `implementation.md` is not
@@ -111,7 +111,7 @@ one per step.
 **Subagent mode** works exactly as `implement.md`'s Phase B describes
 it: one subagent per build-order step, dispatched fresh and never in
 parallel, with the step's full text, its code sketches, the verified
-commands, `code-prefs.md`'s rules, and `../code-craft.md`'s ladder,
+commands, `standards.md`'s rules, and `../code-craft.md`'s ladder,
 TDD scoping, and Git section **copied into the prompt** rather than
 referenced. Nothing else crosses into a subagent's context, so a
 pointer to a file it will never open buys nothing. The main session

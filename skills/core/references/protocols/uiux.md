@@ -10,7 +10,7 @@ chapters, then the frontend token, component, and route sources.
 Sits between `logic` and `architecture`: turns the mockup's screens
 and the logic's rules into a committed frontend design (direction,
 design system, one design chapter per screen) that `stack` honors and
-`build` implements. Docs only, never code. Like `code-prefs`, the
+`build` implements. Docs only, never code. Like `standards`, the
 output is normative but records only decisions the user has confirmed.
 
 ## Method

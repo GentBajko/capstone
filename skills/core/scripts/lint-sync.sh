@@ -201,7 +201,8 @@ if [ "$IN_GIT" -eq 1 ]; then
   fi
   # 10b. the removed commands must not be routable again by accident:
   #      no protocol file, no wrapper, no help line, no dispatcher word.
-  for n in ask changelog guides onboarding be-review fe-review generate sync; do
+  for n in ask changelog guides onboarding be-review fe-review generate sync \
+         code-prefs; do
     [ -e "skills/$n" ] && err "removed skill skills/$n/ is back"
     [ -e "skills/core/references/protocols/$n.md" ] \
       && err "removed protocol $n.md is back"
@@ -234,7 +235,7 @@ fi
 #      a description only makes claims about wiring). Referential forms
 #      only: the bare words are legitimate prose ("design a feature" is
 #      one of groom's triggers, changelog.md is a real file).
-DEAD_NAMES='ask|changelog|guides|onboarding|be-review|fe-review|implementation|design|generate|sync'
+DEAD_NAMES='ask|changelog|guides|onboarding|be-review|fe-review|implementation|design|generate|sync|code-prefs'
 for f in skills/*/SKILL.md; do
   d=$(sed -n 's/^description: *//p' "$f")
   [ -n "$d" ] || continue
@@ -255,7 +256,7 @@ hit=$(grep -Eo "^\*\*($DEAD_NAMES)\*\*" README.md | head -1)
 #     ones say so, and the old opt-in is gone (core.md hard rule 5 is
 #     only as good as its sites)
 for n in groom plan implement mockup logic uiux architecture \
-         code-prefs stack build review \
+         standards stack build review \
          map doctor; do
   grep -q 'changelog entry' "skills/core/references/protocols/$n.md" \
     || err "protocol $n.md has no changelog-entry step"
@@ -434,11 +435,11 @@ done
 
 
 # 14. the pipeline order is spelled identically everywhere it appears
-PIPE='mockup -> logic -> uiux -> architecture -> code-prefs -> stack -> build'
+PIPE='mockup -> logic -> uiux -> architecture -> standards -> stack -> build'
 for f in skills/core/scripts/help.sh skills/start/SKILL.md; do
   grep -qF "$PIPE" "$f" || err "$f missing the pipeline-order string"
 done
-grep -qF 'mockup → logic → uiux → architecture → code-prefs → stack → build' README.md \
+grep -qF 'mockup → logic → uiux → architecture → standards → stack → build' README.md \
   || err "README.md missing the pipeline-order string"
 
 [ "$FAIL" -eq 0 ] && echo "lint-sync: all invariants hold" || echo "lint-sync: FAILURES above"

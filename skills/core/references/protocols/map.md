@@ -182,7 +182,7 @@ paths_covered:
      instead of the root); a repo with no scenarios yet records
      `logic` absent here with its reason instead.
    - If companion docs exist (`review.md`, `changelog.md`,
-     `code-prefs.md`, `implementation.md`, `mockup/`,
+     `standards.md`, `implementation.md`, `mockup/`,
      `uiux/`, `features/`), a `| File | What it is |` table below
      the topic table; the factual reference and the
      opinionated/instructional outputs stay visibly distinct.

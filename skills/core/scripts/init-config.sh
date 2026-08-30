@@ -124,10 +124,13 @@ elif [ -f "$OLD_IDX" ] && [ -f "$NEW_IDX" ]; then
   echo "note: both $OLD_IDX and $NEW_IDX exist - not merging; $NEW_IDX wins"
 fi
 
-# 1c. The uiux stage used to be called design, and wrote docs/capstone/
-#     design/ plus design-interview.md. Move both when the new names are
-#     still free; both present is not a stale layout, so nothing merges.
-for pair in "design:uiux" "design-interview.md:uiux-interview.md"; do
+# 1c. Stage renames: design -> uiux (design/ and design-interview.md),
+#     and code-prefs -> standards (code-prefs.md and its interview).
+#     Move each when the new name is still free; both present is not a
+#     stale layout, so nothing merges.
+for pair in "design:uiux" "design-interview.md:uiux-interview.md" \
+            "code-prefs.md:standards.md" \
+            "code-prefs-interview.md:standards-interview.md"; do
   old="$DOCS_DIR/${pair%%:*}"; new="$DOCS_DIR/${pair##*:}"
   if [ -e "$old" ] && [ ! -e "$new" ]; then
     if [ -n "$(git ls-files "$old" 2>/dev/null | head -1)" ]; then
@@ -140,11 +143,18 @@ for pair in "design:uiux" "design-interview.md:uiux-interview.md"; do
     echo "note: both $old and $new exist - not merging; $new wins"
   fi
 done
-if [ -d "$DOCS_DIR/uiux" ] || [ -f "$DOCS_DIR/uiux-interview.md" ]; then
+if [ -d "$DOCS_DIR/uiux" ] || [ -f "$DOCS_DIR/uiux-interview.md" ] \
+   || [ -f "$DOCS_DIR/standards.md" ] || [ -f "$DOCS_DIR/standards-interview.md" ]; then
+  # Repoint the cross-references the moves invalidated. The interview
+  # substitution runs first: code-prefs-interview.md does not contain
+  # the string code-prefs.md, but keeping the specific rule ahead of the
+  # general one is how this stays true if either name ever changes.
   find "$DOCS_DIR" -type f -name '*.md' -exec sh -c '
     for f do
       sed -e "s|docs/capstone/design/|docs/capstone/uiux/|g" \
           -e "s|design-interview\.md|uiux-interview.md|g" \
+          -e "s|code-prefs-interview\.md|standards-interview.md|g" \
+          -e "s|code-prefs\.md|standards.md|g" \
           "$f" > "$f.capstone-tmp" && mv "$f.capstone-tmp" "$f"
     done' sh {} +
 fi

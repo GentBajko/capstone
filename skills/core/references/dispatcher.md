@@ -10,7 +10,7 @@ protocol files.
    on `start` or `feature`, which route rather than write.
 2. Route on the first argument. The reserved subcommand words
    (`map`, `doctor`, `review`, `mockup`,
-   `logic`, `uiux`, `architecture`, `code-prefs`, `stack`, `build`,
+   `logic`, `uiux`, `architecture`, `standards`, `stack`, `build`,
    `groom`, `plan`, `implement`, `feature`, `start`)
    each route to `protocols/<name>.md`: execute that one protocol
    exactly; behaviors live there, not here.

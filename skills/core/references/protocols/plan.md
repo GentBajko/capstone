@@ -1,7 +1,7 @@
 # plan - task-by-task implementation plan from a groomed spec
 
 **Reads:** config → the feature's `feature-interview.md` → `spec.md`
-→ the chapters, scenarios, and screens it cites → `code-prefs.md` →
+→ the chapters, scenarios, and screens it cites → `standards.md` →
 `../code-craft.md` → the conventions and testing chapters.
 
 Second stage of the feature chain: turns a formalized `spec.md` into a
@@ -38,8 +38,8 @@ Phase A's sources as needed, then re-present the gate.
 
 Read the spec, then exactly what it cites: its Reference impact
 chapters, the `logic/` scenarios and `mockup/` screens it names, plus
-`code-prefs.md` (every code decision follows it), `../code-craft.md`
-(the TDD + YAGNI discipline every planned task obeys; code-prefs wins
+`standards.md` (every code decision follows it), `../code-craft.md`
+(the TDD + YAGNI discipline every planned task obeys; standards wins
 on conflict) and the conventions and testing chapters for how code
 and tests are written here. The chapters answer where things live and
 how they connect; read source files only where the plan must name
@@ -53,7 +53,7 @@ everything. `plan.md`:
 
 - **Header**: goal in one sentence; approach in 2-3; the stack pieces
   touched; global constraints copied verbatim from the spec and
-  `code-prefs.md` (version floors, naming rules, banned patterns).
+  `standards.md` (version floors, naming rules, banned patterns).
 - **File map**: every file created or modified, one responsibility
   each, before any task is defined.
 - **Tasks**: numbered `### Task N: <name>` headings, each the
