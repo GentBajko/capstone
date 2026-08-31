@@ -33,6 +33,10 @@ Arguments are positional words, not flags: `map check`,
 
 ## Three entry points
 
+Diagrammed end to end in [flows.md](flows.md): what each one does, in
+what order, where it stops for you, and what it leaves on disk.
+
+
 Everything else is a stage one of these runs, individually invocable
 when you want to enter mid-chain.
 
