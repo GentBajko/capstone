@@ -125,7 +125,8 @@ section. **Gitignored by default:** it is judgment, not reference.
 ### `start`
 
 Runs the seven stages in order, detecting what is finished and
-resuming at the first incomplete one. Also what a bare `capstone`
+resuming at the first incomplete one, then reads every interview back
+before `build`. Also what a bare `capstone`
 triggers. On a repo that already has code it asks once whether you
 want the pipeline or `map`, and records the answer.
 
@@ -139,8 +140,8 @@ dead session loses nothing, and re-running never re-asks.
 
 | Stage | Produces | State file |
 | --- | --- | --- |
-| `mockup` | `mockup/` - one file per screen: wireframe, copy, behavior, empty/error/success states | `mockup-interview.md` |
-| `logic` | `logic/` - one file per scenario: triggers, exact rules, branches, unhappy paths, invariants | `logic-interview.md` |
+| `mockup` | `mockup/` - one file per screen: wireframe, elements, and a state inventory; `README.md` indexes the screens, the journeys, and the scenario list `logic` works from | `mockup-interview.md` |
+| `logic` | `logic/` - one file per scenario: triggers, exact rules, branches, unhappy paths, invariants, and the dimensions ruled out | `logic-interview.md` |
 | `uiux` | `uiux/01-direction.md`, `02-system.md`, `03-experience.md`, `screens/` | `uiux-interview.md` |
 | `architecture` | The eight numbered chapters, marked `mode: prescriptive` | `architecture-interview.md` |
 | `standards` | `standards.md` | `standards-interview.md` |
@@ -149,15 +150,44 @@ dead session loses nothing, and re-running never re-asks.
 
 **Stage notes**
 
-- **`mockup`** takes an optional artifact argument (a PRD, screenshots)
-  and pre-fills whatever it answers. A project with no visual UI
+- **`mockup`** depicts, it does not decide: when a question's answer
+  would be a rule - a threshold, a formula, what happens on failure -
+  it names the behavior, logs the question `for: logic`, and moves on,
+  rather than inventing a number that outranks nothing and contradicts
+  everything later. Its README hands `logic` a scenario list written at
+  `logic`'s unit, and every state whose rule is unsettled is marked
+  `rule: logic` rather than filled in. It takes an optional artifact
+  argument (a PRD, screenshots) and pre-fills whatever it answers. A project with no visual UI
   records its surfaces (api, cli) and `uiux` skips itself.
+- **`logic`** sweeps every scenario against `logic-craft.md`'s sixteen
+  rule dimensions - authority, money, concurrency, time, failure,
+  what is deliberately hidden, what is deliberately silent, and the
+  rest - and a scenario is finished when each one is answered, cited
+  to an earlier scenario, or recorded inapplicable with its reason.
+  The dimensions generate the questions rather than being asked as
+  questions: what does not apply is confirmed in one batch, not
+  sixteen turns. Without the sweep, a rule nobody thought to ask about
+  reads exactly like a rule that does not exist.
 - **`uiux`** requires a formalized `mockup`. On a repo that already has
   a frontend it runs in **extraction mode** instead: it documents the
   design that exists rather than interviewing for one.
 - **`stack`** researches real options per capability with licenses and
   pricing; you pick. `stack refresh` re-vets recorded picks later.
   Ledger keys `stack/all@Q<n>` and `stack/refresh@Q<n>`.
+- **Between `stack` and `build`** the pipeline reads all six
+  interviews back, in two halves. First it **re-files what landed in
+  the wrong stage** against core.md's Stage ownership table - a
+  business rule settled in the architecture interview belongs to
+  `logic`, a library chosen in the standards interview belongs to
+  `stack` - as one digest you confirm, since nothing is being
+  re-decided, only moved. Then it **raises what one stage decided
+  that contradicts another**, the check no single interview can make,
+  since each sees only its own answers. Same terms as any interview's
+  pushback (core.md's Pushback rule): evidence and a citation, two
+  rounds at most, then your answer stands. Either way the affected
+  interviews are amended and their outputs regenerated without
+  re-interviewing. Ledger key `readback/all@Q<n>`; later runs see it
+  and skip.
 - **`build`** requires a formalized `stack`. It writes an
   implementation plan, **stops for your approval**, then writes code -
   in subagents (fresh context per step) or inline, asked once before

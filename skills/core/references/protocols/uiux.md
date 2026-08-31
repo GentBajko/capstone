@@ -59,7 +59,10 @@ in its frontmatter, append the changelog entry (key
 and hand back; inside `start` the pipeline continues.
 `docs/capstone/logic/` is read when present; absent or partial,
 proceed and record in the interview file that unhappy-path styling
-leans on the mockup's `## States` sections only.
+leans on the mockup's `## States` sections only - which are an
+inventory, so a state the mockup marked `rule: logic` has no trigger
+yet: style it and record that its condition is unsettled, never invent
+one to fill the gap.
 
 ## Extraction mode (brownfield)
 
@@ -171,8 +174,10 @@ produces a good-looking product nobody can operate.
   `screens/` then applies rather than re-decides.
 - **Screens**: for each mockup screen, resolve what the wireframe
   underdetermines: composition and focal moment, the styled meaning
-  of every state (the mockup's `## States` crossed with the logic
-  scenarios' unhappy paths), motion moments, copy register. Ask only
+  of every state (the mockup's `## States` inventory crossed with the
+  logic scenarios' unhappy paths, which is where a `rule: logic` state
+  gets its trigger), motion moments, copy register - the mockup's
+  labels are working copy this stage ratifies or replaces. Ask only
   where the docs and the committed world don't already decide it.
 
 Drill until concrete. The user may stop at any time; jump to Phase D
@@ -236,7 +241,9 @@ implements, anything invented marked "assumed" inline):
   `## Mode & job`; `## Composition` (wireframe → designed layout:
   hierarchy, grid, focal moment; the flagship's first viewport is a
   thesis, not a header); `## States` (every mockup state and every
-  logic unhappy path surfacing here, each with its styled treatment:
+  logic unhappy path surfacing here, the two reconciled rather than
+  concatenated where both describe one state, each with its styled
+  treatment:
   empty states teach, loading is skeletal, errors name the problem
   and the recovery); `## Motion` (each moment and what it
   communicates); `## Copy` (register, key labels, tone rules). Where a

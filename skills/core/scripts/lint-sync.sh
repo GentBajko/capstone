@@ -389,6 +389,15 @@ grep -q 'Copyright (c) 2026 Leonxlnx' skills/core/references/uiux-craft.md \
   || err "uiux-craft.md does not carry taste-skill's MIT copyright line"
 grep -q '© Matt Pocock' skills/core/references/arch-craft.md \
   || err "arch-craft.md lost its MIT copyright line"
+# logic-craft is original work, so no attribution block; it must still
+# declare itself the method and be walked by the protocol it serves,
+# or logic silently goes back to stopping when nothing comes to mind
+grep -q 'This file is the method' skills/core/references/logic-craft.md \
+  || err "logic-craft.md does not declare itself the method"
+grep -q 'logic-craft.md' skills/core/references/protocols/logic.md \
+  || err "logic.md does not wire logic-craft.md"
+grep -q 'Dimensions not in play' skills/core/references/protocols/logic.md \
+  || err "logic.md lost the dimension-coverage record in its scenario files"
 
 # 12f. design/ gets the same generate+sync extraction logic/ has: a
 #      brownfield repo must end up with a frontend design record, not

@@ -2,7 +2,7 @@
   "name": "capstone",
   "displayName": "Capstone",
   "description": "Architecture reference generator: a lean docs/capstone/ index plus topic files stamped to the commit they were derived at, built and kept current by one command, map. Companion commands: doctor, an opt-in two-sided review, a greenfield pipeline from mockup to running code with a frontend-design stage, and a doc-grounded feature chain.",
-  "version": "5.0.0",
+  "version": "5.2.0",
   "author": {
     "name": "Gent Bajko",
     "email": "gent.bajko@gmail.com"

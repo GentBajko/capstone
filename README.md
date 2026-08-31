@@ -180,14 +180,25 @@ from the observed code and you confirm.
 
 **mockup**. Product discovery. Three fixed questions, then every
 question after that is generated from your answers until nothing is
-left to invent. One file per screen: ASCII wireframe, exact copy and
-behavior, the empty/error/success states. No visual UI? It records
-your surfaces (api, cli) and the uiux stage skips itself.
+left to invent. One file per screen: ASCII wireframe, the elements and
+where they lead, the states each screen has. It depicts rather than
+decides - the moment an answer would be a rule, it names the behavior
+and hands the question to `logic` instead of guessing a number that
+would only be contradicted later. What it hands over is the list of
+things the product has to decide, which is what makes the next stage
+fast. No visual UI? It records your surfaces (api, cli) and the uiux
+stage skips itself.
 
 **logic**. One scenario at a time, walked until a developer could
 implement it without inventing a single rule: exact steps, real
 formulas, what happens when the payment fails or the user clicks
-twice. The part of a spec everyone skips and then pays for.
+twice. The part of a spec everyone skips and then pays for. It is
+exhaustive on purpose - every scenario is swept against sixteen rule
+dimensions, so it finishes when each is answered or explicitly ruled
+out, never when nothing else comes to mind. That is what catches the
+rules with no natural question behind them: what the system
+deliberately hides, what it deliberately never says, who eats the cost
+when a charge fails after the money moved.
 
 **uiux**. How it looks and feels: a design read, the visual world,
 the tokens, each screen's composition and states. The method is
@@ -210,6 +221,15 @@ capability, licenses and prices included; you pick, and
 implementation plan, stops for your approval, then writes the code:
 one subagent per step with fresh context, or inline, whichever you
 pick when it starts.
+
+Between the two, the pipeline reads all six interviews back. It moves
+what landed in the wrong stage to the stage that owns it - a business
+rule the architecture interview happened to reach belongs to `logic` -
+and it raises what one stage decided that contradicts another. Neither
+check can be made by a single interview, because none of them can see
+the others. Same terms as everywhere else: evidence and a citation,
+two rounds at most, then your answer stands. It is the last point
+where either costs a paragraph instead of a rewrite.
 
 ## The feature chain
 

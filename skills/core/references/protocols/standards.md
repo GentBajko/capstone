@@ -41,9 +41,9 @@ present:
   `05-dependencies.md`) or the `architecture` interview's decisions: the
   chosen stack scopes the library questions; ask about the libraries
   the project actually faces, not generic ones.
-- The mockup (`docs/capstone/mockup/README.md`): its scenarios inform
-  testing and error-handling preferences (what must never break, what
-  the user journey tolerates).
+- The mockup (`docs/capstone/mockup/README.md`): its Scenarios and
+  Journeys tables inform testing and error-handling preferences (what
+  must never break, what the user journey tolerates).
 
 Never bulk-read all of these upfront; pull each in at the domain that
 needs it.
