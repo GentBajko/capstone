@@ -140,7 +140,7 @@ dead session loses nothing, and re-running never re-asks.
 
 | Stage | Produces | State file |
 | --- | --- | --- |
-| `mockup` | `mockup/` - one file per screen: wireframe, copy, behavior, empty/error/success states | `mockup-interview.md` |
+| `mockup` | `mockup/` - one file per screen: wireframe, elements, and a state inventory; `README.md` indexes the screens, the journeys, and the scenario list `logic` works from | `mockup-interview.md` |
 | `logic` | `logic/` - one file per scenario: triggers, exact rules, branches, unhappy paths, invariants | `logic-interview.md` |
 | `uiux` | `uiux/01-direction.md`, `02-system.md`, `03-experience.md`, `screens/` | `uiux-interview.md` |
 | `architecture` | The eight numbered chapters, marked `mode: prescriptive` | `architecture-interview.md` |
@@ -150,8 +150,14 @@ dead session loses nothing, and re-running never re-asks.
 
 **Stage notes**
 
-- **`mockup`** takes an optional artifact argument (a PRD, screenshots)
-  and pre-fills whatever it answers. A project with no visual UI
+- **`mockup`** depicts, it does not decide: when a question's answer
+  would be a rule - a threshold, a formula, what happens on failure -
+  it names the behavior, logs the question `for: logic`, and moves on,
+  rather than inventing a number that outranks nothing and contradicts
+  everything later. Its README hands `logic` a scenario list written at
+  `logic`'s unit, and every state whose rule is unsettled is marked
+  `rule: logic` rather than filled in. It takes an optional artifact
+  argument (a PRD, screenshots) and pre-fills whatever it answers. A project with no visual UI
   records its surfaces (api, cli) and `uiux` skips itself.
 - **`uiux`** requires a formalized `mockup`. On a repo that already has
   a frontend it runs in **extraction mode** instead: it documents the

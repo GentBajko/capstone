@@ -180,9 +180,14 @@ from the observed code and you confirm.
 
 **mockup**. Product discovery. Three fixed questions, then every
 question after that is generated from your answers until nothing is
-left to invent. One file per screen: ASCII wireframe, exact copy and
-behavior, the empty/error/success states. No visual UI? It records
-your surfaces (api, cli) and the uiux stage skips itself.
+left to invent. One file per screen: ASCII wireframe, the elements and
+where they lead, the states each screen has. It depicts rather than
+decides - the moment an answer would be a rule, it names the behavior
+and hands the question to `logic` instead of guessing a number that
+would only be contradicted later. What it hands over is the list of
+things the product has to decide, which is what makes the next stage
+fast. No visual UI? It records your surfaces (api, cli) and the uiux
+stage skips itself.
 
 **logic**. One scenario at a time, walked until a developer could
 implement it without inventing a single rule: exact steps, real
