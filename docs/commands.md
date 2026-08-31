@@ -125,7 +125,8 @@ section. **Gitignored by default:** it is judgment, not reference.
 ### `start`
 
 Runs the seven stages in order, detecting what is finished and
-resuming at the first incomplete one. Also what a bare `capstone`
+resuming at the first incomplete one, then reads every interview back
+before `build`. Also what a bare `capstone`
 triggers. On a repo that already has code it asks once whether you
 want the pipeline or `map`, and records the answer.
 
@@ -158,6 +159,14 @@ dead session loses nothing, and re-running never re-asks.
 - **`stack`** researches real options per capability with licenses and
   pricing; you pick. `stack refresh` re-vets recorded picks later.
   Ledger keys `stack/all@Q<n>` and `stack/refresh@Q<n>`.
+- **Between `stack` and `build`** the pipeline reads all six
+  interviews back and raises what one stage decided that contradicts
+  another - the check no single interview can make, since each sees
+  only its own answers. Same terms as any interview's pushback
+  (core.md's Pushback rule): evidence and a citation, two rounds at
+  most, then your answer stands. A resolution amends the interview
+  that gives way and regenerates its outputs without re-interviewing.
+  Ledger key `readback/all@Q<n>`; later runs see it and skip.
 - **`build`** requires a formalized `stack`. It writes an
   implementation plan, **stops for your approval**, then writes code -
   in subagents (fresh context per step) or inline, asked once before

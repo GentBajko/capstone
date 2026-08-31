@@ -246,7 +246,9 @@ set.** The entry is an output like any other; the run is not finished
 until it is on disk. Protocols that only read (`help`, `map`'s check
 mode) or only route (`start`, `feature`) write no entry; a
 refresh one of them delegates is recorded by the protocol that
-performs it.
+performs it. Sole exception: `start`'s readback pass
+(`protocols/start.md` step 7) records itself, since it changes
+recorded decisions rather than routing to a stage that would.
 
 Create the file on first write (any stage may be its first writer)
 with frontmatter stamps only (no `paths_covered`, so no refresh path
@@ -372,7 +374,10 @@ generic best practice with no stated consequence here.
 **Then it is theirs.** After two rounds the user's answer stands, and
 you take it without further argument, sulking, or hedged compliance.
 Do not reopen it later in the interview, and do not relitigate it at
-the formalization gate.
+the formalization gate. The one place a settled decision is looked at
+again is `start`'s readback pass (`protocols/start.md` step 7), and
+only against another stage's decisions: no interview can see those
+while it runs, so the conflict was never raisable here.
 
 **Record both sides.** The `### Q<n>` entry records the decision *and*
 the objection: what you raised, what they chose, and the reason they
