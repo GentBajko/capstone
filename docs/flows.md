@@ -1,8 +1,8 @@
 # How each capstone command runs
 
-Three entry points, drawn out: what each one does, in what order, where
-it stops for you, and what it leaves on disk. [commands.md](commands.md)
-is the reference for every command and its arguments; this file is the
+Three entry points: what each does, in what order, where it stops for
+you, and what it leaves on disk. [commands.md](commands.md) is the
+reference for every command and its arguments; this file is the
 mechanics behind the three that run a whole process.
 
 **Jump to:**
@@ -17,156 +17,105 @@ mechanics behind the three that run a whole process.
 
 ## Picking an entry point
 
-```mermaid
-flowchart TD
-  Q{"What are you holding?"}
-  Q -->|"a repo with code in it"| M["map"]
-  Q -->|"an idea, no code yet"| S["start"]
-  Q -->|"a shipped product, one new thing"| F["feature"]
+| You have | Run | It produces |
+| --- | --- | --- |
+| A repo with code in it | `map` | The reference, from what the code does |
+| An idea and no code | `start` | The reference from what you decide, then the code |
+| A shipped product and one new thing | `feature` | One feature's spec, plan, and code, absorbed back |
 
-  M --> MO["the reference, from what the code does"]
-  S --> SO["the reference, from what you decide - then the code"]
-  F --> FO["one feature's spec, plan, and code - absorbed back"]
-
-  MO --> D[("docs/capstone/")]
-  SO --> D
-  FO --> D
-```
-
-They are not alternatives so much as phases of one life. `start` builds
-a product that does not exist; `map` takes over once code does, turning
-intent into observation; `feature` grows what shipped, one change at a
-time, and hands its knowledge back to the same reference.
+They are phases of one life rather than alternatives. `start` builds a
+product that does not exist; `map` takes over once code does, replacing
+intent with observation; `feature` grows what shipped and hands its
+knowledge back to the same reference.
 
 ---
 
 ## `map` - the reference, built and kept true
 
-One verb for build, refresh, and report. What it does depends on what it
-finds, which is why there is no separate "update" command to forget to
-run.
+One verb for build, refresh, and report - which is why there is no
+separate "update" command to forget to run. What happens depends on
+what it finds:
 
 ```mermaid
 flowchart TD
-  A["map"] --> B{"Phase 0: mode select"}
+  A(["map"]) --> B{"Phase 0<br/>mode select"}
 
-  B -->|"map check"| CHK["read-only trust report"]
+  B -->|"map check"| CHK["read-only report"]
   B -->|"a topic name"| ONE["that chapter only"]
-  B -->|"map rebuild"| FULL
-  B -->|"no index on disk"| FULL["full build"]
-  B -->|"an index exists"| REF["refresh"]
+  B -->|"map rebuild"| FULL["full build"]
+  B -->|"no index on disk"| FULL
+  B -->|"an index exists"| REF{"per stamped file:<br/>stamp vs git diff<br/>over its paths_covered"}
 
-  FULL --> P1["Phase 1: inline recon"]
-  ONE --> P1
-  P1 --> P2["Phase 2: deep-dive per topic"]
-  P2 --> P3["Phase 3: compose"]
-  P3 --> P4["Phase 4: verify"]
-  P4 --> OUT[("index + 8 chapters<br/>logic/ + uiux/ maps<br/>changelog entry")]
+  REF -->|"unchanged"| SKIP["left alone"]
+  REF -->|"drifted"| WRITE
+  REF -->|"gap in logic/ or uiux/"| WRITE
 
-  REF --> R1["per stamped file:<br/>stamp vs git diff on its paths_covered"]
-  R1 --> R2{"drifted?"}
-  R2 -->|"no"| SKIP["left alone"]
-  R2 -->|"yes"| P2
-  R1 --> R3["gaps in logic/ and uiux/ filled too"]
-  R3 --> P2
-
-  CHK --> CR[("nothing written<br/>not even a changelog entry")]
+  FULL --> WRITE["deep-dive, compose, verify"]
+  ONE --> WRITE
+  WRITE --> OUT[("index + 8 chapters<br/>logic/ + uiux/ maps")]
+  CHK --> NIL[("nothing written<br/>not even a changelog entry")]
 ```
 
-**How it decides.** Every generated file carries frontmatter stamps:
-the commit it was derived at, the capstone version that wrote it, and
-`paths_covered`, the globs its claims come from. A refresh runs
-`git diff` between the stamp and the working tree over exactly those
-globs, so uncommitted work counts as drift. Only the files that moved
-get rewritten.
+**How drift is detected.** Every generated file carries frontmatter
+stamps: the commit it was derived at, the capstone version that wrote
+it, and `paths_covered` - the globs its claims come from. The refresh
+runs `git diff` between that stamp and the **working tree** over exactly
+those globs, so uncommitted work counts. Only what moved gets rewritten.
 
 **The prescriptive-to-observed flip.** Chapters written by `start` are
 marked `mode: prescriptive` - decisions, not observations. Once any
-tracked source exists, such a file is **stale by definition**: the plan
-described where code was going to land, and code lands where it lands.
-The refresh rewrites it descriptively and records the divergences as
-facts, citing both sides ("designed as X per `architecture-interview.md`
-§Q7, implemented as Y at `file:line`").
+tracked source exists, such a file is stale *by definition*: the plan
+said where code was going to land, and code lands where it lands. The
+refresh rewrites it descriptively and records divergences as facts,
+citing both sides ("designed as X per `architecture-interview.md` §Q7,
+implemented as Y at `file:line`").
 
-**`map check` writes nothing at all**, including no changelog entry -
-nothing was done, only read. Six parts: staleness, pointer drift,
-absorption drift, coverage gaps, stack re-vetting, and a machine-readable
-verdict line CI can grep for.
+**`map check` writes nothing**, including no changelog entry - nothing
+was done, only read. Six parts: staleness, pointer drift, absorption
+drift, coverage gaps, stack re-vetting, and a machine-readable verdict
+line CI can grep.
 
 ---
 
 ## `start` - the greenfield pipeline
 
-Seven interviews in order, each one resumable, each gated on your
-approval before it writes. Typing bare `capstone` runs this.
+Seven interviews in order, each resumable, each gated before it writes.
+Typing bare `capstone` runs this.
 
-```mermaid
-flowchart TD
-  S["start"] --> RES{"resume: first stage<br/>not yet formalized"}
+| # | Stage | Settles | Produces |
+| --- | --- | --- | --- |
+| 1 | `mockup` | What exists: screens, journeys, the behavior inventory, the commercial model | `mockup/` |
+| 2 | `logic` | What happens: rules, branches, unhappy paths, invariants | `logic/` |
+| 3 | `uiux` | How it looks and behaves | `uiux/` |
+| 4 | `architecture` | How the system is built | The 8 chapters, `mode: prescriptive` |
+| 5 | `standards` | How code is written here | `standards.md` |
+| 6 | `stack` | What it is built with | `05-dependencies.md` |
+| — | *readback* | Nothing. It re-files and reconciles what stages 1-6 recorded | Amended interviews |
+| 7 | `build` | The implementation plan, then the code | `implementation.md`, source |
 
-  RES --> M["mockup<br/><i>what exists</i>"]
-  M --> L["logic<br/><i>what happens</i>"]
-  L --> U["uiux<br/><i>how it looks and behaves</i>"]
-  U --> A["architecture<br/><i>how it is built</i>"]
-  A --> ST["standards<br/><i>how code is written here</i>"]
-  ST --> SK["stack<br/><i>what it is built with</i>"]
-  SK --> RB{{"readback<br/>re-file, then reconcile"}}
-  RB --> B["build<br/>plan, your approval, then code"]
-  B --> END[("working code +<br/>the full reference")]
-
-  M -.->|"screens, journeys,<br/>scenario list"| L
-  L -.->|"rules, unhappy paths"| U
-  L -.->|"entities, invariants"| A
-  M -.->|"framing"| A
-```
-
-**Every stage is the same shape.** An interview file on disk records
-each `### Q<n>` before the next question is asked, so a dead session
-loses nothing and a resumed one never re-asks. When the questions run
-out the stage presents a summary and stops: nothing is generated until
-you formalize it.
-
-```mermaid
-stateDiagram-v2
-  [*] --> interviewing: first question asked
-  interviewing --> awaiting_formalization: summary presented at the gate
-  awaiting_formalization --> interviewing: you amend
-  awaiting_formalization --> formalized: you approve, outputs written
-  formalized --> [*]
-  note right of formalized
-    set only AFTER the outputs
-    and the changelog entry are
-    on disk, never before
-  end note
-```
-
-`logic` is the one exception: it gates per scenario rather than once at
-the end, so it stays `interviewing` with a scenario checklist in its
-frontmatter until every scenario is written or dropped.
+Each stage feeds the next, and skipping ahead is not possible: `uiux`
+requires a formalized `mockup`, `build` requires a formalized `stack`.
 
 **The readback, between `stack` and `build`.** No interview can see
-another one's answers, which leaves two things nobody catches: a
-decision recorded in the wrong stage, and two stages deciding the same
-thing differently.
+another's answers, which leaves two things nobody catches. It runs in
+two halves, misplacement first so the second cites final locations:
 
-```mermaid
-flowchart LR
-  IN[("six interview files")] --> MIS["1 - misplacement<br/>against the ownership table"]
-  MIS --> DIG["one digest you confirm"]
-  DIG --> MOVE["decision moved to its owner<br/>both outputs regenerated"]
-  MOVE --> CON["2 - contradiction and pushback"]
-  CON --> ASK["one finding per turn<br/>cited, two rounds, then your call"]
-  ASK --> FIX["losing stage amended<br/>its outputs regenerated"]
-  FIX --> KEY[("readback/all key written<br/>later runs skip")]
-```
+1. **Re-file.** Against core.md's Stage ownership table, every decision
+   whose subject belongs to another stage - a business rule settled in
+   the architecture interview, a library chosen in the standards one.
+   Re-filing is not re-deciding, so it arrives as one digest you
+   confirm, not a finding per turn.
+2. **Reconcile.** Every decision contradicting one recorded elsewhere,
+   raised one per turn with both citations, under the usual two-round
+   cap. Then your answer stands.
 
-Misplacement runs first so the contradiction half cites final locations.
-Re-filing is not re-deciding, so it arrives as one digest rather than a
-question per finding.
+Either half amends the interview that gives way and regenerates its
+outputs - never a re-interview. The pass records itself under
+`readback/all`, so later runs see the key and skip.
 
-**`build` is the only stage that writes source code**, and only after
-you approve its plan. `implementation.md` maps every scenario, screen,
-and component to the build step that implements it; a row with no step
+**`build` is the only pipeline stage that writes source code**, and only
+after you approve its plan. `implementation.md` maps every scenario,
+screen, and component to the step that implements it; a row with no step
 is a gap in the plan, and the plan gets fixed rather than the table.
 
 ---
@@ -176,98 +125,89 @@ is a gap in the plan, and the plan gets fixed rather than the table.
 Three stages, two approval gates, and a review loop that has to prove
 itself finished.
 
-```mermaid
-flowchart TD
-  F["feature 'add CSV export'"] --> RES{"resolve"}
-  RES -->|"folder exists"| STAGE
-  RES -->|"only a changelog key"| SHIP["already shipped - say so, stop"]
-  RES -->|"neither"| NEW["new feature folder"]
-  NEW --> STAGE{"first incomplete stage"}
-
-  STAGE --> G["groom"]
-  G --> GA{{"gate: spec approved?"}}
-  GA --> SPEC[("spec.md")]
-
-  SPEC --> P["plan"]
-  P --> PA{{"gate: plan approved?"}}
-  PA --> PLAN[("plan.md - TDD tasks")]
-
-  PLAN --> I["implement"]
-  I --> EX["execute task by task<br/>subagents or inline"]
-  EX --> RV["review until dry"]
-  RV --> W["wrap"]
-  W --> DONE[("code + refreshed chapters<br/>+ changelog entry")]
-```
+| Stage | Stops for you at | Produces |
+| --- | --- | --- |
+| `groom` | The spec gate | `spec.md`, every requirement traced to a `§Q` |
+| `plan` | The plan gate | `plan.md`, task-by-task TDD |
+| `implement` | Nothing - it runs to completion | Code, refreshed chapters, a changelog entry |
 
 **Grooming is doc-grounded.** It reads the chapters the feature touches
-first, so it asks about the feature rather than re-asking what the
-reference already answers, and every requirement in the spec traces back
-to a `§Q` you gave.
+first, so it asks about the feature instead of re-asking what the
+reference already answers.
 
-**A plan approval can go stale.** It records both `plan_approved: true`
-and a checksum of the spec it was approved against. Edit the spec and
-the approval is void - the plan is re-gated rather than silently
-executed against requirements that changed underneath it.
+**A plan approval can go stale.** It records `plan_approved: true` *and*
+a checksum of the spec it was approved against. Edit the spec and the
+approval is void - the plan is re-gated rather than silently executed
+against requirements that changed underneath it.
 
-**The review loop is recursive on purpose.** A single pass cannot catch
-the bugs its own fixes introduce.
+**The review loop is recursive on purpose**, because a single pass
+cannot catch the bugs its own fixes introduce:
 
 ```mermaid
 flowchart LR
-  D["the feature's full diff"] --> R["round: independent reviews<br/>spec compliance · standards · craft"]
-  R --> V{"any finding survives<br/>verification?"}
-  V -->|"yes"| FIX["fix, then a fresh round<br/>voiding the rounds before it"]
+  D(["the feature's full diff"]) --> R["round: independent reviews<br/>spec compliance · standards · craft"]
+  R --> V{"any finding<br/>survives verification?"}
+  V -->|"yes"| FIX["fix - then a fresh round,<br/>voiding the rounds before it"]
   FIX --> R
   V -->|"no"| DRY["dry round counted"]
   DRY --> E{"enough consecutive<br/>dry rounds?"}
   E -->|"no"| R
-  E -->|"yes"| OUT["loop closes"]
+  E -->|"yes"| OUT(["loop closes"])
 ```
 
-Its state lives in `review-ledger.md` beside the plan: every finding ever
-raised with its verdict and the dry-round count, so a resumed session
-picks the loop up instead of restarting at round one.
+Its state lives in `review-ledger.md` beside the plan - every finding
+ever raised with its verdict, plus the dry-round count - so a resumed
+session picks the loop up instead of restarting at round one.
 
-**The wrap is where a feature stops being local.** `features/` is
-never committed, so the knowledge has to move before the folder goes:
-
-1. The chapters the spec named are stale by construction - `map`
-   refreshes them against what was actually built.
-2. The spec is **absorbed**: its behavior merges into `logic/`, the
-   screens it changed into `mockup/`, the chapters it restyled into
-   `uiux/`. Everything absorbed is stamped `absorbed_from`.
-3. The changelog entry is written - and then the feature folder is
-   deleted, which is why that entry has to be readable with no spec
-   beside it. It is all that survives.
+**The wrap is where a feature stops being local.** `features/` is never
+committed, so its knowledge has to move before the folder goes: the
+chapters the spec named are refreshed against what was actually built,
+then the spec is **absorbed** - behavior into `logic/`, changed screens
+into `mockup/`, restyled chapters into `uiux/`, each stamped
+`absorbed_from`. Only then is the changelog entry written and the folder
+deleted. That entry is all that survives it, which is why it has to be
+readable with no spec beside it.
 
 ---
 
 ## What every stage has in common
 
-**Nothing is generated before you approve it.** Every gate sets
-`awaiting-formalization` and waits. A resumed run re-presents the gate;
-it never takes silence for a yes.
-
-**Every write is recorded before it counts as done.** A run appends its
-entry to `changelog.md` *before* setting its done marker, so a marker
-with no entry is provably a torn write - and `doctor` repairs it from
-the recorded decisions rather than re-interviewing you.
+**Nothing is generated before you approve it.** Every interview moves
+through the same three states, and a resumed run re-presents the gate
+rather than taking silence for a yes:
 
 ```mermaid
-flowchart LR
-  W["outputs written"] --> C["changelog entry appended"]
-  C --> MK["done marker set"]
-  MK --> OK["stage counts as complete"]
-  W -.->|"crash here"| TORN["marker absent:<br/>outputs regenerate from decisions"]
-  C -.->|"crash here"| TORN2["key present, marker absent:<br/>doctor repairs, no re-interview"]
+stateDiagram-v2
+  [*] --> interviewing: first question asked
+  interviewing --> awaiting_formalization: summary presented at the gate
+  awaiting_formalization --> interviewing: you amend
+  awaiting_formalization --> formalized: you approve, outputs written
+  formalized --> [*]
+  note right of formalized
+    set only AFTER the outputs and
+    the changelog entry are on disk,
+    so a crash can never strand a
+    formalized stage with no outputs
+  end note
 ```
 
-**Stopping is always safe.** Every stage persists its state before the
-next question, so the answer to "can I stop here?" is yes, everywhere,
-and the next run resumes exactly where you left off.
+`logic` is the one exception: it gates per scenario rather than once at
+the end, so it stays `interviewing` with a scenario checklist in its
+frontmatter until every scenario is written or dropped.
+
+**Every write is recorded before it counts as done.** A run appends its
+changelog entry *before* setting its done marker. That order is what
+makes a crash diagnosable rather than ambiguous: outputs with no marker
+regenerate from the recorded decisions, and a marker with no entry is
+provably a torn write that `doctor` repairs - neither case re-interviews
+you.
+
+**Stopping is always safe.** Every stage persists its state before
+asking the next question, so the answer to "can I stop here?" is yes,
+everywhere.
 
 **Your decisions outrank the method.** Every interview will challenge an
 answer that conflicts with something recorded, a craft rule, or a number
-you already gave - on evidence, with a citation, and never more than
-twice. Then it is yours, it gets recorded with the objection beside it,
-and nothing reopens it later.
+you already gave - on evidence, with a citation, never more than twice.
+Then it is yours: recorded with the objection beside it, and never
+reopened.
