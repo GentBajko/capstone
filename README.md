@@ -192,7 +192,13 @@ stage skips itself.
 **logic**. One scenario at a time, walked until a developer could
 implement it without inventing a single rule: exact steps, real
 formulas, what happens when the payment fails or the user clicks
-twice. The part of a spec everyone skips and then pays for.
+twice. The part of a spec everyone skips and then pays for. It is
+exhaustive on purpose - every scenario is swept against sixteen rule
+dimensions, so it finishes when each is answered or explicitly ruled
+out, never when nothing else comes to mind. That is what catches the
+rules with no natural question behind them: what the system
+deliberately hides, what it deliberately never says, who eats the cost
+when a charge fails after the money moved.
 
 **uiux**. How it looks and feels: a design read, the visual world,
 the tokens, each screen's composition and states. The method is

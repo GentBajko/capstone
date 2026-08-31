@@ -141,7 +141,7 @@ dead session loses nothing, and re-running never re-asks.
 | Stage | Produces | State file |
 | --- | --- | --- |
 | `mockup` | `mockup/` - one file per screen: wireframe, elements, and a state inventory; `README.md` indexes the screens, the journeys, and the scenario list `logic` works from | `mockup-interview.md` |
-| `logic` | `logic/` - one file per scenario: triggers, exact rules, branches, unhappy paths, invariants | `logic-interview.md` |
+| `logic` | `logic/` - one file per scenario: triggers, exact rules, branches, unhappy paths, invariants, and the dimensions ruled out | `logic-interview.md` |
 | `uiux` | `uiux/01-direction.md`, `02-system.md`, `03-experience.md`, `screens/` | `uiux-interview.md` |
 | `architecture` | The eight numbered chapters, marked `mode: prescriptive` | `architecture-interview.md` |
 | `standards` | `standards.md` | `standards-interview.md` |
@@ -159,6 +159,15 @@ dead session loses nothing, and re-running never re-asks.
   `rule: logic` rather than filled in. It takes an optional artifact
   argument (a PRD, screenshots) and pre-fills whatever it answers. A project with no visual UI
   records its surfaces (api, cli) and `uiux` skips itself.
+- **`logic`** sweeps every scenario against `logic-craft.md`'s sixteen
+  rule dimensions - authority, money, concurrency, time, failure,
+  what is deliberately hidden, what is deliberately silent, and the
+  rest - and a scenario is finished when each one is answered, cited
+  to an earlier scenario, or recorded inapplicable with its reason.
+  The dimensions generate the questions rather than being asked as
+  questions: what does not apply is confirmed in one batch, not
+  sixteen turns. Without the sweep, a rule nobody thought to ask about
+  reads exactly like a rule that does not exist.
 - **`uiux`** requires a formalized `mockup`. On a repo that already has
   a frontend it runs in **extraction mode** instead: it documents the
   design that exists rather than interviewing for one.

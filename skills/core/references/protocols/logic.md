@@ -1,6 +1,7 @@
 # logic - scenario-by-scenario business-logic interview
 
 **Reads:** config → `logic-interview.md` (resume) →
+`../logic-craft.md` (the method, in full, before the first scenario) →
 `mockup/README.md`'s Scenarios table and `mockup-interview.md`'s
 `for: logic` open threads (the question list) →
 the existing `logic/` files when re-entering → in extraction
@@ -64,9 +65,12 @@ with the code answering instead of the user:
 - **Per scenario, the file covers the full Phase B section list**
   (trigger and preconditions, steps with exact rules, branches,
   unhappy paths, state transitions, invariants, outcomes and side
-  effects) from observed behavior, every rule cited `file:line`. An
-  unhappy path the code does not handle is recorded as absent
-  (style.md: absent things are facts too), never skipped.
+  effects) from observed behavior, every rule cited `file:line`, and
+  is swept against logic-craft's dimensions per its §5: each one the
+  code either implements, cited `file:line`, or does not, and "not
+  implemented" is recorded as the finding. An unhappy path the code
+  does not handle is recorded as absent (style.md: absent things are
+  facts too), never skipped.
 - Present each draft; only the user's confirmation or correction
   makes it normative. Corrections are recorded as `### Q<n>` entries
   like any answer. Extraction outputs carry `paths_covered` (the
@@ -92,6 +96,17 @@ would I have to invent?"**; the next question is whatever tops that
 list. One question per turn; concrete options when enumerable; per
 the expertise level in config.
 
+**The generation rule orders; `../logic-craft.md` gates.** That rule
+measures what you noticed, so a rule nobody thought to ask about reads
+exactly like a rule that does not exist. Once the scenario's happy
+path is known, run logic-craft §2's sweep against its sixteen
+dimensions: generate each dimension's questions for this scenario,
+delete the ones the mockup or an earlier scenario already answers,
+batch the dimensions that do not apply into a single confirmation
+rather than a question each, and ask what is left one per turn like
+any other. D16 (invariants) runs last, against what the others
+produced.
+
 Per scenario, cover until nothing is left to invent:
 
 - **Trigger & preconditions**: who starts it, from where, in what
@@ -109,10 +124,18 @@ Per scenario, cover until nothing is left to invent:
 - **Outcomes & side effects**: success and failure endings;
   notifications, records, money moved.
 
-When a scenario has nothing left to invent, present its summary, get
-the user's confirmation ("laid bare?"), then write
-`docs/capstone/logic/<NN>-<scenario>.md` immediately: sections exactly
-as the bullets above, every rule traceable to its `§Q` entry. Append
+A scenario is finished when logic-craft §4's gate passes - every
+dimension answered, cited to an earlier scenario, or recorded
+inapplicable - not when nothing further comes to mind. A dimension the
+user declines to settle is an open question, recorded as one, never an
+inapplicable one.
+
+Then present the summary, get the user's confirmation ("laid bare?"),
+and write `docs/capstone/logic/<NN>-<scenario>.md` immediately:
+sections exactly as the bullets above, every rule traceable to its
+`§Q` entry, closing with `## Dimensions not in play` - one line per
+dimension ruled out and why, per logic-craft §4, so a later reader can
+tell "no money here" from "nobody asked". Append
 that scenario's changelog entry per core.md's ledger (key
 `logic/<NN>-<scenario>@Q<n>`, `<n>` the highest `§Q` the scenario file
 cites), flip that scenario's checklist entry to `written`, and move
@@ -129,7 +152,11 @@ per core.md (one topic-index row per written scenario file, `Topic`
 reading `logic`), set
 `status: formalized` in the interview file (only now, per core.md's
 Interview lifecycle), and note any cross-scenario contradictions
-discovered; surface them as questions, not verdicts. If the user
+discovered; surface them as questions, not verdicts. Report the
+dimension coverage in one line - how many scenarios, how many
+dimensions ruled inapplicable, and every dimension left open - so the
+gaps `architecture` and `build` will meet are named before they get
+there. If the user
 stops earlier, leave status as `interviewing`; the pipeline treats
 pending scenarios as in-progress.
 
