@@ -347,8 +347,8 @@ sees it.
 
 | Stage | Settles | Never settles |
 | --- | --- | --- |
-| `mockup` | What exists: surfaces, screens, their elements and where those lead, journeys, the inventory of behaviors the product must decide - and the commercial model (tiers, prices, grants, rate and runway equations) | The rules behind any of it |
-| `logic` | What happens: triggers and preconditions, exact rules and formulas, branches, unhappy paths, state transitions, invariants, outcomes | How it is built, how it looks |
+| `mockup` | What exists: surfaces, screens, their elements and where those lead, journeys, the inventory of behaviors the product must decide - and the commercial model: what is sold, at what price, for what allowance, and the equations that price it | The rules behind any of it, the ledger its own commercial model is spent through included |
+| `logic` | What happens: triggers and preconditions, exact rules and formulas, branches, unhappy paths, state transitions, invariants, outcomes - including the ledger behind a commercial model it never prices | How it is built, how it looks, what anything costs |
 | `uiux` | How it looks and feels: direction, tokens, composition, each state's styled treatment, motion, copy register | When a state is entered, or what a rule decides |
 | `architecture` | How the system is built: components and boundaries, models and relationships, data flow, quality attributes, deployment shape | The business rules those components apply |
 | `standards` | How code is written here: typing, errors, testing, naming, what an AI must never do in this repo | Which libraries do it |
@@ -356,6 +356,17 @@ sees it.
 
 **The test.** A decision belongs to the stage whose subject it answers,
 never the stage that happened to reach it first.
+
+**On money, where the two rows meet: `mockup` sets the price, `logic`
+runs the ledger.** Anything answering *what does it cost and what do
+you get* is the mockup's, formulas included - the one place it decides
+arithmetic, and the reason its own stop rule carries an exception.
+Anything answering *what happens to the balance, and when* is
+`logic`'s: debiting, reserving, reconciling, refunding, expiry, the
+behavior at zero, and who absorbs a failure. Expiry is `logic`'s even
+though it is commercially motivated, because it is a lifecycle
+transition; "unused credits expire monthly" is priced in the mockup
+and enforced in a scenario.
 
 **Referencing is not owning.** Any stage may cite another's decision and
 should: `logic` naming the commercial model the mockup settled is

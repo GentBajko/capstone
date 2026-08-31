@@ -31,7 +31,12 @@ recorded here outranks nothing and contradicts everything.
 The one exception is the **commercial model** (tiers, prices, grants,
 the rate and runway equations): the business-plan angle settles it
 here, and every later stage references those files rather than
-restating them.
+restating them. It is the only arithmetic this stage decides, and the
+exception ends where the money starts moving - **the price is set
+here, the ledger is `logic`'s**, per core.md's Stage ownership table.
+What a plan costs and what it grants is a mockup question; when a
+balance is debited, reserved, refunded, or expired, what happens at
+zero, and who absorbs a failed charge are all scenarios.
 
 ## Phase A - setup / resume
 

@@ -86,8 +86,10 @@ order, and what happens to the remainder?"
 *Tell:* any number appears. *Lands in:* Steps.
 
 **D5 Money.** Charges, refunds, proration, tax, fees; when value is
-reserved versus captured; what a partial or failed attempt costs and
-**who absorbs it**.
+reserved versus captured; expiry of an unspent balance; what a partial
+or failed attempt costs and **who absorbs it**. The price itself is
+the mockup's and is cited, never re-set here: this dimension is the
+ledger, not the price list.
 *Probe:* "who pays, at what moment, and who eats it when it fails
 after the money moved?"
 *Tell:* value changes hands, including credits and non-currency
