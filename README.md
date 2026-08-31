@@ -28,6 +28,7 @@ flowchart LR
 9. [Not technical? Still yours](#not-technical-still-yours)
 
 Full detail on every command: **[docs/commands.md](docs/commands.md)**.
+How the three run, in diagrams: **[docs/flows.md](docs/flows.md)**.
 
 Works in Claude Code, Copilot CLI, Gemini CLI, Antigravity, and
 OpenCode. Plain `SKILL.md` files, Apache-2.0.
