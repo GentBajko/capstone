@@ -42,6 +42,14 @@ scenarios), `docs/capstone/mockup-interview.md`, and the mockup itself
 question touches the flows they depict). Record everything they answer
 as derived decisions; never re-ask it.
 
+A question here will regularly reach a decision this stage does not
+own - a business rule, a screen's behavior, a library pick. Per
+core.md's Stage ownership table, record it where it belongs: an
+unsettled business rule goes to `logic` as an open thread rather than
+being answered in this interview, and a rule `logic/` already settled
+is cited, never restated. What this stage settles is how the system is
+built, not what it decides at runtime.
+
 ## Phase A - setup / resume
 
 The interview state lives in `docs/capstone/architecture-interview.md`.

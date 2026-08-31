@@ -336,6 +336,42 @@ straight to `formalized` once every listed scenario is `written` or
 `dropped` and the index row exists. The pipeline runner
 (`protocols/start.md`) keys stage completion on these rules.
 
+## Stage ownership: which stage settles what
+
+Interviews generate their questions from the answers before them, so a
+stage routinely *surfaces* a decision it does not own - the mockup
+stumbles onto a pricing rule, the architecture interview onto a
+business rule. Surfacing it is fine. **Recording it there is the
+defect**, because the owning stage then either re-decides it or never
+sees it.
+
+| Stage | Settles | Never settles |
+| --- | --- | --- |
+| `mockup` | What exists: surfaces, screens, their elements and where those lead, journeys, the inventory of behaviors the product must decide - and the commercial model (tiers, prices, grants, rate and runway equations) | The rules behind any of it |
+| `logic` | What happens: triggers and preconditions, exact rules and formulas, branches, unhappy paths, state transitions, invariants, outcomes | How it is built, how it looks |
+| `uiux` | How it looks and feels: direction, tokens, composition, each state's styled treatment, motion, copy register | When a state is entered, or what a rule decides |
+| `architecture` | How the system is built: components and boundaries, models and relationships, data flow, quality attributes, deployment shape | The business rules those components apply |
+| `standards` | How code is written here: typing, errors, testing, naming, what an AI must never do in this repo | Which libraries do it |
+| `stack` | What is used: libraries, services, versions, licenses, prices | How they are wired, or coded against |
+
+**The test.** A decision belongs to the stage whose subject it answers,
+never the stage that happened to reach it first.
+
+**Referencing is not owning.** Any stage may cite another's decision and
+should: `logic` naming the commercial model the mockup settled is
+correct, and restating it instead would be the defect. A decision is
+misplaced only where the non-owning stage is its **only** record, or
+states it a second time in its own words.
+
+**Declared crossings, which are not misplacement:** the mockup settles
+the commercial model for everyone; the architecture interview's framing
+section is pre-filled from `mockup-interview.md` by design; `logic` and
+`uiux` in extraction mode record observed fact from code rather than
+decisions.
+
+`start`'s readback pass (`protocols/start.md` step 7) is where anything
+misfiled anyway gets moved to its owner.
+
 ## Pushback: challenge twice, then it is their call
 
 **An interview that records a bad decision without saying so has

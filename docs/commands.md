@@ -166,13 +166,19 @@ dead session loses nothing, and re-running never re-asks.
   pricing; you pick. `stack refresh` re-vets recorded picks later.
   Ledger keys `stack/all@Q<n>` and `stack/refresh@Q<n>`.
 - **Between `stack` and `build`** the pipeline reads all six
-  interviews back and raises what one stage decided that contradicts
-  another - the check no single interview can make, since each sees
-  only its own answers. Same terms as any interview's pushback
-  (core.md's Pushback rule): evidence and a citation, two rounds at
-  most, then your answer stands. A resolution amends the interview
-  that gives way and regenerates its outputs without re-interviewing.
-  Ledger key `readback/all@Q<n>`; later runs see it and skip.
+  interviews back, in two halves. First it **re-files what landed in
+  the wrong stage** against core.md's Stage ownership table - a
+  business rule settled in the architecture interview belongs to
+  `logic`, a library chosen in the standards interview belongs to
+  `stack` - as one digest you confirm, since nothing is being
+  re-decided, only moved. Then it **raises what one stage decided
+  that contradicts another**, the check no single interview can make,
+  since each sees only its own answers. Same terms as any interview's
+  pushback (core.md's Pushback rule): evidence and a citation, two
+  rounds at most, then your answer stands. Either way the affected
+  interviews are amended and their outputs regenerated without
+  re-interviewing. Ledger key `readback/all@Q<n>`; later runs see it
+  and skip.
 - **`build`** requires a formalized `stack`. It writes an
   implementation plan, **stops for your approval**, then writes code -
   in subagents (fresh context per step) or inline, asked once before

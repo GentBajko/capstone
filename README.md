@@ -216,12 +216,14 @@ implementation plan, stops for your approval, then writes the code:
 one subagent per step with fresh context, or inline, whichever you
 pick when it starts.
 
-Between the two, the pipeline reads all six interviews back and raises
-what one stage decided that contradicts another - the check no single
-interview can make, since each sees only its own answers. Same terms
-as everywhere else: evidence and a citation, two rounds at most, then
-your answer stands. It is the last point where a contradiction costs a
-paragraph instead of a rewrite.
+Between the two, the pipeline reads all six interviews back. It moves
+what landed in the wrong stage to the stage that owns it - a business
+rule the architecture interview happened to reach belongs to `logic` -
+and it raises what one stage decided that contradicts another. Neither
+check can be made by a single interview, because none of them can see
+the others. Same terms as everywhere else: evidence and a citation,
+two rounds at most, then your answer stands. It is the last point
+where either costs a paragraph instead of a rewrite.
 
 ## The feature chain
 

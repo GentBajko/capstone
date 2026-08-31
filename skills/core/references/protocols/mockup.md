@@ -17,8 +17,9 @@ right now, what would I have to invent?" The next question is whatever
 tops that list. The interview is complete when the user says stop, or
 when nothing remains that would change the mockup.
 
-**Where it stops.** The mockup depicts; it does not decide. When the
-next question's answer would be a **rule** - a threshold, a formula, a
+**Where it stops.** The mockup depicts; it does not decide - the
+general form is core.md's Stage ownership table. When the next
+question's answer would be a **rule** - a threshold, a formula, a
 branch condition, who wins a conflict, what happens when something
 fails - it is not this stage's to ask. Name the behavior, record the
 question as an open thread addressed to `logic`, and move on. What

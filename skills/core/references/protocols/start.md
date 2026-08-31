@@ -2,8 +2,8 @@
 
 **Reads:** config → each stage's interview file (status frontmatter)
 and the presence of its outputs; the six pre-`build` interview files
-in full, once, for the readback pass (step 7); nothing else until a
-stage's own protocol runs.
+in full, plus core.md's Stage ownership table, once, for the readback
+pass (step 7); nothing else until a stage's own protocol runs.
 
 Entry point when the user says just "capstone" or asks to start or
 continue the pipeline. Runs the interview chain in order, resuming
@@ -70,18 +70,47 @@ wherever it stopped:
    the next ("mockup done; moving to logic; say stop to pause").
    Stopping is always safe: every stage persists its interview file,
    and the next `start` resumes exactly here.
-7. **Before `build`, read the interviews back.** Every stage pushes
-   back on its own answers per core.md's Pushback rule, but no stage
-   sees another's: a `stack` pick that breaks a `mockup` promise was
-   never challengeable at the time it was recorded. This pass is that
-   rule applied across the six, and it is the last point where a
-   contradiction is cheaper than a rewrite.
+7. **Before `build`, read the interviews back.** No stage can see two
+   things: another stage's decisions, and whether a decision it wrote
+   down was ever its own to make. A `stack` pick that breaks a
+   `mockup` promise is not challengeable while either runs, and a
+   business rule the architecture interview happened to reach gets
+   filed under architecture because that is where it came up. This
+   pass settles both, and it is the last point where either costs a
+   paragraph instead of a rewrite.
 
    Run it when `stack` is `formalized` and `changelog.md` carries no
    `readback/all@Q<n>` key (`<n>` the highest `### Q<n>` across the
    six interview files), before executing `build.md`. Read
    `mockup-`, `logic-`, `uiux-`, `architecture-`, `standards-`, and
-   `stack-interview.md` in full, and collect only what the Pushback
+   `stack-interview.md` in full, then run the two halves in order:
+   misplacement first, so the contradiction half cites final
+   locations.
+
+   **Misplacement: move it to its owner.** Against core.md's Stage
+   ownership table, collect every `### Q<n>` whose subject belongs to
+   a different stage - a business rule settled in
+   `architecture-interview.md`, a component boundary settled in
+   `logic-interview.md`, a library chosen in `standards-interview.md`
+   - plus every decision one stage restates in its own words that
+   another stage already owns. The declared crossings that section
+   names are not findings, and neither is a citation: a stage
+   pointing at another's decision is doing it right.
+
+   Nothing is being re-decided here, only re-filed, so this half is
+   **one digest rather than a debate**: list every move as a line
+   ("the wind-down threshold: `architecture` §Q12 → `logic`"), and
+   the user confirms the set, corrects a destination, or strikes a
+   move. On confirmation, per move: append a `### Q<n>` to the
+   receiving interview file carrying the decision verbatim, its
+   recorded objection included, marked `source: <stage>-interview.md
+   §Q<n>`; annotate the original entry as relocated rather than
+   deleting it, since the interview is the record of what was
+   actually asked; then regenerate both stages' affected outputs, the
+   loser's without it and the owner's with it. A restatement is
+   settled by replacing the non-owner's copy with a citation.
+
+   **Contradiction and pushback: raise it.** Collect what the Pushback
    rule's Grounds make a finding **across** two stages: a decision
    contradicting one recorded in another stage, or one that cannot
    meet a number another stage recorded. Grounds that live inside a
@@ -90,19 +119,21 @@ wherever it stopped:
    answer is settled: never re-raised here, per the same rule's "then
    it is theirs".
 
-   Raise findings one per turn, ordered by blast radius, both sides
+   Raise these one per turn, ordered by blast radius, both sides
    cited `<stage>-interview.md §Q<n>`, under the same two-round cap;
    then the user's answer stands. A resolution appends a `### Q<n>`
    entry to the interview file of the stage that gives way, recording
    both sides per the rule and naming the entry it supersedes, then
    regenerates that stage's affected outputs from the amended
    decisions: never a re-interview, and `status` stays `formalized`.
-   Each regenerated output takes its changelog entry, keyed to the
-   stage that owns it (`standards/readback@Q<n>`).
+
+   Every output either half regenerates takes its changelog entry,
+   keyed to the stage that owns it (`standards/readback@Q<n>`).
 
    Close the pass with its own entry, key `readback/all@Q<n>`, even
-   when it found nothing: it names what was read, every finding, and
-   how each was settled. Stopping mid-pass is safe: applied
+   when it found nothing: it names what was read, every decision
+   relocated and where it went, every finding, and how each was
+   settled. Stopping mid-pass is safe: applied
    resolutions stand, the key goes unwritten, and the next `start`
    re-runs the pass. Resolutions raise the highest `§Q`, so that run
    re-checks once against the amended decisions, then writes the key
