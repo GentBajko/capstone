@@ -66,7 +66,7 @@ with the code answering instead of the user:
   (trigger and preconditions, steps with exact rules, branches,
   unhappy paths, state transitions, invariants, outcomes and side
   effects) from observed behavior, every rule cited `file:line`, and
-  is swept against logic-craft's dimensions per its §5: each one the
+  is swept against logic-craft's dimensions per its §6: each one the
   code either implements, cited `file:line`, or does not, and "not
   implemented" is recorded as the finding. An unhappy path the code
   does not handle is recorded as absent (style.md: absent things are
@@ -124,7 +124,7 @@ Per scenario, cover until nothing is left to invent:
 - **Outcomes & side effects**: success and failure endings;
   notifications, records, money moved.
 
-A scenario is finished when logic-craft §4's gate passes - every
+A scenario is finished when logic-craft §5's gate passes - every
 dimension answered, cited to an earlier scenario, or recorded
 inapplicable - not when nothing further comes to mind. A dimension the
 user declines to settle is an open question, recorded as one, never an
@@ -134,7 +134,7 @@ Then present the summary, get the user's confirmation ("laid bare?"),
 and write `docs/capstone/logic/<NN>-<scenario>.md` immediately:
 sections exactly as the bullets above, every rule traceable to its
 `§Q` entry, closing with `## Dimensions not in play` - one line per
-dimension ruled out and why, per logic-craft §4, so a later reader can
+dimension ruled out and why, per logic-craft §5, so a later reader can
 tell "no money here" from "nobody asked". Append
 that scenario's changelog entry per core.md's ledger (key
 `logic/<NN>-<scenario>@Q<n>`, `<n>` the highest `§Q` the scenario file
@@ -151,8 +151,14 @@ When every listed scenario is `written` or `dropped`, update the index
 per core.md (one topic-index row per written scenario file, `Topic`
 reading `logic`), set
 `status: formalized` in the interview file (only now, per core.md's
-Interview lifecycle), and note any cross-scenario contradictions
-discovered; surface them as questions, not verdicts. Report the
+Interview lifecycle). First run logic-craft §4's
+**cross-scenario sweep**: group every subject more than one scenario
+rules on, name the owner, leave the others citing it, and write each
+boundary into the grouped files' `Not here` index column and their
+`depends_on`. That column is the pass's output, so the wrap is not
+done until it is written. Then note any contradictions across
+scenarios the grouping did not resolve; surface them as questions,
+not verdicts. Report the
 dimension coverage in one line - how many scenarios, how many
 dimensions ruled inapplicable, and every dimension left open - so the
 gaps `architecture` and `build` will meet are named before they get

@@ -73,16 +73,33 @@ The index is `<index_file>`, default
 it indexes rather than at the repository root. Every file this plugin
 writes under `<docs_dir>` must be listed there:
 
-- **Topic index**, a `| Topic | File |` table: the chapterized
-  filenames (`01-architecture.md` ... `08-glossary.md`, so the folder
-  reads in order even without the index), plus `logic/`'s per-scenario
-  files, one row per file under the `logic` topic name (the same
-  split-topic mechanic map.md uses for a monorepo's per-subsystem
-  chapters). Topics that do not apply get a row naming the reason:
-  an absence is a fact, and no file can record it.
-- **Companion docs**, a `| File | What it is |` table: everything else
-  (review, changelog, standards, implementation,
-  mockup/, uiux/, features/).
+- **Topic index**, a `| Topic | File | Settles | Not here |` table:
+  the chapterized filenames (`01-architecture.md` ...
+  `08-glossary.md`, so the folder reads in order even without the
+  index), plus `logic/`'s per-scenario files, one row per file under
+  the `logic` topic name (the same split-topic mechanic map.md uses
+  for a monorepo's per-subsystem chapters). Topics that do not apply
+  get a row naming the reason: an absence is a fact, and no file can
+  record it.
+- **Companion docs**, a `| File | What it is | Settles | Not here |`
+  table: everything else (review, changelog, standards,
+  implementation, mockup/, uiux/, features/), one row per file for
+  chapterized folders rather than one row for the folder.
+- **Terms**, a `| Term | Settled in |` table: every entity, state,
+  and domain noun the reference is authoritative about, mapped to the
+  one file that settles it. Built from what the rows above already
+  claim to own; a term appears once.
+
+**The index routes, it does not summarize.** Its job is to answer
+"which file do I open?" without opening one, so `Settles` is what that
+file decides in one specific line - never its title restated - and
+`Not here` names the neighbour that owns what a reader would plausibly
+look for here and not find ("prices and tiers → `mockup/12`"). That
+column is the load-bearing one: it is what stops a reader opening two
+files to discover which of them was right, and it is written by the
+stage that just decided the boundary, not inferred later. A row with
+no plausible neighbour leaves `Not here` empty rather than inventing
+one.
 
 **The index carries no stamps.** Freshness lives in each file's own
 frontmatter (`generated_at_commit`, `generated_date`,
@@ -101,8 +118,11 @@ indexed: the interview Q&A files (`architecture-interview.md`,
 
 After writing your output, append your changelog entry (Changelog
 ledger in `core.md`), then add or refresh your row; if `<index_file>` does
-not exist yet, create a minimal one (title + the two tables) rather
-than leaving the output orphaned.
+not exist yet, create a minimal one (title + the three tables) rather
+than leaving the output orphaned. A row is part of the output, not
+bookkeeping about it: writing the file without its `Settles` and `Not
+here` costs every later reader the exploratory reads the index exists
+to prevent.
 
 **Legacy index:** capstone used to write `DESIGN.md` at the repository
 root. A root `DESIGN.md` present with no `<index_file>` in the docs

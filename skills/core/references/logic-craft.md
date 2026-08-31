@@ -20,7 +20,7 @@ like a rule that does not exist. The dimensions below are what nobody
 thinks to ask.
 
 **The split: the generation rule orders, this sweep gates.** The rule
-still picks what to ask next, by whatever matters most. §4's gate
+still picks what to ask next, by whatever matters most. §5's gate
 decides when the scenario is finished.
 
 ## 2. The sweep, per scenario
@@ -40,7 +40,7 @@ Run it yourself; it is not an interrogation the user sits through.
 4. **Ask what remains**, one per turn, per `logic`'s Phase B conduct.
 5. **Record.** Applicable answers land in the scenario file's normal
    sections (§3 names which). Dimensions ruled inapplicable are
-   recorded per §4.
+   recorded per §5.
 
 The sweep runs once the scenario's happy path is known, not before: a
 dimension's questions are only answerable against concrete steps.
@@ -188,7 +188,46 @@ dimensions produced. *Lands in:* Invariants.
 **D2, D8, D12 and D16 apply to every scenario.** The rest are earned
 by the tell.
 
-## 4. The completeness gate
+## 4. The cross-scenario sweep
+
+The per-scenario sweep cannot see across scenarios, so it produces one
+predictable defect: **two scenarios settling the same subject
+separately.** They will not contradict each other loudly - each is
+internally coherent - and both will look finished. `logic/04` metering
+credits and `logic/06` handling party membership both end up ruling on
+a failed payment, because a lapsed subscription is money to one and
+access to the other.
+
+Run this once every scenario is written or dropped, before the wrap.
+
+1. **Group by subject.** Across all scenario files, collect every
+   subject more than one file rules on: the same entity's state, the
+   same trigger, the same failure, the same actor's permission. The
+   dimensions are the index to sweep by - two files answering the same
+   D-probe are ruling on one subject, whatever they call it.
+2. **Name the owner.** Per group, exactly one scenario settles it,
+   chosen by whose subject it actually is, not who wrote it first.
+   The rest **cite** it: they keep the sentence that says what happens
+   from their side and defer the rule itself, `§<NN>`-style, the way
+   `logic` already cites the mockup's commercial model rather than
+   restating it. Same rule as everywhere else in capstone: one owner,
+   any number of references.
+3. **Merge only when the cut was wrong.** Two files that turn out to
+   be one behavior split by vocabulary become one scenario, renumbered
+   and recorded as such. Two behaviors that genuinely both touch a
+   subject stay two files: a shared subject is not a duplicate.
+4. **Record the boundary.** Each grouped file's index row gets the
+   other side in its `Not here` column ("losing campaign access →
+   `logic/06`"), and `depends_on` names the owner. That column is this
+   pass's real output: the boundary is decided here, once, instead of
+   being rediscovered by every future reader who opens both files to
+   find out which one was right.
+
+A group the user wants left split with both sides ruling is recorded
+as that decision, in both files, with the reason - not silently left
+as a duplicate.
+
+## 5. The completeness gate
 
 A scenario is finished when **every dimension is answered, cited, or
 recorded inapplicable** - not when nothing more comes to mind.
@@ -211,7 +250,7 @@ Nothing here overrides `logic`'s per-scenario confirmation gate: the
 sweep decides what to ask, the user still confirms the scenario before
 it is written.
 
-## 5. Extraction mode
+## 6. Extraction mode
 
 The same sweep, with the code answering instead of the user. Per
 dimension, either the code implements a rule - cited `file:line` - or

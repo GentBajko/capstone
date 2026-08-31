@@ -19,9 +19,11 @@ architecture questions without exploring the repo.
   prose only for relationships a table cannot show.
 - No filler: delete any sentence that does not help the reader locate or
   understand code. No introductions, no summaries of summaries.
-- The index (`<index_file>`) stays under ~2 pages. Topic files have no
-  hard cap but must earn their length: if a section repeats the index,
-  cut it.
+- The index (`<index_file>`) has no page cap: it is a routing table,
+  and it earns every line by saving a read. It stays dense instead -
+  one row per file, no prose between the tables, nothing restated from
+  the file it points at. Topic files have no hard cap but must earn
+  their length: if a section repeats the index, cut it.
 - `changelog.md` is exempt from every length rule: it is never
   condensed, summarized, or pruned.
 
