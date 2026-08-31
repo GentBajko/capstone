@@ -26,15 +26,19 @@ seeds the interview per core-authoring.md's Artifact seeding rule. Build the
 scenario list: from `docs/capstone/mockup/README.md`'s **Scenarios**
 table if it exists - `mockup` wrote it at this stage's unit, one row
 per behavior the product decides, so it is the list rather than a
-source for one. Confirm it with the user and extend it where the
-screens moved on. Add a scenario for any state or element marked
-`rule: logic` that no row claims, and carry every open thread the
+source for one. Extend it where the screens moved on,
+then check the mockup's cardinality rule in both directions before
+confirming anything: a `rule: logic` marker no row claims gets a
+scenario, and a marker two rows both claim to decide gets its owner
+named, the others left referencing it. Carry every open thread the
 mockup interview marked `for: logic` into the scenario that owns it:
 those are questions the user was deliberately not asked yet, and they
-are answered here or nowhere. An older mockup with no Scenarios table
-(or none at all) falls back to eliciting the list ("walk me through
-everything a user can do, headline by headline"). Order by importance and record the agreed list as a
-checklist in the interview frontmatter, per core.md's Interview
+are answered here or nowhere. Then confirm the list with the user.
+
+An older mockup with no Scenarios table (or none at all) falls back to
+eliciting the list ("walk me through everything a user can do,
+headline by headline"). Order by importance and record the agreed list
+as a checklist in the interview frontmatter, per core.md's Interview
 lifecycle:
 
 ```yaml

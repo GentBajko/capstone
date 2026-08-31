@@ -1,6 +1,6 @@
 {
   "name": "capstone",
-  "version": "5.3.0",
+  "version": "5.2.0",
   "description": "Architecture reference docs: a docs/capstone/ index plus topic files stamped to commits, built and kept current by one command, map, plus doctor/review, a greenfield pipeline from product mockup to running code with a frontend-design stage, and a doc-grounded feature chain.",
   "author": {
     "name": "Gent Bajko",

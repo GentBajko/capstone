@@ -149,8 +149,13 @@ The folder's **only index is `README.md`**, carrying three tables:
   ("credit metering and exhaustion", "who resolves a contested
   action"), never a route through screens. **The completeness test:**
   every state and element marked `rule: logic` anywhere in the folder
-  is claimed by exactly one row. An unclaimed one means the inventory
-  is not finished.
+  is **owned by exactly one row**, which does not stop other rows
+  referencing it - one behavior decides a rule, any number may depend
+  on it, exactly as core.md's Stage ownership table draws the same
+  line between stages. An unclaimed marker means the inventory is not
+  finished; a marker two rows both claim to decide means the cut is
+  wrong, so name the owner rather than merging two behaviors that are
+  genuinely distinct.
 
 All "assumed" items are collected in the README too, for the user to
 review. Only after every screen file and the README are on disk,
