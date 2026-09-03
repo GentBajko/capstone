@@ -63,8 +63,9 @@ Artifact seeding rule.
 
 As soon as the answers imply it (asking directly if still unclear
 after the seeds), record the product's interaction surfaces in the
-interview frontmatter: `surfaces: [web|mobile|cli|api|none]`, any
-combination. `uiux` keys on it (no visual surface → that stage
+interview frontmatter while working and later in the final
+`mockup/README.md`: `surfaces: [web|mobile|cli|api|none]`, any
+combination. `uiux` keys on the final README (no visual surface → that stage
 records itself skipped), and for non-visual surfaces Phase E's
 "screens" are the surface's units (endpoints, commands, message
 flows): same files, same sections, the wireframe replaced by the
@@ -115,8 +116,7 @@ generate until they do.
 On formalization, write `docs/capstone/mockup/` as **chapterized
 markdown, no HTML anywhere**. One file per screen the scenarios imply,
 numbered in journey order (`01-<screen>.md`, `02-<screen>.md`, …), each
-with frontmatter naming the scenario(s) it serves and the `§Q` entries
-it implements, and these sections:
+with frontmatter naming the scenario(s) it serves, and these sections:
 
 - `## Layout`: an ASCII wireframe in a fenced code block plus a short
   element tree (what contains what).
@@ -134,16 +134,20 @@ it implements, and these sections:
   `rule: logic` inline, which is what `uiux` and `logic` both key on;
   the state is not thereby vague, it is correctly unfinished.
 
-Every element and state must trace to an interview answer; anything
-invented is marked "assumed" inline **and** listed in the screen's
-`assumed:` frontmatter - states included, since an invented trigger
-reads as settled fact to every stage downstream. A section is never
-filled to look complete: `rule: logic` is the honest entry, an
-invented threshold is a defect.
+Every element and state must be a confirmed decision written directly
+into the file; anything invented is marked "assumed" inline **and**
+listed in the screen's `assumed:` frontmatter - states included, since
+an invented trigger reads as settled fact to every stage downstream. A
+section is never filled to look complete: `rule: logic` is the honest
+entry, an invented threshold is a defect.
 
-The folder's **only index is `README.md`**, carrying three tables:
+The folder's **only index is `README.md`**. It starts with the final
+product brief: purpose, audience, positioning, success measures,
+interaction surfaces, commercial model, constraints, non-goals,
+confirmed rationale, and every open question or deferral needed by a
+later stage. It then carries three tables:
 
-- **Screens** → the journeys served → the `§Q` entries implemented.
+- **Screens** → the journeys served → the scenarios implemented.
 - **Journeys**: each journey as its path through the screens
   (`01 → 02 → 05`). Mockup's own unit, and what `uiux` and `build`
   order their work by.
@@ -180,6 +184,7 @@ then turns the screens into a committed frontend design, before any
 architecture. Both stages outrank this one on anything they settle: a
 `rule: logic` state is filled in by `logic`, and this folder is
 regenerated rather than defended when the two disagree. `architecture` (run after these) reads
-`mockup-interview.md` and never re-asks what it answers: its framing
-section (§0 of `../interview.md`) is largely pre-filled by this
-interview.
+regenerated rather than defended when the two disagree. `architecture`
+(run after these) reads the formalized mockup and never re-asks what it
+answers: its framing section (§0 of `../interview.md`) is largely
+pre-filled by these final files.

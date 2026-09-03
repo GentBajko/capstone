@@ -1,7 +1,7 @@
 # uiux - how the UI looks and how the UX behaves
 
 **Reads:** config → `uiux-interview.md` (resume) →
-`docs/capstone/mockup/` and `mockup-interview.md` (the brief) →
+`docs/capstone/mockup/` (the brief and screens) →
 `docs/capstone/logic/` (states, unhappy paths) → the existing
 `uiux/` outputs when re-entering → `../uiux-craft.md` (the method,
 in full) → in extraction mode: the conventions and architecture
@@ -45,13 +45,13 @@ Resume = read the file, never re-ask. An artifact argument (brand
 book, Figma export, reference screenshots) seeds the interview per
 core-authoring.md's Artifact seeding rule.
 
-Prerequisite: either `mockup-interview.md` is `formalized` with
-`docs/capstone/mockup/` on disk (greenfield: the screens are this
+Prerequisite: either `docs/capstone/mockup/` is formalized and on disk
+(greenfield: the screens are this
 stage's unit of work), or the repo has frontend code (brownfield:
 Extraction mode below). Neither → say so, point at `mockup` (or
 `start`), and stop.
 
-If the mockup's `surfaces` frontmatter records no visual surface
+If `mockup/README.md` records no visual surface
 (`cli`/`api`/`none` only), there is nothing to design: write
 `uiux-interview.md` with `status: formalized` and `skipped: no-ui`
 in its frontmatter, append the changelog entry (key
@@ -114,7 +114,7 @@ Derive before asking; never re-ask what the docs answer:
   (docs/content), Experience (showcase). The mode belongs to the
   surface, not the product: a tool's landing page is still Persuade.
 - Audience, purpose, positioning, and constraints from
-  `mockup-interview.md`.
+  `mockup/README.md`.
 - A proposed one-line design read per surface group ("Reading this
   as: <surface kind> for <audience>, with a <vibe> language, leaning
   toward <system or aesthetic family>") plus proposed dial values
@@ -196,8 +196,9 @@ generate until they do.
 On formalization, first run uiux-craft §8's design-time pre-flight
 (every mode, delegated or not); fix failures before writing. Then
 write `docs/capstone/uiux/` (chapterized markdown, no HTML,
-standard frontmatter stamps plus the `§Q` entries each file
-implements, anything invented marked "assumed" inline):
+standard frontmatter stamps, with every confirmed decision and its
+rationale written directly into the owning file; anything invented is
+marked "assumed" inline):
 
 - `01-direction.md`: the design read; the mode map (screen → mode
   table); the direction contract in prose: THESIS (the one idea this
@@ -230,14 +231,14 @@ implements, anything invented marked "assumed" inline):
   (confirm, undo, or both); error recovery and what happens to the
   user's work; progressive-disclosure defaults; input burden (what is
   remembered, defaulted, never re-asked); keyboard, pointer, and touch
-  expectations; the accessibility floor. Each rule traceable to its
-  `§Q`. `build` reads this beside `02-system.md`; `review`'s frontend
+  expectations; the accessibility floor. `build` reads this beside
+  `02-system.md`; `review`'s frontend
   side judges the shipped UX against it, the same way it judges the
   shipped UI against the system chapter.
 - `screens/<NN>-<screen>.md`: one per mockup screen, same number and
   slug as its mockup file (the subfolder exists so numbering can
   mirror `mockup/` exactly). Frontmatter names the mockup file, the
-  scenario(s), the logic file(s), and the `§Q` entries. Sections:
+  scenario(s), and the logic file(s). Sections:
   `## Mode & job`; `## Composition` (wireframe → designed layout:
   hierarchy, grid, focal moment; the flagship's first viewport is a
   thesis, not a header); `## States` (every mockup state and every
@@ -251,7 +252,7 @@ implements, anything invented marked "assumed" inline):
   cite the rule instead of restating it; a screen that contradicts it
   is a question for the user, not a local exception.
 - `README.md`: the folder's index, like the mockup's: a table design
-  chapter → mockup screen → logic scenarios → `§Q`, with every
+  chapter → mockup screen → logic scenarios, with every
   "assumed" item collected for the user to review.
 
 Only after every file is on disk, append the changelog entry per

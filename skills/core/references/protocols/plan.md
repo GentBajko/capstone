@@ -1,6 +1,6 @@
 # plan - task-by-task implementation plan from a groomed spec
 
-**Reads:** config → the feature's `feature-interview.md` → `spec.md`
+**Reads:** config → the feature interview's approval frontmatter → `spec.md`
 → the chapters, scenarios, and screens it cites → `standards.md` →
 `../code-craft.md` → the conventions and testing chapters.
 
@@ -10,7 +10,8 @@ writing-plans discipline (bite-sized steps, complete code, exact
 paths, TDD throughout) with capstone's twist that context comes from
 the chapterized reference, not repo exploration.
 
-Prerequisite: the feature's interview `formalized` and `spec.md` on
+Prerequisite: the feature's interview frontmatter says `formalized`
+and `spec.md` is on
 disk. Interview missing or not yet `formalized` → execute
 `protocols/groom.md` first (its Resume rules pick up mid-interview);
 `formalized` with `spec.md` missing is a crash `groom`'s Resume rule

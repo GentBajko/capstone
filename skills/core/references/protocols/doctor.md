@@ -2,7 +2,7 @@
 
 **Reads:** config → `<index_file>` → `<docs_dir>/changelog.md` →
 every interview file's frontmatter → the outputs each done marker
-implies (presence and stamps, not full bodies) →
+implies (presence, stamps, and final bodies for authority check 4b) →
 `<docs_dir>/.gitignore`.
 
 Read-only diagnosis first, then offered repairs. Every repair doctor
@@ -38,6 +38,13 @@ documented rules it proposes, never applies.
    core.md's lifecycle; `formalized` with outputs absent; a `logic`
    checklist holding scenarios neither `written` nor `dropped` while
    the file says `formalized`.
+4b. **Final-output authority**: an indexed final output names an
+   interview file or cites an interview question. Repair = write the
+   confirmed decision and rationale directly into the owning output
+   and remove the working-state provenance. Read a completed interview
+   body only when the final output lacks content needed for that
+   repair; if it is unavailable, report the omission as unrecoverable
+   and never guess.
 5. **Housekeeping**: `<docs_dir>/.gitignore` or config keys missing,
    or the ignore file still listing `changelog.md` (repair = run the
    initializer, core.md's rule); `changelog.md` untracked inside a git

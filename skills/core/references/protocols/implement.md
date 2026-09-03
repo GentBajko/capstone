@@ -1,6 +1,6 @@
 # implement - execute the approved feature plan
 
-**Reads:** config → the feature's `feature-interview.md` → `plan.md`
+**Reads:** config → the feature interview's approval frontmatter → `plan.md`
 → `spec.md` → `standards.md` → `../code-craft.md` → the operations
 chapter its verifications rely on → `review-ledger.md` (resume).
 

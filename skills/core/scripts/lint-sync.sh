@@ -469,6 +469,24 @@ grep -q '^## Pushback' skills/core/references/core.md \
   || err "core.md lost the interview Pushback rule"
 grep -q 'never more than' skills/core/references/core.md \
   || err "core.md's Pushback rule lost its two-round cap"
+
+# 12k. interviews are local working state. Final outputs must survive a
+#      fresh clone, so authoring instructions cannot make them cite an
+#      interview file or question number.
+grep -q 'Final outputs never name or cite interview files' \
+  skills/core/references/core.md \
+  || err "core.md lost final-output authority after formalization"
+grep -q 'Final outputs must stand alone' \
+  skills/core/references/core-authoring.md \
+  || err "core-authoring.md lost the standalone-output rule"
+for f in README.md docs/*.md skills/core/references/*.md \
+         skills/core/references/protocols/*.md; do
+  hit=$(awk 'BEGIN { ORS="" } /^$/ { print "\n"; next } { print $0 " " } END { print "\n" }' "$f" \
+    | grep -E 'interview\.md §Q|traceable to (its|a|an) `?§Q|`§Q` entries.*implements|→ `§Q`' \
+    | head -1)
+  [ -n "$hit" ] \
+    && err "$f instructs a final output to expose interview provenance: $hit"
+done
 grep -q 'Pushback rule' skills/core/references/interview.md \
   || err "interview.md conduct rules do not point at core.md's Pushback rule"
 

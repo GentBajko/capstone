@@ -3,8 +3,8 @@
 **Reads:** config → `architecture-interview.md` (resume) →
 `../interview.md` in full before the first question → upstream
 artifacts if present: `standards.md`, `logic/`,
-`mockup-interview.md`, `mockup/README.md` (screens as questions touch
-them) → `../code-craft.md` (the ladder bounds the design) →
+`mockup/README.md` (screens as questions touch them) →
+`../code-craft.md` (the ladder bounds the design) →
 `../topics.md` at generation.
 
 Design-time mode: there is no code to describe, so the reference is
@@ -15,8 +15,9 @@ user gate between the last two.
 This stage decides what will exist before anything does, so a layer,
 boundary, service, queue, or abstraction agreed here is code the
 ladder never gets a chance to stop later. Every structural element
-needs a recorded reason it is needed **now**, traceable to a `§Q`
-answer or a logic scenario; "we'll need it when we scale" is offered
+needs a recorded reason it is needed **now**, captured while
+interviewing and written into the final chapter with its rationale, or
+traceable to a logic scenario; "we'll need it when we scale" is offered
 as a deferred decision with a trigger rather than built. Exhaustive
 means every question answered - it does not mean every part designed
 in. This is a position you argue, not a veto: per core.md's Pushback
@@ -37,23 +38,27 @@ upstream artifacts, each read only if it exists:
 `docs/capstone/standards.md`, `docs/capstone/logic/` (the business-logic
 scenario files; they pre-fill models: entities, invariants,
 consistency needs; data-flow: lifecycles; and quality-attribute
-scenarios), `docs/capstone/mockup-interview.md`, and the mockup itself
-(`docs/capstone/mockup/README.md`, plus individual screens when a
-question touches the flows they depict). Record everything they answer
-as derived decisions; never re-ask it.
+scenarios), and the mockup itself (`docs/capstone/mockup/README.md`,
+plus individual screens when a question touches the flows they
+depict). Record everything they answer as derived decisions; never
+re-ask it.
 
 A question here will regularly reach a decision this stage does not
 own - a business rule, a screen's behavior, a library pick. Per
 core.md's Stage ownership table, record it where it belongs: an
-unsettled business rule goes to `logic` as an open thread rather than
-being answered in this interview, and a rule `logic/` already settled
-is cited, never restated. What this stage settles is how the system is
-built, not what it decides at runtime.
+unsettled business rule goes into the owning final `logic/` scenario
+as an open question rather than being answered in this interview, and
+a rule `logic/` already settled is cited, never restated. What this
+stage settles is how the system is built, not what it decides at
+runtime.
 
 ## Phase A - setup / resume
 
 The interview state lives in `docs/capstone/architecture-interview.md`.
-If it exists, read it and resume; never re-ask an answered question.
+If it exists and is unfinished, read it and resume; never re-ask an
+answered question. If it is formalized, read the final architecture
+chapters instead; open the interview body only to repair a proven
+omission in them.
 An artifact argument (an RFC, an ADR set, notes) seeds the interview
 per core-authoring.md's Artifact seeding rule.
 If not, create it, **seeding `## Open questions` once** as a
@@ -132,12 +137,12 @@ these differences:
 
 - Frontmatter gains `mode: prescriptive`; stamps are date-only unless a
   git repo already exists.
-- Citations point at interview entries
-  (`architecture-interview.md §Q12`) and at planned paths from the
-  decided layout, since no code exists.
+- Decisions and their rationale are written directly into the owning
+  chapter. Citations point only at other final outputs and planned
+  paths from the decided layout, since no code exists.
 - `paths_covered` uses the planned layout's globs.
-- A banner on each file: "Prescriptive: written from the design
-  interview, not from code."
+- A banner on each file: "Prescriptive design intent; code does not
+  exist yet."
 
 Append the changelog entry per core.md's ledger: key
 `architecture/all@Q<n>`, `<n>` the highest `### Q<n>`/`### D<n>` in
@@ -155,5 +160,6 @@ core.md's Interview lifecycle, never before generation).
 **Lifecycle:** once code exists, `map`'s refresh protocol
 treats every `mode: prescriptive` file as stale by definition: it
 rewrites them descriptively and records designed-vs-implemented
-divergences as facts ("designed as X (architecture-interview.md §Q7),
-implemented as Y (`file:line`)"), describing, not judging.
+divergences as facts ("designed as X; implemented as Y
+(`file:line`)"), preserving the design rationale inline and
+describing, not judging.

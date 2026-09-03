@@ -162,11 +162,13 @@ questions.
 
 Every subcommand reads in the same order, before doing anything else:
 
-1. **Own state first.** A protocol with an interview or state file
-   reads it before anything else; a protocol whose prior outputs
-   exist (`uiux/`, `logic/`, `spec.md`, `review.md`, ...) reads
-   them before regenerating or extending. Never write blind over your
-   own docs.
+1. **Own state first.** A protocol with an unfinished interview or
+   state file reads it before anything else. For a formalized stage,
+   read only interview frontmatter needed for lifecycle metadata, then
+   read its final outputs; open the completed body only to repair a
+   proven omission. A protocol whose prior outputs exist (`uiux/`,
+   `logic/`, `spec.md`, `review.md`, ...) reads them before regenerating
+   or extending. Never write blind over your own docs.
 2. **Discovery through the index, never by globbing.**
    `<index_file>`'s tables say what exists and where; open only the
    files this run's purpose needs. Freshness comes from each file's
@@ -218,8 +220,9 @@ Five bounds on it:
   say so and stop. Never loop.
 - **The greenfield stages are exempt** (`mockup`, `logic`, `uiux`,
   `architecture`, `standards`, `stack`, `build`): they build the
-  reference from interviews rather than reading one, and their
-  prerequisites are upstream *interviews*, not the index. `uiux`
+  reference through interviews rather than reading one, and their
+  prerequisites are upstream formalized outputs, with interview
+  frontmatter used only to resume an unfinished stage. `uiux`
   without a mockup still points at `mockup`; `build` without a
   formalized stack still runs `stack`.
 - **`map` and `doctor` are exempt.** `map` is what the rule
@@ -272,9 +275,10 @@ wrong even when every fact in it is right: this file is scanned by a
 later run hunting one key, never read start to finish.
 `<target>` is the thing acted on (`03-invite-links`,
 `02-models.md`; `all` for a run covering the whole
-project). `<rev>` is the highest interview question number the output
-traces to (`Q7`) for a stage with an interview file, otherwise the
-run's stamp.
+project). `<rev>` is the highest interview question number incorporated
+when the output was formalized (`Q7`) for a stage with an interview
+file, otherwise the run's stamp. The revision belongs in the key only;
+the output never cites the interview or its question numbers.
 
 Before appending, search the file for the key: if it is already there,
 this is a resumed run and the entry stands; never append a second. A
@@ -323,6 +327,13 @@ rather than racing it.
 
 ## Interview lifecycle (shared by all interviews)
 
+Interview files are resumable working state. After formalization, the
+stage's outputs are the source of truth and every later stage consumes
+those outputs. Completed interview bodies are read only to repair a
+proven omission in an owning output; the repair lands before work
+continues. Final outputs never name or cite interview files or question
+numbers. See core-authoring.md's Interviews are working state rule.
+
 An interview file's `status` moves `interviewing` →
 `awaiting-formalization` (set when the summary gate is presented) →
 `formalized`, and **`formalized` is written only AFTER the stage's
@@ -368,15 +379,15 @@ though it is commercially motivated, because it is a lifecycle
 transition; "unused credits expire monthly" is priced in the mockup
 and enforced in a scenario.
 
-**Referencing is not owning.** Any stage may cite another's decision and
-should: `logic` naming the commercial model the mockup settled is
+**Referencing is not owning.** Any stage may cite another final output
+and should: `logic` naming the commercial model the mockup settled is
 correct, and restating it instead would be the defect. A decision is
 misplaced only where the non-owning stage is its **only** record, or
 states it a second time in its own words.
 
 **Declared crossings, which are not misplacement:** the mockup settles
-the commercial model for everyone; the architecture interview's framing
-section is pre-filled from `mockup-interview.md` by design; `logic` and
+the commercial model for everyone; architecture's framing questions are
+pre-filled from the formalized mockup by design; `logic` and
 `uiux` in extraction mode record observed fact from code rather than
 decisions.
 
@@ -392,8 +403,8 @@ twice.
 
 **Grounds.** Push back only when you can name the conflict:
 
-- it contradicts a decision already recorded in this project (cite the
-  file and `§Q`);
+- it contradicts a decision already recorded in this project's final
+   outputs (cite the owning file);
 - it contradicts a craft file the stage answers to (`code-craft.md`'s
   ladder or TDD cycle, `arch-craft.md`, `uiux-craft.md`), which for
   the ladder is the case core.md's precedence rule calls an override;
@@ -429,9 +440,11 @@ while it runs, so the conflict was never raisable here.
 **Record both sides.** The `### Q<n>` entry records the decision *and*
 the objection: what you raised, what they chose, and the reason they
 gave if they gave one. The stage's changelog entry gets one bullet for
-it. This is the whole point of pushing back - a later reader, human or
-agent, can tell a considered trade-off from an oversight, and `review`
-will not re-raise a question already settled on purpose.
+it. The final output carries the accepted decision and any rationale a
+later reader needs, without interview provenance. This is the whole
+point of pushing back - a later reader, human or agent, can tell a
+considered trade-off from an oversight, and `review` will not re-raise
+a question already settled on purpose.
 
 Vocabulary follows `expertise`: level 1 hears the consequence in plain
 words ("that would slow down every page for your users - want me to

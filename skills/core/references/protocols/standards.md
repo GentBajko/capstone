@@ -2,8 +2,7 @@
 
 **Reads:** config → `standards-interview.md` (resume) → lazily, per
 domain: `03-conventions.md`; the index plus `01-architecture.md` and
-`05-dependencies.md` (or the architecture interview);
-`mockup/README.md`, never bulk-read upfront.
+`05-dependencies.md`; `mockup/README.md`, never bulk-read upfront.
 
 Elicits how code **must** be written in this project, independent of
 what the code currently does. The output is normative (allowed, like
@@ -26,8 +25,10 @@ never whole-file rewrites). Interview files are never indexed. Output:
 
 ## Phase A - setup / resume
 
-Read the interview file if it exists and resume; never re-ask. An
-artifact argument (a style guide, an existing CLAUDE.md) seeds the
+Read the interview file if it exists and is unfinished, then resume;
+never re-ask. If it is formalized, read `standards.md` instead and open
+the interview body only to repair a proven omission. An artifact
+argument (a style guide, an existing CLAUDE.md) seeds the
 interview per core-authoring.md's Artifact seeding rule. Then
 ground the interview in whatever already exists, each source read
 lazily, only when the current question domain touches it, and only if
@@ -38,9 +39,8 @@ present:
   currently uses exceptions everywhere: preference or accident?")
   rather than from scratch.
 - The architecture reference (index + `01-architecture.md`,
-  `05-dependencies.md`) or the `architecture` interview's decisions: the
-  chosen stack scopes the library questions; ask about the libraries
-  the project actually faces, not generic ones.
+  `05-dependencies.md`): the chosen stack scopes the library questions;
+  ask about the libraries the project actually faces, not generic ones.
 - The mockup (`docs/capstone/mockup/README.md`): its Scenarios and
   Journeys tables inform testing and error-handling preferences (what
   must never break, what the user journey tolerates).
@@ -106,7 +106,8 @@ Write `docs/capstone/standards.md`: frontmatter stamps (no
 `paths_covered`: standards don't go stale with code, and no refresh
 path may regenerate them); banner "Standards the user set: binding,
 not a description of current code."; rules organized by the domains
-above, each traceable to its `§Q` entry; imperative voice.
+above, with each decision and any needed rationale written directly
+into the file; imperative voice.
 
 Then append the changelog entry per core.md's ledger: key
 `standards/all@Q<n>` from the interview's highest `### Q<n>`; record

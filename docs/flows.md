@@ -67,8 +67,8 @@ marked `mode: prescriptive` - decisions, not observations. Once any
 tracked source exists, such a file is stale *by definition*: the plan
 said where code was going to land, and code lands where it lands. The
 refresh rewrites it descriptively and records divergences as facts,
-citing both sides ("designed as X per `architecture-interview.md` §Q7,
-implemented as Y at `file:line`").
+preserving the design decision and rationale inline beside the observed
+implementation (`file:line`).
 
 **`map check` writes nothing**, including no changelog entry - nothing
 was done, only read. Six parts: staleness, pointer drift, absorption
@@ -90,28 +90,30 @@ Typing bare `capstone` runs this.
 | 4 | `architecture` | How the system is built | The 8 chapters, `mode: prescriptive` |
 | 5 | `standards` | How code is written here | `standards.md` |
 | 6 | `stack` | What it is built with | `05-dependencies.md` |
-| — | *readback* | Nothing. It re-files and reconciles what stages 1-6 recorded | Amended interviews |
+| — | *readback* | Nothing. It re-files and reconciles what stages 1-6 recorded | Amended final outputs |
 | 7 | `build` | The implementation plan, then the code | `implementation.md`, source |
 
 Each stage feeds the next, and skipping ahead is not possible: `uiux`
 requires a formalized `mockup`, `build` requires a formalized `stack`.
 
-**The readback, between `stack` and `build`.** No interview can see
-another's answers, which leaves two things nobody catches. It runs in
-two halves, misplacement first so the second cites final locations:
+**The readback, between `stack` and `build`.** Earlier stages cannot
+see every later final output, which leaves two things nobody catches.
+It runs in two halves, misplacement first so the second cites final
+locations:
 
 1. **Re-file.** Against core.md's Stage ownership table, every decision
-   whose subject belongs to another stage - a business rule settled in
-   the architecture interview, a library chosen in the standards one.
+  whose subject belongs to another stage - a business rule in an
+  architecture chapter, a library choice in `standards.md`.
    Re-filing is not re-deciding, so it arrives as one digest you
    confirm, not a finding per turn.
 2. **Reconcile.** Every decision contradicting one recorded elsewhere,
    raised one per turn with both citations, under the usual two-round
    cap. Then your answer stands.
 
-Either half amends the interview that gives way and regenerates its
-outputs - never a re-interview. The pass records itself under
-`readback/all`, so later runs see the key and skip.
+Either half amends the owning final outputs, their index boundaries,
+stamps, and changelog entries. Completed interview bodies are not read
+or amended. The pass records a stable hash of the six latest stage
+keys under `readback/all@<stamp>`, so unchanged outputs skip.
 
 **`build` is the only pipeline stage that writes source code**, and only
 after you approve its plan. `implementation.md` maps every scenario,

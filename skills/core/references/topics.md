@@ -37,8 +37,8 @@ Required sections:
   points and bundles, design system / component library, and the
   API-client seam to the backend. A project with no human-facing UI
   records exactly that, in one line; a recorded decision to defer or
-  skip the frontend satisfies the section too, cited
-  ("deferred per architecture-interview.md §Qn").
+  skip the frontend satisfies the section too, with the decision and
+  rationale written inline.
 
 Checklist: dependency direction verified by reading imports, not assumed
 from directory names; registries and dispatch tables enumerated in full,

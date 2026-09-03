@@ -2,8 +2,8 @@
 
 **Reads:** config → `logic-interview.md` (resume) →
 `../logic-craft.md` (the method, in full, before the first scenario) →
-`mockup/README.md`'s Scenarios table and `mockup-interview.md`'s
-`for: logic` open threads (the question list) →
+`mockup/README.md`'s Scenarios table and `for: logic` open threads
+(the question list) →
 the existing `logic/` files when re-entering → in extraction
 mode: the data-flow, models, and architecture chapters, then source
 where cited.
@@ -22,8 +22,10 @@ rule): one row per scenario file, `Topic` reading `logic`.
 
 ## Phase A - setup / resume
 
-Resume from the interview file if present. An artifact argument
-seeds the interview per core-authoring.md's Artifact seeding rule. Build the
+Resume from the interview file when it is unfinished. When it is
+formalized, read the final `logic/` files instead and open the interview
+body only to repair a proven omission. An artifact argument seeds the
+interview per core-authoring.md's Artifact seeding rule. Build the
 scenario list: from `docs/capstone/mockup/README.md`'s **Scenarios**
 table if it exists - `mockup` wrote it at this stage's unit, one row
 per behavior the product decides, so it is the list rather than a
@@ -32,7 +34,7 @@ then check the mockup's cardinality rule in both directions before
 confirming anything: a `rule: logic` marker no row claims gets a
 scenario, and a marker two rows both claim to decide gets its owner
 named, the others left referencing it. Carry every open thread the
-mockup interview marked `for: logic` into the scenario that owns it:
+mockup README marked `for: logic` into the scenario that owns it:
 those are questions the user was deliberately not asked yet, and they
 are answered here or nowhere. Then confirm the list with the user.
 
@@ -132,13 +134,15 @@ inapplicable one.
 
 Then present the summary, get the user's confirmation ("laid bare?"),
 and write `docs/capstone/logic/<NN>-<scenario>.md` immediately:
-sections exactly as the bullets above, every rule traceable to its
-`§Q` entry, closing with `## Dimensions not in play` - one line per
-dimension ruled out and why, per logic-craft §4, so a later reader can
+sections exactly as the bullets above, with every confirmed rule and
+its rationale written directly into the file and no interview-file or
+question-number references, closing with `## Dimensions not in play` -
+one line per dimension ruled out and why, per logic-craft §4, so a later reader can
 tell "no money here" from "nobody asked". Append
 that scenario's changelog entry per core.md's ledger (key
-`logic/<NN>-<scenario>@Q<n>`, `<n>` the highest `§Q` the scenario file
-cites), flip that scenario's checklist entry to `written`, and move
+`logic/<NN>-<scenario>@Q<n>`, `<n>` the highest interview entry
+incorporated into the scenario), flip that scenario's checklist entry
+to `written`, and move
 to the next. The user may stop at any point; written scenarios stand,
 the remaining list stays `pending` in the frontmatter. A scenario the
 user decides not to spec is marked `dropped`, with the reason in a
@@ -148,8 +152,9 @@ changelog entry naming the scenario and that reason.
 ## Phase C - wrap
 
 When every listed scenario is `written` or `dropped`, update the index
-per core.md (one topic-index row per written scenario file, `Topic`
-reading `logic`), set
+per core.md (one topic-index row per written scenario file and one
+absence row naming each dropped scenario and its reason, all with
+`Topic` reading `logic`), set
 `status: formalized` in the interview file (only now, per core.md's
 Interview lifecycle), and note any cross-scenario contradictions
 discovered; surface them as questions, not verdicts. Report the

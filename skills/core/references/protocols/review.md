@@ -40,7 +40,7 @@ any machine.
 
 **One rule outranks both files:** the project's own recorded decisions
 beat generic best practice. A divergence from the craft baseline is a
-finding only when the reference and interviews don't already justify
+finding only when the final reference and standards don't already justify
 the choice: show both and let the user rule. `arch-craft.md` §5 states
 the same thing from the backend side, along with the rule to skip what
 tooling already enforces.

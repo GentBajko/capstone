@@ -66,19 +66,22 @@ research within them, never silently re-open them.
 ## Phase C - gate and output
 
 Set `status: awaiting-formalization`; present the summary table
-(capability → pick → one-line why). On formalization, write or update
-`05-dependencies.md` listing every pick with version floor, license,
-pricing notes, and `§Q` traceability; append the changelog entry per
-core.md's ledger: key `stack/all@Q<n>`; record the capability → pick
-table with version floors, licenses and pricing, what each pick replaced
-in the architecture stage's draft, and the capabilities still open.
-Update the index; then set `status: formalized`. On a repo with no code the chapter carries
-`mode: prescriptive`; on a repo that already has code, write the picks
-into the existing descriptive chapter as decision facts ("picked
-(stack-interview.md §Q4), not yet installed") without flipping its
-mode. Either way `map`'s refresh protocol preserves
-unimplemented picks from `stack-interview.md`: the research never
-vanishes because the code hasn't caught up.
+(capability → decision → one-line why). On formalization, write or
+update `05-dependencies.md` as the complete capability matrix: every
+pick with version floor, license and pricing notes; every
+no-dependency decision with the ladder rung that settled it; and every
+open or deferred capability with its trigger. Write each decision's
+rationale inline; append the changelog entry
+per core.md's ledger: key `stack/all@Q<n>`; record the capability
+→ pick table with version floors, licenses and pricing, what each pick
+replaced in the architecture stage's draft, and the capabilities still
+open. Update the index; then set `status: formalized`. On a repo with no
+code the chapter carries `mode: prescriptive`; on a repo that already
+has code, write the picks into the existing descriptive chapter as
+decision facts ("picked but not yet installed") without flipping its
+mode. Either way `map`'s refresh protocol preserves unimplemented picks
+from this chapter: the research never vanishes because the code hasn't
+caught up.
 
 ## refresh - re-vet the recorded picks
 
@@ -86,7 +89,8 @@ vanishes because the code hasn't caught up.
 already records (maintenance activity, license changes, pricing,
 newer majors), presents the deltas (unchanged picks in one line
 each), and records re-confirmations or changes as new `§Q` entries,
-updating the chapter rows touched. Changelog key `stack/refresh@Q<n>`.
+updating the chapter rows touched with the decision and rationale
+inline. Changelog key `stack/refresh@Q<n>`.
 It never re-opens the capability list or the uiux stage's
 commitments; a changed pick flows into `05-dependencies.md` like any
 formalization. `map check`'s dependency section is what suggests it.

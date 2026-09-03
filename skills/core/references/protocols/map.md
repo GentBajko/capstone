@@ -235,7 +235,16 @@ fills gaps in `logic/` and `uiux/`, not only staleness: the maps are
 part of the reference, and a missing scenario is as wrong as a stale
 one.
 
-For each stamped file with `paths_covered`:
+First scan every indexed final Markdown output, including stamp-only
+prescriptive files, for interview filenames or interview-question
+provenance. Any match makes that output stale regardless of source
+drift. Rewrite confirmed decisions and rationale directly into the
+final file and remove that provenance. A completed interview body may
+be opened only when the output omits information needed for this
+repair; if that working record is unavailable, report the missing
+content and never invent it.
+
+Then, for each stamped file with `paths_covered`:
 
 1. Read `generated_at_commit`, `capstone_version`, and
    `paths_covered` from its frontmatter.
@@ -244,14 +253,14 @@ For each stamped file with `paths_covered`:
    may not match where code actually landed. Re-run its Phase 2
    deep-dive, rewrite it descriptively, drop
    `mode: prescriptive` and the banner, and record
-   designed-vs-implemented divergences as facts ("designed as X
-   (architecture-interview.md §Q7), implemented as Y (`file:line`)").
-   When regenerating `05-dependencies.md` by ANY path (refresh,
-   rebuild, or a topic argument): if `stack-interview.md` is
-   formalized, also read it and record every user pick not yet
-   present in the manifests as a fact ("picked (stack-interview.md
-   §Q4), not yet installed"); the user's researched stack decisions
-   must never vanish because the code hasn't caught up.
+   designed-vs-implemented divergences from the existing chapter as
+   facts ("designed as X; implemented as Y (`file:line`)"), preserving
+   the design rationale inline. When regenerating
+   `05-dependencies.md` by ANY path (refresh, rebuild, or a topic
+   argument), carry forward every final-chapter pick not yet present in
+   the manifests as a fact ("picked but not yet installed"); the
+   user's researched stack decisions must never vanish because the
+   code hasn't caught up.
 3. Otherwise check staleness against the **working tree**, not just
    commits: from the repo root, `git diff --stat <stamp> -- <globs>`
    (commit vs working tree) plus `git status --porcelain -- <globs>`
