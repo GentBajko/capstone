@@ -1,37 +1,62 @@
-# Capstone
+<p align="center">
+  <img src="assets/logo.svg" alt="Capstone" width="300">
+</p>
 
-Architecture docs your AI agent reads instead of re-exploring the repo
-every session. Stamped to commits, refreshed only where the code
-moved. For new projects, an interview pipeline that designs the whole
-thing before building it.
+<p align="center">
+  <strong>Your agent, on rails.</strong><br>
+  Every rule decided before a line is written.<br>
+  Every doc read before a token is spent.
+</p>
 
-```mermaid
-flowchart LR
-  R["existing repo"] --> M["map"]
-  P["new product"] --> S["start<br/>mockup · logic · uiux · architecture<br/>standards · stack · build"]
-  F["feature idea"] --> C["feature<br/>groom · plan · implement"]
-  M --> D[("docs/capstone/<br/>index · 8 chapters<br/>logic/ · uiux/")]
-  S --> D
-  C --> D
-```
+<p align="center">
+  <a href="#install"><img
+    src="https://img.shields.io/badge/runs%20in-Claude%20Code%20%C2%B7%20Copilot%20%C2%B7%20Gemini%20%C2%B7%20Antigravity%20%C2%B7%20OpenCode-7FA7E6?style=flat-square"
+    alt="Runs in Claude Code, Copilot CLI, Gemini CLI, Antigravity and OpenCode"></a>
+  <img
+    src="https://img.shields.io/badge/format-plain%20SKILL.md-444C56?style=flat-square"
+    alt="Distributed as plain SKILL.md files">
+  <a href="LICENSE"><img
+    src="https://img.shields.io/badge/license-Apache--2.0-1F2328?style=flat-square"
+    alt="Apache-2.0 licensed"></a>
+</p>
 
-**Jump to:**
+<p align="center">
+  <a href="https://www.patreon.com/cw/GentBajko"><img
+    src="https://img.shields.io/badge/Patreon-support-F96854?style=for-the-badge&logo=patreon&logoColor=white"
+    alt="Support Capstone on Patreon"></a>
+  <a href="https://buymeacoffee.com/gentbajko"><img
+    src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=000000"
+    alt="Buy Gent a coffee"></a>
+</p>
 
-1. [Install](#install)
-2. [Update](#update)
-3. [Where to start](#where-to-start)
-4. [What you get](#what-you-get)
-5. [Commands](#commands)
-6. [The greenfield pipeline](#the-greenfield-pipeline)
-7. [The feature chain](#the-feature-chain)
-8. [What `review` is](#what-review-is)
-9. [Not technical? Still yours](#not-technical-still-yours)
+<p align="center">
+  Architecture docs your AI agent reads instead of re-exploring the repo
+  every session. Stamped to commits, refreshed only where the code
+  moved. For new projects, an interview pipeline that designs the whole
+  thing before building it.
+</p>
 
-Full detail on every command: **[docs/commands.md](docs/commands.md)**.
-How the three run, in diagrams: **[docs/flows.md](docs/flows.md)**.
+<p align="center">
+  <img src="assets/flow.svg" width="620"
+    alt="Three ways in: an existing repo runs map, a new product runs start, a feature idea runs feature. All three write to docs/capstone/.">
+</p>
 
-Works in Claude Code, Copilot CLI, Gemini CLI, Antigravity, and
-OpenCode. Plain `SKILL.md` files, Apache-2.0.
+<p align="center">
+  <a href="#install">Install</a> ·
+  <a href="#update">Update</a> ·
+  <a href="#where-to-start">Where to start</a> ·
+  <a href="#what-you-get">What you get</a> ·
+  <a href="#commands">Commands</a> ·
+  <a href="#the-greenfield-pipeline">Pipeline</a> ·
+  <a href="#the-feature-chain">Feature chain</a> ·
+  <a href="#what-review-is">Review</a> ·
+  <a href="#not-technical-still-yours">Not technical?</a>
+</p>
+
+<p align="center">
+  Full detail on every command: <strong><a href="docs/commands.md">docs/commands.md</a></strong>.<br>
+  How the three run, in diagrams: <strong><a href="docs/flows.md">docs/flows.md</a></strong>.
+</p>
 
 ---
 
