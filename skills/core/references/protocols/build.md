@@ -13,9 +13,10 @@ its plan gate.
 State: `docs/capstone/build-interview.md` (standard lifecycle per
 core.md; `formalized` here means the walking-skeleton slice runs).
 Plan output: `docs/capstone/implementation.md` (companion, indexed).
-Prerequisite: if `stack-interview.md` is not `formalized`, execute
-`protocols/stack.md` first; `05-dependencies.md` existing is not
-enough, since the architecture stage writes a draft of it too.
+Prerequisite: if `05-dependencies.md` does not contain the complete
+formalized capability matrix and its `stack/all@...` changelog key is
+absent, execute `protocols/stack.md` first; an architecture-stage draft
+alone is not enough.
 
 **Resume:** if `implementation.md` exists and the interview records
 plan approval (`plan_approved: true` in its frontmatter, set at the
@@ -40,7 +41,7 @@ official quickstarts for anything unfamiliar. Then write
 - How components connect (interfaces, calls, events), each traceable
   to the architecture chapters that decided it.
 - Build order: the walking-skeleton slice first (recorded in the
-  architecture interview), then backend capabilities in logic-scenario
+  architecture chapters), then backend capabilities in logic-scenario
   priority order, then frontend screens in mockup order, each
   implementing its `uiux/screens/` chapter and
   `uiux/02-system.md`'s Implementation constraints, which carry

@@ -132,7 +132,7 @@ suppress the smell), and **skip anything tooling already enforces**.
 4. Grade each candidate **Strong / Worth exploring / Speculative**,
    and say what deleting or merging it concentrates. Benefits are
    stated as leverage and locality, never as "cleaner".
-5. The project's recorded decisions (the reference, the interviews,
-   `standards.md`) are ADR-equivalents: a candidate contradicting
+5. The project's final reference and `standards.md` are ADR-equivalents:
+  a candidate contradicting
    one is surfaced only when the friction justifies reopening the
    decision, and says so explicitly.

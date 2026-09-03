@@ -49,8 +49,9 @@ A match on a folder still present continues as before: read its
 interview after re-running Phase A's staleness pass (never re-ask an
 answered `§Q`), `awaiting-formalization` re-presents the gate,
 `formalized` points at `plan`, unless the request changes the
-feature itself: then reopen: set `status: interviewing`, interview
-the change (new `§Q` entries naming the ones they supersede),
+feature itself: then reopen from `spec.md`, set `status: interviewing`,
+and interview only the change (new `§Q` entries may name prior working
+entries internally, but the rewritten spec may not),
 re-gate, and rewrite `spec.md`; the changed spec voids any recorded
 plan approval via `plan`'s checksum rule. `formalized` with
 `spec.md` missing or partial is a crash: regenerate the spec from the
@@ -103,7 +104,8 @@ edge-case posture, what's out of scope) and set
 `status: awaiting-formalization`. On approval write `spec.md`:
 
 - **What & why**: the feature in one paragraph; success criteria.
-- **Requirements**: numbered, each traceable to its `§Q` entry.
+- **Requirements**: numbered, with each confirmed decision and any
+  needed rationale written directly into the spec.
 - **Approach**: the chosen shape and the rejected alternatives.
 - **Behavior**: happy path, branches, unhappy paths, state changes;
   exact rules with real numbers, `logic/`-style.

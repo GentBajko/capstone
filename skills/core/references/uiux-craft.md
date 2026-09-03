@@ -363,8 +363,9 @@ disagreed and the reasoning is worth preserving:
 - Every mockup screen has a design chapter; every mockup state and
   every logic unhappy path that surfaces on a screen has a styled
   treatment; empty/loading/error covered everywhere they exist.
-- Every decision traces to a `§Q` entry or is marked "assumed";
-  assumed items are collected in the README.
+- Every confirmed decision and its rationale are written directly into
+  the owning final file; anything else is marked "assumed", and assumed
+  items are collected in the README.
 - Zero em-dashes and no AI-tell phrasing in any proposed interface
   copy; no eyebrow labels in any composition note.
 

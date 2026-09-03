@@ -129,8 +129,8 @@ section. **Gitignored by default:** it is judgment, not reference.
 ### `start`
 
 Runs the seven stages in order, detecting what is finished and
-resuming at the first incomplete one, then reads every interview back
-before `build`. Also what a bare `capstone`
+resuming at the first incomplete one, then reconciles every final
+stage output before `build`. Also what a bare `capstone`
 triggers. On a repo that already has code it asks once whether you
 want the pipeline or `map`, and records the answer.
 
@@ -178,20 +178,19 @@ dead session loses nothing, and re-running never re-asks.
 - **`stack`** researches real options per capability with licenses and
   pricing; you pick. `stack refresh` re-vets recorded picks later.
   Ledger keys `stack/all@Q<n>` and `stack/refresh@Q<n>`.
-- **Between `stack` and `build`** the pipeline reads all six
-  interviews back, in two halves. First it **re-files what landed in
-  the wrong stage** against core.md's Stage ownership table - a
-  business rule settled in the architecture interview belongs to
-  `logic`, a library chosen in the standards interview belongs to
-  `stack` - as one digest you confirm, since nothing is being
-  re-decided, only moved. Then it **raises what one stage decided
-  that contradicts another**, the check no single interview can make,
-  since each sees only its own answers. Same terms as any interview's
-  pushback (core.md's Pushback rule): evidence and a citation, two
-  rounds at most, then your answer stands. Either way the affected
-  interviews are amended and their outputs regenerated without
-  re-interviewing. Ledger key `readback/all@Q<n>`; later runs see it
-  and skip.
+- **Between `stack` and `build`** the pipeline reads all six stages'
+  final outputs in two halves. First it **re-files what landed in the
+  wrong stage** against core.md's Stage ownership table - a business
+  rule in an architecture chapter belongs in `logic`, while a library
+  in `standards.md` belongs in `05-dependencies.md` - as one digest you
+  confirm, since nothing is being re-decided. Then it **raises what one
+  final output says that contradicts another**. Same terms as any
+  interview's pushback: evidence and final-file citations, two rounds
+  at most, then your answer stands. The affected final outputs, index,
+  stamps, and changelog entries are updated directly. Completed
+  interview bodies are not read or amended. Ledger key
+  `readback/all@<stamp>`; unchanged outputs produce the same stable
+  stamp and skip.
 - **`build`** requires a formalized `stack`. It writes an
   implementation plan, **stops for your approval**, then writes code -
   in subagents (fresh context per step) or inline, asked once before
@@ -300,6 +299,8 @@ out to subagents, and where an unrequested full build asks first.
 **Interview lifecycle.** `interviewing` → `awaiting-formalization` →
 `formalized`. The final state is written only *after* outputs are on
 disk, so a crash can never strand a "done" marker over missing files.
+After formalization, those outputs are the source of truth. Interviews
+remain local resume and repair state; final files never cite them.
 
 **The ledger.** Every run that writes appends to `changelog.md` before
 setting its done marker. Newest first, bullets only, append-only.

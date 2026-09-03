@@ -66,6 +66,24 @@ remains. One-way doors (irreversible decisions per `interview.md`'s
 conduct rules) are never taken from an artifact silently: each is
 re-confirmed individually.
 
+## Interviews are working state, not references
+
+An interview is the resumable working record for its stage. While the
+stage is `interviewing`, use it to resume questions and to generate the
+stage's outputs. Once the stage is `formalized`, those outputs are the
+source of truth: every confirmed decision, rationale, constraint, open
+question, and deferral needed by a later reader must be written into
+them.
+
+Final outputs must stand alone. They never cite, link to, name, or
+instruct a reader to consult an interview file or one of its `§Q`,
+`### Q`, or `### D` entries. Question numbers may remain in the
+changelog key required by `core.md` and in the interview itself; they
+do not appear in the final output. Downstream stages read formalized
+outputs, not completed interviews. If a needed decision exists only in
+a completed interview, repair the owning output from that record before
+continuing.
+
 ## Index maintenance
 
 The index is `<index_file>`, default
