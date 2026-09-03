@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" role="img" aria-label="Capstone">
+  <title>Capstone</title>
+  <style>
+    .cs-ink{fill:#1F2328}
+    @media (prefers-color-scheme:dark){.cs-ink{fill:#E6EDF3}}
+  </style>
+  <path d="M8.02 50.88A40.0 40.0 0 0 1 11.11 36.54L24.94 42.34A25.0 25.0 0 0 0 23.01 51.30Z" class="cs-ink" fill="#1F2328"/>
+  <path d="M12.03 34.51A40.0 40.0 0 0 1 20.75 22.71L30.97 33.70A25.0 25.0 0 0 0 25.52 41.07Z" class="cs-ink" fill="#1F2328"/>
+  <path d="M22.43 21.24A40.0 40.0 0 0 1 35.24 14.09L40.03 28.31A25.0 25.0 0 0 0 32.02 32.77Z" class="cs-ink" fill="#1F2328"/>
+  <path d="M60.76 14.09A40.0 40.0 0 0 1 73.57 21.24L63.98 32.77A25.0 25.0 0 0 0 55.97 28.31Z" class="cs-ink" fill="#1F2328"/>
+  <path d="M75.25 22.71A40.0 40.0 0 0 1 83.97 34.51L70.48 41.07A25.0 25.0 0 0 0 65.03 33.70Z" class="cs-ink" fill="#1F2328"/>
+  <path d="M84.89 36.54A40.0 40.0 0 0 1 87.98 50.88L72.99 51.30A25.0 25.0 0 0 0 71.06 42.34Z" class="cs-ink" fill="#1F2328"/>
+  <rect x="8" y="52" width="15" height="24" class="cs-ink" fill="#1F2328"/>
+  <rect x="73" y="52" width="15" height="24" class="cs-ink" fill="#1F2328"/>
+  <path d="M34.84 7.00L61.16 7.00L55.31 23.09A25.0 25.0 0 0 0 40.69 23.09Z" fill="#7FA7E6"/>
+</svg>
