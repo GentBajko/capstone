@@ -37,7 +37,8 @@ official quickstarts for anything unfamiliar. Then write
 
 - The module/file layout to create: backend tree, then frontend tree.
 - Per component: what it does, its key files, and real code sketches
-  for the load-bearing seams (the wiring, not the boilerplate).
+  for the load-bearing seams (the wiring, not the boilerplate),
+  commented only where `../code-craft.md`'s Comments section earns it.
 - How components connect (interfaces, calls, events), each traceable
   to the architecture chapters that decided it.
 - Build order: the walking-skeleton slice first (recorded in the
@@ -56,9 +57,10 @@ official quickstarts for anything unfamiliar. Then write
 
 Every code decision follows `standards.md`, and every plan step and
 line of code obeys `../code-craft.md` (TDD + YAGNI, earned
-interfaces, and its Git section for every branch and commit this
-stage makes; standards wins on conflict): the layout and sketches
-carry no layer, file, or abstraction the ladder didn't earn.
+interfaces, its Comments section, and its Git section for every
+branch and commit this stage makes; standards wins on conflict): the
+layout and sketches carry no layer, file, abstraction, or comment the
+ladder didn't earn.
 
 **Review, then re-review.** A drafted `implementation.md` is not
 presentable until it survives full passes of this check, repeated
@@ -113,10 +115,11 @@ one per step.
 it: one subagent per build-order step, dispatched fresh and never in
 parallel, with the step's full text, its code sketches, the verified
 commands, `standards.md`'s rules, and `../code-craft.md`'s ladder,
-TDD scoping, and Git section **copied into the prompt** rather than
-referenced. Nothing else crosses into a subagent's context, so a
-pointer to a file it will never open buys nothing. The main session
-verifies each step's report before dispatching the next.
+TDD scoping, Comments section, and Git section **copied into the
+prompt** rather than referenced. Nothing else crosses into a
+subagent's context, so a pointer to a file it will never open buys
+nothing. The main session verifies each step's report before
+dispatching the next.
 
 **Inline mode** runs the same steps in this session, same order, same
 verification, same commits.

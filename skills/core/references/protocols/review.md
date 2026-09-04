@@ -92,8 +92,9 @@ supply evidence the ranking then treats like any other.
    via the installed security skill when present, else spot-checked
    directly), stack currency (dependencies and patterns against the
    dependencies chapter's own recorded floors and research dates),
-   craft divergence (unearned abstractions and unclimbed ladder rungs
-   per `../code-craft.md`), and, when `docs/capstone/standards.md`
+   craft divergence (unearned abstractions, unclimbed ladder rungs,
+   and comments that narrate rather than explain, per
+   `../code-craft.md`), and, when `docs/capstone/standards.md`
    exists, divergence between the user's stated preferences and the
    observed conventions.
 4. **Frontend side**: inventory the surfaces from `uiux/screens/`

@@ -90,7 +90,10 @@ abstraction no rung earned, is cut from the plan, not deferred to the
 executor's judgment, unless a spec requirement mandates it, which is
 a recorded user decision and earns it per code-craft's never-lazy
 list. The plan's tests are YAGNI-scoped per code-craft; its
-interfaces appear only where that file says one is earned.
+interfaces appear only where that file says one is earned; and the
+code it shows carries only the comments code-craft's Comments section
+earns. A plan that narrates its own snippets teaches the executor to
+narrate the file.
 
 **Review, then re-review.** A drafted plan is not presentable until
 it survives full passes of this check, repeated until a pass finds
@@ -102,8 +105,9 @@ nothing to fix:
 2. Walk the tasks in order: names and signatures a task consumes
    match the task that defined them, and no task consumes what a
    later task defines.
-3. Sweep for the placeholder patterns above; any survivor fails the
-   pass.
+3. Sweep for the placeholder patterns above, and for comments in the
+   shown code that only restate the line beneath them; any survivor
+   fails the pass.
 
 Fix what a pass finds, then run the next full pass; a pass that found
 anything voids the ones before it. Dropping a spec detail because a
