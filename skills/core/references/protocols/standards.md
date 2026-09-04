@@ -69,7 +69,11 @@ immediately. Walk these domains, skipping any the user rules out:
 - **Error handling**: exceptions vs result types; error taxonomy;
   logging rules; what must never be swallowed.
 - **Organization**: package-by-feature vs by-layer; file-size
-  discipline; naming conventions; comment and docstring policy.
+  discipline; naming conventions. Comment and docstring policy
+  defaults to `../code-craft.md`'s Comments section (a comment earns
+  its line only by saying what the code can't; self-explanatory code
+  gets none): ask what the user changes about it, and on which
+  surfaces docstrings are mandatory.
 - **Testing**: `../code-craft.md`'s TDD, YAGNI-scoped, is the default
   (failing test → minimum code to green → verify → commit; non-trivial
   logic always leaves its check behind, trivial one-liners need none).

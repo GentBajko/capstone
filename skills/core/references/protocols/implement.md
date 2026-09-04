@@ -91,9 +91,10 @@ reference:
    `Test:` paths, the interfaces it consumes and produces, and every
    checkbox step with its code and exact commands.
 2. `standards.md`'s rules, and `../code-craft.md`'s ladder, TDD
-   scoping, and **Git section in full**. A pointer to a file is
-   useless here: a subagent that never reads `code-craft.md` commits
-   however it likes.
+   scoping, **Comments section, and Git section in full**. A pointer
+   to a file is useless here: a subagent that never reads
+   `code-craft.md` commits however it likes, and comments every line
+   it writes.
 3. The conventions chapter's paradigm, typing, and error-handling
    rules, plus the operations chapter's verified commands.
 4. The rules: execute only this task; run every verification and do
@@ -133,8 +134,8 @@ restarting at round one.
 1. **Round**: independent reviews of the diff, each through a
    different lens: spec compliance (every `spec.md` requirement
    implemented, nothing extra), code quality per `standards.md`,
-   `code-craft.md` (unearned abstractions and unclimbed ladder rungs
-   are findings), and
+   `code-craft.md` (unearned abstractions, unclimbed ladder rungs,
+   and comments that only restate the code are findings), and
    the conventions chapter, and the spec's unhappy paths actually
    exercised by the tests. Fresh eyes every round: with subagents,
    dispatch one reviewer per lens; without, re-read the diff once per

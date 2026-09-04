@@ -63,8 +63,50 @@ broken.
 - Mark deliberate ceilings with a `ceiling:` comment naming the limit
   and the upgrade path
   (`# ceiling: global lock, per-account locks if throughput matters`).
-- Comments state only constraints the code can't show. No narration,
-  no doc-comments nobody asked for.
+- Comments earn their line or they don't get written; see Comments
+  below.
+
+## Comments: the same ladder, applied to prose
+
+A comment is code that must be maintained and that nothing tests, so
+it climbs a rung of its own: **does this say something the code
+cannot say itself?** No - delete it. The reader can already see the
+next line. What they can't see is why you picked it.
+
+Earned:
+
+- Why this and not the obvious alternative, when the obvious one
+  looks better on the page.
+- A constraint no reader would reconstruct: an upstream bug and its
+  issue link, a spec or RFC clause, an ordering requirement, an
+  overflow or precision trap, a rate limit.
+- A workaround, named as one, with the condition that retires it.
+- `ceiling:` markers per the rule above.
+- Docstrings where `standards.md` asks for them, on the surface it
+  names, and nowhere else.
+
+Not earned, and deleted on sight:
+
+- Restating the line (`# increment the counter`, `// set the flag`).
+- Narrating a sequence the code already spells out ("Step 1:
+  validate the payload").
+- Section banners inside a file.
+- Docstrings on self-evident helpers; parameter and return lists that
+  repeat what the annotations already say.
+- Commented-out code. Delete it, git has it.
+- A `TODO` standing in for work the current task covers. Do the work.
+
+Naming beats explaining. A comment saying what a badly-named thing is
+is a rename waiting; one explaining a dense block is usually an
+extracted function waiting. Reach for those first, and the comment
+stops being needed.
+
+A stale comment is worse than no comment, because it gets read as
+true: the commit that outdates one updates or deletes it in the same
+diff.
+
+Prose the code already carries is a review finding, ranked like any
+other unearned addition.
 
 ## TDD, YAGNI-scoped
 
