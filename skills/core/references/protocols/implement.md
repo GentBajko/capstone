@@ -10,7 +10,8 @@ code (core.md hard rule 2), and only after its plan gate.
 
 Prerequisite, checked in this order (resolve a `<feature>` argument
 as `groom`'s Resume rule does): no folder but an
-`implement/<NN>-<slug>` key in `changelog.md`, or `implemented: true`
+`implement/<id>` key in the ledger (`changelog.md`, its rotation
+files, or an unfolded `changelog.d/` fragment), or `implemented: true`
 in a folder still present → the feature is done; say so, point at the
 changelog entry, and stop. Otherwise require `plan_approved: true` in the
 feature's `feature-interview.md`, with `approved_spec` still matching
@@ -176,11 +177,17 @@ Entered when Phase C goes dry.
    changed; update the touched `uiux/screens/` chapters, and
    `uiux/02-system.md` only when the spec recorded a token or lock
    change. Every absorbed or created file gains
-   `absorbed_from: features/<NN>-<slug>@<date>` in frontmatter;
+   `absorbed_from: features/<id>@<date>` in frontmatter;
    refresh the folders' README indexes and Companion docs rows.
-3. Append the changelog entry per core.md's ledger: key
-   `implement/<NN>-<slug>@Q<n>`, the same highest `§Q` (this stage adds
-   none, so the key is stable across a resumed review loop).
+3. Write the changelog entry per core.md's ledger (a `changelog.d/`
+   fragment): key
+   `implement/<id>@Q<n>`, the same highest `§Q` (this stage adds
+   none, so the key is stable across a resumed review loop). The
+   entry stays a fragment here: folding is main-only per the ledger
+   rule, and this run is normally on a feature branch. The fragment
+   merges as its own file - that is the point - and the next writing
+   run on main folds it. On a consented main run, fold per the
+   ledger rule, this entry included.
    **Step 6 deletes the feature folder, so this entry is all that
    survives it: write it to be read without the spec beside it.**
    Bullets only, per the ledger's entry format. This is the longest
@@ -210,7 +217,7 @@ Entered when Phase C goes dry.
    `git log` shows it uses (on a consented main run there is no branch
    to finish, just the repo's push conventions). Ask before opening a
    PR or pushing; neither is implied by the plan's approval.
-6. **Delete `features/<NN>-<slug>/`**, last, once step 3's entry is on
+6. **Delete `features/<id>/`**, last, once step 3's entry is on
    disk and the branch is finished. The folder was scaffolding: the
    spec is absorbed into `logic/`, `mockup/`, and `uiux/`, the plan
    is spent, the ledger's counts are in the changelog entry, and
@@ -218,9 +225,9 @@ Entered when Phase C goes dry.
    history anyway. Deleting it keeps the folder to features actually
    in flight.
 
-   From here the **changelog key is the done marker**: `<NN>` is
+   From here the **changelog key is the done marker**: the id is
    retired and never reused, and every stage-detection rule below
-   reads "folder absent AND an `implement/<NN>-<slug>` key in
-   `changelog.md`" as done. Folder still present with that key is a
+   reads "folder absent AND an `implement/<id>` key in the ledger
+   (fragments included)" as done. Folder still present with that key is a
    torn wrap, not an unfinished feature: finish the delete, never
    re-run the stage (`doctor` repairs this).

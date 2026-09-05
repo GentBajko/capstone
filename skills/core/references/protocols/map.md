@@ -7,7 +7,9 @@ template drift). A full build additionally reads Phase 1's recon set
 (manifests, type/lint configs, README/CLAUDE/AGENTS, tree, entry
 points); the deep-dive reads source per topic, and the extractions
 read the composed chapters (per logic.md and uiux.md). For `check`
-additionally: `changelog.md` (absorption drift), `05-dependencies.md`
+additionally: the ledger - `changelog.md`, its rotation files, and
+`changelog.d/` fragments (absorption drift, unfolded fragments) -
+and `05-dependencies.md`
 plus the manifests and lockfile (re-vetting). Nothing else unprompted.
 
 The descriptive reference for the current project: a lean
@@ -111,8 +113,9 @@ Do this in the main session with cheap reads only:
    reading order so the folder itself reads like a table of contents:
    `01-architecture.md`, `02-models.md`, `03-conventions.md`,
    `04-data-flow.md`, `05-dependencies.md`, `06-testing.md`,
-   `07-operations.md`, `08-glossary.md` (skip absent topics without
-   renumbering). If unnumbered topic files exist from an earlier
+   `07-operations.md`, `08-glossary.md`, `09-interfaces.md` (skip
+   absent topics without renumbering; `09-interfaces.md` also honors
+   the config `interfaces` key per `../topics.md`). If unnumbered topic files exist from an earlier
    version, rename them to the chapter names during the run and
    update every cross-reference. Use the exact headings from
    `../topics.md`, with this frontmatter:
@@ -122,10 +125,16 @@ Do this in the main session with cheap reads only:
 generated_at_commit: <12-char sha of HEAD>   # omit outside git
 generated_date: <YYYY-MM-DD>
 capstone_version: <this plugin's manifest version>  # omit if unreadable
+content_hash: <12 chars>   # omit outside git; see core.md's stamps rule
 paths_covered:
   - "<glob>"
 ---
 ```
+
+   `content_hash` is computed per core.md's stamps rule:
+   `git ls-tree -r HEAD -- <this file's globs> | git hash-object
+   --stdin`, first 12 chars. It is the stamp that survives a squash
+   or rebase merge making `generated_at_commit` unreachable.
 
 2. Choose `paths_covered` globs deliberately; they drive the Refresh's
    staleness. Cover every directory the topic's content was derived
@@ -143,7 +152,11 @@ paths_covered:
    bash is unavailable, write the global JSON template from core.md
    and the ignore list from core-authoring.md yourself.
 4. **Logic extraction** (full build and refresh only; a topic
-   argument skips steps 4-5 per Phase 0 branch 2): build
+   argument skips steps 4-5 per Phase 0 branch 2, and the config
+   `extract` key gates each pass: run this step only when `"logic"`
+   is listed, step 5 only when `"uiux"` is - `[]` skips both, and a
+   skipped pass is recorded in the index as disabled by config, not
+   absent): build
    `<docs_dir>/logic/` per logic.md's
    extraction mode, invoked as its "Invoked by `map`" rules say: the
    entry-point inventory from the module map and the just-written
@@ -175,13 +188,16 @@ paths_covered:
    only the surfaces the map is missing - except under `rebuild`,
    which regenerates the extraction-mode ones. A committed design the
    `uiux` interview produced is never overwritten, in any mode.
-6. Append the changelog entry per core.md's Changelog ledger, key
-   `map/<topic|all>@<the run's stamp>`; one bullet per chapter
-   and logic scenario written **this run** (every one, never only
-   those you judge materially changed; that judgment is the escape
-   hatch), the topics recorded absent with their reasons, and whether
-   the index was created or refreshed. Nothing written (Phase 1 step
-   9's empty-repo stop) → no entry.
+6. Write the changelog entry per core.md's Changelog ledger (a
+   `changelog.d/` fragment), key `map/<topic|all>@<the run's stamp>`;
+   one bullet per chapter and logic scenario written **this run**
+   (every one, never only those you judge materially changed; that
+   judgment is the escape hatch), the topics recorded absent with
+   their reasons, and whether the index was created or refreshed.
+   Nothing written (Phase 1 step 9's empty-repo stop) → no entry.
+   This run writes the docs area, so it also **folds** any waiting
+   `changelog.d/` fragments into `changelog.md` per that ledger rule
+   (its own entry included).
 7. Write `<index_file>` **last**, so the index reflects what was
    actually written. It is chapter zero of the docs area
    (`docs/capstone/00-index.md` by default), and it carries no stamps:
@@ -246,8 +262,8 @@ content and never invent it.
 
 Then, for each stamped file with `paths_covered`:
 
-1. Read `generated_at_commit`, `capstone_version`, and
-   `paths_covered` from its frontmatter.
+1. Read `generated_at_commit`, `capstone_version`, `content_hash`,
+   and `paths_covered` from its frontmatter.
 2. If the frontmatter has `mode: prescriptive` and any tracked source
    now exists, the file is **stale by definition**: the planned globs
    may not match where code actually landed. Re-run its Phase 2
@@ -264,7 +280,13 @@ Then, for each stamped file with `paths_covered`:
 3. Otherwise check staleness against the **working tree**, not just
    commits: from the repo root, `git diff --stat <stamp> -- <globs>`
    (commit vs working tree) plus `git status --porcelain -- <globs>`
-   for untracked files.
+   for untracked files. **Stamp unreachable** (squash or rebase merge
+   erased the branch commit): fall back to `content_hash` - recompute
+   it per core.md's stamps rule and compare. Equal, and the working
+   tree is clean over the globs → current; different → stale,
+   regenerate this file only. Only a file with neither a reachable
+   stamp nor a `content_hash` (written by an older capstone) is
+   stale-by-unknowable and regenerates.
 4. **No changes** → skip; leave the file and its stamp untouched.
    **Changes** → regenerate it through Phases 2-3; a stale
    extraction-mode `logic/` or `uiux/` file regenerates per its own
@@ -283,7 +305,9 @@ Then, for each stamped file with `paths_covered`:
 5. Re-run the **Applicable** test from `../topics.md` for every topic
    the index lists as absent; write any newly applicable topic at
    its fixed chapter number and update its index row.
-6. **Logic coverage.** Build the entry-point inventory per logic.md's
+6. **Logic coverage** (only when `"logic"` is in the config `extract`
+   list; steps 6-7 follow the same gating as Phase 3 steps 4-5).
+   Build the entry-point inventory per logic.md's
    extraction mode: every externally triggerable behavior (routes, UI
    actions, jobs and crons, queue consumers, CLI commands, webhooks)
    from the chapters' dispatch tables and the module map. Every entry
@@ -294,7 +318,8 @@ Then, for each stamped file with `paths_covered`:
    cited `file:line`, stamped with `paths_covered` so later refreshes
    keep them current. Interview-derived scenario files are not
    touched here; they absorb shipped features through `implement`.
-7. **Design coverage.** Applicable when the repo has a frontend.
+7. **Design coverage.** Applicable when the repo has a frontend and
+   `"uiux"` is in the config `extract` list.
    Build the surface inventory per uiux.md's extraction mode: every
    route or view a user reaches, from the chapters' route tables and
    the module map. Every surface must be claimed by a chapter in
@@ -307,34 +332,43 @@ Then, for each stamped file with `paths_covered`:
    the code happens to do. Where extraction and a committed chapter
    disagree, that is drift for `review` to judge, not for `map` to
    resolve.
-8. If any file was rewritten or created in this run, append the
-   changelog entry per core.md's ledger, key `map/<scope>@<the
-   run's stamp>` (`<scope>` = the topic name for a single file, `all`
-   otherwise); record the files regenerated or created and each one's
-   trigger (covered paths changed, `mode: prescriptive` with code now
-   present, template drift, version gap, newly applicable topic,
-   logic or design coverage gap), the divergences recorded, and the
-   files skipped as current.
-   A run where every file was current writes nothing.
+8. If any file was rewritten or created in this run, write the
+   changelog entry per core.md's ledger (a `changelog.d/` fragment),
+   key `map/<scope>@<the run's stamp>` (`<scope>` = the topic name
+   for a single file, `all` otherwise); record the files regenerated
+   or created and each one's trigger (covered paths changed,
+   `mode: prescriptive` with code now present, template drift,
+   version gap, newly applicable topic, logic or design coverage
+   gap), the divergences recorded, and the files skipped as current.
+   A writing run also folds waiting `changelog.d/` fragments per the
+   ledger rule. A run where every file was current writes nothing
+   and folds nothing.
 9. Always re-verify the index's module map and rows.
-10. Fall back to a full build (Phases 1-4) when the stamped commit is
-   unreachable (rebase, shallow clone) or there is no git repo. Say
-   so before doing it: the user asked to refresh and is getting a
-   rewrite.
+10. Fall back to a full build (Phases 1-4) only when there is no git
+   repo. An unreachable stamped commit is no longer that trigger:
+   step 3's `content_hash` comparison keeps the refresh per-file
+   through squash and rebase merges and shallow clones. When falling
+   back, say so before doing it: the user asked to refresh and is
+   getting a rewrite.
 
 Config `workspaces` set → run the refresh per workspace (an argument
 targets one) and re-verify the root index-of-indexes' workspace table.
 
 ## check - the read-only trust report
 
-No writes, and no changelog entry: nothing was done, only read.
-Six parts:
+No writes, and no changelog entry: nothing was done, only read - it
+reports leftover `changelog.d/` fragments (part 7) rather than
+folding them. Seven parts:
 
 1. **Staleness**: for each stamped file with `paths_covered`, read
    its stamp and globs, then from the repo root run
    `git diff --stat <stamp> -- <globs>` (commit vs **working tree**,
    so uncommitted work counts) plus `git status --porcelain --
-   <globs>` for untracked files. Report a table: file | stamp |
+   <globs>` for untracked files. A stamp unreachable (squash or
+   rebase merge) falls back to recomputing `content_hash` per
+   core.md's stamps rule: equal and clean → current, different →
+   stale; unreachable with no `content_hash` → verdict "stamp
+   unreachable". Report a table: file | stamp |
    capstone_version | files changed since | verdict (current / stale /
    stamp unreachable / written by an older capstone, for a
    `capstone_version` behind the running plugin's or absent /
@@ -346,7 +380,8 @@ Six parts:
    misses with the drifted lines' new locations when findable.
 3. **Absorption drift**: interview-derived `logic/`, `mockup/`, and
    `uiux/` files carry no globs; their staleness signal is shipped
-   features they never absorbed. From `changelog.md`, list
+   features they never absorbed. From the ledger (`changelog.md`,
+   rotation files, and unfolded fragments), list
    `implement/*` keys newer than each folder's newest stamp whose
    entry's outputs name that folder; report "logic/ missed N absorbed
    features" (repair: `doctor`, which re-runs the absorb step
@@ -359,12 +394,20 @@ Six parts:
 5. **Logic coverage**: the Refresh step 6 inventory, read-only:
    entry points no `logic/` scenario claims. Report "logic/ missing
    N scenarios", naming the unclaimed entry points (repair: `map`,
-   which extracts them).
+   which extracts them). `"logic"` absent from the config `extract`
+   list reports the section as disabled by config, never as a gap.
 6. **Design coverage**: the Refresh step 7 inventory, read-only:
    surfaces no `uiux/screens/` chapter claims. Report "uiux/
    missing N surfaces", naming them (repair: `map`, which extracts
    them). A repo with no frontend reports the section as not
-   applicable rather than as a gap.
+   applicable rather than as a gap; `"uiux"` absent from the config
+   `extract` list reports it as disabled by config.
+7. **Unfolded fragments**: list any files in `changelog.d/`, with
+   their keys, and name the repair (any writing run folds them; so
+   does `doctor`). Informational only: fragments are the designed
+   state on a branch, so they never count toward the stale verdict
+   below - a doc-carrying PR must not fail a freshness gate for
+   carrying its own ledger entry.
 
 End with one sentence (whether the reference can be trusted as-is,
 needs `map`, or needs `map rebuild`) followed by the machine

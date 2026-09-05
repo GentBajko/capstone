@@ -105,6 +105,19 @@ status: interviewing   # see core.md "Interview lifecycle"
   Decisions derivable from earlier answers are recorded as
   `### D<n> - derived` entries with the reasoning, not re-asked, but
   state them to the user as you go so wrong derivations get caught.
+- **Ground cross-repo edges in the real contract.** When config
+  `cross_repo` is `auto` and the `quarry` CLI is on PATH (no
+  `09-interfaces.md` precondition here - a greenfield repo has none
+  yet), any answer or upstream doc naming an existing system this
+  product will talk to gets looked up before the follow-up question:
+  `quarry docs search "<name>"` to find the repo, then
+  `quarry docs section <repo> "<contract>"` to read the contract as
+  that repo documents it. Ask the follow-up against the real
+  endpoint names and fields, cite them in the recorded decision, and
+  record what the lookup settled as a `### D<n>` derived entry
+  rather than asking the user to recite a contract that is already
+  written down. Lookup misses, config `off`, or no CLI → interview
+  exactly as before. Protocol text, never a harness hook.
 - **Question order:** walk `../interview.md` top to bottom: Framing
   (§0), then the one-way-door shape decisions (§1, with 2-3 candidates
   for macro-structure), then the topic-mapped checklists (§2), quality
@@ -143,6 +156,14 @@ these differences:
 - `paths_covered` uses the planned layout's globs.
 - A banner on each file: "Prescriptive design intent; code does not
   exist yet."
+- `09-interfaces.md` is applicable when the design declares any
+  cross-repo edge (and config `interfaces` is `auto`): the planned
+  Produces/Consumes tables per `../topics.md`, `Site` cells naming
+  planned paths from the decided layout, consumer contract fields
+  taken from the interview's quarry lookups where they ran. Writing
+  it here is what lets `groom` and `plan` consult quarry from day
+  one, and gives `map` a declared design to check the observed edges
+  against once code exists.
 
 Append the changelog entry per core.md's ledger: key
 `architecture/all@Q<n>`, `<n>` the highest `### Q<n>`/`### D<n>` in

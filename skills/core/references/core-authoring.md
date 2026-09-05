@@ -11,8 +11,9 @@ Some outputs are personal working state and are **never committed**,
 whatever `docs_in_git` says: `features/` (the whole feature chain:
 interviews, specs, plans, review ledgers), every `*-interview.md`,
 `capstone.json`, and `review.md` (plus the legacy `be-review.md` and
-`fe-review.md` older versions wrote). `changelog.md` is NOT on this
-list, and unlike the chapters it does not follow `docs_in_git`
+`fe-review.md` older versions wrote). `changelog.md` and the
+`changelog.d/` fragment folder are NOT on this
+list, and unlike the chapters they do not follow `docs_in_git`
 either: **the ledger is always committed** (core.md's Changelog
 ledger says why - `implement` deletes each feature's folder on the
 strength of its entry, so an untracked ledger makes that deletion
@@ -115,9 +116,13 @@ indexed: the interview Q&A files (`architecture-interview.md`,
 `mockup-interview.md`, `standards-interview.md`,
 `logic-interview.md`, `uiux-interview.md`, `stack-interview.md`,
 `build-interview.md`, `features/*/feature-interview.md`,
-`features/*/review-ledger.md`) and `capstone.json`.
+`features/*/review-ledger.md`), `changelog.d/` fragments (working
+state of the ledger; `changelog.md` and its rotation files get
+Companion docs rows, the fragment folder does not), and
+`capstone.json`.
 
-After writing your output, append your changelog entry (Changelog
+After writing your output, write your changelog entry (a
+`changelog.d/` fragment per the Changelog
 ledger in `core.md`), then add or refresh your row; if `<index_file>` does
 not exist yet, create a minimal one (title + the two tables) rather
 than leaving the output orphaned.

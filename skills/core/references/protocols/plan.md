@@ -18,7 +18,7 @@ disk. Interview missing or not yet `formalized` → execute
 regenerates.
 
 State: the feature's
-`docs/capstone/features/<NN>-<slug>/feature-interview.md`
+`docs/capstone/features/<id>/feature-interview.md`
 (`plan_approved: true` is set at the gate; the lifecycle `status`
 stays `formalized`; this stage never touches it). Output: `plan.md`
 beside the spec. Resolve a `<feature>` argument as `groom`'s Resume
@@ -46,6 +46,16 @@ and tests are written here. The chapters answer where things live and
 how they connect; read source files only where the plan must name
 exact lines, or where a chapter labels its coverage shallow.
 
+**Cross-repo constraints, before writing a task.** Under the same
+conditions as `groom`'s Phase A step 4 (config `cross_repo: "auto"`,
+the `quarry` CLI on PATH, a `09-interfaces.md` present): run
+`quarry docs deps <repo> --downstream --json`, then
+`quarry docs section <consumer> "<contract>"` for each consumer of an
+interface the spec touches; fall back to
+`quarry docs search "<name>"` where no edge is declared. Any
+condition unmet → skip silently. This lives in protocol text, never
+as a harness hook.
+
 ## Phase B - write the plan
 
 Assume the executing engineer is skilled but knows nothing about this
@@ -72,6 +82,11 @@ everything. `plan.md`:
   see it pass (exact command), commit (message per code-craft's Git
   section: `<type>(<scope>): <subject>` plus the why in the body).
 - Backend before frontend where the feature spans both.
+- Every task that changes an interface a downstream repo consumes
+  (per Phase A's quarry findings) cites the constraint in the task
+  body: the consumer, the contract, and the fields it reads. The
+  executor sees only its own task, so a constraint not written into
+  the task does not exist.
 - **Coverage**, the closing section: a table with one row per
   numbered spec requirement, per Behavior rule (each happy-path step,
   branch, unhappy path, and state change), and per global constraint,
@@ -115,8 +130,8 @@ executor sees only the plan.
 Present the summary: file map, task list, the Coverage table's totals
 (N requirements and N behavior rules, all mapped), what Task 1
 proves. The user approves before any code is written. On approval,
-first append the changelog entry per core.md's ledger, key
-`plan/<NN>-<slug>@Q<n>` from the same highest `§Q`; record the file
+first write the changelog entry per core.md's ledger, key
+`plan/<id>@Q<n>` from the same highest `§Q`; record the file
 map, the task count and titles, and the global constraints pinned.
 Then record `plan_approved: true` and `approved_spec: <checksum of
 spec.md>` (`git hash-object spec.md`; any stable checksum outside

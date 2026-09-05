@@ -61,21 +61,30 @@ means refresh only what drifted.
 | *(none)* | No stamped index → full build. Stamped index → refresh what drifted. |
 | `check` | Read-only trust report. Writes nothing, not even a ledger entry. |
 | `rebuild` | Force a full rewrite of a reference that looks current. |
-| `<topic>` | Rebuild one chapter: `architecture`, `models`, `conventions`, `data-flow`, `dependencies`, `testing`, `operations`, `glossary`. |
+| `<topic>` | Rebuild one chapter: `architecture`, `models`, `conventions`, `data-flow`, `dependencies`, `testing`, `operations`, `glossary`, `interfaces`. |
 
-**Writes** `docs/capstone/00-index.md`, the numbered chapters,
-`logic/` (business-logic scenarios) and `uiux/` (surface chapters).
+**Writes** `docs/capstone/00-index.md`, the numbered chapters
+(`09-interfaces.md`, the cross-repo produces/consumes tables, appears
+when the repo talks to another repo; the `interfaces` config key can
+turn it off), `logic/` (business-logic scenarios) and `uiux/`
+(surface chapters); the `extract` config key can skip either
+extraction pass.
 Every file carries `generated_at_commit`, `generated_date`,
-`capstone_version` and `paths_covered` in frontmatter; those globs are
-what a later refresh diffs against.
+`capstone_version`, `content_hash` and `paths_covered` in
+frontmatter; those globs are what a later refresh diffs against, and
+the content hash is the stamp that survives squash and rebase merges,
+so an unreachable commit degrades to a per-file check instead of a
+full rebuild.
 
 **A refresh also fills gaps**, not just staleness: entry points no
 `logic/` scenario claims and surfaces no `uiux/screens/` chapter
 claims get extracted. Interview-derived files in either folder are
 never overwritten by extraction.
 
-`map check` reports six things - staleness, pointer drift, absorption
-drift, dependency re-vetting, logic coverage, design coverage - and
+`map check` reports seven things - staleness, pointer drift,
+absorption drift, dependency re-vetting, logic coverage, design
+coverage, and unfolded `changelog.d/` fragments (informational only;
+fragments never flip the verdict) - and
 ends with a machine-parseable verdict:
 
 ```text
@@ -101,7 +110,8 @@ ledger key whose outputs are missing), approval integrity (voided plan
 approvals, truncated plans), torn wraps (a feature folder left behind
 after its entry landed), index ↔ disk drift, lifecycle validity,
 housekeeping (missing `.gitignore` or config keys, an untracked
-ledger), absorption drift, logic coverage, and ledger size.
+ledger), absorption drift, logic coverage, ledger size, and unfolded
+`changelog.d/` fragments.
 
 **Ledger key** `doctor/<scope>@<stamp>` - only when something was
 actually repaired.
@@ -147,7 +157,7 @@ dead session loses nothing, and re-running never re-asks.
 | `mockup` | `mockup/` - one file per screen: wireframe, elements, and a state inventory; `README.md` indexes the screens, the journeys, and the scenario list `logic` works from | `mockup-interview.md` |
 | `logic` | `logic/` - one file per scenario: triggers, exact rules, branches, unhappy paths, invariants, and the dimensions ruled out | `logic-interview.md` |
 | `uiux` | `uiux/01-direction.md`, `02-system.md`, `03-experience.md`, `screens/` | `uiux-interview.md` |
-| `architecture` | The eight numbered chapters, marked `mode: prescriptive` | `architecture-interview.md` |
+| `architecture` | The numbered chapters, marked `mode: prescriptive` (`09-interfaces.md` too when the design declares cross-repo edges) | `architecture-interview.md` |
 | `standards` | `standards.md` | `standards-interview.md` |
 | `stack` | `05-dependencies.md` | `stack-interview.md` |
 | `build` | `implementation.md`, then source code | `build-interview.md` |
@@ -216,8 +226,8 @@ groom → plan → implement
 
 | Stage | Produces | Gate |
 | --- | --- | --- |
-| `groom <feature>` | `features/<NN>-<slug>/spec.md` | Spec approval |
-| `plan <feature>` | `features/<NN>-<slug>/plan.md` | **Plan approval, before any code** |
+| `groom <feature>` | `features/<date>-<slug>/spec.md` | Spec approval |
+| `plan <feature>` | `features/<date>-<slug>/plan.md` | **Plan approval, before any code** |
 | `implement <feature>` | Source code, then reference updates | - |
 
 **`groom`** requires a stamped index; without one it builds the
@@ -240,8 +250,10 @@ and **deletes the feature folder**.
 > record of why the feature was built that way - which is why the
 > ledger is always committed.
 
-**Ledger key** `implement/<NN>-<slug>@Q<n>`. That key is also the done
-marker: `<NN>` is retired and never reused.
+**Ledger key** `implement/<date>-<slug>@Q<n>`. That key is also the
+done marker: the id is retired and never reused. Ids are derived from
+the groom date and slug, never allocated from a counter, so two
+parallel feature branches can't mint the same one.
 
 ---
 
@@ -271,10 +283,12 @@ docs/capstone/
 ├── 06-testing.md          layout, doubles, coverage shape
 ├── 07-operations.md       run it, env vars, infra, deploy
 ├── 08-glossary.md         the domain words your codebase invented
+├── 09-interfaces.md       cross-repo produces/consumes tables
 ├── logic/                 business logic, one file per scenario
 ├── mockup/                one file per screen
 ├── uiux/                  direction, design system, per-screen chapters
-├── changelog.md           append-only ledger - always committed
+├── changelog.md           the folded ledger - always committed
+├── changelog.d/           one fragment per new entry, folded on main - committed
 ├── standards.md           how code should be written here
 ├── implementation.md      build's plan
 ├── review.md              opinionated findings          (gitignored)
@@ -292,9 +306,29 @@ moves, so a custom location stays discoverable.
 hook. `expertise` (1–5) calibrates the conversation only, never the
 docs. `teaching_mode` narrates what is happening and why.
 `docs_in_git` governs whether the reference is committed -
-`changelog.md` is the sole exception and is always committed.
+the ledger (`changelog.md` and `changelog.d/`) is the sole exception
+and is always committed.
 `subagent_threshold` (default 150 source files) is where `map` fans
 out to subagents, and where an unrequested full build asks first.
+`non_interactive` resolves every prompt to its default for headless
+CI runs (approval gates still stop). `extract` picks which of `map`'s
+extraction passes run (`["logic"]` skips the expensive uiux pass;
+`[]` skips both). `interfaces` and `interfaces_frontmatter` control
+the `09-interfaces.md` chapter; `cross_repo` controls whether
+`groom`, `plan`, and the `architecture` interview consult the
+`quarry` CLI for cross-repo contracts (`auto` uses it only when the
+CLI is on PATH, and for `groom`/`plan` the repo also has a
+`09-interfaces.md`).
+
+**Cross-repo contracts.** With `cross_repo: "auto"` and quarry
+installed, `groom` runs `quarry docs deps <repo> --downstream --json`
+and reads each consumer's contract section before its first question,
+and `plan` writes the constraint into every task that crosses a repo
+boundary. The `architecture` interview looks up any existing system
+a greenfield design will talk to (`quarry docs search`, then the
+contract section) and writes the planned edges into a prescriptive
+`09-interfaces.md`, so the feature chain can consult quarry from day
+one. Without quarry, everything behaves exactly as before.
 
 **Interview lifecycle.** `interviewing` → `awaiting-formalization` →
 `formalized`. The final state is written only *after* outputs are on
@@ -302,14 +336,21 @@ disk, so a crash can never strand a "done" marker over missing files.
 After formalization, those outputs are the source of truth. Interviews
 remain local resume and repair state; final files never cite them.
 
-**The ledger.** Every run that writes appends to `changelog.md` before
-setting its done marker. Newest first, bullets only, append-only.
-`doctor` archives past 200 entries but never drops a key.
+**The ledger.** Every run that writes records itself as one file in
+`changelog.d/` before setting its done marker; the next writing run
+on main folds the fragments into `changelog.md`, newest first,
+bullets only, and deletes them. Distinct filenames mean two
+doc-carrying PRs never conflict in the ledger. Rotation past 200
+entries moves the oldest into `changelog-<YYYY>.md`, keys and bodies
+together; a key is never dropped.
 
 **Staleness.** Each generated file records the commit it was derived
-at plus the globs it covers. A refresh diffs those globs against the
+at, a content hash of the tree under its globs, and the globs it
+covers. A refresh diffs those globs against the
 working tree - uncommitted changes count - and rewrites only what
-moved. `capstone_version` records which capstone wrote a file, so a
+moved; when a squash or rebase merge makes the commit unreachable,
+the content hash keeps the check per-file instead of forcing a full
+rebuild. `capstone_version` records which capstone wrote a file, so a
 later release can migrate by version rather than guessing from shape.
 
 **Descriptive, always.** Docs state facts with `file:line` pointers,
@@ -339,4 +380,7 @@ a considered trade-off from an oversight.
 Copy `templates/capstone-map-check.yml` into `.github/workflows/` and
 add an `ANTHROPIC_API_KEY` secret. It runs `map check` on every PR and
 fails when the reference is stale, by parsing the `MAP CHECK:` verdict
-line.
+line. The template writes a config with `non_interactive: true` so
+the headless run resolves every prompt to its default; unfolded
+`changelog.d/` fragments are reported but never fail the gate, so a
+PR carrying its own ledger entry still passes.

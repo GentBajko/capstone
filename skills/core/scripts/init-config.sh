@@ -29,13 +29,19 @@ if [ ! -f "$GLOBAL_FILE" ]; then
   mkdir -p "$GLOBAL_DIR"
   cat > "$GLOBAL_FILE" <<'EOF'
 {
-  "expertise": null,
-  "teaching_mode": false,
-  "docs_dir": "docs/capstone",
-  "index_file": "docs/capstone/00-index.md",
-  "subagent_threshold": 150,
-  "docs_in_git": "ask",
-  "language": "en"
+  // Comments are allowed in this file; capstone reads around them.
+  "expertise": null,                  // null = ask once | 1 vibe | 2 explorer | 3 builder | 4 engineer | 5 architect; conversation only, never the docs
+  "teaching_mode": false,             // true = narrate each step and the concept behind it, at any expertise level
+  "docs_dir": "docs/capstone",        // where generated docs land; relative path inside the repo
+  "index_file": "docs/capstone/00-index.md", // chapter zero of the docs area; relative path inside the repo
+  "subagent_threshold": 150,          // source-file count where map fans out to subagents and unrequested full builds ask first
+  "docs_in_git": "ask",               // "commit" | "ignore" | "ask" - the factual reference only; the ledger is always committed
+  "language": "en",                   // language the generated docs are written in
+  "non_interactive": false,           // true = resolve every defaulted prompt silently (CI); approval gates still stop
+  "extract": ["logic", "uiux"],       // map's extraction passes: ["logic","uiux"] both | ["logic"] skip uiux | [] skip both
+  "interfaces": "auto",               // "auto" = write 09-interfaces.md when the repo talks to another repo | "off" = never
+  "interfaces_frontmatter": false,    // true = also mirror the interface tables into frontmatter, for machine consumers
+  "cross_repo": "auto"                // "auto" = groom/plan/architecture consult quarry when installed (groom/plan also need 09-interfaces.md) | "off" = never
 }
 EOF
   echo "created: $GLOBAL_FILE"
@@ -179,9 +185,10 @@ else
 # Capstone's local-only outputs. Committed docs are the factual
 # reference; everything listed here is personal working state.
 # The feature chain (groom -> plan -> implement) never commits.
-# changelog.md is deliberately NOT here and must never be added: the
-# ledger is always committed, whatever docs_in_git says, because
-# implement deletes each feature folder on the strength of its entry.
+# changelog.md and changelog.d/ are deliberately NOT here and must
+# never be added: the ledger is always committed, whatever
+# docs_in_git says, because implement deletes each feature folder on
+# the strength of its entry.
 
 # Feature working files: interviews, specs, plans, review ledgers
 features/

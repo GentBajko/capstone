@@ -132,7 +132,7 @@ inapplicable - not when nothing further comes to mind. A dimension the
 user declines to settle is an open question, recorded as one, never an
 inapplicable one.
 
-Then present the summary, get the user's confirmation ("laid bare?"),
+Then present the summary, get the user's confirmation ("formalize?"),
 and write `docs/capstone/logic/<NN>-<scenario>.md` immediately:
 sections exactly as the bullets above, with every confirmed rule and
 its rationale written directly into the file and no interview-file or
