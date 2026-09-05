@@ -15,6 +15,9 @@
   <img
     src="https://img.shields.io/badge/format-plain%20SKILL.md-444C56?style=flat-square"
     alt="Distributed as plain SKILL.md files">
+  <a href="https://github.com/GentBajko/quarry"><img
+    src="https://img.shields.io/badge/pairs%20with-quarry-A96A38?style=flat-square"
+    alt="Pairs with quarry for cross-repo docs"></a>
   <a href="LICENSE"><img
     src="https://img.shields.io/badge/license-Apache--2.0-1F2328?style=flat-square"
     alt="Apache-2.0 licensed"></a>
@@ -39,6 +42,14 @@
 <p align="center">
   <img src="assets/flow.svg" width="620"
     alt="Three ways in: an existing repo runs map, a new product runs start, a feature idea runs feature. All three write to docs/capstone/.">
+</p>
+
+<p align="center">
+  <strong>Running a fleet of repos?</strong>
+  <a href="https://github.com/GentBajko/quarry">Quarry</a> gathers every
+  capstone reference into one indexed docs repo, so "what breaks if I
+  change this endpoint" is a one-line query from any terminal.<br>
+  Capstone writes the edges; quarry walks them.
 </p>
 
 <p align="center">
