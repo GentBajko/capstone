@@ -81,10 +81,12 @@ full rebuild.
 claims get extracted. Interview-derived files in either folder are
 never overwritten by extraction.
 
-`map check` reports seven things - staleness, pointer drift,
+`map check` reports eight things - staleness, pointer drift,
 absorption drift, dependency re-vetting, logic coverage, design
-coverage, and unfolded `changelog.d/` fragments (informational only;
-fragments never flip the verdict) - and
+coverage, unfolded `changelog.d/` fragments (informational only;
+fragments never flip the verdict), and a mechanical schema pass
+(required frontmatter keys and required headings per file, grep
+only) - and
 ends with a machine-parseable verdict:
 
 ```text
@@ -110,7 +112,8 @@ ledger key whose outputs are missing), approval integrity (voided plan
 approvals, truncated plans), torn wraps (a feature folder left behind
 after its entry landed), index ↔ disk drift, lifecycle validity,
 housekeeping (missing `.gitignore` or config keys, an untracked
-ledger), absorption drift, logic coverage, ledger size, and unfolded
+ledger), absorption drift, logic coverage, ledger size, schema
+(missing frontmatter keys or required headings), and unfolded
 `changelog.d/` fragments.
 
 **Ledger key** `doctor/<scope>@<stamp>` - only when something was
