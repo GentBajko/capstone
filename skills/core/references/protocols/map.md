@@ -358,7 +358,7 @@ targets one) and re-verify the root index-of-indexes' workspace table.
 
 No writes, and no changelog entry: nothing was done, only read - it
 reports leftover `changelog.d/` fragments (part 7) rather than
-folding them. Seven parts:
+folding them. Eight parts:
 
 1. **Staleness**: for each stamped file with `paths_covered`, read
    its stamp and globs, then from the repo root run
@@ -408,6 +408,24 @@ folding them. Seven parts:
    state on a branch, so they never count toward the stale verdict
    below - a doc-carrying PR must not fail a freshness gate for
    carrying its own ledger entry.
+8. **Schema**: a mechanical pass over every generated file, grep
+   only, no judgment. Two halves:
+   - Frontmatter keys: each indexed chapter, `logic/` and `uiux/`
+     extraction file carries `generated_date` plus, inside git,
+     `generated_at_commit`, `content_hash`, and `paths_covered`
+     (`capstone_version` absent is already part 1's older-capstone
+     verdict, not re-reported here). Interview-derived files are
+     checked for `generated_date` only, since they carry no globs by
+     design.
+   - Required headings: each chapter's `^## ` lines cover every
+     required section `../topics.md` defines for that topic (a
+     section may be satisfied by "None found" text, but the heading
+     itself must exist).
+   Report file | missing keys | missing headings. Every finding here
+   counts toward the stale verdict: a missing heading is template
+   drift and a missing stamp breaks the refresh, and the repair for
+   both is `map`, which regenerates the file against the current
+   template.
 
 End with one sentence (whether the reference can be trusted as-is,
 needs `map`, or needs `map rebuild`) followed by the machine

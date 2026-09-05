@@ -29,7 +29,12 @@ Required sections:
 - `## Entry points`: every process entry (CLI, server, workers) with
   `file:line`.
 - `## Communication`: how parts talk: HTTP routes, websocket commands,
-  events, queues; where each is registered and dispatched.
+  events, queues, streams; where each is registered and dispatched,
+  **and the payload each carries in both directions**: the named
+  entity or DTO from `02-models.md` where one exists, the fields
+  inline (name, type, optionality) where none does - an ad-hoc dict
+  pushed to a broker is a contract even though no class declares it.
+  Cite the send and receive sites `file:line`.
 - `## Composition`: where objects are wired together (DI container,
   factories, `main()`).
 - `## Frontend`: for products with a human-facing UI: rendering model
@@ -42,7 +47,10 @@ Required sections:
 
 Checklist: dependency direction verified by reading imports, not assumed
 from directory names; registries and dispatch tables enumerated in full,
-not sampled; the rendering model read from the client build config and
+not sampled; every Communication row names its payload in both
+directions, read from the call site rather than the route name - a
+bare route list fails the section; the rendering model read from the
+client build config and
 entry files, not assumed from the framework's name.
 
 ## models.md
