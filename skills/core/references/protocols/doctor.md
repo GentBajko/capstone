@@ -1,7 +1,8 @@
 # doctor - verify and repair the docs area's own consistency
 
-**Reads:** config → `<index_file>` → `<docs_dir>/changelog.md` →
-every interview file's frontmatter → the outputs each done marker
+**Reads:** config → `<index_file>` → the ledger
+(`<docs_dir>/changelog.md`, its rotation files, and `changelog.d/`
+fragments) → every interview file's frontmatter → the outputs each done marker
 implies (presence, stamps, and final bodies for authority check 4b) →
 `<docs_dir>/.gitignore`.
 
@@ -23,8 +24,8 @@ documented rules it proposes, never applies.
    then re-gate); `approved_spec` no longer matching a checksum of
    the current `spec.md` (a voided approval; plan.md's Resume rule:
    drop the stale keys, re-plan).
-2b. **Torn wrap**: a `features/<NN>-<slug>/` folder still on disk
-   while `changelog.md` carries its `implement/<NN>-<slug>` key: the
+2b. **Torn wrap**: a `features/<id>/` folder still on disk
+   while the ledger carries its `implement/<id>` key: the
    wrap died between recording and deleting. Repair = finish the
    delete (implement.md Phase D step 6), never re-run the stage. The
    inverse (`implemented: true` with no key) is a torn write, check 1.
@@ -51,7 +52,8 @@ documented rules it proposes, never applies.
    repo whatever `docs_in_git` says (the ledger is always committed,
    core.md; repair = stage it, and report it loudly: every shipped
    feature's reasoning was one disk away from gone);
-   `capstone.json` invalid JSON or keys outside their ranges.
+   `capstone.json` invalid JSON (`//` line comments are permitted
+   per core.md and are never a finding) or keys outside their ranges.
 6. **Absorption drift**: `map check`'s absorption count; repair =
    re-run `implement`'s absorb step (its Phase D step 2) per missed
    feature, reading that feature's `spec.md` if still on disk; a
@@ -60,12 +62,19 @@ documented rules it proposes, never applies.
    points no `logic/` scenario claims; repair = the `map` refresh's
    logic-coverage step (extraction per missing scenario, map.md).
 8. **Ledger size**: `changelog.md` past 200 entries; repair = the
-   rotation in core.md's ledger rule (archive all but the newest 100
-   into `changelog-archive-<YYYY>.md`, leaving every archived entry's
-   `## <date>` heading and `key:` line behind under `## Archived`).
-   Dropping a key is never part of it: `feature` allocates the next
-   `<NN>` from those keys, so a dropped one is a reused number and a
-   shipped feature that reads as unstarted.
+   rotation in core.md's ledger rule (move all but the newest 100
+   into `changelog-<YYYY>.md`, keys **with** their bodies; nothing is
+   left behind in `changelog.md`). Dropping a key is never part of
+   it: shipped features resolve from the `implement/*` keys wherever
+   they live, so a dropped one is a shipped feature that reads as
+   unstarted and an id freed for reuse. A legacy
+   `changelog-archive-<YYYY>.md` with a stripped-key `## Archived`
+   section is left as-is and searched like any other ledger file.
+9. **Unfolded fragments**: files sitting in `changelog.d/`; repair =
+   fold them per core.md's ledger rule. Doctor applying any approved
+   repair is a writing run and folds anyway; on a non-default branch
+   the fold is skipped per that rule and the fragments are reported
+   as the designed state, not a finding.
 
 ## Report, then repair
 
@@ -73,7 +82,9 @@ Present the findings table (check · finding · owning rule · proposed
 repair), grouped auto-repairable (a documented crash rule) vs
 needs-confirmation. Apply what the user approves (a user who invoked
 doctor with "fix" pre-approves the documented crash rules) and
-re-run the affected checks after. Append ONE changelog entry only
+re-run the affected checks after. Write ONE changelog entry (a
+`changelog.d/` fragment, folded per core.md's ledger rule when on
+the default branch) only
 when something was repaired, key `doctor/<scope>@<stamp>`, listing
 each repair and its owning rule. A clean or report-only run writes
 nothing and says so.

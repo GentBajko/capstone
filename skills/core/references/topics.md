@@ -3,7 +3,7 @@
 Topics are written as numbered chapters in this reading order:
 `01-architecture.md`, `02-models.md`, `03-conventions.md`,
 `04-data-flow.md`, `05-dependencies.md`, `06-testing.md`,
-`07-operations.md`, `08-glossary.md`. The headings below use the
+`07-operations.md`, `08-glossary.md`, `09-interfaces.md`. The headings below use the
 logical topic names; the chapter number is a filename prefix only.
 `logic/`'s per-scenario files join the same topic index (core.md's
 Index maintenance rule) under the `logic` topic name, one row per
@@ -156,6 +156,81 @@ Required sections:
 Checklist: covers every mechanism whose name alone does not explain it
 (invented nouns, domain jargon, lifecycle states); entries explain intent,
 not just location.
+
+## interfaces.md
+
+**Applicable:** config `interfaces` is `auto` (the default) AND the
+codebase talks to another repository (in `architecture`'s
+prescriptive mode: the design declares that it will; `Site` cells
+then hold planned paths): it publishes something others
+consume (an HTTP API, queue messages, events, a shared schema) or
+consumes another repo's (an API client, a queue subscriber, a
+webhook handler for someone else's events). "Another repository"
+means a sibling codebase in the same organization or ecosystem - one
+with its own origin URL that could carry its own docs - never a
+third-party service: Stripe, S3, and their kind belong in
+`05-dependencies.md`'s External services, and a repo whose only
+outside talk is to vendors gets no chapter. Most single-repo
+projects therefore never see this chapter, which is the intended
+default. `interfaces: "off"` skips the pass entirely.
+
+The chapter carries both directions of the repo's cross-repo edges,
+as tables. Cross-repo tooling (quarry) indexes exactly these tables,
+and a plain markdown viewer gets a navigable graph from the links,
+so there is one form and no mirror to drift.
+
+Required sections:
+
+- `## Produces`: table with columns `Kind`, `Name`, `To`, `Site` -
+  one row per thing this repo publishes for another repo: kind is
+  free-form lowercase (`http`, `sqs`, `event`, `schema`, ...), name
+  identifies the contract (`GET /customers/{id}`, `file-ingest`),
+  `To` names the consuming repo: as a relative link to that repo's
+  own chapter, `[data-collection](../data-collection/09-interfaces.md)`,
+  when the docs are gathered side by side (a quarry docs repo), or as
+  the plain repo name when they are not - readers strip link syntax
+  before matching, so both forms index identically, and a dead link
+  helps nobody. `Site` is the backticked `` `path:line` `` of the
+  publish site.
+- `## Consumes`: same table shape with `From` in place of `To`, one
+  row per contract this repo reads from another repo, `Site` the
+  client/subscriber site. Inline the contract fields this repo
+  actually reads (a short list under the table or a `Fields` column)
+  rather than pointing at a schema file in the other repo: a pointer
+  means the reader clones the consumer anyway.
+
+Format rules the index depends on: columns are matched by header
+name, not position; cells are read after stripping backticks and
+link syntax; tables count only on a page named `09-interfaces.md`
+and never inside a fenced code block, so a chapter documenting the
+format declares nothing. `kind`, `name`, and `to`/`from` are
+required per row; a repo name is the last path segment of that
+repo's origin URL. Either side of an edge may declare it; when both
+do and disagree, the disagreement stays visible in each repo's own
+chapter rather than being merged away.
+
+When config `interfaces_frontmatter` is `true`, mirror the tables
+into frontmatter lists too (same required fields, lowercase `kind`):
+
+```yaml
+produces:
+  - kind: sqs
+    name: file-ingest
+    to: data-collection
+    site: src/publish/sqs.py:57
+consumes:
+  - kind: http
+    name: GET /customers/{id}
+    from: customers-service
+    site: src/clients/customers.py:12
+```
+
+Checklist: every publish and client site found by reading the code
+(route registrations, queue publishers/subscribers, generated
+clients, webhook senders), not guessed from config names; every row's
+`Site` verified `file:line`; internal calls between this repo's own
+modules excluded - the chapter is cross-repo edges only; kinds
+lowercase; no row missing `kind`, `name`, or `to`/`from`.
 
 ## testing.md
 

@@ -19,11 +19,16 @@ exists), then groom against it: grooming against no reference is
 guessing, and `map` producing no index either - an empty repo - is
 the one case that stops the run.
 
-State: `docs/capstone/features/<NN>-<slug>/feature-interview.md`, same
+State: `docs/capstone/features/<id>/feature-interview.md`, same
 resumable format as the other interviews (frontmatter with `status`,
 numbered `§Q` decision entries; standard lifecycle per core.md; never
-indexed). `<NN>` continues the `features/` folder's numbering (01 when
-the folder is new); `<slug>` is a short kebab name for the feature.
+indexed). `<id>` is `<YYYY-MM-DD>-<slug>`: the date this groom began
+plus a short kebab name for the feature. The id is derived from the
+request, never allocated from a ledger: the old `<NN>-<slug>` scheme
+took the next number from what was visible on the current branch, so
+two parallel PRs both minted `03-`. Existing `<NN>-<slug>` folders
+and keys stay as they are and are matched like any other id; only
+new features get the date form.
 Output: `spec.md` beside it; the `features/` folder is one Companion
 docs row. Later stages add their own keys to the same frontmatter
 (`plan_approved`, `approved_spec`, `base_commit`, `implemented`);
@@ -31,16 +36,17 @@ docs row. Later stages add their own keys to the same frontmatter
 feature is built.
 
 **Resume:** before anything else, match the request against existing
-`docs/capstone/features/*/` slugs and spec titles **and against the
-`implement/<NN>-<slug>` keys in `changelog.md`**, whose features are
-shipped and whose folders `implement` deleted. Never mint a new `<NN>`
-that a key already retired, and never reuse a retired slug's number.
+`docs/capstone/features/*/` ids and spec titles **and against the
+`implement/*` keys in the ledger** (`changelog.md`, its rotation
+files, and unfolded `changelog.d/` fragments, per core.md), whose
+features are shipped and whose folders `implement` deleted. Never
+reuse a shipped feature's id, legacy `<NN>-<slug>` ids included.
 
 A match on a changelog key only (no folder) is a **shipped** feature:
 say so and show that entry. A request to change it is a new feature
 grooming against the shipped behavior now recorded in `logic/` and the
-chapters, not a reopening: give it the next `<NN>`, and have its `§Q`
-entries cite the earlier key as the thing being amended. There is no
+chapters, not a reopening: give it its own date-slug id, and have its
+`§Q` entries cite the earlier key as the thing being amended. There is no
 folder to reopen, and re-deriving one from the changelog would invent
 decisions the user never restated.
 
@@ -72,7 +78,21 @@ recorded `§Q` decisions, without re-interviewing.
    feature: the `logic/` scenarios it extends, the `mockup/` screens
    it changes, the `uiux/` chapters it touches, `standards.md`.
    Never ask what these already answer.
-4. An artifact argument (a ticket, a PRD, notes) seeds the interview
+4. **Cross-repo constraints, before the first question.** When config
+   `cross_repo` is `auto` (the default), the `quarry` CLI is on PATH,
+   and the repo has a `09-interfaces.md`: run
+   `quarry docs deps <repo> --downstream --json` (`<repo>` = the last
+   path segment of this repo's origin URL), then
+   `quarry docs section <consumer> "<contract>"` for each consumer
+   the deps call returns, to read the contract fields each downstream
+   repo actually depends on. When the feature touches an interface no
+   declared edge covers, fall back to
+   `quarry docs search "<name>"`. Any condition unmet (config `off`,
+   no CLI, no chapter) → skip silently and groom exactly as before.
+   This lives here, in protocol text, deliberately - never as a
+   harness hook, because capstone also runs on harnesses without
+   hooks.
+5. An artifact argument (a ticket, a PRD, notes) seeds the interview
    per core-authoring.md's Artifact seeding rule.
 
 ## Phase B - the interview
@@ -84,6 +104,11 @@ answers, YAGNI ruthlessly. Record every answer as a `§Q` entry in
 generation rule: **"if I had to write the spec right now, what would
 I have to invent?"** The next question is whatever tops that list.
 
+- When Phase A step 4 found downstream consumers, the **first
+  question cites the constraint**: name the consumer, the contract,
+  and the fields it reads, and ask how the feature holds or breaks
+  them. A groomed change to a produced interface that never surfaced
+  its consumers is a spec defect.
 - Scope first: if the description hides several independent features,
   say so and split: each gets its own `features/` entry and its own
   chain run. Groom one; list the rest in the interview file.
@@ -120,8 +145,8 @@ edge-case posture, what's out of scope) and set
 Self-review before handing the file over (fix inline, don't re-gate):
 no placeholders ("TBD", "handle errors appropriately"), no section
 contradicting another, no requirement readable two ways, scoped to a
-single plan. Then append the changelog entry per core.md's ledger: key
-`groom/<NN>-<slug>@Q<n>`, `<n>` the highest `§Q` in
+single plan. Then write the changelog entry per core.md's ledger: key
+`groom/<id>@Q<n>`, `<n>` the highest `§Q` in
 `feature-interview.md`; record the chosen approach with the rejected
 alternatives and the out-of-scope rulings. Add or refresh the
 `features/` Companion docs row, set `status: formalized` (only now,

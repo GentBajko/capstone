@@ -17,6 +17,27 @@ jobs:
           npm install -g @anthropic-ai/claude-code
           claude plugin marketplace add GentBajko/capstone
           claude plugin install capstone@capstone-marketplace
+      - name: Headless config
+        # non_interactive resolves every prompt to its default so the
+        # run never hangs waiting for an answer (core.md's config key)
+        run: |
+          mkdir -p ~/.claude
+          cat > ~/.claude/capstone.json <<'EOF'
+          {
+            "expertise": null,
+            "teaching_mode": false,
+            "docs_dir": "docs/capstone",
+            "index_file": "docs/capstone/00-index.md",
+            "subagent_threshold": 150,
+            "docs_in_git": "ask",
+            "language": "en",
+            "non_interactive": true,
+            "extract": ["logic", "uiux"],
+            "interfaces": "auto",
+            "interfaces_frontmatter": false,
+            "cross_repo": "auto"
+          }
+          EOF
       - name: Map check
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

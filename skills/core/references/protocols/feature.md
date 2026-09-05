@@ -12,19 +12,22 @@ an existing feature's slug.
 
 1. Per core.md: read the config.
 2. Resolve the feature: match the argument against
-   `docs/capstone/features/*/` slugs and spec titles **and against the
-   `implement/<NN>-<slug>` keys in `changelog.md`** (shipped features,
-   whose folders `implement` deleted). No match → a new feature: the
-   next `<NN>` above every number either source shows, so a retired
-   one is never reused, and a short kebab slug derived from the
-   description. No argument → list existing features with their stage,
+   `docs/capstone/features/*/` ids and spec titles **and against the
+   `implement/*` keys in the ledger** (`changelog.md`, its rotation
+   files, and unfolded `changelog.d/` fragments: shipped features,
+   whose folders `implement` deleted). No match → a new feature: id
+   `<YYYY-MM-DD>-<slug>`, today's date plus a short kebab slug
+   derived from the description (per `groom`'s naming rule; derived,
+   never allocated from a ledger a parallel branch cannot see). A
+   shipped feature's id, legacy `<NN>-<slug>` included, is never
+   reused. No argument → list existing features with their stage,
    plus the shipped ones from their keys, and ask which to continue
    (or offer a new one).
 3. Determine the stage from the feature's `feature-interview.md` and
    outputs, per core.md's Interview lifecycle:
-   - **folder absent with an `implement/<NN>-<slug>` key present →
-     shipped**, checked before every row below; say so and show the
-     entry. A change request against it is a new feature per `groom`'s
+   - **folder absent with an `implement/<id>` key present anywhere
+     in the ledger → shipped**, checked before every row below; say
+     so and show the entry. A change request against it is a new feature per `groom`'s
      Resume rule, never a reopening: there is no folder left to reopen.
    - folder present with `implemented: true` → done but the wrap tore
      before its delete (implement.md Phase D step 6); finish the

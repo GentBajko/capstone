@@ -493,17 +493,21 @@ grep -q 'Pushback rule' skills/core/references/interview.md \
 # 12k. README's jump-to nav must resolve. GitHub renders a dead anchor
 #      without complaint, so a renamed section breaks navigation
 #      silently - the same class as a stale SKILL.md description.
+#      Anchors come in two shapes: markdown ](#...) links, and the
+#      README header's HTML <a href="#..."> row (the branded nav).
 for doc in README.md docs/commands.md; do
   HEADS=$(grep -E '^#{2,3} ' "$doc" \
     | sed -e 's/^#\{2,3\} //' -e 's/[`*_]//g' \
           -e 's/[^[:alnum:][:space:]-]//g' \
           -e 's/[[:space:]]\{1,\}/-/g' \
     | tr '[:upper:]' '[:lower:]')
-  for a in $(grep -o '](#[^)]*)' "$doc" | sed -e 's/](#//' -e 's/)//'); do
+  ANCHORS=$( { grep -o '](#[^)]*)' "$doc" | sed -e 's/](#//' -e 's/)//'
+               grep -o 'href="#[^"]*"' "$doc" | sed -e 's/href="#//' -e 's/"//'; } )
+  for a in $ANCHORS; do
     printf '%s\n' "$HEADS" | grep -qx "$a" \
       || err "$doc jump-to link #$a matches no heading"
   done
-  grep -q '^\*\*Jump to:\*\*' "$doc" \
+  { grep -q '^\*\*Jump to:\*\*' "$doc" || grep -q 'href="#' "$doc"; } \
     || err "$doc lost its jump-to nav"
 done
 
@@ -522,7 +526,8 @@ for f in .claude-plugin/plugin.json .codex-plugin/plugin.json \
   grep -q '"license": "Apache-2.0"' "$f" \
     || err "$f does not declare license Apache-2.0"
 done
-grep -q 'files, Apache-2.0' README.md \
+# the branded README states the licence via the shield badge's alt text
+grep -q 'Apache-2.0 licensed' README.md \
   || err "README does not state the project licence as Apache-2.0"
 # every vendored work keeps its own notice
 for w in 'impeccable' 'design-taste-frontend' 'mattpocock/skills'; do

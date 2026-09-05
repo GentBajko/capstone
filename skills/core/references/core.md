@@ -22,17 +22,27 @@ write this template yourself:
 
 ```json
 {
-  "expertise": null,
-  "teaching_mode": false,
-  "docs_dir": "docs/capstone",
-  "index_file": "docs/capstone/00-index.md",
-  "subagent_threshold": 150,
-  "docs_in_git": "ask",
-  "language": "en"
+  // Comments are allowed in this file; capstone reads around them.
+  "expertise": null,                  // null = ask once | 1 vibe | 2 explorer | 3 builder | 4 engineer | 5 architect; conversation only, never the docs
+  "teaching_mode": false,             // true = narrate each step and the concept behind it, at any expertise level
+  "docs_dir": "docs/capstone",        // where generated docs land; relative path inside the repo
+  "index_file": "docs/capstone/00-index.md", // chapter zero of the docs area; relative path inside the repo
+  "subagent_threshold": 150,          // source-file count where map fans out to subagents and unrequested full builds ask first
+  "docs_in_git": "ask",               // "commit" | "ignore" | "ask" - the factual reference only; the ledger is always committed
+  "language": "en",                   // language the generated docs are written in
+  "non_interactive": false,           // true = resolve every defaulted prompt silently (CI); approval gates still stop
+  "extract": ["logic", "uiux"],       // map's extraction passes: ["logic","uiux"] both | ["logic"] skip uiux | [] skip both
+  "interfaces": "auto",               // "auto" = write 09-interfaces.md when the repo talks to another repo | "off" = never
+  "interfaces_frontmatter": false,    // true = also mirror the interface tables into frontmatter, for machine consumers
+  "cross_repo": "auto"                // "auto" = groom/plan/architecture consult quarry when installed (groom/plan also need 09-interfaces.md) | "off" = never
 }
 ```
 
-Read it first; absent keys use the defaults above.
+Read it first; absent keys use the defaults above. Both config files
+are JSON with `//` line comments permitted (the created template
+ships with one per key, so the options are readable in place); read
+around them, keep them when editing a key's value, and never call
+the file invalid for carrying them.
 
 **Per-project state and overrides: `docs/capstone/capstone.json`,
 optional.** Never created as a matter of course; it exists only when
@@ -62,10 +72,52 @@ asking when ambiguous.
 
 `docs_in_git` (`"commit" | "ignore" | "ask"`) pre-answers the
 commit-or-gitignore question **for the factual reference only**: the
-index and the topic chapters, plus `logic/`, `mockup/`, `uiux/`,
-`standards.md`, and `changelog.md`.
+index and the topic chapters, plus `logic/`, `mockup/`, `uiux/`, and
+`standards.md`. The ledger (`changelog.md`, its rotation files,
+`changelog.d/`) is exempt: always committed, per its own rule below.
 `language` sets the generated docs' language. The user can change any
 key by editing the files or just telling you.
+
+`non_interactive` (boolean, default `false`): when `true`, every
+prompt resolves to its recommended default without being asked, so
+`claude -p "/capstone:map"` runs headlessly in CI. A question that
+carries a default (a confirm, a mode ask, `docs_in_git: "ask"`'s
+commit-or-ignore question) takes the default and is noted in the
+report. A question with no default - an approval gate (`plan`'s,
+`build`'s, a spec gate), consent to write main, an interview question
+- is never answered by inventing consent: the run says what it is
+blocked on and stops. It changes how prompts resolve, never what gets
+written.
+
+`extract` (list, default `["logic", "uiux"]`): which of `map`'s
+extraction passes run. `["logic"]` skips the uiux surface extraction
+(the expensive half for a backend service with no frontend to speak
+of), `[]` skips both. A pass not listed is skipped everywhere `map`
+would run it - build, refresh, and its coverage checks - and
+`map check` reports that pass as disabled by config rather than as a
+gap. Interview-derived `logic/` and `uiux/` files are untouched by
+this key; it gates extraction only.
+
+`interfaces` (`"auto" | "off"`, default `"auto"`): whether `map`
+writes the `09-interfaces.md` chapter (see `topics.md`). `auto` means
+the chapter's own Applicable test decides: a repo that talks to no
+other repo gets no chapter. `off` skips the interfaces pass entirely.
+`interfaces_frontmatter` (boolean, default `false`): when `true`, the
+chapter also mirrors its edge tables into frontmatter `produces:` /
+`consumes:` lists for a machine consumer that cannot parse markdown;
+the tables stay the canonical form, so leave this off unless
+something needs it - a mirror is one more thing to drift.
+
+`cross_repo` (`"auto" | "off"`, default `"auto"`): whether `groom`,
+`plan`, and the `architecture` interview consult the `quarry` CLI
+for cross-repo contracts (their protocols carry the exact calls).
+`auto` means: use it only when the CLI is on PATH **and**, for
+`groom` and `plan`, the repo has a `09-interfaces.md`
+(`architecture` drops that second condition - a greenfield repo has
+no chapter yet, and writing the prescriptive one is its job), so a
+machine without quarry behaves exactly as before with no
+configuration. `off` is the kill switch for someone who has quarry
+installed but does not want the calls.
 
 ## `expertise` (1-5): calibrates every conversation, never the docs
 
@@ -139,8 +191,8 @@ level 3 without asking and leave `expertise` null.
    and `core-authoring.md` for landing it: what is never committed,
    what gets indexed, and how a stage seeds and delegates.
 5. **Record what you did**: every run that writes or changes a durable
-   output appends its entry to `<docs_dir>/changelog.md` before
-   setting its done marker (Changelog ledger, below).
+   output writes its entry as a `<docs_dir>/changelog.d/` fragment
+   before setting its done marker (Changelog ledger, below).
 
 ## Progress tasks: every run shows where it stands
 
@@ -189,8 +241,14 @@ Every subcommand reads in the same order, before doing anything else:
 
 Everything a subcommand writes carries the topic-file frontmatter
 stamps (`generated_at_commit`, `generated_date`, `capstone_version`,
-plus `paths_covered` where the refresh protocol applies; date-only
-outside git).
+plus `paths_covered` and `content_hash` where the refresh protocol
+applies; date-only outside git). `content_hash` is
+`git ls-tree -r HEAD -- <the file's paths_covered globs>` piped
+through `git hash-object --stdin`, truncated to 12 chars. It exists
+because squash and rebase merges make every branch-commit stamp
+unreachable: a refresh that cannot diff from `generated_at_commit`
+recomputes this hash instead, and an unchanged hash means current,
+so the run degrades to a per-file check rather than a full rebuild.
 
 `capstone_version` is this plugin's own version, read once per run
 from its manifest (`.claude-plugin/plugin.json` at the plugin root,
@@ -244,7 +302,7 @@ Five bounds on it:
 ## Changelog ledger: `<docs_dir>/changelog.md`
 
 **Every run that writes or changes a durable output records itself
-there: one entry per done marker, appended before that marker is
+there: one entry per done marker, on disk before that marker is
 set.** The entry is an output like any other; the run is not finished
 until it is on disk. Protocols that only read (`help`, `map`'s check
 mode) or only route (`start`, `feature`) write no entry; a
@@ -253,12 +311,40 @@ performs it. Sole exception: `start`'s readback pass
 (`protocols/start.md` step 7) records itself, since it changes
 recorded decisions rather than routing to a stage that would.
 
-Create the file on first write (any stage may be its first writer)
-with frontmatter stamps only (no `paths_covered`, so no refresh path
-regenerates it), and add its Companion docs row. **Insert directly
-below the frontmatter, never at end of file**: entries are
-newest-first, so the newest is always the one directly under the
-frontmatter. An entry is
+**Entries land as fragments, one file each, folded on sight.** A run
+never inserts into `changelog.md` directly: it writes its entry as
+its own file, `<docs_dir>/changelog.d/<YYYY-MM-DD>-<stage>-<target>.md`
+(the key, slugged, as the filename), holding the complete entry and
+nothing else. Distinct filenames are the whole point: the old rule
+inserted every entry at the same offset directly below the
+frontmatter, so two doc-carrying branches conflicted there every
+single time; two branches each writing one new file never conflict.
+The fixed-offset insert is retired; nothing writes to `changelog.md`
+except the fold.
+
+**Folding:** the next run that already writes the docs area (`map`
+building or refreshing, `implement`'s wrap, `doctor` applying
+repairs) also folds, **but only on the repo's default branch**
+(main/master; anywhere in a repo without branches): read every file
+in `changelog.d/`, insert the entries into `changelog.md`
+newest-first directly below its frontmatter, delete the fragments,
+all in the same run. On any other branch, write your fragment and
+leave every fragment alone - folding there would put two branches'
+entries back at the same insert offset, which is exactly the
+conflict fragments exist to remove. The folded
+end state is byte-identical to the old single file. Read-only runs
+(`map check`) report leftover fragments instead of folding them, so
+a read-only gate stays read-only; a fragment that reaches a reader
+before it was folded is a small extra file, harmless, folded away by
+the next writing run on main. Create `changelog.md` at the first
+fold (any stage may trigger it) with frontmatter stamps only (no
+`paths_covered`, so no refresh path regenerates it), and add its
+Companion docs row; `changelog.d/` needs no row of its own.
+
+**Reading the ledger means reading all of it**: `changelog.md`, its
+rotation files, and any unfolded `changelog.d/` fragments. Every rule
+in this section that searches for a key searches all three. An entry
+is
 
     ## <date> - <stage>: <target>
     key: <stage>/<target>@<rev>
@@ -273,23 +359,25 @@ bullet needing a paragraph is several bullets. Never restate what the
 output already says; point at it. An entry that reads as a story is
 wrong even when every fact in it is right: this file is scanned by a
 later run hunting one key, never read start to finish.
-`<target>` is the thing acted on (`03-invite-links`,
+`<target>` is the thing acted on (`2026-09-05-invite-links`,
 `02-models.md`; `all` for a run covering the whole
 project). `<rev>` is the highest interview question number incorporated
 when the output was formalized (`Q7`) for a stage with an interview
 file, otherwise the run's stamp. The revision belongs in the key only;
 the output never cites the interview or its question numbers.
 
-Before appending, search the file for the key: if it is already there,
-this is a resumed run and the entry stands; never append a second. A
+Before writing a fragment, search the ledger (all of it, per the rule
+above) for the key: if it is already there, this is a resumed run and
+the entry stands; never write a second. A
 done marker found with no matching key is a torn write: append the
 missing entry from the recorded decisions, never re-run the stage.
 Writes to `*-interview.md`, `features/*/review-ledger.md` and
 `capstone.json` are not reported. A run that produced little still
 records: a dropped scenario, a topic recorded absent, a capability
 left open are the entry's content, never a reason to skip it.
-**The ledger is always committed, whatever `docs_in_git` says**, and
-is that setting's sole exception. It is the only durable record of
+**The ledger is always committed, whatever `docs_in_git` says** -
+`changelog.md`, its rotation files, and `changelog.d/` fragments
+alike - and is that setting's sole exception. It is the only durable record of
 why a feature was built the way it was: `implement` deletes the
 feature folder - spec, plan, and review ledger - on the strength of
 its entry here, so a local-only ledger would turn that deletion into
@@ -297,33 +385,39 @@ permanent loss on one machine change. `docs_in_git` and the absence
 of git change how an entry is stamped, never whether it is written,
 and never whether it is tracked.
 
-**Merges:** every entry inserts at the same offset, directly below the
-frontmatter, so branches conflict there routinely. Keep both sides and
-re-sort the conflicted block by date, newest first: resolving by
-picking a side drops a recorded event.
+**Merges:** fragments carry distinct filenames, so two doc-carrying
+branches merge cleanly; the next writing run folds both. A conflict
+inside `changelog.md` itself can still appear in a repo whose
+branches predate fragments: keep both sides and re-sort the
+conflicted block by date, newest first; resolving by picking a side
+drops a recorded event.
 
-**Rotation:** the file is append-only and read whole by `doctor` and
+**Rotation:** the folded file is read whole by `doctor` and
 `map check`, so it cannot grow without bound. Past **200 entries**,
-`doctor` moves all but the newest 100 into
-`changelog-archive-<YYYY>.md` beside it (same entry format, same
-newest-first order, its own Companion docs row, never rewritten
-afterwards).
+the next fold (or `doctor`) moves all but the newest 100 into
+`changelog-<YYYY>.md` beside it, the year the moved entries' dates
+fall in (same entry format, same newest-first order, its own
+Companion docs row, never rewritten afterwards). **Keys move with
+their bodies**: a rollup file is still greppable, and every rule that
+resolves a key already reads the rotation files, so nothing is left
+behind in `changelog.md` - no stripped headings, no `## Archived`
+stub section. A repo carrying a `changelog-archive-<YYYY>.md` and an
+`## Archived` section from the old body-stripping rotation keeps
+them as-is; key searches include them.
 
-**The keys never leave.** `feature` resolves shipped features and
-allocates the next `<NN>` from the `implement/*` keys here, so
-rotation leaves every archived entry's `## <date>` heading and `key:`
-line in place, bullets removed, under a trailing `## Archived`
-section naming the archive file. Bodies move; keys stay. A rotation
-that drops a key retires an `<NN>` into reuse and makes a shipped
-feature look unstarted.
+**The keys never leave.** `implement` deletes a feature's folder on
+the strength of its entry here, and `groom` and `feature` resolve
+shipped features from the `implement/*` keys, wherever they live.
+Deleting an entry - rather than rotating it - makes a shipped
+feature look unstarted and frees its identifier for silent reuse.
+Why not delete old entries instead of rotating: same reason.
 
 **One writer at a time.** Nothing here locks: two sessions writing
 the docs area at once (two terminals, or a `map` landing mid-wrap)
-interleave into the same chapters and the same insert offset. Append-
-only limits the damage to a conflict rather than a lost entry, and
-the Merges rule resolves it, but the reference is single-writer by
-assumption. When another capstone run may be live, say so and stop
-rather than racing it.
+interleave into the same chapters, and both may fold at once.
+Fragments limit the damage - an unfolded entry is never a lost entry
+- but the reference is single-writer by assumption. When another
+capstone run may be live, say so and stop rather than racing it.
 
 ## Interview lifecycle (shared by all interviews)
 

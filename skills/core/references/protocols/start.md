@@ -81,8 +81,10 @@ wherever it stopped:
    are the only decision sources: completed interview bodies are not
    opened, cited, or amended.
 
-   Run it when the stack output is formalized and `changelog.md`
-   carries no `readback/all@<stamp>` key, before executing `build.md`.
+   Run it when the stack output is formalized and the ledger
+   (`changelog.md` and unfolded `changelog.d/` fragments, per
+   core.md) carries no `readback/all@<stamp>` key, before executing
+   `build.md`.
    `<stamp>` is a stable hash of the ordered latest changelog keys for
    the six stage outputs, so unchanged outputs skip and any amended
    stage runs the pass again.

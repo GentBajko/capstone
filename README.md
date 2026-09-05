@@ -124,7 +124,7 @@ when you want to enter mid-chain.
 
 ## What you get
 
-`/capstone:map` produces a `00-index.md`, eight numbered chapters
+`/capstone:map` produces a `00-index.md`, up to nine numbered chapters
 beside it in `docs/capstone/`, and a `logic/` folder mapping the
 observed business logic scenario by scenario:
 
@@ -137,10 +137,12 @@ observed business logic scenario by scenario:
 06-testing.md        layout, test doubles, coverage shape
 07-operations.md     how to run it, env vars, infra, deploy
 08-glossary.md       the domain words your codebase invented
+09-interfaces.md     what this repo publishes for and consumes from other repos
 ```
 
 Everything is facts with `file:line` citations, never advice. Every
-file records the commit it was derived at and the globs it covers, so
+file records the commit it was derived at, a content hash that
+survives squash and rebase merges, and the globs it covers, so
 a later run rewrites only what actually moved - and every command
 declares what it reads before acting, so re-runs don't burn tokens
 re-exploring what the docs already know.
@@ -182,9 +184,10 @@ instead of sending you off to run something else.
 Plus `/capstone:help` for usage - in Claude Code a hook answers it
 before the model is invoked, so it costs zero tokens.
 
-Not a command: `docs/capstone/changelog.md`, the append-only ledger
-every writing command records itself in before it sets its done
-marker.
+Not a command: `docs/capstone/changelog.md`, the ledger every writing
+command records itself in before it sets its done marker. New entries
+land as one file each under `changelog.d/`, so parallel doc-carrying
+PRs never conflict; the next writing run on main folds them in.
 
 **[Full command reference →](docs/commands.md)** - every argument,
 output, prerequisite, ledger key, and the shared mechanics.
@@ -234,7 +237,7 @@ way on any machine.
 
 **architecture**. The big interview. Done only when every section of
 the future docs is answerable from your recorded decisions. Writes
-the same eight chapters, marked prescriptive; once code exists,
+the same numbered chapters, marked prescriptive; once code exists,
 `map` replaces intent with observation.
 
 **standards**. Typing strictness, library versus hand-rolled, error
@@ -307,15 +310,21 @@ Installing creates `~/.claude/capstone.json` (the first session after
 install runs the plugin's SessionStart hook): one config for the
 user, shared by every project.
 
-```json
+```jsonc
 {
-  "expertise": null,
-  "teaching_mode": false,
-  "docs_dir": "docs/capstone",
-  "index_file": "docs/capstone/00-index.md",
-  "subagent_threshold": 150,
-  "docs_in_git": "ask",
-  "language": "en"
+  // Comments ship in the created file too; capstone reads around them.
+  "expertise": null,                  // null = ask once | 1-5, vibe -> architect
+  "teaching_mode": false,             // narrate each step and the concept behind it
+  "docs_dir": "docs/capstone",        // where generated docs land
+  "index_file": "docs/capstone/00-index.md", // chapter zero of the docs area
+  "subagent_threshold": 150,          // where map fans out to subagents
+  "docs_in_git": "ask",               // "commit" | "ignore" | "ask"
+  "language": "en",                   // language of the generated docs
+  "non_interactive": false,           // resolve defaulted prompts silently (CI)
+  "extract": ["logic", "uiux"],       // map's extraction passes; [] skips both
+  "interfaces": "auto",               // "auto" | "off" - the 09-interfaces.md chapter
+  "interfaces_frontmatter": false,    // mirror interface tables into frontmatter
+  "cross_repo": "auto"                // "auto" | "off" - quarry lookups in groom/plan/architecture
 }
 ```
 
@@ -328,9 +337,15 @@ user, shared by every project.
 | `subagent_threshold` | Source-file count above which `map` fans out subagents, and above which an unrequested full build asks first |
 | `docs_in_git` | `commit`, `ignore`, or `ask`, for the factual reference |
 | `language` | The generated docs' language |
+| `non_interactive` | Resolve every prompt to its default, for headless CI runs; approval gates still stop |
+| `extract` | Which `map` extraction passes run: `["logic", "uiux"]`, `["logic"]`, or `[]` |
+| `interfaces` | `auto` or `off`: whether `map` writes the cross-repo `09-interfaces.md` chapter |
+| `interfaces_frontmatter` | Mirror the interface tables into frontmatter for machine consumers; off by default |
+| `cross_repo` | `auto` or `off`: whether `groom`, `plan`, and the `architecture` interview consult the `quarry` CLI for cross-repo contracts |
 
 Interviews, `features/`, and `review.md` stay local via a generated
-`.gitignore`. **`changelog.md` is the one exception and is always
+`.gitignore`. **The ledger - `changelog.md` and its `changelog.d/`
+fragments - is the one exception and is always
 committed**: `implement` deletes a feature's folder once its ledger
 entry is written, so the ledger is the only surviving record of why
 the feature was built that way.
@@ -411,6 +426,13 @@ Copy `templates/capstone-map-check.yml` into `.github/workflows/`,
 add an `ANTHROPIC_API_KEY` secret, and every PR fails when the
 reference is stale.
 
+**Upgrading from 5.x:** nothing to migrate by hand. Existing
+`changelog.md` entries, `<NN>-<slug>` feature keys, and
+`changelog-archive-<YYYY>.md` files stay valid and are read in place;
+new entries land as `changelog.d/` fragments, new features get
+date-slug ids, and files without a `content_hash` stamp gain one on
+their next regeneration.
+
 **Upgrading from 4.x:** `generate` and `sync` merged into `map`, and
 the verdict line the CI job greps changed from `SYNC CHECK:` to
 `MAP CHECK:`. An old `capstone-sync-check.yml` fails loudly with
@@ -433,7 +455,7 @@ Windows field-testing is thin either way.
 Budget an afternoon for the `logic` interview on a real app; the depth
 is the point.
 
-Retrieval is grep over eight markdown files - plenty at this scale,
+Retrieval is grep over nine markdown files - plenty at this scale,
 unproven on giant monorepos.
 
 </details>

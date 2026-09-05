@@ -197,8 +197,9 @@ stateDiagram-v2
 the end, so it stays `interviewing` with a scenario checklist in its
 frontmatter until every scenario is written or dropped.
 
-**Every write is recorded before it counts as done.** A run appends its
-changelog entry *before* setting its done marker. That order is what
+**Every write is recorded before it counts as done.** A run writes its
+changelog entry (a `changelog.d/` fragment, folded into
+`changelog.md` on main) *before* setting its done marker. That order is what
 makes a crash diagnosable rather than ambiguous: outputs with no marker
 regenerate from the recorded decisions, and a marker with no entry is
 provably a torn write that `doctor` repairs - neither case re-interviews

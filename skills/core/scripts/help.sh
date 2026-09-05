@@ -34,7 +34,7 @@ Usage: /capstone:<command>
   stack refresh        Re-vet the recorded picks: maintenance, license, pricing deltas
   build                Implementation plan (backend then frontend), gate, then working code
 
-  groom <feature>      Feature interview against the existing docs -> features/<NN>-<slug>/spec.md
+  groom <feature>      Feature interview against the existing docs -> features/<date>-<slug>/spec.md
   plan <feature>       Task-by-task TDD plan from a groomed spec; gated on your approval
   implement <feature>  Execute the approved plan into code, in subagents or inline (you pick)
   feature <desc>       Take one feature idea to shipped code: chains groom -> plan ->
