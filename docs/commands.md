@@ -64,11 +64,11 @@ means refresh only what drifted.
 | `<topic>` | Rebuild one chapter: `architecture`, `models`, `conventions`, `data-flow`, `dependencies`, `testing`, `operations`, `glossary`, `interfaces`. |
 
 **Writes** `docs/capstone/00-index.md`, the numbered chapters
-(`09-interfaces.md`, the cross-repo produces/consumes tables, appears
-when the repo talks to another repo; the `interfaces` config key can
-turn it off), `logic/` (business-logic scenarios) and `uiux/`
-(surface chapters); the `extract` config key can skip either
-extraction pass.
+(`09-interfaces.md`, the cross-repo produces/consumes tables with one
+`### <Name>` payload section per row, appears when the repo talks to
+another repo; the `interfaces` config key can turn it off), `logic/`
+(business-logic scenarios) and `uiux/` (surface chapters); the
+`extract` config key can skip either extraction pass.
 Every file carries `generated_at_commit`, `generated_date`,
 `capstone_version`, `content_hash` and `paths_covered` in
 frontmatter; those globs are what a later refresh diffs against, and
@@ -353,7 +353,15 @@ boundary. The `architecture` interview looks up any existing system
 a greenfield design will talk to (`quarry docs search`, then the
 contract section) and writes the planned edges into a prescriptive
 `09-interfaces.md`, so the feature chain can consult quarry from day
-one. Without quarry, everything behaves exactly as before.
+one. Going the other way, `quarry check` runs in the producer's CI:
+it reads the working tree's `09-interfaces.md`, pairs each Produces
+payload section with the matching Consumes section in every consumer
+the quarry knows, and exits 1 when a field a consumer reads is gone
+or changed type. `quarry update` runs the same comparison as advisory
+notes. Both read the `### <Name>` sections `map` writes, which is why
+the chapter, and not `01-architecture.md`'s Communication section,
+holds the field table for a cross-repo channel. Without quarry,
+everything behaves exactly as before.
 
 **Interview lifecycle.** `interviewing` → `awaiting-formalization` →
 `formalized`. The final state is written only *after* outputs are on
@@ -412,3 +420,7 @@ nightly and on `workflow_dispatch`, with an `ANTHROPIC_API_KEY`
 secret, failing on the `MAP REVIEW:` line and ignoring the script's.
 It writes a config with `non_interactive: true` so the headless run
 resolves every prompt to its default.
+
+A repo registered in a quarry adds `quarry init` and `quarry check`
+to the same pull-request workflow; that gate reads the payload
+sections, needs no API key, and is documented in quarry's README.

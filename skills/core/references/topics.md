@@ -34,7 +34,12 @@ Required sections:
   entity or DTO from `02-models.md` where one exists, the fields
   inline (name, type, optionality) where none does - an ad-hoc dict
   pushed to a broker is a contract even though no class declares it.
-  Cite the send and receive sites `file:line`.
+  Cite the send and receive sites `file:line`. A channel that
+  `09-interfaces.md` lists under Produces or Consumes cites its
+  payload section there (`09-interfaces.md § GET /records`) instead of
+  repeating the field table: the chapter holds the one copy
+  `quarry check` compares, and internal channels keep their fields
+  inline here.
 - `## Composition`: where objects are wired together (DI container,
   factories, `main()`).
 - `## Frontend`: for products with a human-facing UI: rendering model
@@ -48,7 +53,8 @@ Required sections:
 Checklist: dependency direction verified by reading imports, not assumed
 from directory names; registries and dispatch tables enumerated in full,
 not sampled; every Communication row names its payload in both
-directions, read from the call site rather than the route name - a
+directions, inline or by citing its `09-interfaces.md` section, read
+from the call site rather than the route name - a
 bare route list fails the section; the rendering model read from the
 client build config and
 entry files, not assumed from the framework's name.
@@ -199,13 +205,26 @@ Required sections:
   the plain repo name when they are not - readers strip link syntax
   before matching, so both forms index identically, and a dead link
   helps nobody. `Site` is the backticked `` `path:line` `` of the
-  publish site.
+  publish site. Below the table, one `### <Name>` section per row,
+  heading text equal to the row's `Name` cell verbatim
+  (`### GET /records`, `### file-ingest`), holding the payload this
+  repo emits on that contract as a table with columns `Field`,
+  `Type`, `Required` (a `Notes` column is optional): one row per
+  field, `Required` as `yes` or `no`, `Type` as the code names it.
+  Read it from the serializer or response type at the row's `Site`,
+  never from a consumer's docs. Two rows that share a `Name` (one
+  contract, two consumers) share one section.
 - `## Consumes`: same table shape with `From` in place of `To`, one
   row per contract this repo reads from another repo, `Site` the
-  client/subscriber site. Inline the contract fields this repo
-  actually reads (a short list under the table or a `Fields` column)
-  rather than pointing at a schema file in the other repo: a pointer
-  means the reader clones the consumer anyway.
+  client/subscriber site. Below the table, one `### <Name>` section
+  per row in the same shape as Produces, listing only the fields this
+  repo actually reads (the ones dereferenced at the row's `Site`)
+  with the type and optionality the client code assumes; a version
+  suffix in parentheses is allowed on the heading
+  (`### file-ingest (v2)`) when the code pins one. Never point at a
+  schema file in the other repo: a pointer means the reader clones
+  the consumer anyway, and the contract check compares tables, not
+  pointers.
 
 Format rules the index depends on: columns are matched by header
 name, not position; cells are read after stripping backticks and
@@ -216,6 +235,19 @@ required per row; a repo name is the last path segment of that
 repo's origin URL. Either side of an edge may declare it; when both
 do and disagree, the disagreement stays visible in each repo's own
 chapter rather than being merged away.
+
+**Payload sections.** `quarry check`, run in the producer's CI, pairs
+each Produces section here with the Consumes section of the same
+`Name` in every consumer's chapter and compares field by field: a
+field a consumer lists that the producer's table no longer has is a
+break, a type change is a break, a `Required` flip is a warning.
+Matching is exact on the heading first, then `<Name> (` as a prefix,
+case-insensitive; columns are matched by header name, not position;
+`Required` accepts `yes|no|true|false`; types are compared after
+trimming, case-folding and collapsing whitespace. Write the heading
+text exactly as the `Name` cell reads, without backticks. A heading is
+not a table cell, so a `Name` that escapes a pipe (`GET /b \| GET /c`)
+drops the escape there: `### GET /b | GET /c`.
 
 When config `interfaces_frontmatter` is `true`, mirror the tables
 into frontmatter lists too (same required fields, lowercase `kind`):
@@ -236,9 +268,14 @@ consumes:
 Checklist: every publish and client site found by reading the code
 (route registrations, queue publishers/subscribers, generated
 clients, webhook senders), not guessed from config names; every row's
-`Site` verified `file:line`; internal calls between this repo's own
-modules excluded - the chapter is cross-repo edges only; kinds
-lowercase; no row missing `kind`, `name`, or `to`/`from`.
+`Site` a verified `file:line` and tracked in git (`map check` and
+`quarry update --strict` both reject a path the tree does not hold; a
+prescriptive chapter's planned paths are the one exception);
+internal calls between this repo's own modules excluded - the chapter
+is cross-repo edges only; kinds lowercase; no row missing `kind`,
+`name`, or `to`/`from`; every Produces and Consumes row has its
+`### <Name>` payload section with `Field`, `Type`, `Required`
+columns, read from the code at the row's `Site`.
 
 ## testing.md
 

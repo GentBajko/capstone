@@ -586,6 +586,19 @@ for f in skills/*/SKILL.md; do
   fi
 done
 
+# 12n. the payload-section contract: topics.md defines the `### <Name>`
+#      sections quarry check compares, map.md names them at compose
+#      time, map-check.sh enforces them in the schema pass, and
+#      docs/commands.md tells the reader what reads them
+grep -q '^\*\*Payload sections\.\*\*' skills/core/references/topics.md \
+  || err "topics.md lost the Payload sections paragraph"
+grep -q 'Payload sections' skills/core/references/protocols/map.md \
+  || err "map.md does not mention the payload sections"
+grep -q 'payload section' skills/core/scripts/map-check.sh \
+  || err "map-check.sh lost the payload-section check"
+grep -q 'quarry check' docs/commands.md \
+  || err "docs/commands.md does not mention quarry check"
+
 # 13. bash syntax of every .sh
 for s in skills/core/scripts/*.sh; do
   bash -n "$s" 2>/dev/null || err "bash syntax error in $s"
@@ -781,14 +794,22 @@ if command -v git >/dev/null 2>&1; then
   [ "$(printf '%s\n' "$MC_OUT" | grep -c '^MAP CHECK:')" -eq 1 ] || err "map-check.sh two docs dirs: not exactly one verdict line"
   rm "$S/src/new.rs"; rm -r "$S/docs/two"
   # Site cells: tracked, an escaped pipe in an earlier cell, a link cell
-  # with a :from-to range, a fenced decoy
-  {
-    printf -- '---\ngenerated_at_commit: %s\ngenerated_date: 2026-01-01\ncapstone_version: %s\ncontent_hash: %s\npaths_covered:\n  - ":(top)src/**"\n---\n' "$SHA" "$MANIFEST_V" "$H"
-    printf '# Interfaces\n\n## Produces\n\n| Kind | Name | To | Site |\n| --- | --- | --- | --- |\n| http | GET /a | other | `src/main.rs:12` |\n'
-    printf '%s\n\n' '| http | GET /b \| GET /c | other | `src/main.rs:1` |'
-    printf '## Consumes\n\n| Kind | Name | From | Site |\n| --- | --- | --- | --- |\n| sqs | ingest | other | [src/main.rs](../../src/main.rs):57-60 |\n\n'
-    printf '```markdown\n| Kind | Name | To | Site |\n| --- | --- | --- | --- |\n| http | decoy | other | `src/decoy.rs:1` |\n```\n'
-  } > "$S/docs/capstone/09-interfaces.md"
+  # with a :from-to range, a fenced decoy. Every row carries its
+  # `### <Name>` payload section, one of them by the version-suffix form
+  # (`### ingest (v2)`), so the site cases below count sites only.
+  mc_iface() { # dir: the interfaces fixture, payload sections included
+    {
+      printf -- '---\ngenerated_at_commit: %s\ngenerated_date: 2026-01-01\ncapstone_version: %s\ncontent_hash: %s\npaths_covered:\n  - ":(top)src/**"\n---\n' "$SHA" "$MANIFEST_V" "$H"
+      printf '# Interfaces\n\n## Produces\n\n| Kind | Name | To | Site |\n| --- | --- | --- | --- |\n| http | GET /a | other | `src/main.rs:12` |\n'
+      printf '%s\n\n' '| http | GET /b \| GET /c | other | `src/main.rs:1` |'
+      printf '### GET /a\n\n| Field | Type | Required |\n| --- | --- | --- |\n| id | string | yes |\n\n'
+      printf '%s\n\n' '### GET /b | GET /c'
+      printf '## Consumes\n\n| Kind | Name | From | Site |\n| --- | --- | --- | --- |\n| sqs | ingest | other | [src/main.rs](../../src/main.rs):57-60 |\n\n'
+      printf '### ingest (v2)\n\n| Field | Type | Required |\n| --- | --- | --- |\n| id | string | yes |\n\n'
+      printf '```markdown\n| Kind | Name | To | Site |\n| --- | --- | --- | --- |\n| http | decoy | other | `src/decoy.rs:1` |\n```\n'
+    } > "$1/09-interfaces.md"
+  }
+  mc_iface "$S/docs/capstone"
   git -C "$S" add docs; git -C "$S" $GC commit -qm iface
   mc_run 'tracked sites' 0 'MAP CHECK: current' "$S"
   sed 's|`src/main.rs:12`|`src/gone.rs:12`|' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$S/docs/capstone/09-interfaces.md"
@@ -811,6 +832,52 @@ mode: prescriptive' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$
   mc_run 'prescriptive page skips sites' 1 'MAP CHECK: stale (1 findings)' "$S"
   mc_row '| docs/capstone/09-interfaces.md | .* | prescriptive, pending first observation |' 'prescriptive page skips sites'
   printf '%s\n' "$MC_OUT" | grep -q 'site src/gone.rs' && err "map-check.sh verified sites on a prescriptive page"
+  # payload sections (topics.md): a Produces row whose `### <Name>`
+  # section is gone is one finding in the missing-headings column, and
+  # the covered page passes with the version-suffix heading matching
+  mc_iface "$S/docs/capstone"
+  mc_run 'payload sections covered' 0 'MAP CHECK: current' "$S"
+  grep -v '^### GET /a$' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$S/docs/capstone/09-interfaces.md"
+  mc_run 'missing payload section' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/09-interfaces.md | - | ### GET /a | - | - |' 'missing payload section'
+  # quarry's normalize_heading strips no backticks and its heading_of
+  # demands a space after the hashes, so a backticked heading and a
+  # tabbed one are both rows without a payload table there and findings
+  # here. topics.md says to write the heading without backticks.
+  mc_iface "$S/docs/capstone"
+  sed 's|^### GET /a$|### `GET /a`|' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$S/docs/capstone/09-interfaces.md"
+  mc_run 'backticked payload heading' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/09-interfaces.md | - | ### GET /a | - | - |' 'backticked payload heading'
+  MC_TAB=$(printf '\t')
+  mc_iface "$S/docs/capstone"
+  sed "s|^### GET /a\$|###${MC_TAB}GET /a|" "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$S/docs/capstone/09-interfaces.md"
+  mc_run 'tabbed payload heading' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/09-interfaces.md | - | ### GET /a | - | - |' 'tabbed payload heading'
+  # the same sections written tight: no blank line before or after a
+  # payload heading, which GFM allows. The heading has to close the edge
+  # table, or the `| Field | Type | Required |` rows under it read as more
+  # edge rows and every Type and value cell becomes a missing section.
+  # The headings here also differ in case from their `Name` cell and
+  # escape a pipe the way the cell does; both still match.
+  mc_iface_tight() { # dir [extra Produces row]
+    {
+      printf -- '---\ngenerated_at_commit: %s\ngenerated_date: 2026-01-01\ncapstone_version: %s\ncontent_hash: %s\npaths_covered:\n  - ":(top)src/**"\n---\n' "$SHA" "$MANIFEST_V" "$H"
+      printf '# Interfaces\n\n## Produces\n\n| Kind | Name | To | Site |\n| --- | --- | --- | --- |\n| http | GET /a | other | `src/main.rs:12` |\n'
+      printf '%s\n' '| http | GET /b \| GET /c | other | `src/main.rs:1` |'
+      [ -n "${2:-}" ] && printf '%s\n' "$2"
+      printf '### get /a\n| Field | Type | Required |\n| --- | --- | --- |\n| id | string | yes |\n'
+      printf '%s\n' '### GET /b | GET /c'
+      printf '| Field | Type | Required |\n| --- | --- | --- |\n| id | string | yes |\n'
+      printf '## Consumes\n| Kind | Name | From | Site |\n| --- | --- | --- | --- |\n| sqs | ingest | other | `src/main.rs:1` |\n'
+      printf '### ingest (v2)\n| Field | Type | Required |\n| --- | --- | --- |\n| id | string | yes |\n'
+    } > "$1/09-interfaces.md"
+  }
+  mc_iface_tight "$S/docs/capstone"
+  mc_run 'tight payload sections' 0 'MAP CHECK: current' "$S"
+  # and a row with no section at all is still the one finding it was
+  mc_iface_tight "$S/docs/capstone" '| http | miss | other | `src/main.rs:1` |'
+  mc_run 'tight page, uncovered row' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/09-interfaces.md | - | ### miss | - | - |' 'tight page, uncovered row'
 else
   echo "note: map-check.sh git fixture skipped (no git)"
 fi

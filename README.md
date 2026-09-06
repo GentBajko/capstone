@@ -440,7 +440,10 @@ the pinned release tag and run over `docs/capstone`. For the model
 half (pointer drift, absorption, re-vetting, coverage) copy
 `templates/capstone-map-review.yml` too and add an
 `ANTHROPIC_API_KEY` secret; it runs nightly or on demand and fails on
-its own `MAP REVIEW:` line.
+its own `MAP REVIEW:` line. A repo registered in a quarry pairs the
+same job with `quarry init` and `quarry check`, which reads the
+`### <Name>` payload sections in `09-interfaces.md` and fails the PR
+when a field one of its consumers reads is gone.
 
 **Upgrading from 6.1:** replace your `capstone-map-check.yml` with
 the new template. The old one still runs the model on every PR and
@@ -450,7 +453,10 @@ model's run now prints a second one, `MAP REVIEW:`, which only the
 review template reads. `content_hash` stamps written by 6.1 or
 earlier were computed over a file set that never included wildcard
 matches, so the first check after a squash merge may report such a
-chapter stale once; `map` regenerates it with the new hash.
+chapter stale once; `map` regenerates it with the new hash. An
+`09-interfaces.md` written by 6.1 has no `### <Name>` payload
+sections, so the first check reports one finding per Produces and
+Consumes row until `map interfaces` rewrites the chapter.
 
 **Upgrading from 5.x:** nothing to migrate by hand. Existing
 `changelog.md` entries, `<NN>-<slug>` feature keys, and

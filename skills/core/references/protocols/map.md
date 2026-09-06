@@ -140,6 +140,11 @@ paths_covered:
    the stamp that survives a squash or rebase merge making
    `generated_at_commit` unreachable.
 
+   `09-interfaces.md` carries one `### <Name>` payload section per
+   Produces and Consumes row (topics.md's Payload sections); the
+   producer's `quarry check` compares exactly those tables, so a row
+   without its section is a chapter that fails the schema pass.
+
 2. Choose `paths_covered` globs deliberately; they drive the Refresh's
    staleness. Cover every directory the topic's content was derived
    from, but prefer the tightest globs that still do: package-level
@@ -417,7 +422,9 @@ own:
    verdict, not re-reported here); missing required `## ` headings
    per `../topics.md` (a section may be satisfied by "None found"
    text, but the heading itself must exist; the list is embedded in
-   the script and lint-sync keeps it equal to `../topics.md`); `Site`
+   the script and lint-sync keeps it equal to `../topics.md`); on
+   `09-interfaces.md`, a `### <Name>` payload section for every
+   Produces and Consumes row (topics.md's Payload sections); `Site`
    cells in `09-interfaces.md`'s Produces and Consumes tables whose
    path, once a trailing `:<line>` or `:<from>-<to>` is stripped,
    fails `git ls-files --error-unmatch` or matches something other

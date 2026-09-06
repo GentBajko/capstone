@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # The script half of `map check` (protocols/map.md, "check"): parts 1
 # (staleness), 7 (unfolded changelog.d/ fragments, informational) and 8
-# (schema: frontmatter keys, required headings, Site paths, secret-shaped
-# strings). Prints the same tables the protocol describes and ends with
+# (schema: frontmatter keys, required headings, payload sections, Site
+# paths, secret-shaped strings). Prints the same tables the protocol
+# describes and ends with
 # exactly one verdict line, `MAP CHECK: current` or
 # `MAP CHECK: stale (<N> findings)`, which templates/capstone-map-check.yml
 # greps. Exit 0 on current, 1 on stale, 2 on a usage error. No model, no
@@ -256,6 +257,71 @@ site_cells() {
     { intable = 0 }' "$1"
 }
 
+# payload_gaps file: the Name cells of an interfaces page's Produces and
+# Consumes tables that have no `### <Name>` payload section under the
+# same `## ` heading (references/topics.md, "Payload sections" - the
+# tables `quarry check` compares). One table per section, the Name
+# column located by header name, fenced blocks skipped, backticks and
+# link syntax stripped from the cell, escaped pipes parked as \001 so
+# they never shift a column. A heading matches its row exactly or as the row plus ` (`,
+# which is the version suffix topics.md allows. Both sides are normalised
+# the way quarry's frontmatter::normalize_heading normalises a heading: a
+# trailing `{#anchor}` is dropped, runs of whitespace collapse to one
+# space, and the comparison folds case. A `### ` heading also ends the
+# edge table, so a page that writes one with no blank line around it
+# never has its payload rows read as more edge rows. Backticks, link
+# syntax and escaped pipes are stripped from the cell only; the heading
+# is taken as written, because quarry reads the cell out of a table and
+# the heading through normalize_heading, which strips none of the three.
+# A backticked heading is therefore a finding here and no payload table
+# for quarry. Only a space after the hashes opens a heading, the way
+# quarry's frontmatter::heading_of demands; the `## ` rule below still
+# accepts a tab, since it only scopes this script's own search.
+payload_gaps() {
+  awk '
+    function flush(   i, j, ok) {
+      for (i = 1; i <= nn; i++) {
+        ok = 0
+        for (j = 1; j <= nh; j++)
+          if (lheads[j] == lnames[i] || index(lheads[j], lnames[i] " (") == 1) { ok = 1; break }
+        if (!ok) print names[i]
+      }
+      nn = 0; nh = 0; col = 0; intable = 0; done = 0
+    }
+    { sub(/\r$/, "") }
+    /^[ \t]*(```|~~~)/ { fence = !fence; next }
+    fence { next }
+    /^###+ / {
+      if (intable) { intable = 0; done = 1 }
+      if (want) { h = $0; sub(/^#+[ \t]*/, "", h); gsub(/^[ \t]+|[ \t]+$/, "", h)
+        sub(/[ \t]*\{#[^}]*\}$/, "", h); gsub(/[ \t]+/, " ", h)
+        if (h != "") { heads[++nh] = h; lheads[nh] = tolower(h) } }
+      next }
+    /^##[ \t]/ {
+      flush()
+      s = $0; sub(/^##[ \t]*/, "", s); gsub(/^[ \t]+|[ \t]+$/, "", s)
+      want = (s == "Produces" || s == "Consumes"); sect++
+      next }
+    !want { next }
+    /^[ \t]*\|/ {
+      if (done) next
+      line = $0; gsub(/\\[|]/, "\001", line)
+      if (!intable) { intable = 1; col = 0; n = split(line, hd, "|")
+        for (i = 1; i <= n; i++) { x = hd[i]; gsub(/^[ \t]+|[ \t]+$/, "", x); gsub(/`/, "", x)
+          if (tolower(x) == "name") col = i }
+        next }
+      if (line ~ /^[| \t:-]+$/) next
+      if (col) { n = split(line, c, "|"); v = c[col]; gsub(/\001/, "|", v); gsub(/`/, "", v)
+        while (match(v, /\[[^]]*\]\([^)]*\)/)) { m = substr(v, RSTART, RLENGTH); t = m
+          sub(/^\[/, "", t); sub(/\].*$/, "", t)
+          v = substr(v, 1, RSTART - 1) t substr(v, RSTART + RLENGTH) }
+        gsub(/^[ \t]+|[ \t]+$/, "", v); gsub(/[ \t]+/, " ", v)
+        if (v != "" && v != "-" && !seen[sect, v]++) { names[++nn] = v; lnames[nn] = tolower(v) } }
+      next }
+    intable { intable = 0; done = 1 }
+    END { flush() }' "$1"
+}
+
 # the path before a trailing :line or :from-to
 site_path() { printf '%s\n' "$1" | sed 's/:[0-9]\{1,\}\(-[0-9]\{1,\}\)\{0,1\}$//'; }
 
@@ -361,7 +427,15 @@ $cell
               sites="${sites:+$sites, }site $cell"; items=$((items + 1))
             fi
           done <<< "$(site_cells "$f"; fm_sites "$fm")"
-        fi ;;
+        fi
+        # payload sections: a Produces or Consumes row without its
+        # `### <Name>` section is the table quarry check cannot compare.
+        # Checked outside git and on a prescriptive chapter too: the
+        # section is text the page owes, not a path the tree has to hold.
+        while IFS= read -r name; do
+          [ -n "$name" ] || continue
+          heads="${heads:+$heads, }### $name"; items=$((items + 1))
+        done <<< "$(payload_gaps "$f")" ;;
     esac
   fi
   while IFS= read -r line; do
