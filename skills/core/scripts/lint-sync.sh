@@ -879,7 +879,7 @@ if command -v git >/dev/null 2>&1; then
   # (`### ingest (v2)`), so the site cases below count sites only.
   mc_iface() { # dir: the interfaces fixture, payload sections included
     {
-      printf -- '---\ngenerated_at_commit: %s\ngenerated_date: 2026-01-01\ncapstone_version: %s\ncontent_hash: %s\npaths_covered:\n  - ":(top)src/**"\n---\n' "$SHA" "$MANIFEST_V" "$H"
+      printf -- '---\ngenerated_at_commit: %s\ngenerated_date: 2026-01-01\ncapstone_version: %s\ncontent_hash: %s\nknown_as: []\npaths_covered:\n  - ":(top)src/**"\n---\n' "$SHA" "$MANIFEST_V" "$H"
       printf '# Interfaces\n\n## Produces\n\n| Kind | Name | To | Site |\n| --- | --- | --- | --- |\n| http | GET /a | other | `src/main.rs:12` |\n'
       printf '%s\n\n' '| http | GET /b \| GET /c | other | `src/main.rs:1` |'
       printf '### GET /a\n\n| Field | Type | Required |\n| --- | --- | --- |\n| id | string | yes |\n\n'
@@ -933,6 +933,23 @@ mode: prescriptive' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$
   sed "s|^### GET /a\$|###${MC_TAB}GET /a|" "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$S/docs/capstone/09-interfaces.md"
   mc_run 'tabbed payload heading' 1 'MAP CHECK: stale (1 findings)' "$S"
   mc_row '| docs/capstone/09-interfaces.md | - | ### GET /a | - | - |' 'tabbed payload heading'
+  # known_as (topics.md): the interfaces chapter owes the key, and a
+  # scalar value is the shape quarry's known_as_of refuses, registering
+  # no alias for the page and saying so only on `docs index --force`.
+  # Both land in the frontmatter-keys column.
+  mc_iface "$S/docs/capstone"
+  sed 's|^known_as: .*|known_as: records.internal|' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$S/docs/capstone/09-interfaces.md"
+  mc_run 'scalar known_as' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/09-interfaces.md | known_as not a list | - | - | - |' 'scalar known_as'
+  mc_iface "$S/docs/capstone"
+  grep -v '^known_as: ' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$S/docs/capstone/09-interfaces.md"
+  mc_run 'missing known_as' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/09-interfaces.md | known_as | - | - | - |' 'missing known_as'
+  # a block list is a list too, and so is an empty one
+  mc_iface "$S/docs/capstone"
+  sed 's|^known_as: .*|known_as:\
+  - records.internal|' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$S/docs/capstone/09-interfaces.md"
+  mc_run 'block known_as' 0 'MAP CHECK: current' "$S"
   # the same sections written tight: no blank line before or after a
   # payload heading, which GFM allows. The heading has to close the edge
   # table, or the `| Field | Type | Required |` rows under it read as more
@@ -941,7 +958,7 @@ mode: prescriptive' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$
   # escape a pipe the way the cell does; both still match.
   mc_iface_tight() { # dir [extra Produces row]
     {
-      printf -- '---\ngenerated_at_commit: %s\ngenerated_date: 2026-01-01\ncapstone_version: %s\ncontent_hash: %s\npaths_covered:\n  - ":(top)src/**"\n---\n' "$SHA" "$MANIFEST_V" "$H"
+      printf -- '---\ngenerated_at_commit: %s\ngenerated_date: 2026-01-01\ncapstone_version: %s\ncontent_hash: %s\nknown_as: []\npaths_covered:\n  - ":(top)src/**"\n---\n' "$SHA" "$MANIFEST_V" "$H"
       printf '# Interfaces\n\n## Produces\n\n| Kind | Name | To | Site |\n| --- | --- | --- | --- |\n| http | GET /a | other | `src/main.rs:12` |\n'
       printf '%s\n' '| http | GET /b \| GET /c | other | `src/main.rs:1` |'
       [ -n "${2:-}" ] && printf '%s\n' "$2"

@@ -168,6 +168,25 @@ fm_globs() {
     inlist { inlist = 0 }'
 }
 
+# known_as_form fm: `missing`, `list` or `scalar` for the interfaces
+# chapter's known_as key (references/topics.md). A list is either
+# bracketed (`known_as: [a, b]`, `known_as: []`) or an empty value with a
+# `- ` block under it. Anything else is a scalar, which quarry's
+# known_as_of reports as `known_as is not a list` and then registers no
+# aliases at all, so every consumer naming this repo by an alias loses
+# its edge. A bare `known_as:` with no block is YAML null, a scalar there
+# too.
+known_as_form() {
+  printf '%s\n' "$1" | awk '
+    { sub(/\r$/, "") }
+    done { next }
+    /^known_as:[ \t]*\[/ { r = "list"; done = 1; next }
+    /^known_as:[ \t]*$/ { r = "scalar"; block = 1; next }
+    /^known_as:/ { r = "scalar"; done = 1; next }
+    block { if ($0 ~ /^[ \t]*-([ \t]|$)/) r = "list"; done = 1; next }
+    END { if (r == "") r = "missing"; print r }'
+}
+
 # the frontmatter `site:` mirror (interfaces_frontmatter: true)
 fm_sites() {
   printf '%s\n' "$1" | sed -n 's/^[[:space:]]*site:[[:space:]]*//p' | sed -e 's/[[:space:]]*$//' -e 's/`//g'
@@ -447,6 +466,16 @@ check_part8() {
     fi
     case "$base" in
       09-interfaces.md|09-interfaces-*.md)
+        # known_as: topics.md makes the key mandatory, `known_as: []`
+        # included, and quarry drops every alias on the page when the
+        # value is a scalar. Its warning only reaches `docs index
+        # --force`, so this is the one gate that catches either shape.
+        # Checked outside git and on a prescriptive chapter too: the key
+        # is text the page owes, like the payload sections below.
+        case "$(known_as_form "$fm")" in
+          missing) keys="${keys:+$keys, }known_as"; items=$((items + 1)) ;;
+          scalar) keys="${keys:+$keys, }known_as not a list"; items=$((items + 1)) ;;
+        esac
         if [ "$IN_GIT" -eq 1 ] && [ "$mode" != prescriptive ]; then
           seen="
 "

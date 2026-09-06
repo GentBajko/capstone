@@ -445,7 +445,12 @@ own:
    and `content_hash` for stamped files and `paths_covered` for
    chapters; prescriptive and interview-derived files are held to
    `generated_date` only, since they carry no commit stamps or globs
-   by design; `capstone_version` absent is part 1's older-capstone
+   by design; on `09-interfaces.md` also `known_as`, reported missing
+   when the key is absent and `known_as not a list` when its value is
+   a scalar instead of a bracketed or `- ` list, whatever the mode and
+   inside git or out, because quarry registers no alias at all for
+   that page and says so only on `docs index --force`;
+   `capstone_version` absent is part 1's older-capstone
    verdict, not re-reported here); missing required `## ` headings
    per `../topics.md` (a section may be satisfied by "None found"
    text, but the heading itself must exist; the list is embedded in

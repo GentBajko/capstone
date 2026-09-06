@@ -71,8 +71,9 @@ documented rules it proposes, never applies.
    `changelog-archive-<YYYY>.md` with a stripped-key `## Archived`
    section is left as-is and searched like any other ledger file.
 9. **Schema**: the part-8 pass of `map check`'s script
-   (`scripts/map-check.sh`: frontmatter keys, required headings,
-   `Site` paths, secret-shaped strings per file); repair = the `map`
+   (`scripts/map-check.sh`: frontmatter keys, `known_as` included,
+   required headings, `09-interfaces.md`'s `### <Name>` payload
+   sections, `Site` paths, secret-shaped strings per file); repair = the `map`
    refresh, which regenerates a file missing a key or heading against
    the current template; a secret is removed by hand, never
    regenerated around.

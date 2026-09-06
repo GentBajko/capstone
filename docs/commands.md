@@ -99,10 +99,15 @@ API key; default `docs/capstone`, several arguments for a monorepo's
 workspaces), does staleness (part 1), unfolded `changelog.d/`
 fragments (part 7, informational only; fragments never flip the
 verdict) and the mechanical schema pass (part 8: required frontmatter
-keys, required headings per chapter, `Site` paths checked with
-`git ls-files --error-unmatch` and required to name one tracked file,
-so a directory or a wildcard is a finding, and secret-shaped strings
-reported by pattern name), then ends with a machine-parseable verdict:
+keys, `09-interfaces.md`'s `known_as` among them, which is a finding
+when the key is absent and when its value is a scalar instead of a
+list; required headings per chapter; a `### <Name>` payload section for
+every Produces and Consumes row on `09-interfaces.md` (topics.md's
+Payload sections), reported in the missing-headings column; `Site`
+paths checked with `git ls-files --error-unmatch` and required to name
+one tracked file, so a directory or a wildcard is a finding; and
+secret-shaped strings reported by pattern name), then ends with a
+machine-parseable verdict:
 
 ```text
 MAP CHECK: current
@@ -146,8 +151,10 @@ approvals, truncated plans), torn wraps (a feature folder left behind
 after its entry landed), index ↔ disk drift, lifecycle validity,
 housekeeping (missing `.gitignore` or config keys, an untracked
 ledger), absorption drift, logic coverage, ledger size, schema
-(`map-check.sh`'s part 8: missing frontmatter keys or required
-headings, untracked `Site` paths, secret-shaped strings), and unfolded
+(`map-check.sh`'s part 8: missing frontmatter keys, `known_as`
+included, or required headings, a Produces or Consumes row on
+`09-interfaces.md` with no `### <Name>` payload section, untracked
+`Site` paths, secret-shaped strings), and unfolded
 `changelog.d/` fragments.
 
 **Ledger key** `doctor/<scope>@<stamp>` - only when something was

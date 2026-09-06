@@ -168,7 +168,7 @@ instead of sending you off to run something else.
 | Command | What it does |
 | --- | --- |
 | `/capstone:map` | Build the reference, or refresh only what drifted. `rebuild` forces a full rewrite; a topic name targets one chapter |
-| `/capstone:map check` | Read-only trust report in two halves: a bash script (staleness, ledger fragments, schema: stamps, headings, `Site` paths, secret shapes; the CI gate, no API key) and the model's review (pointer drift, absorption, re-vetting, coverage). Writes nothing |
+| `/capstone:map check` | Read-only trust report in two halves: a bash script (staleness, ledger fragments, schema: stamps, `known_as`, headings, payload sections, `Site` paths, secret shapes; the CI gate, no API key) and the model's review (pointer drift, absorption, re-vetting, coverage). Writes nothing |
 | `/capstone:doctor` | Diagnose and repair the docs area: torn writes, index drift, voided approvals, absorption gaps |
 | `/capstone:review [be\|fe]` | The opt-in judgment → `review.md`. No argument does both sides; `backend` takes architecture, `frontend` grades the UI against your own design docs |
 
