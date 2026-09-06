@@ -6,9 +6,10 @@ companion file `core-authoring.md` carries the rules for *producing*
 an output (seeding, delegating, indexing, ignoring); every subcommand
 except the two chain runners reads that one too.
 
-## User config: global `capstone.json`, per-project overrides
+## Config: the user's global `capstone.json`, and the project's shared one
 
-The config belongs to the user, not the repo. `capstone.json` lives in
+Two config files, each with an owner. The global one belongs to the
+user: `capstone.json` lives in
 the agent's global config folder: `~/.claude` for Claude Code (or
 `$CLAUDE_CONFIG_DIR` when set), the agent's own equivalent
 (`~/.codex`, `~/.gemini`, ...) elsewhere. It is created at
@@ -45,17 +46,27 @@ ships with one per key, so the options are readable in place); read
 around them, keep them when editing a key's value, and never call
 the file invalid for carrying them.
 
-**Per-project state and overrides: `docs/capstone/capstone.json`,
-optional.** Never created as a matter of course; it exists only when
-something project-scoped must be recorded. Any global key set there
-overrides the global file for this repo. Two keys are project state
-that never goes global, `pipeline` and `workspaces`; a protocol
-recording one creates the file holding just that key. The project
-file's path is fixed no matter what `docs_dir` is set to: `docs_dir`
+**Project config, shared and committed: `docs/capstone/capstone.json`,
+optional.** The team's configuration for this repo: the settings every
+run on it follows (`docs_dir`, `interfaces`, `cross_repo`, `redact`,
+`extract`, `language`, or any other global key; a key set here
+overrides the global file for this repo) and the project's state. Two
+keys are project state that never goes global, `pipeline` and
+`workspaces`; a protocol recording one creates the file holding just
+that key, and that is the only way the file comes to exist. It is
+never created as a matter of course. **It is always committed,
+whatever `docs_in_git` says**, like the ledger: a config that lives on
+one machine is not a standard. Two keys are personal and never belong
+in it, `expertise` and `teaching_mode`: a run ignores them when found
+there, `doctor` reports them (its check 5), and the global file keeps
+them. The project file's path is fixed no matter what `docs_dir` is
+set to: `docs_dir`
 relocates generated outputs only, never the config, so a custom
 `docs_dir` can always be discovered. `docs_dir` and `index_file` must
 be relative paths inside the repository; refuse anything else.
-Neither config file is ever indexed (settings, not docs).
+Neither config file is ever indexed (settings, not docs), and neither
+is a doc in hard rule 3's sense: a run edits one key in place and
+keeps everything else, comments included.
 
 `"expertise": null` means "not yet asked": behave as level 3 until the
 ask-once rule below fills it. `pipeline` absent (or `null`) means the
@@ -77,15 +88,17 @@ imports it under that folder, so a protocol passing `<repo>` to
 quarry passes the workspace name whenever the request's files fall
 inside a workspace, and the origin URL's last path segment otherwise
 (the single-rooted case, and the root index-of-indexes, which quarry
-imports under the origin name). A consumer in another repo therefore
-writes the workspace name in its `From` cell, never the monorepo's
-name.
+imports under the origin name). An edge into a monorepo therefore
+resolves to the workspace name, never the monorepo's, and a `from`
+someone writes by hand names the workspace too.
 
 `docs_in_git` (`"commit" | "ignore" | "ask"`) pre-answers the
 commit-or-gitignore question **for the factual reference only**: the
 index and the topic chapters, plus `logic/`, `mockup/`, `uiux/`, and
-`standards.md`. The ledger (`changelog.md`, its rotation files,
-`changelog.d/`) is exempt: always committed, per its own rule below.
+`standards.md`. Two things are exempt and always committed: the
+ledger (`changelog.md`, its rotation files, `changelog.d/`), per its
+own rule below, and the project config
+`docs/capstone/capstone.json`, per the paragraph above.
 `language` sets the generated docs' language. The user can change any
 key by editing the files or just telling you.
 
@@ -113,24 +126,28 @@ this key; it gates extraction only.
 writes the `09-interfaces.md` chapter (see `topics.md`). `auto` means
 the chapter's own Applicable test decides: a repo that talks to no
 other repo gets no chapter. `off` skips the interfaces pass entirely.
-`interfaces_frontmatter` (boolean, default `false`): when `true`, the
-chapter also mirrors its edge tables into frontmatter `produces:` /
-`consumes:` lists for a machine consumer that cannot parse markdown;
-the tables stay the canonical form, so leave this off unless
-something needs it - a mirror is one more thing to drift.
+`interfaces_frontmatter` (boolean, default `false`): the chapter's
+`edges:` frontmatter block is canonical and always written, and so is
+its `known_as` list of the names other systems reach this repo by
+(see `topics.md`); this key adds the legacy top-level `produces:` /
+`consumes:` lists beside it, for a machine consumer pinned to the 6.2
+shape. Leave it off unless something needs it - a second copy of the
+same rows is one more thing to drift.
 
 `cross_repo` (`"auto" | "off"`, default `"auto"`): whether `groom`,
 `plan`, the `architecture` interview, and `map`'s interfaces pass
 consult the `quarry` CLI (their protocols carry the exact calls: deps
-and section lookups for the first three, `quarry docs list --json`
-for `map`, which spells every `To`/`From` cell as a registered repo
-name or `known_as` alias). `auto` means: use it only when the CLI is
+and section lookups for the first three, `quarry docs index --json`
+for `map`, whose `ambiguous` rows are the edges the registry's join
+could not settle). `auto` means: use it only when the CLI is
 on PATH **and**, for `groom` and `plan`, the docs area in play has a
 `09-interfaces.md` (`architecture` and `map` drop that second
 condition - a greenfield repo has no chapter yet, and writing the
 chapter is `map`'s job), so a machine without quarry behaves exactly
 as before with no configuration. `off` is the kill switch for someone
-who has quarry installed but does not want the calls.
+who has quarry installed but does not want the calls. `auto` with the
+CLI on PATH is also the condition under which a run asks the user to
+settle an edge the registry could not (Edge confirmation, below).
 
 `redact` (list of env-var name patterns, default
 `["*_SECRET", "*_TOKEN", "*_PASSWORD", "*_KEY"]`): variables whose
@@ -209,9 +226,17 @@ level 3 without asking and leave `expertise` null.
    implementation-plan artifacts, which is their purpose, and only
    after their plan gates.
 3. **Docs are skill-owned**: re-runs may rewrite any generated
-   section; manual edits are not preserved. Sole exception:
+   section; manual edits are not preserved. Two named exceptions.
    `changelog.md` is append-only; re-runs add entries and never
-   rewrite, reorder, or drop them.
+   rewrite, reorder, or drop them. And the `to` and `from` values in
+   `09-interfaces.md`'s `edges:` block belong to the person or the
+   confirmation that wrote them: **no run writes or edits one**. A
+   consumer's code holds an address, a producer's code holds nothing
+   about its callers, so those values answer a question no read of
+   this repo can, and a run that re-derived them would overwrite an
+   answer with a guess. `map` writes the rest of each row - `kind`,
+   `name`, `site`, `schema` - and merges by `(direction, kind, name)`
+   per `topics.md`'s interfaces section.
 4. Follow `style.md` (same directory) for every sentence you write,
    and `core-authoring.md` for landing it: what is never committed,
    what gets indexed, and how a stage seeds and delegates.
@@ -326,6 +351,69 @@ Five bounds on it:
   did not agree to. Declined → do not fall back to working without a
   reference: say what is missing and stop.
 
+## Edge confirmation: answer what the registry cannot join
+
+`map` writes `kind`, `name`, `site` and `schema` into
+`09-interfaces.md`'s `edges:` block and never a `to` or a `from`
+(hard rule 3). Quarry supplies those by joining every registered
+repo's declarations on `(kind, name)`. One repo on the other side
+gives one edge; no repo at all leaves the row a publication.
+**Several repos on one contract is the case a person has to settle**,
+and this section is that ask.
+
+The trigger is narrow. When config `cross_repo` is `auto` and the
+`quarry` CLI is on PATH, run `quarry docs index --json` once and read
+its `ambiguous` list, keeping the rows whose `repo` is this repo (in
+a monorepo with `workspaces` configured, the workspace name, per the
+naming contract above). Ask about those rows and nothing else: a row
+the join settled is already right, a row with no partner is a
+publication and asking would only invite a guess, and a row whose
+`to`/`from` is already written is answered. With `cross_repo` off, no
+CLI, or an empty `ambiguous` list, nothing is asked and the run
+continues.
+
+The ask is **one digest**, whatever the row count, in the shape
+core-authoring.md's Artifact seeding uses: a numbered list, one line
+per row, each naming its direction, `kind`, `name`, `site`, and the
+candidate repos quarry reported, in the order quarry reported them.
+The user answers per row with a repo name, several names for a
+produced contract, `unknown`, or `skip`. Every answer but `skip` is
+written into that row's `to` (a list when several) or `from` in the
+block, and the tables are rendered from it. `unknown` records a real
+answer: no sibling repo sits on the other side, quarry keeps the row
+as a publication, and no later run re-asks it. `skip` writes nothing,
+and the row comes back next time.
+A name quarry does not list is still written, since the user may know
+something the registry has yet to be told; quarry's `docs index`
+then reports it unresolved. Vocabulary follows `expertise` like any
+interview turn: at level 1 the question reads "which of your other
+services reads this queue?", and the phrase "resolve the edge" waits
+for level 4.
+
+Under `non_interactive` the run asks nothing, leaves those rows'
+`to`/`from` absent, and ends its report with
+`N interfaces unresolved; run /capstone:map interfaces`.
+
+Where each protocol asks:
+
+- `map` (`protocols/map.md`, the interfaces pass) asks after the
+  block is written and before the chapter is rendered, so the answers
+  land in the same run that found the rows.
+- `groom`, and `feature` through it (`protocols/groom.md`, Phase A
+  step 4), asks before its first question, and only about the
+  interfaces the feature adds or changes. The answer goes into the
+  spec's Reference impact for `implement`'s wrap to write into the
+  chapter, and the confirmed name is what the rest of the interview's
+  deps and section calls use.
+- `architecture`, and `start` through it
+  (`protocols/architecture.md`, the "Ground cross-repo edges" bullet
+  and Phase D), confirms each planned edge in the interview, and
+  Phase D writes the prescriptive chapter with those names already in
+  place.
+
+An answer is a decision, so the run's changelog entry names the rows
+it settled in one bullet.
+
 ## Changelog ledger: `<docs_dir>/changelog.md`
 
 **Every run that writes or changes a durable output records itself
@@ -404,7 +492,8 @@ records: a dropped scenario, a topic recorded absent, a capability
 left open are the entry's content, never a reason to skip it.
 **The ledger is always committed, whatever `docs_in_git` says** -
 `changelog.md`, its rotation files, and `changelog.d/` fragments
-alike - and is that setting's sole exception. It is the only durable record of
+alike - and is, with the project config, one of that setting's two
+exemptions. It is the only durable record of
 why a feature was built the way it was: `implement` deletes the
 feature folder - spec, plan, and review ledger - on the strength of
 its entry here, so a local-only ledger would turn that deletion into

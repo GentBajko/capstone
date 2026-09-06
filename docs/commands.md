@@ -76,17 +76,25 @@ the content hash is the stamp that survives squash and rebase merges,
 so an unreachable commit degrades to a per-file check instead of a
 full rebuild.
 
-`09-interfaces.md` also records what other systems call this repo: a
-`known_as` list in its frontmatter, read from the deploy config the
+`09-interfaces.md`'s frontmatter carries the canonical `edges:` block:
+one row per cross-repo edge with its `kind`, `name`, `site` (a path,
+no line number) and `schema`, and the Produces and Consumes tables
+below it are rendered from those rows. `map` writes exactly those four
+fields and never a `to` or a `from`, because no repo holds another
+repo's name; quarry supplies them by joining every registered repo's
+rows on `(kind, name)`. The frontmatter also records what other
+systems call this repo: a
+`known_as` list, read from the deploy config the
 operations chapter cites (compose service names, ingress hosts,
 Kubernetes manifests), so quarry can resolve a consumer's
-`From: records.internal` to this repo's folder. A Produces row whose
-consumers the code cannot show writes `unknown` in `To`; quarry keeps
-it as a publication and lists possible consumers by name. With
-`cross_repo: "auto"` and quarry on PATH, the interfaces pass runs
-`quarry docs list --json` once and spells every `To`/`From` cell as a
-registered name or alias when the code's hostname or service name
-matches one.
+`from: records.internal` to this repo's folder. Where the join finds
+several candidates on one contract, and `cross_repo: "auto"` has
+quarry on PATH, the interfaces pass reads
+`quarry docs index --json`'s `ambiguous` rows and asks you, once, in
+one digest; the answer is written into that row and no run edits it
+afterwards. `unknown` is a legal answer and means no sibling repo sits
+on the other side: quarry keeps the row as a publication and lists
+possible consumers by name.
 
 **A refresh also fills gaps**, not just staleness: entry points no
 `logic/` scenario claims and surfaces no `uiux/screens/` chapter
@@ -101,12 +109,14 @@ fragments (part 7, informational only; fragments never flip the
 verdict) and the mechanical schema pass (part 8: required frontmatter
 keys, `09-interfaces.md`'s `known_as` among them, which is a finding
 when the key is absent and when its value is a scalar instead of a
-list; required headings per chapter; a `### <Name>` payload section for
-every Produces and Consumes row on `09-interfaces.md` (topics.md's
-Payload sections), reported in the missing-headings column; `Site`
-paths checked with `git ls-files --error-unmatch` and required to name
-one tracked file, so a directory or a wildcard is a finding; and
-secret-shaped strings reported by pattern name), then ends with a
+list; required headings per chapter; and, read off `09-interfaces.md`'s
+frontmatter `edges:` block, four edge findings - a row with no `site`,
+a `site` whose path fails `git ls-files --error-unmatch` or names
+something other than one tracked file so a directory and a wildcard
+both count, a row with no `### <Name>` payload section or one holding
+neither a field table nor a `Model:` line, and a `schema` or `Model:`
+naming an entity `02-models.md` has no `### <Entity>` section for;
+plus secret-shaped strings reported by pattern name), then ends with a
 machine-parseable verdict:
 
 ```text
@@ -338,7 +348,7 @@ docs/capstone/
 ├── review.md              opinionated findings          (gitignored)
 ├── *-interview.md         interview transcripts         (gitignored)
 ├── features/              specs, plans, review ledgers   (gitignored)
-└── capstone.json          project-scoped overrides       (gitignored)
+└── capstone.json          the project's settings and state - committed
 ```
 
 `docs_dir` relocates all of it; `capstone.json`'s own path never
@@ -366,6 +376,11 @@ in play also has a `09-interfaces.md`). `redact` lists env-var name
 patterns whose values never reach the docs; `07-operations.md` writes
 `<redacted>` for them. `workspaces` (project-scoped)
 names each monorepo workspace; the name doubles as its quarry target.
+`docs/capstone/capstone.json` is the project's own
+shared config, committed like the ledger whatever `docs_in_git` says,
+holding `pipeline`, `workspaces`, and any global key this repo
+overrides; `expertise` and `teaching_mode` are personal, live in the
+global file, and are ignored if found here.
 
 **Cross-repo contracts.** With `cross_repo: "auto"` and quarry
 installed, `groom` runs `quarry docs deps <repo> --downstream --json`
@@ -386,11 +401,15 @@ the quarry knows, and exits 1 when a field a consumer reads is gone
 or changed type. `quarry update` runs the same comparison as advisory
 notes. Both read the `### <Name>` sections `map` writes, which is why
 the chapter, and not `01-architecture.md`'s Communication section,
-holds the field table for a cross-repo channel. `map` runs
-`quarry docs list --json` while writing `09-interfaces.md` and takes
-each edge's repo name from the registry, so a consumer that knows the
-producer by a hostname still lands on the producer's folder. Without
-quarry, everything behaves exactly as before.
+holds the fields for a cross-repo channel - as a table, or as
+`Model: <Entity>` naming a `### <Entity>` section in this repo's
+`02-models.md`. `map` runs `quarry docs index --json` and
+`quarry docs list --json` while writing `09-interfaces.md`, to find
+the edges the registry's join could not settle and to check that this
+repo is registered at all. Without
+quarry, everything behaves exactly as before: the rows are written
+with no `to` and no `from`, and the join happens whenever the repo
+reaches a quarry.
 
 **Interview lifecycle.** `interviewing` → `awaiting-formalization` →
 `formalized`. The final state is written only *after* outputs are on

@@ -21,9 +21,9 @@ Usage: /capstone:<command>
                         interfaces)
   map check            Read-only trust report in two halves: a bash script
                        (staleness, ledger fragments, schema: stamps, headings,
-                       Site paths, secret shapes -> "MAP CHECK:") and the
-                       model's review (pointer drift, absorption, re-vetting,
-                       coverage -> "MAP REVIEW:")
+                       edge sites, payload sections, model references, secret
+                       shapes -> "MAP CHECK:") and the model's review (pointer
+                       drift, absorption, re-vetting, coverage -> "MAP REVIEW:")
   doctor               Verify and repair the docs area: torn writes, index
                        drift, voided approvals, absorption gaps
   review [be|fe]       Opt-in judgment -> review.md; no arg does both sides,
@@ -66,8 +66,15 @@ narrate and teach while working), docs_dir, index_file,
 subagent_threshold, docs_in_git, language, redact (env-var name
 patterns whose values the docs never quote), cross_repo (auto = map,
 groom, plan and architecture consult quarry when it is on PATH).
-Per-project state and overrides live in an optional
-docs/capstone/capstone.json: pipeline, workspaces (each name doubles as
-the workspace's quarry target), or any global key to override for that
-repo.
+The optional docs/capstone/capstone.json is the project's own shared
+config, committed like the ledger: pipeline, workspaces (each name
+doubles as the workspace's quarry target), or any global key to
+override for that repo. expertise and teaching_mode are personal and
+stay in the global file.
+
+Cross-repo edges: 09-interfaces.md's frontmatter edges block is the
+record. map writes kind, name, site and schema from the code and never
+to/from - no repo holds another repo's name - quarry fills those by
+joining the two halves on (kind, name), and you are asked only where
+that join finds several candidates.
 EOF

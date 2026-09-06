@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # The script half of `map check` (protocols/map.md, "check"): parts 1
 # (staleness), 7 (unfolded changelog.d/ fragments, informational) and 8
-# (schema: frontmatter keys, required headings, payload sections, Site
-# paths, secret-shaped strings). Prints the same tables the protocol
+# (schema: frontmatter keys, required headings, the interfaces
+# chapter's edge rows - site present, site tracked, payload section
+# present and non-empty, schema resolving to a 02-models.md entity -
+# and secret-shaped strings). Prints the same tables the protocol
 # describes and ends with
 # exactly one verdict line, `MAP CHECK: current` or
 # `MAP CHECK: stale (<N> findings)`, which templates/capstone-map-check.yml
@@ -61,6 +63,14 @@ EMPTY_HASH='e69de29bb2d1'
 
 # a literal carriage return, for CRLF-tolerant fixed-string greps
 CR=$(printf '\r')
+# the field separator of every parsed-row helper below. Not a tab: a
+# tab is IFS whitespace, so `read` would collapse two of them into one
+# and shift every field after an empty one - exactly the case a row
+# with no `site` produces.
+SEP=$(printf '\001')
+# the docs area part 8 is reading, so an interfaces row's `schema` can
+# be resolved against the models chapter beside it
+DOCS_ABS=""
 
 # Skipped entirely (brief P10): never stamped, or local working state.
 # Matched on the path relative to docs_dir. The index is skipped for
@@ -190,6 +200,186 @@ known_as_form() {
 # the frontmatter `site:` mirror (interfaces_frontmatter: true)
 fm_sites() {
   printf '%s\n' "$1" | sed -n 's/^[[:space:]]*site:[[:space:]]*//p' | sed -e 's/[[:space:]]*$//' -e 's/`//g'
+}
+
+# edge_items: `dir<TAB>kind<TAB>name<TAB>site<TAB>schema` per row, from a
+# frontmatter fragment already narrowed to the block that holds the
+# `produces:`/`consumes:` keys. Both list forms references/topics.md
+# allows are read: a flow mapping (`- { kind: sqs, name: x, site: y }`)
+# and a block mapping (`- kind: sqs` with `name:` on the lines under
+# it). One pair of surrounding quotes is stripped from a scalar. A
+# comma inside a quoted flow value would split the row, which no
+# contract name capstone writes carries; the block form is the way out
+# for one that does. `to` and `from` are read only so that a row
+# carrying them still ends where it should - this pass never reports
+# on them, they are the user's and quarry's.
+edge_items() {
+  awk '
+    BEGIN { S = sprintf("%c", 1) }
+    function unq(s) {
+      gsub(/^[ \t]+|[ \t]+$/, "", s)
+      if (s ~ /^".*"$/) return substr(s, 2, length(s) - 2)
+      if (s ~ /^\047.*\047$/) return substr(s, 2, length(s) - 2)
+      return s
+    }
+    function setkv(k, v) {
+      if (k == "kind") kind = v
+      else if (k == "name") name = v
+      else if (k == "site") site = v
+      else if (k == "schema") schema = v
+    }
+    function emit() {
+      if (open) print dir S kind S name S site S schema
+      open = 0; kind = ""; name = ""; site = ""; schema = ""
+    }
+    function pair(s,   p, k) {
+      p = index(s, ":")
+      if (p == 0) return
+      k = substr(s, 1, p - 1); gsub(/^[ \t]+|[ \t]+$/, "", k)
+      setkv(tolower(k), unq(substr(s, p + 1)))
+    }
+    function flow(s,   n, a, i) {
+      sub(/^[ \t]*\{[ \t]*/, "", s); sub(/[ \t]*\}[ \t]*$/, "", s)
+      n = split(s, a, ",")
+      for (i = 1; i <= n; i++) pair(a[i])
+    }
+    { sub(/\r$/, "") }
+    /^[ \t]*#/ { next }
+    /^[ \t]*produces:[ \t]*$/ { emit(); dir = "produces"; next }
+    /^[ \t]*consumes:[ \t]*$/ { emit(); dir = "consumes"; next }
+    dir == "" { next }
+    /^[ \t]*-[ \t]*\{/ { emit(); open = 1; s = $0; sub(/^[ \t]*-[ \t]*/, "", s); flow(s); next }
+    /^[ \t]*-[ \t]*(kind|name|site|schema|to|from)[ \t]*:/ {
+      emit(); open = 1; s = $0; sub(/^[ \t]*-[ \t]*/, "", s); pair(s); next }
+    open && /^[ \t]*(kind|name|site|schema|to|from)[ \t]*:/ { pair($0); next }
+    { emit(); dir = "" }
+    END { emit() }'
+}
+
+# edges_of fm: the frontmatter edge rows. references/topics.md makes the
+# `edges:` block canonical, with `produces:`/`consumes:` under it; a
+# page written before the block existed carries those two keys at the
+# top level instead, and quarry reads whichever it finds first, so this
+# reads the block alone when there is one.
+edges_of() {
+  if printf '%s\n' "$1" | grep -q '^edges:[[:space:]]*$'; then
+    printf '%s\n' "$1" | awk '
+      { sub(/\r$/, "") }
+      inb && /^[^ \t]/ { inb = 0 }
+      inb { print }
+      /^edges:[ \t]*$/ { inb = 1 }' | edge_items
+  else
+    printf '%s\n' "$1" | edge_items
+  fi
+}
+
+# table_edges file: the same rows read from the Produces and Consumes
+# tables, for a page whose frontmatter carries no edge block at all.
+# Columns are located by header name, fenced blocks are skipped,
+# backticks and link syntax come off the cell, and an escaped pipe is
+# parked as \001 so it never shifts a column - the rules site_cells and
+# payload_gaps already apply. A `### ` heading closes the edge table.
+table_edges() {
+  awk '
+    BEGIN { S = sprintf("%c", 1) }
+    function cell(v) {
+      gsub(/\001/, "|", v); gsub(/`/, "", v)
+      while (match(v, /\[[^]]*\]\([^)]*\)/)) { m = substr(v, RSTART, RLENGTH); t = m
+        sub(/^\[/, "", t); sub(/\].*$/, "", t)
+        v = substr(v, 1, RSTART - 1) t substr(v, RSTART + RLENGTH) }
+      gsub(/^[ \t]+|[ \t]+$/, "", v); gsub(/[ \t]+/, " ", v)
+      if (v == "-") v = ""
+      return v
+    }
+    { sub(/\r$/, "") }
+    /^[ \t]*(```|~~~)/ { fence = !fence; next }
+    fence { next }
+    /^###+ / { if (intable) { intable = 0 } done = 1; next }
+    /^##[ \t]/ {
+      s = $0; sub(/^##[ \t]*/, "", s); gsub(/^[ \t]+|[ \t]+$/, "", s)
+      if (s == "Produces") dir = "produces"
+      else if (s == "Consumes") dir = "consumes"
+      else dir = ""
+      intable = 0; done = 0; next }
+    dir == "" { next }
+    /^[ \t]*\|/ {
+      if (done) next
+      line = $0; gsub(/\\[|]/, "\001", line)
+      if (!intable) { intable = 1; ck = 0; cn = 0; cs = 0; n = split(line, hd, "|")
+        for (i = 1; i <= n; i++) { x = hd[i]; gsub(/^[ \t]+|[ \t]+$/, "", x); gsub(/`/, "", x)
+          x = tolower(x)
+          if (x == "kind") ck = i; else if (x == "name") cn = i
+          else if (x == "site") cs = i }
+        next }
+      if (line ~ /^[| \t:-]+$/) next
+      n = split(line, c, "|")
+      print dir S cell(ck ? c[ck] : "") S cell(cn ? c[cn] : "") S cell(cs ? c[cs] : "") S ""
+      next }
+    intable { intable = 0; done = 1 }' "$1"
+}
+
+# payload_bodies file: one line per `### <Name>` section under a
+# Produces or Consumes heading, `name<TAB>form<TAB>model`. `form` is
+# `table` when a table row follows the heading, `model` when a `Model:`
+# line does, `both` when the section carries both (topics.md: the table
+# wins, and the reference is still checked), and `empty` when it
+# carries neither, which is the section quarry check cannot compare.
+# Only a space after the hashes opens a heading, the way quarry's
+# frontmatter::heading_of demands.
+payload_bodies() {
+  awk '
+    BEGIN { S = sprintf("%c", 1) }
+    function flush(   f) {
+      if (h != "") {
+        f = (tab && mdl) ? "both" : (tab ? "table" : (mdl ? "model" : "empty"))
+        print h S f S mv }
+      h = ""; tab = 0; mdl = 0; mv = ""
+    }
+    { sub(/\r$/, "") }
+    /^[ \t]*(```|~~~)/ { fence = !fence; next }
+    fence { next }
+    /^###+ / {
+      flush()
+      if (want) { s = $0; sub(/^#+[ \t]*/, "", s); sub(/[ \t]*\{#[^}]*\}$/, "", s)
+        gsub(/^[ \t]+|[ \t]+$/, "", s); gsub(/[ \t]+/, " ", s); h = s }
+      next }
+    /^##[ \t]/ {
+      flush()
+      s = $0; sub(/^##[ \t]*/, "", s); gsub(/^[ \t]+|[ \t]+$/, "", s)
+      want = (s == "Produces" || s == "Consumes"); next }
+    h == "" { next }
+    /^[ \t]*\|/ { tab = 1; next }
+    /^[ \t]*Model:[ \t]*/ {
+      mdl = 1; s = $0; sub(/^[ \t]*Model:[ \t]*/, "", s); gsub(/`/, "", s)
+      gsub(/^[ \t]+|[ \t]+$/, "", s); mv = s; next }
+    END { flush() }' "$1"
+}
+
+# model_known docs_dir entity: this docs area's models chapter holds a
+# `### <Entity>` section for it (references/topics.md, Fields and
+# types). A trailing `[]` is a list of the same entity and changes
+# nothing. Matching follows quarry: a trailing `{#anchor}` dropped,
+# runs of whitespace collapsed, case folded, exact heading first and
+# then `<entity> (` as a prefix. A split chapter (02-models-<part>.md,
+# map.md Phase 3 step 8) counts too.
+model_known() {
+  local d="$1" e="$2" f
+  e=$(printf '%s' "$2" | sed -e 's/\[\]$//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+  [ -n "$e" ] || return 1
+  for f in "$d"/02-models.md "$d"/02-models-*.md; do
+    [ -f "$f" ] || continue
+    awk -v want="$e" '
+      { sub(/\r$/, "") }
+      /^[ \t]*(```|~~~)/ { fence = !fence; next }
+      fence { next }
+      /^###[ \t]/ {
+        h = $0; sub(/^#+[ \t]*/, "", h); sub(/[ \t]*\{#[^}]*\}$/, "", h)
+        gsub(/^[ \t]+|[ \t]+$/, "", h); gsub(/[ \t]+/, " ", h)
+        lh = tolower(h); lw = tolower(want)
+        if (lh == lw || index(lh, lw " (") == 1) { found = 1; exit } }
+      END { exit(found ? 0 : 1) }' "$f" && return 0
+  done
+  return 1
 }
 
 # topic_of basename: NN-<topic>.md or NN-<topic>-<part>.md at the docs root
@@ -446,6 +636,7 @@ check_part1() {
 check_part8() {
   local f="$1" disp="$2" fm="$3" globs="$4" chapter="$5" topic="$6" only_secrets="$7"
   local keys="" heads="" sites="" secrets="" mode h cell p line name re seen k base items=0
+  local rows="" models="" rowsites="" edir ekind ename esite eschema pname pform pmodel
   mode=$(fm_value "$fm" mode)
   base=$(basename "$f")
   if [ "$only_secrets" -eq 0 ]; then
@@ -476,6 +667,26 @@ check_part8() {
           missing) keys="${keys:+$keys, }known_as"; items=$((items + 1)) ;;
           scalar) keys="${keys:+$keys, }known_as not a list"; items=$((items + 1)) ;;
         esac
+        # the edge rows: the frontmatter block when the page carries
+        # one, else the tables (references/topics.md's precedence, the
+        # order quarry reads them in).
+        rows=$(edges_of "$fm")
+        [ -n "$rows" ] || rows=$(table_edges "$f")
+        # a row with no site cannot point at the code it describes.
+        # Checked outside git and on a prescriptive chapter too, like
+        # the payload sections below: it is text the page owes, not a
+        # path the tree has to hold.
+        rowsites=""
+        while IFS="$SEP" read -r edir ekind ename esite eschema; do
+          [ -n "$ekind$ename$esite$eschema" ] || continue
+          if [ -z "$esite" ]; then
+            sites="${sites:+$sites, }no site for ${ekind:--} ${ename:--}"
+            items=$((items + 1))
+          else
+            rowsites="$rowsites$esite
+"
+          fi
+        done <<< "$rows"
         if [ "$IN_GIT" -eq 1 ] && [ "$mode" != prescriptive ]; then
           seen="
 "
@@ -491,7 +702,7 @@ $cell
             if ! site_tracked "$p"; then
               sites="${sites:+$sites, }site $cell"; items=$((items + 1))
             fi
-          done <<< "$(site_cells "$f"; fm_sites "$fm")"
+          done <<< "$(site_cells "$f"; fm_sites "$fm"; printf '%s' "$rowsites")"
         fi
         # payload sections: a Produces or Consumes row without its
         # `### <Name>` section is the table quarry check cannot compare.
@@ -500,7 +711,44 @@ $cell
         while IFS= read -r name; do
           [ -n "$name" ] || continue
           heads="${heads:+$heads, }### $name"; items=$((items + 1))
-        done <<< "$(payload_gaps "$f")" ;;
+        done <<< "$(payload_gaps "$f")"
+        # and a section that holds neither a field table nor a
+        # `Model:` line leaves quarry check nothing to compare either.
+        # Every model named, by a section or by a row's `schema`, has
+        # to resolve to a `### <Entity>` in this docs area's
+        # 02-models.md; each distinct name is reported once.
+        models="
+"
+        while IFS="$SEP" read -r pname pform pmodel; do
+          [ -n "$pname" ] || continue
+          case "$pform" in
+            empty)
+              heads="${heads:+$heads, }payload ### $pname"; items=$((items + 1)) ;;
+            model|both)
+              # `<Entity>[]` is a list of the same entity, so the two
+              # spellings are one reference and one finding
+              pmodel=${pmodel%'[]'}
+              [ -n "$pmodel" ] || continue
+              case "$models" in *"
+$pmodel
+"*) continue ;; esac
+              models="$models$pmodel
+"
+              model_known "$DOCS_ABS" "$pmodel" && continue
+              heads="${heads:+$heads, }model $pmodel"; items=$((items + 1)) ;;
+          esac
+        done <<< "$(payload_bodies "$f")"
+        while IFS="$SEP" read -r edir ekind ename esite eschema; do
+          eschema=${eschema%'[]'}
+          [ -n "$eschema" ] || continue
+          case "$models" in *"
+$eschema
+"*) continue ;; esac
+          models="$models$eschema
+"
+          model_known "$DOCS_ABS" "$eschema" && continue
+          heads="${heads:+$heads, }model $eschema"; items=$((items + 1))
+        done <<< "$rows" ;;
     esac
   fi
   while IFS= read -r line; do
@@ -601,7 +849,7 @@ print_part8() {
 # run_dir docs_abs given: one report section for one docs area
 run_dir() {
   local d="$1" given="$2" disp idx files f rel fm globs chapter topic dfile
-  ROOT=""; IN_GIT=0; BASE="$PWD"
+  ROOT=""; IN_GIT=0; BASE="$PWD"; DOCS_ABS="$d"
   if command -v git >/dev/null 2>&1; then
     ROOT=$(git -C "$d" rev-parse --show-toplevel 2>/dev/null) && IN_GIT=1
   fi

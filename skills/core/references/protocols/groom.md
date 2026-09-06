@@ -103,6 +103,15 @@ recorded `§Q` decisions, without re-interviewing.
    This lives here, in protocol text, deliberately - never as a
    harness hook, because capstone also runs on harnesses without
    hooks.
+   In the same pass, run `quarry docs index --json` and take its
+   `ambiguous` rows for this repo that name an interface the feature
+   adds or changes. Put those to the user as core.md's Edge
+   confirmation describes, one digest, before the first question:
+   the answer decides which consumer the interview is holding the
+   feature to. Record each answer in the spec's Reference impact so
+   `implement`'s wrap writes it into `09-interfaces.md`'s `edges:`
+   block; this stage never edits the chapter itself. Nothing
+   ambiguous, or any condition unmet → ask nothing.
 5. An artifact argument (a ticket, a PRD, notes) seeds the interview
    per core-authoring.md's Artifact seeding rule.
 
@@ -150,7 +159,10 @@ edge-case posture, what's out of scope) and set
   `logic/` scenarios it adds or amends, the `mockup/` screens it
   changes, the `uiux/` chapters it touches (`plan` reads this to
   scope its study; `implement`'s wrap performs the absorption; the
-  `map` refresh settles the chapters).
+  `map` refresh settles the chapters). Every edge Phase A step 4's
+  confirmation settled is one line here - direction, kind, name, and
+  the repo name the user gave - because `09-interfaces.md`'s `to`
+  and `from` are the one thing the `map` refresh will not derive.
 - **Out of scope**: non-goals, recorded as decisions.
 
 Self-review before handing the file over (fix inline, don't re-gate):

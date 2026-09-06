@@ -70,7 +70,9 @@ wherever it stopped:
    (`mockup.md`, `logic.md`, `uiux.md`, `architecture.md`,
    `standards.md`, `stack.md`, `build.md`) exactly, including its
    own formalization gate. Do not blend stages. `build.md` runs only
-   after step 7's readback pass.
+   after step 7's readback pass. A cross-repo edge the design
+   declares is confirmed inside `architecture` per core.md's Edge
+   confirmation; `start` routes and asks nothing of its own.
 6. When a stage formalizes, announce it in one line and continue to
    the next ("mockup done; moving to logic; say stop to pause").
    Stopping is always safe: every stage persists its interview file,

@@ -49,7 +49,9 @@ an existing feature's slug.
    the rest pending; the running stage's protocol adds its own tasks
    beneath. Then execute the current stage's protocol file
    (`groom.md`, `plan.md`, `implement.md`) exactly, including its own
-   gate. Do not blend stages. A stage counts as done only when its
+   gate. Do not blend stages. A cross-repo edge the feature adds is
+   confirmed inside `groom` per core.md's Edge confirmation;
+   `feature` routes and asks nothing of its own. A stage counts as done only when its
    marker AND its changelog key are both present; a marker with no
    key is a torn write: append that stage's missing entry per
    core.md, never re-run the stage.

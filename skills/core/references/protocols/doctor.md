@@ -47,11 +47,16 @@ documented rules it proposes, never applies.
    repair; if it is unavailable, report the omission as unrecoverable
    and never guess.
 5. **Housekeeping**: `<docs_dir>/.gitignore` or config keys missing,
-   or the ignore file still listing `changelog.md` (repair = run the
-   initializer, core.md's rule); `changelog.md` untracked inside a git
-   repo whatever `docs_in_git` says (the ledger is always committed,
-   core.md; repair = stage it, and report it loudly: every shipped
-   feature's reasoning was one disk away from gone);
+   or the ignore file still listing `changelog.md` or `capstone.json`
+   (repair = run the
+   initializer, core.md's rule); `changelog.md` or the project
+   `docs/capstone/capstone.json` untracked inside a git
+   repo whatever `docs_in_git` says (both are always committed,
+   core.md; repair = stage it, and report an untracked ledger loudly:
+   every shipped feature's reasoning was one disk away from gone);
+   `expertise` or `teaching_mode` in the project config (repair =
+   delete the key there; it is personal, the global file keeps it,
+   and a run ignores it wherever it sits);
    `capstone.json` invalid JSON (`//` line comments are permitted
    per core.md and are never a finding) or keys outside their ranges.
 6. **Absorption drift**: `map check`'s absorption count; repair =
@@ -72,8 +77,11 @@ documented rules it proposes, never applies.
    section is left as-is and searched like any other ledger file.
 9. **Schema**: the part-8 pass of `map check`'s script
    (`scripts/map-check.sh`: frontmatter keys, `known_as` included,
-   required headings, `09-interfaces.md`'s `### <Name>` payload
-   sections, `Site` paths, secret-shaped strings per file); repair = the `map`
+   required headings, and on `09-interfaces.md` the `edges:` block's
+   four edge findings - a row with no `site`, a `site` the tree does
+   not hold, a missing or empty `### <Name>` payload section, and a
+   `schema` naming an entity `02-models.md` has none of - plus
+   secret-shaped strings per file); repair = the `map`
    refresh, which regenerates a file missing a key or heading against
    the current template; a secret is removed by hand, never
    regenerated around.

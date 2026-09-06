@@ -10,17 +10,22 @@ only `core.md`; everything else reads both.
 Some outputs are personal working state and are **never committed**,
 whatever `docs_in_git` says: `features/` (the whole feature chain:
 interviews, specs, plans, review ledgers), every `*-interview.md`,
-`capstone.json`, and `review.md` (plus the legacy `be-review.md` and
+and `review.md` (plus the legacy `be-review.md` and
 `fe-review.md` older versions wrote). `changelog.md` and the
 `changelog.d/` fragment folder are NOT on this
 list, and unlike the chapters they do not follow `docs_in_git`
 either: **the ledger is always committed** (core.md's Changelog
 ledger says why - `implement` deletes each feature's folder on the
 strength of its entry, so an untracked ledger makes that deletion
-permanent loss). The
+permanent loss). `capstone.json` is off the list too: it is the
+project's shared config, committed for the same kind of reason - it
+holds the settings every run on the repo follows and the project's
+state, and a config that lives on one machine is not a standard
+(core.md's Project config paragraph). The
 initializer's per-project run writes `<docs_dir>/.gitignore` listing
-exactly those, and deletes the `changelog.md` line older versions
-wrote; whenever you write into `<docs_dir>` and that file is absent,
+exactly the local-only set, and deletes the `changelog.md` and
+`capstone.json` lines older versions wrote; whenever you write into
+`<docs_dir>` and that file is absent,
 create it: the same idempotent initializer without the global flag
 (`init-config.sh [docs_dir]`, via bash on every platform) does
 that, the legacy migration below, and the retroactive untracking. The

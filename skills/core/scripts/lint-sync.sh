@@ -385,8 +385,10 @@ done
 # 12. the local-only ignore list is identical in both initializers and
 #     documented in core.md (hand-synced across three files); changelog.md
 #     is part of the reference and must never reappear in the templates,
-#     and both initializers must carry the unignore migration for it
-for r in 'features/' '\*-interview.md' 'capstone.json' 'review.md' 'be-review.md' 'fe-review.md'; do
+#     and both initializers must carry the unignore migration for it.
+#     capstone.json left this list in 6.3 and is asserted absent by
+#     check 19, with its own migration.
+for r in 'features/' '\*-interview.md' 'review.md' 'be-review.md' 'fe-review.md'; do
   for f in skills/core/scripts/init-config.sh; do
     grep -q "^$r$" "$f" || err "$f ignore template missing rule $r"
   done
@@ -884,6 +886,7 @@ if command -v git >/dev/null 2>&1; then
       printf '%s\n\n' '| http | GET /b \| GET /c | other | `src/main.rs:1` |'
       printf '### GET /a\n\n| Field | Type | Required |\n| --- | --- | --- |\n| id | string | yes |\n\n'
       printf '%s\n\n' '### GET /b | GET /c'
+      printf '| Field | Type | Required |\n| --- | --- | --- |\n| id | string | yes |\n\n'
       printf '## Consumes\n\n| Kind | Name | From | Site |\n| --- | --- | --- | --- |\n| sqs | ingest | other | [src/main.rs](../../src/main.rs):57-60 |\n\n'
       printf '### ingest (v2)\n\n| Field | Type | Required |\n| --- | --- | --- |\n| id | string | yes |\n\n'
       printf '```markdown\n| Kind | Name | To | Site |\n| --- | --- | --- | --- |\n| http | decoy | other | `src/decoy.rs:1` |\n```\n'
@@ -933,6 +936,70 @@ mode: prescriptive' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$
   sed "s|^### GET /a\$|###${MC_TAB}GET /a|" "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$S/docs/capstone/09-interfaces.md"
   mc_run 'tabbed payload heading' 1 'MAP CHECK: stale (1 findings)' "$S"
   mc_row '| docs/capstone/09-interfaces.md | - | ### GET /a | - | - |' 'tabbed payload heading'
+  # the frontmatter edges block (topics.md): it is what map writes and
+  # what quarry reads, so the pass reads it and falls back to the
+  # tables only where a page has none. Sites, payload sections and
+  # schema references are all checked off it, and `to`/`from` are
+  # never read at all. The models chapter beside it is what a `schema`
+  # and a `Model:` line resolve against.
+  mc_models() { # dir: a models chapter carrying one ### Record entity
+    {
+      printf -- '---\ngenerated_at_commit: %s\ngenerated_date: 2026-01-01\ncapstone_version: %s\ncontent_hash: %s\npaths_covered:\n  - ":(top)src/**"\n---\n' "$SHA" "$MANIFEST_V" "$H"
+      printf '# Models\n\n## Entities\n\nnone\n\n## Fields and types\n\n'
+      printf '### Record\n\n| Field | Type | Required |\n| --- | --- | --- |\n| id | string | yes |\n\n'
+      printf '## Relationships\n\nnone\n\n## Boundaries\n\nnone\n\n## Validation\n\nnone\n\n## Schema\n\nnone\n'
+    } > "$1/02-models.md"
+  }
+  mc_iface_fm() { # dir [extra produces row]: the edges-block form
+    {
+      printf -- '---\ngenerated_at_commit: %s\ngenerated_date: 2026-01-01\ncapstone_version: %s\ncontent_hash: %s\nknown_as: []\nedges:\n  produces:\n' "$SHA" "$MANIFEST_V" "$H"
+      printf '    - { kind: http, name: GET /a, site: src/main.rs, schema: Record }\n'
+      [ -n "${2:-}" ] && printf '%s\n' "$2"
+      printf 'paths_covered:\n  - ":(top)src/**"\n---\n'
+      printf '# Interfaces\n\n## Produces\n\n| Kind | Name | To | Site |\n| --- | --- | --- | --- |\n| http | GET /a | - | `src/main.rs` |\n\n'
+      printf '### GET /a\n\nModel: Record\n\n## Consumes\n\nNone found.\n'
+    } > "$1/09-interfaces.md"
+  }
+  mc_models "$S/docs/capstone"
+  mc_iface_fm "$S/docs/capstone"
+  git -C "$S" add docs; git -C "$S" $GC commit -qm models
+  mc_run 'edges block clean' 0 'MAP CHECK: current' "$S"
+  # the block's site is the one verified; the table is a rendering
+  sed 's|site: src/main.rs|site: src/gone.rs|' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$S/docs/capstone/09-interfaces.md"
+  mc_run 'edges block site' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/09-interfaces.md | - | - | site src/gone.rs | - |' 'edges block site'
+  # a row with no site at all cannot point at the code it describes
+  mc_iface_fm "$S/docs/capstone" '    - { kind: sqs, name: orphan, schema: Record }'
+  mc_run 'edge row with no site' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/09-interfaces.md | - | - | no site for sqs orphan | - |' 'edge row with no site'
+  # a schema naming an entity 02-models.md has no section for
+  mc_iface_fm "$S/docs/capstone"
+  sed 's|schema: Record|schema: Nope|' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$S/docs/capstone/09-interfaces.md"
+  mc_run 'dangling schema' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/09-interfaces.md | - | model Nope | - | - |' 'dangling schema'
+  # and the same for the payload section's rendered Model: line
+  mc_iface_fm "$S/docs/capstone"
+  sed 's|^Model: Record$|Model: Nope|' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$S/docs/capstone/09-interfaces.md"
+  mc_run 'dangling model reference' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/09-interfaces.md | - | model Nope | - | - |' 'dangling model reference'
+  # a list schema is the same entity
+  mc_iface_fm "$S/docs/capstone"
+  sed 's|schema: Record|schema: Record[]|' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$S/docs/capstone/09-interfaces.md"
+  mc_run 'list schema' 0 'MAP CHECK: current' "$S"
+  # a payload section holding neither a field table nor a Model: line
+  mc_iface_fm "$S/docs/capstone"
+  grep -v '^Model: Record$' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$S/docs/capstone/09-interfaces.md"
+  mc_run 'empty payload section' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/09-interfaces.md | - | payload ### GET /a | - | - |' 'empty payload section'
+  # a to/from in the block is never a finding, whatever it says
+  mc_iface_fm "$S/docs/capstone" '    - { kind: sqs, name: pub, site: src/main.rs, schema: Record, to: [a, b] }'
+  mc_run 'to and from are never checked' 0 'MAP CHECK: current' "$S"
+  # with no models chapter the reference resolves to nothing, once for
+  # the two spellings of the same entity
+  rm "$S/docs/capstone/02-models.md"
+  mc_iface_fm "$S/docs/capstone"
+  mc_run 'schema with no models chapter' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/09-interfaces.md | - | model Record | - | - |' 'schema with no models chapter'
   # known_as (topics.md): the interfaces chapter owes the key, and a
   # scalar value is the shape quarry's known_as_of refuses, registering
   # no alias for the page and saying so only on `docs index --force`.
@@ -1036,6 +1103,91 @@ script:
 $SCRIPT_PATTERNS
 map.md:
 $DOC_PATTERNS"
+
+# 18. the edge contract. No repository holds the other repository's
+#     name, so capstone writes what the code says - kind, name, site,
+#     schema - quarry joins the two halves on (kind, name), and a
+#     person answers only what that join leaves ambiguous. Three
+#     things have to agree or an answer gets overwritten by a guess:
+#     the rule that no run writes to/from, the section that governs
+#     the ask, and the vocabulary every writer and reader uses.
+grep -q '^## Edge confirmation' skills/core/references/core.md \
+  || err "core.md has no Edge confirmation section"
+for n in map groom architecture; do
+  tr '\n' ' ' < "skills/core/references/protocols/$n.md" | tr -s ' ' \
+    | grep -q 'Edge confirmation' \
+    || err "protocol $n.md does not cite core.md's Edge confirmation by name"
+done
+for n in start feature; do
+  tr '\n' ' ' < "skills/core/references/protocols/$n.md" | tr -s ' ' \
+    | grep -q 'Edge confirmation' \
+    || err "router $n.md does not say which stage confirms an edge"
+done
+for f in skills/core/references/topics.md \
+         skills/core/references/protocols/map.md; do
+  for s in 'edges:' 'schema' 'Model'; do
+    grep -qF "$s" "$f" || err "$f does not carry the edge vocabulary: $s"
+  done
+done
+# the ownership rule, matched against each file flattened to one line
+# so re-wrapping a paragraph cannot turn the gate red
+for f in skills/core/references/core.md \
+         skills/core/references/protocols/map.md; do
+  tr '\n' ' ' < "$f" | tr -s ' ' | grep -q 'no run writes or edits one' \
+    || err "$(basename "$f") lost the rule that no run writes to/from"
+done
+tr '\n' ' ' < skills/core/references/topics.md | tr -s ' ' \
+  | grep -q 'It never writes `to` or `from`' \
+  || err "topics.md interfaces section does not say map never writes to/from"
+for f in skills/core/references/core.md \
+         skills/core/references/protocols/map.md; do
+  grep -q 'quarry docs index --json' "$f" \
+    || err "$(basename "$f") does not read quarry's ambiguous list"
+done
+# the script half reads the block, and map.md documents what it finds
+grep -q 'edges_of' skills/core/scripts/map-check.sh \
+  || err "map-check.sh does not read the frontmatter edges block"
+for s in 'no site for' 'payload ### ' 'model $pmodel'; do
+  grep -qF "$s" skills/core/scripts/map-check.sh \
+    || err "map-check.sh lost the edge finding: $s"
+done
+for s in 'no site for <kind> <name>' 'payload ### <Name>' 'model <Entity>'; do
+  grep -qF "$s" skills/core/references/protocols/map.md \
+    || err "map.md check part 8 does not document the edge finding: $s"
+done
+# models.md's entity headings are the join key a schema resolves through
+tr '\n' ' ' < skills/core/references/topics.md | tr -s ' ' \
+  | grep -q 'one `### <Entity>` section per entity' \
+  || err "topics.md models section does not pin the ### <Entity> heading"
+
+# 19. the project config left the ignore list in 6.3: it holds the
+#     settings every run on the repo follows, so it is committed like
+#     the ledger. The template must never list it again, the
+#     initializer carries the migration that removes a 6.2 rule with
+#     its own report line, and every file that tells a reader where
+#     the config lives has to say the same thing.
+grep -q '^capstone\.json$' skills/core/scripts/init-config.sh \
+  && err "init-config.sh ignore template still lists capstone.json (it is committed now)"
+grep -q 'unignored: capstone.json' skills/core/scripts/init-config.sh \
+  || err "init-config.sh lost the capstone.json unignore migration"
+for f in skills/core/scripts/init-config.sh \
+         skills/core/references/core-authoring.md \
+         skills/core/scripts/help.sh README.md docs/commands.md; do
+  tr '\n' ' ' < "$f" | tr -s ' ' | grep -q 'shared config, committed' \
+    || err "$f does not say the project config is shared and committed"
+done
+tr '\n' ' ' < skills/core/references/core.md | tr -s ' ' \
+  | grep -q 'Project config, shared and committed' \
+  || err "core.md does not declare the project config shared and committed"
+tr '\n' ' ' < skills/core/references/protocols/doctor.md | tr -s ' ' \
+  | grep -q 'still listing `changelog.md` or `capstone.json`' \
+  || err "doctor.md check 5 does not repair a stale capstone.json ignore rule"
+# the two personal keys stay in the global file
+tr '\n' ' ' < skills/core/references/core.md | tr -s ' ' \
+  | grep -q 'Two keys are personal and never belong in it, `expertise` and `teaching_mode`' \
+  || err "core.md does not keep expertise and teaching_mode out of the project config"
+grep -q 'teaching_mode' skills/core/references/protocols/doctor.md \
+  || err "doctor.md check 5 does not report a personal key in the project config"
 
 [ "$FAIL" -eq 0 ] && echo "lint-sync: all invariants hold" || echo "lint-sync: FAILURES above"
 exit $FAIL

@@ -168,7 +168,7 @@ instead of sending you off to run something else.
 | Command | What it does |
 | --- | --- |
 | `/capstone:map` | Build the reference, or refresh only what drifted. `rebuild` forces a full rewrite; a topic name targets one chapter |
-| `/capstone:map check` | Read-only trust report in two halves: a bash script (staleness, ledger fragments, schema: stamps, `known_as`, headings, payload sections, `Site` paths, secret shapes; the CI gate, no API key) and the model's review (pointer drift, absorption, re-vetting, coverage). Writes nothing |
+| `/capstone:map check` | Read-only trust report in two halves: a bash script (staleness, ledger fragments, schema: stamps, `known_as`, headings, edge sites, payload sections, model references, secret shapes; the CI gate, no API key) and the model's review (pointer drift, absorption, re-vetting, coverage). Writes nothing |
 | `/capstone:doctor` | Diagnose and repair the docs area: torn writes, index drift, voided approvals, absorption gaps |
 | `/capstone:review [be\|fe]` | The opt-in judgment → `review.md`. No argument does both sides; `backend` takes architecture, `frontend` grades the UI against your own design docs |
 
@@ -334,7 +334,7 @@ user, shared by every project.
   "non_interactive": false,           // resolve defaulted prompts silently (CI)
   "extract": ["logic", "uiux"],       // map's extraction passes; [] skips both
   "interfaces": "auto",               // "auto" | "off" - the 09-interfaces.md chapter
-  "interfaces_frontmatter": false,    // mirror interface tables into frontmatter
+  "interfaces_frontmatter": false,    // also write the legacy top-level produces:/consumes: lists
   "cross_repo": "auto",               // "auto" | "off" - quarry lookups in groom/plan/architecture/map
   "redact": ["*_SECRET", "*_TOKEN", "*_PASSWORD", "*_KEY"] // env-var names whose values the docs never quote
 }
@@ -352,21 +352,25 @@ user, shared by every project.
 | `non_interactive` | Resolve every prompt to its default, for headless CI runs; approval gates still stop |
 | `extract` | Which `map` extraction passes run: `["logic", "uiux"]`, `["logic"]`, or `[]` |
 | `interfaces` | `auto` or `off`: whether `map` writes the cross-repo `09-interfaces.md` chapter |
-| `interfaces_frontmatter` | Mirror the interface tables into frontmatter for machine consumers; off by default |
-| `cross_repo` | `auto` or `off`: whether `groom`, `plan`, the `architecture` interview, and `map`'s interfaces pass consult the `quarry` CLI; `map` takes edge names from the registry and writes the `known_as` aliases quarry resolves against |
+| `interfaces_frontmatter` | Also write the legacy top-level `produces:`/`consumes:` lists beside the canonical `edges:` block, for a machine consumer pinned to the 6.2 shape; off by default |
+| `cross_repo` | `auto` or `off`: whether `groom`, `plan`, the `architecture` interview, and `map`'s interfaces pass consult the `quarry` CLI; `map` reads the edges quarry could not join and asks you about those, and writes the `known_as` aliases quarry resolves names against |
 | `redact` | Env-var name patterns (`*` at either end) whose values `map` writes as `<redacted>` and never quotes; case-insensitive |
 
 Interviews, `features/`, and `review.md` stay local via a generated
 `.gitignore`. **The ledger - `changelog.md` and its `changelog.d/`
-fragments - is the one exception and is always
+fragments - is always
 committed**: `implement` deletes a feature's folder once its ledger
 entry is written, so the ledger is the only surviving record of why
-the feature was built that way.
+the feature was built that way. So is the project config below.
 
-Project-scoped state lives in an optional
-`docs/capstone/capstone.json`, created only when there is something to
-record; any global key set there overrides the global file for that
-repo. `pipeline` records the one-time pipeline-or-map choice on repos
+The project's own `docs/capstone/capstone.json` is the team's
+shared config, committed like the ledger whatever `docs_in_git` says:
+a config that lives on one machine is not a standard. It is created
+only when there is something to record, and any global key set there
+overrides the global file for that repo. `expertise` and
+`teaching_mode` are personal, stay in the global file, and are
+ignored if they turn up here.
+`pipeline` records the one-time pipeline-or-map choice on repos
 that already have code, and `workspaces` gives each monorepo workspace
 its own docs area with the root project's `00-index.md` as an
 index-of-indexes; a workspace's name is also its folder in a quarry
@@ -450,6 +454,26 @@ registered in a quarry pairs the same job with `quarry init` and
 `quarry check`, which reads the `### <Name>` payload sections in
 `09-interfaces.md` and fails the PR when a field one of its consumers
 reads is gone.
+
+**Upgrading from 6.2:** the project config is committed now. Run any
+command once and the initializer drops the `capstone.json` line from
+`docs/capstone/.gitignore`, reporting what it removed; commit the
+file, since it holds the settings every run on the repo follows.
+`09-interfaces.md`'s frontmatter is where the edges live: an `edges:`
+block with a `kind`, `name`, `site` and `schema` per row, and the
+Produces and Consumes tables rendered from it. `to` and `from` are
+yours: `map` writes neither and never edits one, quarry fills them in
+by joining every registered repo's rows on `(kind, name)`, and you are
+asked only about a contract several repos sit on. Whatever your
+chapter already says in a `To` or `From` cell survives the first run
+untouched. `Site` cells lose their line numbers on that run - the
+chapter is normative and a line number drifts on every edit - and
+quarry keeps reading the old form meanwhile. A payload section may
+now read `Model: <Entity>` instead of repeating a table
+`02-models.md` already holds; the first `map check` after the upgrade
+reports one finding per payload section that holds neither a table
+nor a model, and one per model reference `02-models.md` has no
+`### <Entity>` section for.
 
 **Upgrading from 6.1:** replace your `capstone-map-check.yml` with
 the new template. The old one still runs the model on every PR and

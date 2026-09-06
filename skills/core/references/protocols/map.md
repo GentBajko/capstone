@@ -8,13 +8,16 @@ template drift). A full build additionally reads Phase 1's recon set
 points); the deep-dive reads source per topic, and the extractions
 read the composed chapters (per logic.md and uiux.md). For `check`
 the script half (`scripts/map-check.sh`, the `core` skill) reads the
-stamped files' frontmatter, `changelog.d/`, and `09-interfaces.md`'s
-`Site` cells; the model half also reads the ledger -
+stamped files' frontmatter, `changelog.d/`, `09-interfaces.md`'s
+`edges:` block and `02-models.md`'s entity headings; the model half
+also reads the ledger -
 `changelog.md`, its rotation files, and `changelog.d/` fragments
 (absorption drift) - and `05-dependencies.md` plus the manifests and
 lockfile (re-vetting). When config `cross_repo` is `auto` and the
 `quarry` CLI is on PATH, Phase 2's interfaces pass also reads the
-output of `quarry docs list --json`. Nothing else unprompted.
+existing `09-interfaces.md` and the output of
+`quarry docs index --json` and `quarry docs list --json`. Nothing
+else unprompted.
 
 The descriptive reference for the current project: a lean
 `00-index.md` index and chapterized topic files in `<docs_dir>/`,
@@ -115,22 +118,49 @@ Do this in the main session with cheap reads only:
      which variables get `<redacted>` in the Default column.
 
 **Interfaces pass.** Whichever branch runs, the `interfaces` topic
-(when applicable) does two extra things. First, it fills the
-chapter's `known_as` frontmatter from the deploy sources the
-operations topic reads - compose files, ingress and gateway
-manifests, Kubernetes manifests, service-discovery config - per
-`../topics.md`'s interfaces section. Second, when config `cross_repo`
-is `auto` (the default) and the `quarry` CLI is on PATH, run
-`quarry docs list --json` once in the main session and pass the rows'
-`name` and `known_as` values to the writer (in the subagent prompt
-above the threshold): every `To`/`From` cell that matches a
-registered `name` or `known_as` entry - case-insensitive, against the
-hostname, service name, or env-var value the client code holds - is
-written as that repo's `name`; a cell that matches nothing is written
-as the code spells it, never invented. No `09-interfaces.md` is
-required for this call, unlike `groom` and `plan`. Any condition
-unmet (config `off`, no CLI, the command fails) → skip silently and
-name repos as before.
+(when applicable) works in a fixed order, because the chapter's
+`edges:` frontmatter block is the canonical record and only part of
+each row is this run's to write (`../topics.md`'s interfaces
+section).
+
+1. **Read the existing chapter first**, if there is one, and keep its
+   `edges:` block: every row's `to` and `from` is an answer a person
+   or a confirmation gave, and **no run writes or edits one** (core.md
+   hard rule 3).
+2. **Derive this run's rows from the code**: `kind`, `name`, `site`
+   as a repo-relative path with no line number, and `schema` naming
+   the `### <Entity>` section `02-models.md` holds for that payload,
+   or no `schema` where the payload is ad-hoc and the row's
+   `### <Name>` section carries its own field table instead.
+3. **Merge by `(direction, kind, name)`**: a row the block already
+   carries keeps its `to`/`from` untouched and takes this run's
+   `site` and `schema`; a row the code has and the block lacks is
+   added with neither; a row the block has and the code no longer
+   does is dropped and named in the run report
+   (`dropped: sqs old-topic (was to record-store)`).
+4. **Fill the chapter's `known_as`** from the deploy sources the
+   operations topic reads - compose files, ingress and gateway
+   manifests, Kubernetes manifests, service-discovery config - per
+   `../topics.md`.
+5. **Ask about what the registry could not join.** When config
+   `cross_repo` is `auto` (the default) and the `quarry` CLI is on
+   PATH, run `quarry docs index --json` once in the main session and
+   read its `ambiguous` rows for this repo (the workspace name when
+   `workspaces` is configured, per core.md); each is a contract
+   several sibling repos sit on, which the join cannot settle alone.
+   Put them to the user as core.md's Edge confirmation describes -
+   one digest, one line per row - and write each answer into that
+   row's `to` or `from`. Run `quarry docs list --json` in the same
+   pass to confirm this repo is registered; when it is not, say so in
+   one report line, because an unregistered repo is one no join will
+   ever reach. No `09-interfaces.md` is required for either call,
+   unlike `groom` and `plan`. Any condition unmet (config `off`, no
+   CLI, a command that fails, an empty `ambiguous` list) → skip
+   silently and leave those rows without a `to` or a `from`, which is
+   what quarry expects to resolve later.
+6. **Render the tables and the payload sections from the merged
+   block**, and the legacy top-level mirror too when config
+   `interfaces_frontmatter` is on.
 
 ## Phase 3 - compose
 
@@ -163,12 +193,16 @@ paths_covered:
    the stamp that survives a squash or rebase merge making
    `generated_at_commit` unreachable.
 
-   `09-interfaces.md` carries one `### <Name>` payload section per
-   Produces and Consumes row (topics.md's Payload sections); the
-   producer's `quarry check` compares exactly those tables, so a row
-   without its section is a chapter that fails the schema pass. Its
-   frontmatter carries one more key, `known_as`, per `../topics.md`'s
-   interfaces section.
+   `09-interfaces.md` carries two more frontmatter keys, `known_as`
+   and the canonical `edges:` block, per `../topics.md`'s interfaces
+   section; the Produces and Consumes tables are rendered from that
+   block, and each row gets a `### <Name>` section holding
+   either `Model: <Entity>` (the row's `schema`, resolved against
+   `02-models.md`) or its own `Field`, `Type`, `Required` table
+   (topics.md's Payload sections). The
+   producer's `quarry check` compares exactly those fields, so a row
+   with no section, or a section naming a model `02-models.md` does
+   not hold, is a chapter that fails the schema pass.
 
 2. Choose `paths_covered` globs deliberately; they drive the Refresh's
    staleness. Cover every directory the topic's content was derived
@@ -269,10 +303,11 @@ paths_covered:
    against the actual source.
 3. Report to the user: files written, topics skipped or absent and
    why.
-4. The local-only outputs (`features/`, interviews, `review.md`,
-   `capstone.json`) are already covered by
+4. The local-only outputs (`features/`, interviews, `review.md`) are
+   already covered by
    `<docs_dir>/.gitignore`; this question is only about the factual
-   reference (`changelog.md` included). If those generated files are
+   reference (`changelog.md` and the project config `capstone.json`
+   included, both always committed per core.md). If those generated files are
    untracked and not covered by `.gitignore`: honor the `docs_in_git`
    config key when set (`commit` or `ignore`); when it is `ask` or
    unset, ask the user whether to commit them or add
@@ -455,21 +490,37 @@ own:
    per `../topics.md` (a section may be satisfied by "None found"
    text, but the heading itself must exist; the list is embedded in
    the script and lint-sync keeps it equal to `../topics.md`); on
-   `09-interfaces.md`, a `### <Name>` payload section for every
-   Produces and Consumes row (topics.md's Payload sections); `Site`
-   cells in `09-interfaces.md`'s Produces and Consumes tables whose
-   path, once a trailing `:<line>` or `:<from>-<to>` is stripped,
-   fails `git ls-files --error-unmatch` or matches something other
-   than itself, so a directory and a wildcard are both findings
-   (skipped for a prescriptive chapter, whose sites are planned;
-   quarry runs the same test at import, so a site this pass rejects
-   is the one `quarry update --strict` refuses); and secret-shaped
+   `09-interfaces.md`, the edge findings below; and secret-shaped
    strings, reported by pattern name and never by the matched text,
    in every file, the index itself included. Every item counts toward the
    verdict: a missing heading is template drift, a missing stamp
    breaks the refresh, an unknown site is a dead edge, and a leaked
    credential must not ship; the repair for the first three is
    `map`, which regenerates the file against the current template.
+   - Edges, on `09-interfaces.md` only: the pass reads the
+     frontmatter `edges:` block, and falls back to the Produces and
+     Consumes tables on a page written before the block existed. Four
+     findings, none of them a judgment call. A row with no `site`
+     (`no site for <kind> <name>`, in the sites column): the chapter
+     cannot point at the code. A `site` whose path, once a trailing
+     `:<line>` or `:<from>-<to>` is stripped, fails
+     `git ls-files --error-unmatch` or matches something other than
+     itself, so a directory and a wildcard are both findings
+     (`site <cell>`; skipped for a prescriptive chapter, whose sites
+     are planned, and outside git; quarry runs the same test at
+     import, so a site this pass rejects is the one
+     `quarry update --strict` refuses). A row with no `### <Name>`
+     payload section (`### <Name>`, in the headings column), and a
+     section holding neither a field table nor a `Model:` line
+     (`payload ### <Name>`): `quarry check` has nothing to compare
+     either way. And a `schema` or `Model:` naming an entity this
+     docs area's `02-models.md` has no `### <Entity>` section for
+     (`model <Entity>`, in the headings column), which is a payload
+     reference pointing at nothing. The last three are checked
+     outside git and on a prescriptive chapter too: they are text the
+     page owes, not paths the tree has to hold. `to` and `from` are
+     never checked here - they are quarry's to resolve and the user's
+     to settle, and this pass never reads them.
    - Secret-shaped strings: every file the pass visits is grepped for
      the six shapes below, and so is every non-markdown file the docs
      area carries (inside git, every one it tracks). The skip list the
