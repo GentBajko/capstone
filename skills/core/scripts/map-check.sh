@@ -217,6 +217,42 @@ list_docs() {
   done
 }
 
+# list_non_md docs_dir: every non-markdown file under the docs area,
+# relative to it, NUL-delimited, skip list applied - the secret scan's
+# second pass. A .env.example or a compose excerpt beside the chapters
+# ships like any other file and the schema pass never opens it. Inside
+# git only tracked files count (an untracked scratch file is not
+# shipped); `git ls-files` is run with -C in the docs dir so a path
+# holding glob metacharacters is never read as a pathspec, and with -z
+# so git never C-quotes the name. Without -z a tracked name outside
+# plain ASCII comes back escaped (`uni-` plus an e-acute reads as the
+# literal `"uni-\303\251.env"`), the `[ -f ]` test below drops it
+# without a word, and a credential in a shipped file is never scanned;
+# -z covers the same for a name holding a quote, a backslash or a
+# newline. The output is NUL-delimited for the same reason: a newline
+# in a tracked name would otherwise split into two paths the caller
+# cannot open. Outside git the `find` fallback is newline-delimited, so
+# there a name holding one is dropped. `git ls-files` emits index
+# order, which is byte order already, so only the find branch is
+# sorted.
+list_non_md() {
+  local d="$1" p
+  {
+    if [ "$IN_GIT" -eq 1 ]; then
+      git -C "$d" ls-files -z 2>/dev/null
+    else
+      (cd "$d" 2>/dev/null && find . -type f | sed 's|^\./||' \
+        | LC_ALL=C sort | tr '\n' '\0')
+    fi
+  } | while IFS= read -r -d '' p; do
+    [ -n "$p" ] || continue
+    case "$p" in *.md) continue ;; esac
+    is_skipped "$p" && continue
+    [ -f "$d/$p" ] || continue
+    printf '%s\0' "$p"
+  done
+}
+
 # git helpers; every one runs from the repo root so :(top) globs and
 # plain relative globs both anchor there
 changed_since() {
@@ -495,6 +531,44 @@ resolve_index() {
   printf '%s\n' "$d/00-index.md"
 }
 
+# sweep_non_md docs_abs disp: part 8 over every non-markdown file the
+# docs area carries. The secrets column is the only one that can fire -
+# these files have no frontmatter, no required headings and no Site
+# cells - so the sweep runs even when the index is missing and the
+# markdown pass cannot. NUL-delimited end to end (see list_non_md), and
+# read through a process substitution so the loop stays in this shell
+# and its findings survive.
+sweep_non_md() {
+  local d="$1" disp="$2" rel shown
+  while IFS= read -r -d '' rel; do
+    [ -n "$rel" ] || continue
+    # a newline in the name would split the table row in half, so a
+    # name holding a control character is shown quoted, and a literal
+    # pipe - legal in a filename, fatal to a markdown cell - is
+    # backslash-escaped; the path the scan opens is the raw one
+    case $rel in
+      *[[:cntrl:]]*) shown=$(printf '%q' "$rel") ;;
+      *) shown=$rel ;;
+    esac
+    shown=${shown//|/\\|}
+    check_part8 "$d/$rel" "$disp/$shown" "" "" 0 "" 1
+  done < <(list_non_md "$d")
+}
+
+# print_part8 : the schema section, from whatever rows part 8 collected
+print_part8() {
+  echo
+  echo "## 8. Schema"
+  echo
+  if [ -n "$P8_ROWS" ]; then
+    echo "| file | missing keys | missing headings | unverifiable sites | secrets |"
+    echo "| --- | --- | --- | --- | --- |"
+    printf '%s' "$P8_ROWS"
+  else
+    echo "schema: clean"
+  fi
+}
+
 # run_dir docs_abs given: one report section for one docs area
 run_dir() {
   local d="$1" given="$2" disp idx files f rel fm globs chapter topic dfile
@@ -520,7 +594,12 @@ run_dir() {
     echo
     echo "no index at $disp/${idx#"$d"/}"
     FINDINGS=$((FINDINGS + 1)); IDX_FINDINGS=$((IDX_FINDINGS + 1))
+    # no index means no file list, so the markdown schema pass cannot
+    # run; the non-markdown sweep does not need one, and a credential
+    # in a shipped file is worth naming even while the index is gone
+    sweep_non_md "$d" "$disp"
     check_part7 "$d"
+    print_part8
     return 0
   fi
   files=$(list_docs "$d" "$idx")
@@ -541,6 +620,7 @@ run_dir() {
   # the index carries no stamps, headings or sites by design, but a
   # credential pasted into it ships like any other
   check_part8 "$idx" "$disp/${idx#"$d"/}" "" "" 0 "" 1
+  sweep_non_md "$d" "$disp"
   echo
   echo "## 1. Staleness"
   echo
@@ -552,16 +632,7 @@ run_dir() {
     echo "no stamped files with paths_covered"
   fi
   check_part7 "$d"
-  echo
-  echo "## 8. Schema"
-  echo
-  if [ -n "$P8_ROWS" ]; then
-    echo "| file | missing keys | missing headings | unverifiable sites | secrets |"
-    echo "| --- | --- | --- | --- | --- |"
-    printf '%s' "$P8_ROWS"
-  else
-    echo "schema: clean"
-  fi
+  print_part8
 }
 
 main() {

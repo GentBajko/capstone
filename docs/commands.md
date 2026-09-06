@@ -355,7 +355,9 @@ the `09-interfaces.md` chapter; `cross_repo` controls whether
 `groom`, `plan`, the `architecture` interview, and `map`'s interfaces
 pass consult the `quarry` CLI for cross-repo contracts (`auto` uses
 it only when the CLI is on PATH, and for `groom`/`plan` the docs area
-in play also has a `09-interfaces.md`). `workspaces` (project-scoped)
+in play also has a `09-interfaces.md`). `redact` lists env-var name
+patterns whose values never reach the docs; `07-operations.md` writes
+`<redacted>` for them. `workspaces` (project-scoped)
 names each monorepo workspace; the name doubles as its quarry target.
 
 **Cross-repo contracts.** With `cross_repo: "auto"` and quarry
@@ -435,11 +437,13 @@ it clones capstone at the pinned release tag and runs
 `skills/core/scripts/map-check.sh docs/capstone`, no API key, failing
 on the `MAP CHECK:` verdict line. Unfolded `changelog.d/` fragments
 are reported but never fail it, so a PR carrying its own ledger entry
-still passes. `templates/capstone-map-review.yml` is the model half:
-nightly and on `workflow_dispatch`, with an `ANTHROPIC_API_KEY`
-secret, failing on the `MAP REVIEW:` line and ignoring the script's.
-It writes a config with `non_interactive: true` so the headless run
-resolves every prompt to its default.
+still passes. The script's schema pass also fails the gate on a
+secret-shaped string in any generated file.
+`templates/capstone-map-review.yml` is the model half: nightly and on
+`workflow_dispatch`, with an `ANTHROPIC_API_KEY` secret, failing on
+the `MAP REVIEW:` line and ignoring the script's. It writes a config
+with `non_interactive: true` so the headless run resolves every
+prompt to its default.
 
 A repo registered in a quarry adds `quarry init` and `quarry check`
 to the same pull-request workflow; that gate reads the payload

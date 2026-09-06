@@ -335,7 +335,8 @@ user, shared by every project.
   "extract": ["logic", "uiux"],       // map's extraction passes; [] skips both
   "interfaces": "auto",               // "auto" | "off" - the 09-interfaces.md chapter
   "interfaces_frontmatter": false,    // mirror interface tables into frontmatter
-  "cross_repo": "auto"                // "auto" | "off" - quarry lookups in groom/plan/architecture/map
+  "cross_repo": "auto",               // "auto" | "off" - quarry lookups in groom/plan/architecture/map
+  "redact": ["*_SECRET", "*_TOKEN", "*_PASSWORD", "*_KEY"] // env-var names whose values the docs never quote
 }
 ```
 
@@ -353,6 +354,7 @@ user, shared by every project.
 | `interfaces` | `auto` or `off`: whether `map` writes the cross-repo `09-interfaces.md` chapter |
 | `interfaces_frontmatter` | Mirror the interface tables into frontmatter for machine consumers; off by default |
 | `cross_repo` | `auto` or `off`: whether `groom`, `plan`, the `architecture` interview, and `map`'s interfaces pass consult the `quarry` CLI; `map` takes edge names from the registry and writes the `known_as` aliases quarry resolves against |
+| `redact` | Env-var name patterns (`*` at either end) whose values `map` writes as `<redacted>` and never quotes; case-insensitive |
 
 Interviews, `features/`, and `review.md` stay local via a generated
 `.gitignore`. **The ledger - `changelog.md` and its `changelog.d/`
@@ -442,10 +444,12 @@ the pinned release tag and run over `docs/capstone`. For the model
 half (pointer drift, absorption, re-vetting, coverage) copy
 `templates/capstone-map-review.yml` too and add an
 `ANTHROPIC_API_KEY` secret; it runs nightly or on demand and fails on
-its own `MAP REVIEW:` line. A repo registered in a quarry pairs the
-same job with `quarry init` and `quarry check`, which reads the
-`### <Name>` payload sections in `09-interfaces.md` and fails the PR
-when a field one of its consumers reads is gone.
+its own `MAP REVIEW:` line. The script's schema pass also fails the
+gate on a secret-shaped string in any generated file. A repo
+registered in a quarry pairs the same job with `quarry init` and
+`quarry check`, which reads the `### <Name>` payload sections in
+`09-interfaces.md` and fails the PR when a field one of its consumers
+reads is gone.
 
 **Upgrading from 6.1:** replace your `capstone-map-check.yml` with
 the new template. The old one still runs the model on every PR and

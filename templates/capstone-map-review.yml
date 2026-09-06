@@ -43,7 +43,8 @@ jobs:
             "extract": ["logic", "uiux"],
             "interfaces": "auto",
             "interfaces_frontmatter": false,
-            "cross_repo": "auto"
+            "cross_repo": "auto",
+            "redact": ["*_SECRET", "*_TOKEN", "*_PASSWORD", "*_KEY"]
           }
           EOF
       - name: Map review

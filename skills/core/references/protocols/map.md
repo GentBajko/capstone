@@ -110,6 +110,9 @@ Do this in the main session with cheap reads only:
   3. The rules: read-only, modify nothing; facts only; a `file:line`
      pointer for every claim; no recommendations; return raw markdown
      matching the required sections, no preamble.
+  4. For the operations topic, the resolved config `redact` list
+     (project file over global), verbatim, so the deep-dive knows
+     which variables get `<redacted>` in the Default column.
 
 **Interfaces pass.** Whichever branch runs, the `interfaces` topic
 (when applicable) does two extra things. First, it fills the
@@ -462,6 +465,25 @@ own:
    breaks the refresh, an unknown site is a dead edge, and a leaked
    credential must not ship; the repair for the first three is
    `map`, which regenerates the file against the current template.
+   - Secret-shaped strings: every file the pass visits is grepped for
+     the six shapes below, and so is every non-markdown file the docs
+     area carries (inside git, every one it tracks). The skip list the
+     rest of the pass applies holds here too - `changelog*.md`,
+     `changelog.d/`, `*-interview.md`, `features/`, `review.md`,
+     `be-review.md`, `fe-review.md`, `capstone.json` and `.gitignore`
+     are never opened by either pass, so a credential parked in one of
+     them is not reported. A hit is reported as `secret: <name>`, never
+     the matched text, and counts toward the stale verdict. The repair
+     is to remove the value from the source the chapter quoted, add its
+     variable to the config `redact` list, and run `map`.
+     | Shape | Pattern |
+     | --- | --- |
+     | aws-access-key | `AKIA[0-9A-Z]{16}` |
+     | github-token | `gh[pousr]_[A-Za-z0-9]{36,}` |
+     | slack-token | `xox[abprs]-[A-Za-z0-9-]{10,}` |
+     | stripe-key | `sk_(live\|test)_[A-Za-z0-9]{16,}` |
+     | google-api-key | `AIza[0-9A-Za-z_-]{35}` |
+     | private-key | `-----BEGIN [A-Z ]*PRIVATE KEY-----` |
 
 The script ends with exactly one of
 

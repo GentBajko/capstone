@@ -148,14 +148,21 @@ Required sections:
 - `## Processes`: every runnable process: exact local command, container
   command, and what it depends on.
 - `## Configuration`: the environment variable inventory: name, default,
-  consuming code, documented where.
+  consuming code, documented where. A name matching a config `redact`
+  pattern (default `["*_SECRET", "*_TOKEN", "*_PASSWORD", "*_KEY"]`; `*`
+  matches any prefix or suffix, case-insensitive) gets `<redacted>` in the
+  Default column, and its value appears nowhere in the reference: not in
+  this chapter, not in an Infrastructure excerpt, not beside a `file:line`
+  pointer. Redact by name, whatever the value looks like; a placeholder
+  such as `changeme` is redacted too.
 - `## Infrastructure`: containers/services with images, ports,
   healthchecks, compose profiles, volumes.
 - `## Developer workflow`: exact commands for tests, type check,
   lint/format, and migrations.
 
 Checklist: commands verified against compose files/scripts/README, not
-guessed; every compose service listed with its profile.
+guessed; every compose service listed with its profile; no value of a
+`redact`-matched variable quoted anywhere in the chapter.
 
 ## glossary.md
 

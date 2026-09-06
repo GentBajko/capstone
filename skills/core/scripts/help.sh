@@ -62,7 +62,8 @@ Config: capstone.json in the agent's global folder (~/.claude; created
 at install): expertise 1-5 (vibe coder ... architect; how technical
 conversations are, asked once then saved), teaching_mode (true =
 narrate and teach while working), docs_dir, index_file,
-subagent_threshold, docs_in_git, language, cross_repo (auto = map,
+subagent_threshold, docs_in_git, language, redact (env-var name
+patterns whose values the docs never quote), cross_repo (auto = map,
 groom, plan and architecture consult quarry when it is on PATH).
 Per-project state and overrides live in an optional
 docs/capstone/capstone.json: pipeline, workspaces (each name doubles as

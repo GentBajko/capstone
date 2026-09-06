@@ -34,7 +34,8 @@ write this template yourself:
   "extract": ["logic", "uiux"],       // map's extraction passes: ["logic","uiux"] both | ["logic"] skip uiux | [] skip both
   "interfaces": "auto",               // "auto" = write 09-interfaces.md when the repo talks to another repo | "off" = never
   "interfaces_frontmatter": false,    // true = also mirror the interface tables into frontmatter, for machine consumers
-  "cross_repo": "auto"                // "auto" = groom/plan/architecture/map consult quarry when installed (groom/plan also need 09-interfaces.md) | "off" = never
+  "cross_repo": "auto",               // "auto" = groom/plan/architecture/map consult quarry when installed (groom/plan also need 09-interfaces.md) | "off" = never
+  "redact": ["*_SECRET", "*_TOKEN", "*_PASSWORD", "*_KEY"] // env-var name patterns whose values the docs never quote; * matches any prefix or suffix
 }
 ```
 
@@ -130,6 +131,18 @@ condition - a greenfield repo has no chapter yet, and writing the
 chapter is `map`'s job), so a machine without quarry behaves exactly
 as before with no configuration. `off` is the kill switch for someone
 who has quarry installed but does not want the calls.
+
+`redact` (list of env-var name patterns, default
+`["*_SECRET", "*_TOKEN", "*_PASSWORD", "*_KEY"]`): variables whose
+values never reach the docs. `*` stands for any run of characters at
+the start or the end of a name, so `*_KEY` covers `STRIPE_KEY` and
+`AWS_*` covers `AWS_SECRET_ACCESS_KEY`; matching is case-insensitive.
+A matching variable's Default column in `07-operations.md` reads
+`<redacted>`, and its value is quoted nowhere in the reference: not in
+a compose excerpt, not in the text around a `file:line` citation. A
+project that keeps secrets under other names extends the list in
+`docs/capstone/capstone.json`; the override replaces the list, so
+repeat the defaults you still want.
 
 ## `expertise` (1-5): calibrates every conversation, never the docs
 

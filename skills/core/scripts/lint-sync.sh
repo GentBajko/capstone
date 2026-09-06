@@ -164,7 +164,9 @@ grep -q 'init-config.sh --global' hooks/hooks.json || err "hooks.json SessionSta
 #    core.md and README
 for f in skills/core/scripts/init-config.sh \
          skills/core/references/core.md README.md; do
-  for k in expertise teaching_mode docs_dir index_file subagent_threshold docs_in_git language; do
+  for k in expertise teaching_mode docs_dir index_file subagent_threshold \
+           docs_in_git language non_interactive extract interfaces \
+           interfaces_frontmatter cross_repo redact; do
     grep -q "\"$k\"" "$f" || err "$f config template missing key $k"
   done
   for k in pipeline workspaces; do
@@ -177,18 +179,25 @@ for f in skills/core/references/core.md README.md; do
   done
 done
 
-# 7b. the cross_repo template comment is one string in the initializer
-#     and core.md (map joined the list of consulting protocols), and the
-#     known_as / To: unknown contract is spelled at every site quarry
-#     parses against
+# 7b. the cross_repo and redact template lines are one string each in the
+#     initializer and core.md, trailing comment included (map joined the
+#     list of consulting protocols; redact's comment defines what `*`
+#     matches), and the known_as / To: unknown contract is spelled at
+#     every site quarry parses against
 XREPO_INIT=$(grep '"cross_repo"' skills/core/scripts/init-config.sh | head -1)
 XREPO_CORE=$(grep '"cross_repo"' skills/core/references/core.md | head -1)
+REDACT_INIT=$(grep '"redact"' skills/core/scripts/init-config.sh | head -1)
+REDACT_CORE=$(grep '"redact"' skills/core/references/core.md | head -1)
 # both empty compares equal, so a template line that vanished from both
 # files would pass the byte compare; require each side to exist first.
 [ -n "$XREPO_INIT" ] || err "init-config.sh has no cross_repo template line"
 [ -n "$XREPO_CORE" ] || err "core.md has no cross_repo template line"
 [ "$XREPO_INIT" = "$XREPO_CORE" ] \
   || err "cross_repo template line differs between init-config.sh and core.md"
+[ -n "$REDACT_INIT" ] || err "init-config.sh has no redact template line"
+[ -n "$REDACT_CORE" ] || err "core.md has no redact template line"
+[ "$REDACT_INIT" = "$REDACT_CORE" ] \
+  || err "redact template line differs between init-config.sh and core.md"
 for f in skills/core/references/topics.md \
          skills/core/references/protocols/map.md \
          skills/core/references/core.md docs/commands.md README.md; do
@@ -224,6 +233,23 @@ for p in $PROTOS; do
 done
 tr '\n' ' ' < docs/commands.md | tr -s ' ' | grep -q 'workspace name' \
   || err "docs/commands.md does not say quarry is queried by workspace name"
+
+# 7d. redact's default list is spelled once. init-config.sh's and
+#     core.md's config templates and README's block carry it as a config
+#     line; topics.md's operations rule quotes the same list in prose, so
+#     a project reading only the topic rule redacts the same names map's
+#     config does; the review workflow's headless config repeats it.
+REDACT='"redact": \["\*_SECRET", "\*_TOKEN", "\*_PASSWORD", "\*_KEY"\]'
+for f in skills/core/scripts/init-config.sh skills/core/references/core.md README.md; do
+  grep -q "$REDACT" "$f" || err "$f redact default differs from the canonical list"
+done
+grep -q '\["\*_SECRET", "\*_TOKEN", "\*_PASSWORD", "\*_KEY"\]' \
+  skills/core/references/topics.md \
+  || err "topics.md operations rule does not quote the redact default"
+grep -q '<redacted>' skills/core/references/topics.md \
+  || err "topics.md operations rule lost the <redacted> marker"
+grep -q "$REDACT" templates/capstone-map-review.yml \
+  || err "templates/capstone-map-review.yml redact default differs from the canonical list"
 
 # 8. no .ps1 anywhere: the scripts are bash-only by design (see header).
 #    A returning twin means someone re-created the hand-mirroring that
@@ -926,10 +952,67 @@ mode: prescriptive' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$
   mc_iface_tight "$S/docs/capstone" '| http | miss | other | `src/main.rs:1` |'
   mc_run 'tight page, uncovered row' 1 'MAP CHECK: stale (1 findings)' "$S"
   mc_row '| docs/capstone/09-interfaces.md | - | ### miss | - | - |' 'tight page, uncovered row'
+  # the non-markdown sweep: a tracked .env.example beside the chapters
+  # is secret-scanned, an untracked one is not (it never ships), and a
+  # skipped path stays skipped whatever it holds
+  mc_iface_tight "$S/docs/capstone"
+  mc_run 'tight payload sections again' 0 'MAP CHECK: current' "$S"
+  printf -- 'AWS_ACCESS_KEY_ID=AKIA%s\n' "ABCDEFGHIJKLMNOP" > "$S/docs/capstone/scratch.env"
+  mc_run 'untracked non-markdown file' 0 'MAP CHECK: current' "$S"
+  mv "$S/docs/capstone/scratch.env" "$S/docs/capstone/.env.example"
+  git -C "$S" add docs/capstone/.env.example
+  mc_run 'tracked non-markdown file' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/.env.example | - | - | - | secret: aws-access-key |' 'tracked non-markdown file'
+  MC_NEEDLE=$(printf 'AKIA%s' "ABCDEFGHIJKLMNOP")
+  printf '%s\n' "$MC_OUT" | grep -qF "$MC_NEEDLE" && err "map-check.sh printed the matched secret"
+  git -C "$S" rm -q --cached docs/capstone/.env.example
+  rm "$S/docs/capstone/.env.example"
+  # a tracked name that is not plain ASCII. Plain `git ls-files` prints
+  # it C-quoted (`"uni-\303\251.env"`), no file of that name exists, and
+  # the sweep would drop a shipped credential without a word; the
+  # NUL-delimited read keeps the bytes. The name is built with printf so
+  # this file stays ASCII.
+  MC_UNI=$(printf 'uni-\303\251.env')
+  printf -- 'AWS_ACCESS_KEY_ID=AKIA%s\n' "ABCDEFGHIJKLMNOP" > "$S/docs/capstone/$MC_UNI"
+  git -C "$S" add "docs/capstone/$MC_UNI"
+  mc_run 'tracked non-ascii filename' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row "| docs/capstone/$MC_UNI | - | - | - | secret: aws-access-key |" 'tracked non-ascii filename'
+  git -C "$S" rm -q --cached "docs/capstone/$MC_UNI"
+  rm "$S/docs/capstone/$MC_UNI"
+  printf -- '{ "note": "AKIA%s" }\n' "ABCDEFGHIJKLMNOP" > "$S/docs/capstone/capstone.json"
+  git -C "$S" add docs/capstone/capstone.json
+  mc_run 'skipped non-markdown file' 0 'MAP CHECK: current' "$S"
+  git -C "$S" rm -q --cached docs/capstone/capstone.json
+  rm "$S/docs/capstone/capstone.json"
 else
   echo "note: map-check.sh git fixture skipped (no git)"
 fi
 rm -rf "$T"
+
+# 17. the secret-shape list is one list: map-check.sh's embedded table
+#     must equal the table map.md documents, name and pattern, in order.
+#     The gate greps with the script's copy and a reader repairs against
+#     map.md's, so a shape added to one and not the other is a shape the
+#     docs promise and the gate never looks for. The markdown cell
+#     escapes | as \|; that is stripped before comparing. The doc table
+#     is the |-prefixed lines between the `Secret-shaped strings` anchor
+#     and the next blank line, so the bullet and its table stay
+#     contiguous.
+LS_TAB=$(printf '\t')
+SCRIPT_PATTERNS=$(bash skills/core/scripts/map-check.sh --patterns 2>/dev/null)
+DOC_PATTERNS=$(sed -n '/Secret-shaped strings/,/^$/p' \
+    skills/core/references/protocols/map.md \
+  | sed -n "s/^ *| \([a-z-]*\) | \`\(.*\)\` |\$/\\1$LS_TAB\\2/p" \
+  | sed 's/\\|/|/g')
+[ -n "$SCRIPT_PATTERNS" ] || err "map-check.sh --patterns prints nothing"
+[ "$(printf '%s\n' "$SCRIPT_PATTERNS" | grep -c '.')" -eq 6 ] \
+  || err "map-check.sh --patterns does not print exactly six shapes"
+[ "$SCRIPT_PATTERNS" = "$DOC_PATTERNS" ] \
+  || err "secret-shape table differs between map-check.sh and map.md
+script:
+$SCRIPT_PATTERNS
+map.md:
+$DOC_PATTERNS"
 
 [ "$FAIL" -eq 0 ] && echo "lint-sync: all invariants hold" || echo "lint-sync: FAILURES above"
 exit $FAIL
