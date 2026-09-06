@@ -177,6 +177,34 @@ for f in skills/core/references/core.md README.md; do
   done
 done
 
+# 7b. the cross_repo template comment is one string in the initializer
+#     and core.md (map joined the list of consulting protocols), and the
+#     known_as / To: unknown contract is spelled at every site quarry
+#     parses against
+XREPO_INIT=$(grep '"cross_repo"' skills/core/scripts/init-config.sh | head -1)
+XREPO_CORE=$(grep '"cross_repo"' skills/core/references/core.md | head -1)
+# both empty compares equal, so a template line that vanished from both
+# files would pass the byte compare; require each side to exist first.
+[ -n "$XREPO_INIT" ] || err "init-config.sh has no cross_repo template line"
+[ -n "$XREPO_CORE" ] || err "core.md has no cross_repo template line"
+[ "$XREPO_INIT" = "$XREPO_CORE" ] \
+  || err "cross_repo template line differs between init-config.sh and core.md"
+for f in skills/core/references/topics.md \
+         skills/core/references/protocols/map.md \
+         skills/core/references/core.md docs/commands.md README.md; do
+  grep -q 'known_as' "$f" || err "$f does not mention the known_as frontmatter key"
+done
+grep -q 'quarry docs list --json' skills/core/references/protocols/map.md \
+  || err "map.md interfaces pass does not consult quarry docs list --json"
+grep -q 'write `unknown` in `To`' skills/core/references/topics.md \
+  || err "topics.md lost the To: unknown rule"
+# scoped to the prose paragraph: core.md's template comment (compared byte
+# for byte above) already carries "cross_repo" and "map" on one line, so an
+# unscoped grep would only restate that compare.
+sed -n '/^`cross_repo` (/,/^$/p' skills/core/references/core.md \
+  | grep -q '`map`' \
+  || err "core.md cross_repo paragraph does not name map"
+
 # 8. no .ps1 anywhere: the scripts are bash-only by design (see header).
 #    A returning twin means someone re-created the hand-mirroring that
 #    shipped silently-missing checks three times.

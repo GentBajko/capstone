@@ -41,7 +41,7 @@ if [ ! -f "$GLOBAL_FILE" ]; then
   "extract": ["logic", "uiux"],       // map's extraction passes: ["logic","uiux"] both | ["logic"] skip uiux | [] skip both
   "interfaces": "auto",               // "auto" = write 09-interfaces.md when the repo talks to another repo | "off" = never
   "interfaces_frontmatter": false,    // true = also mirror the interface tables into frontmatter, for machine consumers
-  "cross_repo": "auto"                // "auto" = groom/plan/architecture consult quarry when installed (groom/plan also need 09-interfaces.md) | "off" = never
+  "cross_repo": "auto"                // "auto" = groom/plan/architecture/map consult quarry when installed (groom/plan also need 09-interfaces.md) | "off" = never
 }
 EOF
   echo "created: $GLOBAL_FILE"

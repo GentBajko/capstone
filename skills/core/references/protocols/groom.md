@@ -90,8 +90,11 @@ recorded `§Q` decisions, without re-interviewing.
    the deps call returns, to read the contract fields each downstream
    repo actually depends on. When the feature touches an interface no
    declared edge covers, fall back to
-   `quarry docs search "<name>"`. Any condition unmet (config `off`,
-   no CLI, no chapter) → skip silently and groom exactly as before.
+   `quarry docs search "<name>"`. A deps row with `by_name: true` is
+   a possible consumer found by name only, not a declared edge: cite
+   it as a lead, and a `quarry docs section` refusal on such a row
+   is not an error. Any condition unmet (config `off`, no CLI, no
+   chapter) → skip silently and groom exactly as before.
    This lives here, in protocol text, deliberately - never as a
    harness hook, because capstone also runs on harnesses without
    hooks.

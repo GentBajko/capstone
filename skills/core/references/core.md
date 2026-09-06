@@ -34,7 +34,7 @@ write this template yourself:
   "extract": ["logic", "uiux"],       // map's extraction passes: ["logic","uiux"] both | ["logic"] skip uiux | [] skip both
   "interfaces": "auto",               // "auto" = write 09-interfaces.md when the repo talks to another repo | "off" = never
   "interfaces_frontmatter": false,    // true = also mirror the interface tables into frontmatter, for machine consumers
-  "cross_repo": "auto"                // "auto" = groom/plan/architecture consult quarry when installed (groom/plan also need 09-interfaces.md) | "off" = never
+  "cross_repo": "auto"                // "auto" = groom/plan/architecture/map consult quarry when installed (groom/plan also need 09-interfaces.md) | "off" = never
 }
 ```
 
@@ -109,15 +109,17 @@ the tables stay the canonical form, so leave this off unless
 something needs it - a mirror is one more thing to drift.
 
 `cross_repo` (`"auto" | "off"`, default `"auto"`): whether `groom`,
-`plan`, and the `architecture` interview consult the `quarry` CLI
-for cross-repo contracts (their protocols carry the exact calls).
-`auto` means: use it only when the CLI is on PATH **and**, for
-`groom` and `plan`, the repo has a `09-interfaces.md`
-(`architecture` drops that second condition - a greenfield repo has
-no chapter yet, and writing the prescriptive one is its job), so a
-machine without quarry behaves exactly as before with no
-configuration. `off` is the kill switch for someone who has quarry
-installed but does not want the calls.
+`plan`, the `architecture` interview, and `map`'s interfaces pass
+consult the `quarry` CLI (their protocols carry the exact calls: deps
+and section lookups for the first three, `quarry docs list --json`
+for `map`, which spells every `To`/`From` cell as a registered repo
+name or `known_as` alias). `auto` means: use it only when the CLI is
+on PATH **and**, for `groom` and `plan`, the repo has a
+`09-interfaces.md` (`architecture` and `map` drop that second
+condition - a greenfield repo has no chapter yet, and writing the
+chapter is `map`'s job), so a machine without quarry behaves exactly
+as before with no configuration. `off` is the kill switch for someone
+who has quarry installed but does not want the calls.
 
 ## `expertise` (1-5): calibrates every conversation, never the docs
 

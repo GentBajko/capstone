@@ -12,7 +12,9 @@ stamped files' frontmatter, `changelog.d/`, and `09-interfaces.md`'s
 `Site` cells; the model half also reads the ledger -
 `changelog.md`, its rotation files, and `changelog.d/` fragments
 (absorption drift) - and `05-dependencies.md` plus the manifests and
-lockfile (re-vetting). Nothing else unprompted.
+lockfile (re-vetting). When config `cross_repo` is `auto` and the
+`quarry` CLI is on PATH, Phase 2's interfaces pass also reads the
+output of `quarry docs list --json`. Nothing else unprompted.
 
 The descriptive reference for the current project: a lean
 `00-index.md` index and chapterized topic files in `<docs_dir>/`,
@@ -109,6 +111,24 @@ Do this in the main session with cheap reads only:
      pointer for every claim; no recommendations; return raw markdown
      matching the required sections, no preamble.
 
+**Interfaces pass.** Whichever branch runs, the `interfaces` topic
+(when applicable) does two extra things. First, it fills the
+chapter's `known_as` frontmatter from the deploy sources the
+operations topic reads - compose files, ingress and gateway
+manifests, Kubernetes manifests, service-discovery config - per
+`../topics.md`'s interfaces section. Second, when config `cross_repo`
+is `auto` (the default) and the `quarry` CLI is on PATH, run
+`quarry docs list --json` once in the main session and pass the rows'
+`name` and `known_as` values to the writer (in the subagent prompt
+above the threshold): every `To`/`From` cell that matches a
+registered `name` or `known_as` entry - case-insensitive, against the
+hostname, service name, or env-var value the client code holds - is
+written as that repo's `name`; a cell that matches nothing is written
+as the code spells it, never invented. No `09-interfaces.md` is
+required for this call, unlike `groom` and `plan`. Any condition
+unmet (config `off`, no CLI, the command fails) → skip silently and
+name repos as before.
+
 ## Phase 3 - compose
 
 1. Write each topic file **chapterized**: a numbered prefix in
@@ -143,7 +163,9 @@ paths_covered:
    `09-interfaces.md` carries one `### <Name>` payload section per
    Produces and Consumes row (topics.md's Payload sections); the
    producer's `quarry check` compares exactly those tables, so a row
-   without its section is a chapter that fails the schema pass.
+   without its section is a chapter that fails the schema pass. Its
+   frontmatter carries one more key, `known_as`, per `../topics.md`'s
+   interfaces section.
 
 2. Choose `paths_covered` globs deliberately; they drive the Refresh's
    staleness. Cover every directory the topic's content was derived
@@ -152,7 +174,9 @@ paths_covered:
    Some topics (architecture, conventions) are legitimately
    repo-wide. Anchor every glob at the repository root with the
    `:(top)` magic pathspec (e.g. `:(top)src/api/**`) so staleness
-   checks work from any cwd.
+   checks work from any cwd. `09-interfaces.md`'s globs also cover
+   the deploy sources its `known_as` was read from, so a renamed
+   service marks the chapter stale.
 3. Ensure the global config and the docs area's `.gitignore` exist by
    running the platform-appropriate initializer from the `core`
    skill's `scripts/` directory (idempotent, never overwrites

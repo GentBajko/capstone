@@ -76,6 +76,18 @@ the content hash is the stamp that survives squash and rebase merges,
 so an unreachable commit degrades to a per-file check instead of a
 full rebuild.
 
+`09-interfaces.md` also records what other systems call this repo: a
+`known_as` list in its frontmatter, read from the deploy config the
+operations chapter cites (compose service names, ingress hosts,
+Kubernetes manifests), so quarry can resolve a consumer's
+`From: records.internal` to this repo's folder. A Produces row whose
+consumers the code cannot show writes `unknown` in `To`; quarry keeps
+it as a publication and lists possible consumers by name. With
+`cross_repo: "auto"` and quarry on PATH, the interfaces pass runs
+`quarry docs list --json` once and spells every `To`/`From` cell as a
+registered name or alias when the code's hostname or service name
+matches one.
+
 **A refresh also fills gaps**, not just staleness: entry points no
 `logic/` scenario claims and surfaces no `uiux/screens/` chapter
 claims get extracted. Interview-derived files in either folder are
@@ -340,10 +352,10 @@ CI runs (approval gates still stop). `extract` picks which of `map`'s
 extraction passes run (`["logic"]` skips the expensive uiux pass;
 `[]` skips both). `interfaces` and `interfaces_frontmatter` control
 the `09-interfaces.md` chapter; `cross_repo` controls whether
-`groom`, `plan`, and the `architecture` interview consult the
-`quarry` CLI for cross-repo contracts (`auto` uses it only when the
-CLI is on PATH, and for `groom`/`plan` the repo also has a
-`09-interfaces.md`).
+`groom`, `plan`, the `architecture` interview, and `map`'s interfaces
+pass consult the `quarry` CLI for cross-repo contracts (`auto` uses
+it only when the CLI is on PATH, and for `groom`/`plan` the repo also
+has a `09-interfaces.md`).
 
 **Cross-repo contracts.** With `cross_repo: "auto"` and quarry
 installed, `groom` runs `quarry docs deps <repo> --downstream --json`
@@ -360,8 +372,11 @@ the quarry knows, and exits 1 when a field a consumer reads is gone
 or changed type. `quarry update` runs the same comparison as advisory
 notes. Both read the `### <Name>` sections `map` writes, which is why
 the chapter, and not `01-architecture.md`'s Communication section,
-holds the field table for a cross-repo channel. Without quarry,
-everything behaves exactly as before.
+holds the field table for a cross-repo channel. `map` runs
+`quarry docs list --json` while writing `09-interfaces.md` and takes
+each edge's repo name from the registry, so a consumer that knows the
+producer by a hostname still lands on the producer's folder. Without
+quarry, everything behaves exactly as before.
 
 **Interview lifecycle.** `interviewing` → `awaiting-formalization` →
 `formalized`. The final state is written only *after* outputs are on

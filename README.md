@@ -148,7 +148,7 @@ observed business logic scenario by scenario:
 06-testing.md        layout, test doubles, coverage shape
 07-operations.md     how to run it, env vars, infra, deploy
 08-glossary.md       the domain words your codebase invented
-09-interfaces.md     what this repo publishes for and consumes from other repos
+09-interfaces.md     cross-repo edges both ways, and the names it goes by
 ```
 
 Everything is facts with `file:line` citations, never advice. Every
@@ -335,7 +335,7 @@ user, shared by every project.
   "extract": ["logic", "uiux"],       // map's extraction passes; [] skips both
   "interfaces": "auto",               // "auto" | "off" - the 09-interfaces.md chapter
   "interfaces_frontmatter": false,    // mirror interface tables into frontmatter
-  "cross_repo": "auto"                // "auto" | "off" - quarry lookups in groom/plan/architecture
+  "cross_repo": "auto"                // "auto" | "off" - quarry lookups in groom/plan/architecture/map
 }
 ```
 
@@ -352,7 +352,7 @@ user, shared by every project.
 | `extract` | Which `map` extraction passes run: `["logic", "uiux"]`, `["logic"]`, or `[]` |
 | `interfaces` | `auto` or `off`: whether `map` writes the cross-repo `09-interfaces.md` chapter |
 | `interfaces_frontmatter` | Mirror the interface tables into frontmatter for machine consumers; off by default |
-| `cross_repo` | `auto` or `off`: whether `groom`, `plan`, and the `architecture` interview consult the `quarry` CLI for cross-repo contracts |
+| `cross_repo` | `auto` or `off`: whether `groom`, `plan`, the `architecture` interview, and `map`'s interfaces pass consult the `quarry` CLI; `map` takes edge names from the registry and writes the `known_as` aliases quarry resolves against |
 
 Interviews, `features/`, and `review.md` stay local via a generated
 `.gitignore`. **The ledger - `changelog.md` and its `changelog.d/`

@@ -204,9 +204,15 @@ Required sections:
   when the docs are gathered side by side (a quarry docs repo), or as
   the plain repo name when they are not - readers strip link syntax
   before matching, so both forms index identically, and a dead link
-  helps nobody. `Site` is the backticked `` `path:line` `` of the
-  publish site. Below the table, one `### <Name>` section per row,
-  heading text equal to the row's `Name` cell verbatim
+  helps nobody. When the code publishes something whose consumers it
+  cannot show - a broadcast event, a public topic, an endpoint with no
+  client in any sibling repo - write `unknown` in `To` rather than
+  guessing a repo or dropping the row. Quarry keeps that row as a
+  publication with no edge and lists possible consumers by name; an
+  invented repo name becomes a missing edge nobody can trace back.
+  `Site` is the backticked `` `path:line` `` of the publish site.
+  Below the table, one `### <Name>` section per row, heading text
+  equal to the row's `Name` cell verbatim
   (`### GET /records`, `### file-ingest`), holding the payload this
   repo emits on that contract as a table with columns `Field`,
   `Type`, `Required` (a `Notes` column is optional): one row per
@@ -226,15 +232,37 @@ Required sections:
   the consumer anyway, and the contract check compares tables, not
   pointers.
 
+The chapter's frontmatter carries one key beyond the stamps and
+the optional mirror, `known_as`: a YAML list of every name other
+systems reach this repo by, read from the same sources the
+operations chapter's Infrastructure and Configuration sections
+cite - compose service names, ingress and gateway hosts,
+Kubernetes Service and Deployment names, service-discovery
+registrations, the hostname a client's env var would hold. Each
+entry verbatim as the deploy config spells it, deduplicated, the
+repo's own name left out; `known_as: []` when the sources name
+nothing, so an empty list is a recorded observation rather than an
+omission. Quarry resolves a `To`/`From` cell against every
+registered repo's `known_as` before marking the edge missing,
+which is what lets a consumer that knows this repo as
+`records.internal` land on the same edge.
+
+```yaml
+known_as: [records.internal, records-service, records-svc]
+```
+
 Format rules the index depends on: columns are matched by header
 name, not position; cells are read after stripping backticks and
 link syntax; tables count only on a page named `09-interfaces.md`
 and never inside a fenced code block, so a chapter documenting the
 format declares nothing. `kind`, `name`, and `to`/`from` are
 required per row; a repo name is the last path segment of that
-repo's origin URL. Either side of an edge may declare it; when both
-do and disagree, the disagreement stays visible in each repo's own
-chapter rather than being merged away.
+repo's origin URL, or one of the names that repo lists under
+`known_as`; `map`'s interfaces pass (`protocols/map.md`, Phase 2)
+takes the registered spelling from quarry when it is installed.
+Either side of an edge may declare it; when both do and disagree,
+the disagreement stays visible in each repo's own chapter rather
+than being merged away.
 
 **Payload sections.** `quarry check`, run in the producer's CI, pairs
 each Produces section here with the Consumes section of the same
@@ -253,6 +281,7 @@ When config `interfaces_frontmatter` is `true`, mirror the tables
 into frontmatter lists too (same required fields, lowercase `kind`):
 
 ```yaml
+known_as: [records.internal]
 produces:
   - kind: sqs
     name: file-ingest
@@ -265,6 +294,9 @@ consumes:
     site: src/clients/customers.py:12
 ```
 
+`known_as` is written whether or not the mirror is on; it is
+frontmatter, not a table.
+
 Checklist: every publish and client site found by reading the code
 (route registrations, queue publishers/subscribers, generated
 clients, webhook senders), not guessed from config names; every row's
@@ -275,7 +307,9 @@ internal calls between this repo's own modules excluded - the chapter
 is cross-repo edges only; kinds lowercase; no row missing `kind`,
 `name`, or `to`/`from`; every Produces and Consumes row has its
 `### <Name>` payload section with `Field`, `Type`, `Required`
-columns, read from the code at the row's `Site`.
+columns, read from the code at the row's `Site`; `known_as` copied
+from the deploy config, never invented; `To` reads `unknown` only
+when the code shows no consumer, never as a default.
 
 ## testing.md
 
