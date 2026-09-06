@@ -475,7 +475,20 @@ own:
    so they never count toward the verdict - a doc-carrying PR must
    not fail a freshness gate for carrying its own ledger entry.
 - Part 8, schema: a mechanical pass over every generated file, grep
-   only, no judgment. Four columns per file: missing frontmatter keys
+   only, no judgment. The definition it runs against is
+   `../schema.txt`, one record per output type naming the frontmatter
+   keys that type owes, its `## ` headings in order, and the columns
+   its tables carry; the script reads that file at runtime and holds no
+   copy of it, and `lint-sync` checks 15, 20 and 21 keep it equal to
+   `../topics.md` and to the protocols that write `logic/`, `mockup/`
+   and `uiux/`. Every file the index reaches is checked against its
+   record, so a scenario file and a screen chapter are held to their
+   section lists the way a chapter is. A schema that cannot be read
+   costs the headings and the tables and nothing else: the run prints
+   `schema: <path> unreadable; headings and tables not checked`, holds
+   every page to `generated_date`, and reaches the same verdict line
+   with the same exit code. Four columns per file: missing frontmatter
+   keys
    (`generated_date` everywhere; inside git also `generated_at_commit`
    and `content_hash` for stamped files and `paths_covered` for
    chapters; prescriptive and interview-derived files are held to
@@ -487,10 +500,17 @@ own:
    that page and says so only on `docs index --force`;
    `capstone_version` absent is part 1's older-capstone
    verdict, not re-reported here); missing required `## ` headings
-   per `../topics.md` (a section may be satisfied by "None found"
-   text, but the heading itself must exist; the list is embedded in
-   the script and lint-sync keeps it equal to `../topics.md`); on
-   `09-interfaces.md`, the edge findings below; and secret-shaped
+   per the record's `head` list, which `../topics.md` and the owning
+   protocol spell in prose (a section may be satisfied by "None found"
+   text, but the heading itself must exist), reported as
+   `## <Heading>`; a heading that sits ahead of one the record puts
+   before it, `## <Heading> out of order (before ## <Previous>)`, since
+   a template read out of order is drift a reader meets before the
+   content does; a table under a required heading whose header row
+   lacks a column the record names,
+   `table <Heading> missing <Column>`, matched by lowercased header
+   name rather than position, with a section carrying no table at all
+   left alone; on `09-interfaces.md`, the edge findings below; and secret-shaped
    strings, reported by pattern name and never by the matched text,
    in every file, the index itself included. Every item counts toward the
    verdict: a missing heading is template drift, a missing stamp

@@ -18,6 +18,14 @@ after any surface change; CI runs it on every push:
 bash skills/core/scripts/lint-sync.sh
 ```
 
+## The output schema
+
+`skills/core/references/schema.txt` is the machine-readable form of the
+format rules `references/topics.md` and the protocol files teach.
+`map-check.sh` reads it at runtime. Change the schema and the prose in
+the same commit: checks 15, 20 and 21 fail when a heading, a column or a
+required key reads one way in the prose and another in the schema.
+
 ## Releasing
 
 Bump the version in all six manifests (check 2), then in

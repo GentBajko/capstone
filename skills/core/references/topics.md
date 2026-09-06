@@ -16,6 +16,13 @@ exact headings shown here. A deep-dive (inline or subagent) must return
 content for every required section; write "None found" plus where you
 looked rather than omitting a section.
 
+The machine-readable form of everything below lives in
+`schema.txt` beside this file: one record per output type, with the
+frontmatter keys it owes, its `## ` headings in order, and the columns
+its tables carry. `scripts/map-check.sh` reads that file and no copy of
+it, and `lint-sync` checks 15 and 20 fail when the two stop agreeing, so
+a heading renamed here without being renamed there turns the lint red.
+
 ## architecture.md
 
 **Applicable:** always.

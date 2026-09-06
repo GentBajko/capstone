@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # The script half of `map check` (protocols/map.md, "check"): parts 1
 # (staleness), 7 (unfolded changelog.d/ fragments, informational) and 8
-# (schema: frontmatter keys, required headings, the interfaces
-# chapter's edge rows - site present, site tracked, payload section
-# present and non-empty, schema resolving to a 02-models.md entity -
-# and secret-shaped strings). Prints the same tables the protocol
+# (schema: frontmatter keys, required headings in their required order,
+# table columns, the interfaces chapter's edge rows - site present,
+# site tracked, payload section present and non-empty, schema resolving
+# to a 02-models.md entity - and secret-shaped strings). What each kind
+# of file owes comes from ../references/schema.txt, one record per
+# output type, read at runtime. Prints the same tables the protocol
 # describes and ends with
 # exactly one verdict line, `MAP CHECK: current` or
 # `MAP CHECK: stale (<N> findings)`, which templates/capstone-map-check.yml
@@ -22,28 +24,39 @@
 # checkout with autocrlf) are read as LF: a trailing \r is dropped from
 # frontmatter, headings and table rows before comparison.
 # Usage: map-check.sh [docs_dir ...]   (default docs/capstone)
-#        map-check.sh --headings | --patterns | -h
+#        map-check.sh --headings | --patterns | --schema | -h
 set -u
 
 PLUGIN_ROOT="$(cd "$(dirname "$0")/../../.." 2>/dev/null && pwd -P)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd -P)"
 # /nonexistent when HOME is unset (a bare container, a cron job): under
 # set -u a bare $HOME would abort the run before the verdict line.
 GLOBAL_DIR="${CAPSTONE_GLOBAL_DIR:-${CLAUDE_CONFIG_DIR:-${HOME:-/nonexistent}/.claude}}"
 
 TOPICS='architecture models conventions data-flow dependencies testing operations glossary interfaces'
 
-# Required `## ` headings per topic, from references/topics.md. lint-sync
-# check 15 regenerates this list from topics.md's `- `## ...`` bullets
-# and fails when the two differ; edit topics.md first, then mirror it.
-HEADINGS='architecture: Layers|Module boundaries|Entry points|Communication|Composition|Frontend
-models: Entities|Fields and types|Relationships|Boundaries|Validation|Schema
-conventions: Paradigm|Typing|Error handling|Dependency injection
-data-flow: Lifecycles|State|Side-effect boundaries|Failure paths
-dependencies: Dev and tooling|External services
-testing: Layout|Doubles|Coverage shape
-operations: Processes|Configuration|Infrastructure|Developer workflow
-glossary: Concepts
-interfaces: Produces|Consumes'
+# references/schema.txt is the definition of every output shape this
+# pass checks: which frontmatter keys a file owes, which `## ` headings
+# it carries and in which order, and which columns its tables need. It
+# is read here rather than copied in, so the rule lives in the schema
+# and in the prose beside it (references/topics.md and the protocol
+# files) and nowhere else; lint-sync checks 15, 20 and 21 assert the
+# two agree. Resolved from this script's own directory, the same way
+# PLUGIN_ROOT above finds the plugin manifest. A schema that has moved
+# or cannot be read costs the headings, tables and key lists and
+# nothing else: the run says so on its header line, checks every file
+# for `generated_date`, keeps the edge and secret passes, and reaches
+# the same verdict line with the same exit code. A gate that dies
+# because a reference file moved is worse than one that names what it
+# skipped.
+SCHEMA_DIR="$(cd "$SCRIPT_DIR/../references" 2>/dev/null && pwd -P)"
+SCHEMA_FILE="${SCHEMA_DIR:-$SCRIPT_DIR/../references}/schema.txt"
+SCHEMA_TEXT=""
+SCHEMA_OK=0
+if [ -f "$SCHEMA_FILE" ] && [ -r "$SCHEMA_FILE" ]; then
+  SCHEMA_TEXT=$(cat "$SCHEMA_FILE" 2>/dev/null) && SCHEMA_OK=1
+fi
+SCHEMA_MATCHES=""
 
 # Secret-shaped strings (brief P8), `name=ERE` per line. Spelled
 # identically in quarry's src/secrets.rs; `--patterns` prints them for
@@ -61,8 +74,6 @@ private-key=-----BEGIN [A-Z ]*PRIVATE KEY-----'
 # as absent.
 EMPTY_HASH='e69de29bb2d1'
 
-# a literal carriage return, for CRLF-tolerant fixed-string greps
-CR=$(printf '\r')
 # the field separator of every parsed-row helper below. Not a tab: a
 # tab is IFS whitespace, so `read` would collapse two of them into one
 # and shift every field after an empty one - exactly the case a row
@@ -85,15 +96,88 @@ is_skipped() {
 usage() {
   cat <<'EOF'
 map-check.sh [docs_dir ...]     run parts 1, 7, 8 over each docs area (default: docs/capstone)
-map-check.sh --headings         print the embedded required-headings list, one topic per line
+map-check.sh --headings         print the schema's required-headings list, one topic per line
 map-check.sh --patterns         print the embedded secret patterns, name<TAB>regex per line
+map-check.sh --schema           print the resolved schema path and its record count
 map-check.sh -h | --help        usage
 EOF
 }
 
 die_usage() { echo "map-check: $*" >&2; usage >&2; exit 2; }
 
-print_headings() { printf '%s\n' "$HEADINGS"; }
+# One schema line is `<field><space><value>`, with the value running to
+# the end of the line so a heading list may hold spaces, `&` and `|`.
+# A line whose first character is `#` is a comment and a blank line ends
+# a record. These three readers are the only place the format is parsed.
+
+# schema_types: every `type` id, in file order
+schema_types() {
+  printf '%s\n' "$SCHEMA_TEXT" | awk '
+    { sub(/\r$/, ""); line = $0 }
+    line ~ /^#/ { next }
+    { key = line; sub(/[ \t].*$/, "", key)
+      val = line; sub(/^[^ \t]*[ \t]*/, "", val); sub(/[ \t]+$/, "", val) }
+    key == "type" && val != "" { print val }'
+}
+
+# schema_pairs: `<type><SEP><glob>` per `match` line, in file order
+schema_pairs() {
+  printf '%s\n' "$SCHEMA_TEXT" | awk -v S="$SEP" '
+    { sub(/\r$/, ""); line = $0 }
+    line ~ /^#/ { next }
+    { key = line; sub(/[ \t].*$/, "", key)
+      val = line; sub(/^[^ \t]*[ \t]*/, "", val); sub(/[ \t]+$/, "", val) }
+    key == "type" { t = val; next }
+    key == "match" && t != "" && val != "" { print t S val }'
+}
+
+# schema_field type field: that record's values for that field, one per
+# line, in the order the record spells them
+schema_field() {
+  printf '%s\n' "$SCHEMA_TEXT" | awk -v want="$1" -v f="$2" '
+    { sub(/\r$/, ""); line = $0 }
+    line ~ /^#/ { next }
+    { key = line; sub(/[ \t].*$/, "", key)
+      val = line; sub(/^[^ \t]*[ \t]*/, "", val); sub(/[ \t]+$/, "", val) }
+    key == "type" { inr = (val == want); next }
+    inr && key == f && val != "" { print val }'
+}
+
+# schema_type_for relpath: the first record whose glob fits the path,
+# empty when none does. The glob is unquoted on purpose - that is what
+# makes `case` read it as a pattern.
+schema_type_for() {
+  local rel="$1" t g
+  [ "$SCHEMA_OK" -eq 1 ] || return 0
+  while IFS="$SEP" read -r t g; do
+    [ -n "$t" ] && [ -n "$g" ] || continue
+    case "$rel" in $g) printf '%s\n' "$t"; return 0 ;; esac
+  done <<< "$SCHEMA_MATCHES"
+  return 0
+}
+
+print_headings() {
+  local t h
+  if [ "$SCHEMA_OK" -eq 0 ]; then
+    echo "schema: $SCHEMA_FILE unreadable; no headings to print" >&2
+    return 0
+  fi
+  for t in $TOPICS; do
+    h=$(schema_field "chapter-$t" head | head -1)
+    [ -n "$h" ] || continue
+    printf '%s: %s\n' "$t" "$h"
+  done
+}
+
+print_schema() {
+  local n
+  if [ "$SCHEMA_OK" -eq 0 ]; then
+    printf 'schema: %s unreadable\nrecords: 0\n' "$SCHEMA_FILE"
+    return 0
+  fi
+  n=$(schema_types | grep -c .)
+  printf 'schema: %s\nrecords: %s\n' "$SCHEMA_FILE" "$n"
+}
 
 print_patterns() {
   printf '%s\n' "$SECRET_PATTERNS" | awk -F= '{print $1 "\t" substr($0, length($1)+2)}'
@@ -382,19 +466,121 @@ model_known() {
   return 1
 }
 
-# topic_of basename: NN-<topic>.md or NN-<topic>-<part>.md at the docs root
-topic_of() {
-  local stem t
-  case "$1" in [0-9][0-9]-*.md) ;; *) return 0 ;; esac
-  stem=${1#[0-9][0-9]-}; stem=${stem%.md}
-  for t in $TOPICS; do
-    if [ "$stem" = "$t" ]; then printf '%s\n' "$t"; return 0; fi
-    case "$stem" in "$t"-*) printf '%s\n' "$t"; return 0 ;; esac
-  done
+# head_findings file heads: one finding per required `## ` heading the
+# file does not carry (`## <H>`) and per heading that sits ahead of one
+# the schema puts before it
+# (`## <H> out of order (before ## <Prev>)`), in schema order. Extra
+# headings are never a finding. Only two hashes followed by a space or a
+# tab open a heading here, so a `### ` payload section never satisfies a
+# chapter section; fenced blocks are skipped, so a chapter documenting
+# the template satisfies nothing by quoting it. A trailing \r and
+# surrounding whitespace come off before comparing, the way every other
+# reader in this file treats a CRLF checkout.
+head_findings() {
+  awk -v req="$2" '
+    BEGIN { n = split(req, R, "|") }
+    { sub(/\r$/, "") }
+    /^[ \t]*(```|~~~)/ { fence = !fence; next }
+    fence { next }
+    /^##[ \t]/ {
+      s = substr($0, 3); gsub(/^[ \t]+|[ \t]+$/, "", s); gsub(/[ \t]+/, " ", s)
+      if (s != "" && !(s in pos)) { seq++; pos[s] = seq }
+      next }
+    END {
+      prev = ""; prevpos = 0
+      for (i = 1; i <= n; i++) {
+        h = R[i]
+        if (h == "") continue
+        if (!(h in pos)) { print "## " h; continue }
+        if (prevpos > 0 && pos[h] < prevpos)
+          print "## " h " out of order (before ## " prev ")"
+        prev = h; prevpos = pos[h]
+      }
+    }' "$1"
 }
 
-required_headings() {
-  printf '%s\n' "$HEADINGS" | sed -n "s/^$1: //p"
+# table_finding file heading columns: the columns the first table under
+# `## <heading>` does not carry. Columns are matched by lowercased
+# header name, never by position, and a column the schema does not name
+# is free. A heading the file does not carry produces nothing here -
+# head_findings already reported it, and one gap is one finding. A
+# heading with no table under it produces nothing either: references/
+# topics.md tells a deep-dive to write "None found" plus where it
+# looked rather than omit a section, so an empty Produces or Consumes
+# is the sanctioned answer and not a defect.
+table_finding() {
+  awk -v want="$2" -v cols="$3" '
+    function norm(v) {
+      gsub(/`/, "", v); gsub(/\001/, "|", v)
+      gsub(/^[ \t]+|[ \t]+$/, "", v); gsub(/[ \t]+/, " ", v); return v }
+    BEGIN { nc = split(cols, C, "|") }
+    { sub(/\r$/, "") }
+    /^[ \t]*(```|~~~)/ { fence = !fence; next }
+    fence { next }
+    /^##[ \t]/ {
+      s = norm(substr($0, 3))
+      if (inw) { inw = 0; done = 1 }
+      if (!done && s == want) { inw = 1; found = 1 }
+      next }
+    !inw { next }
+    /^[ \t]*\|/ {
+      if (hdr) next
+      line = $0; gsub(/\\[|]/, "\001", line)
+      if (line ~ /^[| \t:-]+$/) next
+      hdr = 1
+      n = split(line, h, "|")
+      for (i = 1; i <= n; i++) { x = norm(h[i]); if (x != "") seen[tolower(x)] = 1 }
+      next }
+    END {
+      if (!found || !hdr) exit 0
+      for (i = 1; i <= nc; i++)
+        if (C[i] != "" && !(tolower(C[i]) in seen)) print "table " want " missing " C[i]
+    }' "$1"
+}
+
+# subtable_finding file heading level columns: the same column test
+# applied to every heading at <level> under `## <heading>`, which is the
+# shape `head` cannot express - the models chapter's one `### <Entity>`
+# section per entity, each holding its own field table. The finding
+# names the sub-heading, so a reader is sent to the section rather than
+# the chapter.
+subtable_finding() {
+  awk -v want="$2" -v lvl="$3" -v cols="$4" '
+    function norm(v) {
+      gsub(/`/, "", v); gsub(/\001/, "|", v)
+      gsub(/^[ \t]+|[ \t]+$/, "", v); gsub(/[ \t]+/, " ", v); return v }
+    function hlevel(   n) { n = 0; while (substr($0, n + 1, 1) == "#") n++; return n }
+    function flush(   i) {
+      if (sh != "")
+        for (i = 1; i <= nc; i++)
+          if (C[i] != "" && !(tolower(C[i]) in seen)) print "table " sh " missing " C[i]
+      sh = ""; hdr = 0; split("", seen)
+    }
+    BEGIN { nc = split(cols, C, "|") }
+    { sub(/\r$/, "") }
+    /^[ \t]*(```|~~~)/ { fence = !fence; next }
+    fence { next }
+    /^#+[ \t]/ {
+      L = hlevel()
+      if (L <= lvl) flush()
+      if (L == 2) {
+        s = norm(substr($0, 3))
+        if (inw) { inw = 0; done = 1 }
+        if (!done && s == want) inw = 1
+        next }
+      if (inw && L == lvl) sh = norm(substr($0, lvl + 1))
+      next }
+    !inw { next }
+    sh == "" { next }
+    /^[ \t]*\|/ {
+      if (hdr) next
+      line = $0; gsub(/\\[|]/, "\001", line)
+      if (line ~ /^[| \t:-]+$/) next
+      hdr = 1
+      n = split(line, h, "|")
+      for (i = 1; i <= n; i++) { x = norm(h[i]); if (x != "") seen[tolower(x)] = 1 }
+      next }
+    END { flush() }' "$1"
 }
 
 # list_docs docs_dir index: the files to check, absolute, one per line -
@@ -631,42 +817,99 @@ check_part1() {
 "
 }
 
-# check_part8 file disp fm globs is_chapter topic secrets_only: one
-# schema row when the file has at least one item; each item is a finding
+# check_part8 file disp fm globs record secrets_only: one schema row
+# when the file has at least one item; each item is a finding. `record`
+# is the schema type the path resolved to, empty for a file no record
+# claims and for the non-markdown sweep.
 check_part8() {
-  local f="$1" disp="$2" fm="$3" globs="$4" chapter="$5" topic="$6" only_secrets="$7"
-  local keys="" heads="" sites="" secrets="" mode h cell p line name re seen k base items=0
+  local f="$1" disp="$2" fm="$3" globs="$4" record="$5" only_secrets="$6"
+  local keys="" heads="" sites="" secrets="" mode cell p line name re seen k base items=0
   local rows="" models="" rowsites="" edir ekind ename esite eschema pname pform pmodel
+  local hl opts spec col lvl
   mode=$(fm_value "$fm" mode)
   base=$(basename "$f")
   if [ "$only_secrets" -eq 0 ]; then
-    if [ -z "$(fm_value "$fm" generated_date)" ]; then keys="generated_date"; items=$((items + 1)); fi
-    if [ "$IN_GIT" -eq 1 ] && [ "$mode" != prescriptive ] && { [ "$chapter" -eq 1 ] || [ -n "$globs" ]; }; then
-      for k in generated_at_commit content_hash; do
-        if [ -z "$(fm_value "$fm" "$k")" ]; then keys="${keys:+$keys, }$k"; items=$((items + 1)); fi
-      done
-      if [ "$chapter" -eq 1 ] && [ -z "$globs" ]; then keys="${keys:+$keys, }paths_covered"; items=$((items + 1)); fi
+    # keys!: owed on every page, inside git or out, prescriptive or not.
+    # `known_as` is spelled in the schema like any other key and read
+    # here by the rule topics.md sets for it: quarry registers no alias
+    # at all when the value is a scalar, and says so only on `docs index
+    # --force`, so this is the one gate that catches either shape.
+    # Without a readable schema every page still owes its date.
+    if [ "$SCHEMA_OK" -eq 1 ]; then
+      hl=$(schema_field "$record" 'keys!' | tr ' ' '\n')
+    elif [ "$record" = index ]; then
+      hl=""
+    else
+      hl="generated_date"
     fi
-    if [ "$chapter" -eq 1 ]; then
-      # fixed-string, whole-line: heading text may hold regex metacharacters;
-      # the second pattern accepts a CRLF line ending
-      while IFS= read -r h; do
-        [ -n "$h" ] || continue
-        if ! grep -qFx -e "## $h" -e "## $h$CR" "$f"; then heads="${heads:+$heads, }## $h"; items=$((items + 1)); fi
-      done <<< "$(required_headings "$topic" | tr '|' '\n')"
+    while IFS= read -r k; do
+      [ -n "$k" ] || continue
+      case "$k" in
+        known_as)
+          case "$(known_as_form "$fm")" in
+            missing) keys="${keys:+$keys, }known_as"; items=$((items + 1)) ;;
+            scalar) keys="${keys:+$keys, }known_as not a list"; items=$((items + 1)) ;;
+          esac ;;
+        *)
+          if [ -z "$(fm_value "$fm" "$k")" ]; then
+            keys="${keys:+$keys, }$k"; items=$((items + 1))
+          fi ;;
+      esac
+    done <<< "$hl"
+    # keys: the stamps only git can produce. A prescriptive page owes
+    # none of them - it describes code that does not exist yet - and
+    # outside git there is nothing to stamp against. `opt` waives its
+    # keys on a page carrying no globs, which is how an interview's
+    # output and the same file written by extraction are told apart.
+    if [ "$SCHEMA_OK" -eq 1 ] && [ "$IN_GIT" -eq 1 ] && [ "$mode" != prescriptive ]; then
+      opts=" $(schema_field "$record" opt | tr '\n' ' ') "
+      while IFS= read -r k; do
+        [ -n "$k" ] || continue
+        if [ -z "$globs" ]; then
+          case "$opts" in *" $k "*) continue ;; esac
+        fi
+        # paths_covered is read as a list, so its presence is whether
+        # this run found any glob rather than whether a scalar follows
+        # the colon
+        if [ "$k" = paths_covered ]; then
+          [ -n "$globs" ] && continue
+        elif [ -n "$(fm_value "$fm" "$k")" ]; then
+          continue
+        fi
+        keys="${keys:+$keys, }$k"; items=$((items + 1))
+      done <<< "$(schema_field "$record" keys | tr ' ' '\n')"
+    fi
+    if [ "$SCHEMA_OK" -eq 1 ] && [ -n "$record" ]; then
+      hl=$(schema_field "$record" head | head -1)
+      if [ -n "$hl" ]; then
+        while IFS= read -r line; do
+          [ -n "$line" ] || continue
+          heads="${heads:+$heads, }$line"; items=$((items + 1))
+        done <<< "$(head_findings "$f" "$hl")"
+      fi
+      while IFS= read -r spec; do
+        [ -n "$spec" ] || continue
+        col=${spec#*:}; name=${spec%%:*}
+        [ -n "$col" ] && [ "$col" != "$spec" ] || continue
+        while IFS= read -r line; do
+          [ -n "$line" ] || continue
+          heads="${heads:+$heads, }$line"; items=$((items + 1))
+        done <<< "$(table_finding "$f" "$name" "$col")"
+      done <<< "$(schema_field "$record" table)"
+      while IFS= read -r spec; do
+        [ -n "$spec" ] || continue
+        name=${spec%%:*}; spec=${spec#*:}
+        lvl=${spec%%:*}; col=${spec#*:}
+        [ -n "$col" ] && [ -n "$lvl" ] && [ "$col" != "$lvl" ] || continue
+        case "$lvl" in *[!0-9]*|'') continue ;; esac
+        while IFS= read -r line; do
+          [ -n "$line" ] || continue
+          heads="${heads:+$heads, }$line"; items=$((items + 1))
+        done <<< "$(subtable_finding "$f" "$name" "$lvl" "$col")"
+      done <<< "$(schema_field "$record" subtable)"
     fi
     case "$base" in
       09-interfaces.md|09-interfaces-*.md)
-        # known_as: topics.md makes the key mandatory, `known_as: []`
-        # included, and quarry drops every alias on the page when the
-        # value is a scalar. Its warning only reaches `docs index
-        # --force`, so this is the one gate that catches either shape.
-        # Checked outside git and on a prescriptive chapter too: the key
-        # is text the page owes, like the payload sections below.
-        case "$(known_as_form "$fm")" in
-          missing) keys="${keys:+$keys, }known_as"; items=$((items + 1)) ;;
-          scalar) keys="${keys:+$keys, }known_as not a list"; items=$((items + 1)) ;;
-        esac
         # the edge rows: the frontmatter block when the page carries
         # one, else the tables (references/topics.md's precedence, the
         # order quarry reads them in).
@@ -828,7 +1071,7 @@ sweep_non_md() {
       *) shown=$rel ;;
     esac
     shown=${shown//|/\\|}
-    check_part8 "$d/$rel" "$disp/$shown" "" "" 0 "" 1
+    check_part8 "$d/$rel" "$disp/$shown" "" "" "" 1
   done < <(list_non_md "$d")
 }
 
@@ -848,7 +1091,7 @@ print_part8() {
 
 # run_dir docs_abs given: one report section for one docs area
 run_dir() {
-  local d="$1" given="$2" disp idx files f rel fm globs chapter topic dfile
+  local d="$1" given="$2" disp idx files f rel fm globs record dfile
   ROOT=""; IN_GIT=0; BASE="$PWD"; DOCS_ABS="$d"
   if command -v git >/dev/null 2>&1; then
     ROOT=$(git -C "$d" rev-parse --show-toplevel 2>/dev/null) && IN_GIT=1
@@ -863,6 +1106,7 @@ run_dir() {
   echo "# map check: $disp"
   if [ -n "$PLUGIN_VERSION" ]; then echo "plugin version: $PLUGIN_VERSION"
   else echo "plugin version: unreadable; version gap not checked"; fi
+  [ "$SCHEMA_OK" -eq 1 ] || echo "schema: $SCHEMA_FILE unreadable; headings and tables not checked"
   [ "$IN_GIT" -eq 1 ] || echo "not a git repo: staleness unknowable, sites unverifiable"
   idx=$(resolve_index "$d")
   if [ ! -f "$idx" ]; then
@@ -886,17 +1130,15 @@ run_dir() {
     dfile="$disp/$rel"
     fm=$(frontmatter_of "$f")
     globs=$(fm_globs "$fm")
-    chapter=0; topic=""
-    if [ "$(dirname "$f")" = "$d" ]; then
-      topic=$(topic_of "$(basename "$f")")
-      [ -n "$topic" ] && chapter=1
-    fi
+    record=$(schema_type_for "$rel")
     [ -n "$globs" ] && check_part1 "$dfile" "$fm" "$globs"
-    check_part8 "$f" "$dfile" "$fm" "$globs" "$chapter" "$topic" 0
+    check_part8 "$f" "$dfile" "$fm" "$globs" "$record" 0
   done <<< "$files"
-  # the index carries no stamps, headings or sites by design, but a
-  # credential pasted into it ships like any other
-  check_part8 "$idx" "$disp/${idx#"$d"/}" "" "" 0 "" 1
+  # the index is looked up by record rather than by path, because
+  # config `index_file` may name it anything. Its record carries no
+  # keys and no headings - core-authoring.md's rule that the index
+  # carries no stamps - so what runs over it is the secret scan.
+  check_part8 "$idx" "$disp/${idx#"$d"/}" "$(frontmatter_of "$idx")" "" index 0
   sweep_non_md "$d" "$disp"
   echo
   echo "## 1. Staleness"
@@ -916,11 +1158,13 @@ main() {
   local -a dirs
   local a d abs first=1
   dirs=()
+  SCHEMA_MATCHES=$(schema_pairs)
   while [ $# -gt 0 ]; do
     case "$1" in
       -h|--help) usage; exit 0 ;;
       --headings) print_headings; exit 0 ;;
       --patterns) print_patterns; exit 0 ;;
+      --schema) print_schema; exit 0 ;;
       --) shift; break ;;
       -*) die_usage "unknown flag: $1" ;;
       *) dirs+=("$1") ;;

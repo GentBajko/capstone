@@ -747,12 +747,15 @@ done
 #      script would be read as a glob and mangle displayed paths and the
 #      skip list.
 MCABS="$PWD/$MC"
+# the script under test. One case below points this at a copy with no
+# schema.txt beside it, so set it back after.
+MC_BIN="$MCABS"
 T=$(mktemp -d 2>/dev/null || mktemp -d -t capstone)
 G="$T/g[1]"
 mkdir -p "$T/global" "$G/ok/docs/changelog.d" "$G/bad/docs" "$G/crlf/docs" "$G/noidx/docs"
 mc_run() { # label expected_rc expected_verdict dir [args...]; sets MC_OUT
   local label="$1" rc_want="$2" want="$3" dir="$4" rc; shift 4
-  MC_OUT=$(cd "$dir" && CAPSTONE_GLOBAL_DIR="$T/global" bash "$MCABS" "$@" 2>&1); rc=$?
+  MC_OUT=$(cd "$dir" && CAPSTONE_GLOBAL_DIR="$T/global" bash "$MC_BIN" "$@" 2>&1); rc=$?
   [ "$rc" -eq "$rc_want" ] || err "map-check.sh $label exited $rc, wanted $rc_want"
   printf '%s\n' "$MC_OUT" | tail -1 | grep -qx "$want" \
     || err "map-check.sh $label verdict: $(printf '%s\n' "$MC_OUT" | tail -1), wanted: $want"
@@ -1074,6 +1077,141 @@ mode: prescriptive' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$
   mc_run 'skipped non-markdown file' 0 'MAP CHECK: current' "$S"
   git -C "$S" rm -q --cached docs/capstone/capstone.json
   rm "$S/docs/capstone/capstone.json"
+  # 16c. the schema records (references/schema.txt). Every file the
+  #      index reaches is now held to its record, so the folders that
+  #      used to be checked for `generated_date` alone - logic/,
+  #      mockup/, uiux/ - have their section lists gated too, chapters
+  #      are held to heading order rather than presence, and the
+  #      interfaces and models tables are held to their columns.
+  mkdir -p "$S/docs/capstone/logic"
+  mc_logic() { # dir: one complete scenario file
+    printf -- '---\ngenerated_date: 2026-01-01\n---\n# s\n\n## Trigger & preconditions\n\nx\n\n## Steps\n\nx\n\n## Branches\n\nx\n\n## Unhappy paths\n\nx\n\n## State transitions\n\nx\n\n## Invariants\n\nx\n\n## Outcomes & side effects\n\nx\n\n## Dimensions not in play\n\nx\n' \
+      > "$1/01-scenario.md"
+  }
+  mc_logic "$S/docs/capstone/logic"
+  mc_run 'logic scenario complete' 0 'MAP CHECK: current' "$S"
+  grep -v '^## Invariants$' "$S/docs/capstone/logic/01-scenario.md" > "$S/x" \
+    && mv "$S/x" "$S/docs/capstone/logic/01-scenario.md"
+  mc_run 'logic scenario missing a section' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/logic/01-scenario.md | - | ## Invariants | - | - |' 'logic scenario missing a section'
+  rm -r "$S/docs/capstone/logic"
+  # a uiux screen chapter, the same way
+  mkdir -p "$S/docs/capstone/uiux/screens"
+  printf -- '---\ngenerated_date: 2026-01-01\n---\n# s\n\n## Mode & job\n\nx\n\n## Composition\n\nx\n\n## States\n\nx\n\n## Motion\n\nx\n\n## Copy\n\nx\n' \
+    > "$S/docs/capstone/uiux/screens/01-screen.md"
+  mc_run 'uiux screen complete' 0 'MAP CHECK: current' "$S"
+  grep -v '^## States$' "$S/docs/capstone/uiux/screens/01-screen.md" > "$S/x" \
+    && mv "$S/x" "$S/docs/capstone/uiux/screens/01-screen.md"
+  mc_run 'uiux screen missing a section' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/uiux/screens/01-screen.md | - | ## States | - | - |' 'uiux screen missing a section'
+  rm -r "$S/docs/capstone/uiux"
+  # heading order: every required section is there, two of them swapped.
+  # The finding names both positions, so the repair is obvious without
+  # opening the file.
+  mc_conv() { # dir body: a conventions chapter with the given sections
+    printf -- '---\ngenerated_at_commit: %s\ngenerated_date: 2026-01-01\ncapstone_version: %s\ncontent_hash: %s\npaths_covered:\n  - ":(top)src/**"\n---\n# c\n\n%s\n' \
+      "$SHA" "$MANIFEST_V" "$H" "$2" > "$1/03-conventions.md"
+  }
+  mc_conv "$S/docs/capstone" '## Paradigm
+
+x
+
+## Typing
+
+x
+
+## Error handling
+
+x
+
+## Dependency injection
+
+x'
+  mc_run 'chapter sections in order' 0 'MAP CHECK: current' "$S"
+  mc_conv "$S/docs/capstone" '## Typing
+
+x
+
+## Paradigm
+
+x
+
+## Error handling
+
+x
+
+## Dependency injection
+
+x'
+  mc_run 'chapter sections out of order' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/03-conventions.md | - | ## Typing out of order (before ## Paradigm) | - | - |' 'chapter sections out of order'
+  rm "$S/docs/capstone/03-conventions.md"
+  # the models chapter's per-entity field tables, which `head` cannot
+  # express: the record's `subtable` holds every `### <Entity>` under
+  # Fields and types to Field, Type and Required
+  mc_models "$S/docs/capstone"
+  mc_run 'entity table complete' 0 'MAP CHECK: current' "$S"
+  sed 's/^| Field | Type | Required |$/| Field | Type |/' "$S/docs/capstone/02-models.md" > "$S/x" \
+    && mv "$S/x" "$S/docs/capstone/02-models.md"
+  mc_run 'entity table missing a column' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/02-models.md | - | table Record missing Required | - | - |' 'entity table missing a column'
+  rm "$S/docs/capstone/02-models.md"
+  # and the interfaces chapter's own two tables, whose columns
+  # topics.md spells literally
+  mc_iface_cols() { # dir consumes-body
+    {
+      printf -- '---\ngenerated_at_commit: %s\ngenerated_date: 2026-01-01\ncapstone_version: %s\ncontent_hash: %s\nknown_as: []\npaths_covered:\n  - ":(top)src/**"\n---\n' "$SHA" "$MANIFEST_V" "$H"
+      printf '# Interfaces\n\n## Produces\n\n| Kind | Name | Site |\n| --- | --- | --- |\n| http | GET /a | `src/main.rs:12` |\n\n'
+      printf '### GET /a\n\n| Field | Type | Required |\n| --- | --- | --- |\n| id | string | yes |\n\n'
+      printf '%s\n' "$2"
+    } > "$1/09-interfaces.md"
+  }
+  mc_iface_cols "$S/docs/capstone" '## Consumes
+
+| Kind | Name | From | Site |
+| --- | --- | --- | --- |
+| sqs | ingest | other | `src/main.rs:1` |
+
+### ingest
+
+| Field | Type | Required |
+| --- | --- | --- |
+| id | string | yes |'
+  mc_run 'produces table missing a column' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/09-interfaces.md | - | table Produces missing To | - | - |' 'produces table missing a column'
+  # a required heading whose body is "None found" is what topics.md asks
+  # a deep-dive to write when it found nothing, so the column test says
+  # nothing about it: the Produces gap below is the only finding
+  mc_iface_cols "$S/docs/capstone" '## Consumes
+
+None found.'
+  mc_run 'consumes heading with no table' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/09-interfaces.md | - | table Produces missing To | - | - |' 'consumes heading with no table'
+  # back to the covered page, so the schema-file case below starts clean
+  mc_iface_tight "$S/docs/capstone"
+  mc_run 'covered again before the schema case' 0 'MAP CHECK: current' "$S"
+  # 16d. a run whose schema.txt is not there. The script says so on its
+  #      header line, holds every page to `generated_date` alone, keeps
+  #      part 1, the edge pass and the secret scan, and reaches the same
+  #      verdict and exit code. A gate that dies because a reference
+  #      file moved is worse than one that names what it skipped. The
+  #      repo's own copy is never touched: the case runs a copy of the
+  #      script from a sandbox plugin root with no references/ beside it.
+  mkdir -p "$T/plugin/skills/core/scripts" "$T/plugin/skills/core/references" \
+           "$T/plugin/.claude-plugin"
+  cp "$MCABS" "$T/plugin/skills/core/scripts/map-check.sh"
+  cp .claude-plugin/plugin.json "$T/plugin/.claude-plugin/plugin.json"
+  MC_BIN="$T/plugin/skills/core/scripts/map-check.sh"
+  mc_run 'schema file absent' 0 'MAP CHECK: current' "$S"
+  mc_row '^schema: .*schema\.txt unreadable; headings and tables not checked$' 'schema file absent'
+  mc_row "| docs/capstone/08-glossary.md | $SHA | $MANIFEST_V | 0 | current |" 'schema file absent'
+  mc_row '^unfolded fragments: 0 ' 'schema file absent'
+  # and a page missing its date is still a finding with no schema
+  printf -- '---\ncapstone_version: %s\n---\n# s\n' "$MANIFEST_V" > "$S/docs/capstone/mockup.md"
+  mc_run 'schema file absent, page with no date' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/mockup.md | generated_date | - | - | - |' 'schema file absent, page with no date'
+  rm "$S/docs/capstone/mockup.md"
+  MC_BIN="$MCABS"
 else
   echo "note: map-check.sh git fixture skipped (no git)"
 fi
@@ -1188,6 +1326,140 @@ tr '\n' ' ' < skills/core/references/core.md | tr -s ' ' \
   || err "core.md does not keep expertise and teaching_mode out of the project config"
 grep -q 'teaching_mode' skills/core/references/protocols/doctor.md \
   || err "doctor.md check 5 does not report a personal key in the project config"
+
+# 20. every `head` list in the schema is the section list of the prose
+#     that teaches it. Check 15 does this for the chapters by
+#     regenerating topics.md's bullets; this does it for every record
+#     that carries a `from`, chapters included, by reading the named
+#     section of the named file. A protocol that renames a section
+#     without touching the schema fails here.
+#     The three shapes the prose uses for a section name are a
+#     backticked `## <name>` and a bold bullet lead `- **<name>**`;
+#     both are read, in document order, with several allowed on one
+#     line (uiux.md Phase E puts `## Mode & job` and `## Composition`
+#     side by side). The schema's list must appear in that order. A
+#     section the prose names and the schema leaves out passes, because
+#     a phase often lists more than one file's sections in one place -
+#     mockup.md Phase E names the screen's three and the README's three
+#     tables together - and telling those apart needs a marker the
+#     protocols do not carry yet.
+SCHEMA_TXT=skills/core/references/schema.txt
+ls_sections() { # file section-name-prefix
+  awk -v want="$2" '
+    { sub(/\r$/, "") }
+    /^## / { s = $0; sub(/^## /, "", s); inw = (index(s, want) == 1); next }
+    !inw { next }
+    {
+      if (match($0, /^- \*\*[^*]+\*\*/)) print substr($0, 5, RLENGTH - 6)
+      rest = $0
+      while (match(rest, /`## [^`]+`/)) {
+        print substr(rest, RSTART + 4, RLENGTH - 5)
+        rest = substr(rest, RSTART + RLENGTH)
+      }
+    }' "$1"
+}
+if [ ! -f "$SCHEMA_TXT" ]; then
+  err "$SCHEMA_TXT is missing (map-check.sh reads it at runtime)"
+else
+  LS_RECS=$(awk '
+    { sub(/\r$/, ""); line = $0 }
+    line ~ /^#/ { next }
+    { key = line; sub(/[ \t].*$/, "", key)
+      val = line; sub(/^[^ \t]*[ \t]*/, "", val); sub(/[ \t]+$/, "", val) }
+    key == "type" {
+      if (t != "" && h != "" && fr != "") print t "\t" h "\t" fr
+      t = val; h = ""; fr = ""; next }
+    key == "head" && h == "" { h = val; next }
+    key == "from" && fr == "" { fr = val; next }
+    END { if (t != "" && h != "" && fr != "") print t "\t" h "\t" fr }
+  ' "$SCHEMA_TXT")
+  [ -n "$LS_RECS" ] || err "$SCHEMA_TXT declares no record with both head and from"
+  while IFS="$LS_TAB" read -r rty rhead rfrom; do
+    [ -n "$rty" ] || continue
+    rfile=${rfrom%%|*}; rsect=${rfrom#*|}
+    if [ "$rfile" = "$rsect" ] || [ -z "$rsect" ]; then
+      err "schema record $rty has a from without a section: $rfrom"
+      continue
+    fi
+    case "$rfile" in
+      topics.md) rpath="skills/core/references/$rfile" ;;
+      *) rpath="skills/core/references/protocols/$rfile" ;;
+    esac
+    if [ ! -f "$rpath" ]; then
+      err "schema record $rty points at $rpath, which does not exist"
+      continue
+    fi
+    LS_GOT=$(ls_sections "$rpath" "$rsect")
+    if [ -z "$LS_GOT" ]; then
+      err "$rpath has no section named $rsect, or that section names no sections"
+      continue
+    fi
+    LS_MISS=$(printf '%s\n' "$LS_GOT" | awk -v req="$rhead" '
+      { g[++n] = $0 }
+      END {
+        m = split(req, R, "|"); j = 1
+        for (i = 1; i <= m; i++) {
+          hit = 0
+          while (j <= n) { if (g[j++] == R[i]) { hit = 1; break } }
+          if (!hit) print R[i]
+        }
+      }')
+    [ -z "$LS_MISS" ] || err "schema record $rty disagrees with $rfile section $rsect
+absent there, or out of order: $(printf '%s' "$LS_MISS" | tr '\n' ' ')
+the sections that file names, in order:
+$LS_GOT"
+  done <<< "$LS_RECS"
+fi
+
+# 21. the schema file itself: it parses, its record ids are unique,
+#     every record can be reached by a path, and map-check.sh no longer
+#     carries the copy it used to embed. `--schema` is what a caller
+#     asks to find out which file the gate actually read.
+if [ -f "$SCHEMA_TXT" ]; then
+  LS_BADFIELD=$(awk '
+    { sub(/\r$/, ""); line = $0 }
+    line ~ /^#/ { next }
+    line ~ /^[ \t]*$/ { next }
+    { key = line; sub(/[ \t].*$/, "", key) }
+    key != "type" && key != "match" && key != "keys" && key != "keys!" \
+      && key != "opt" && key != "head" && key != "table" \
+      && key != "subtable" && key != "from" { print FNR ": " line }
+  ' "$SCHEMA_TXT")
+  [ -z "$LS_BADFIELD" ] || err "$SCHEMA_TXT has lines that are not a known field:
+$LS_BADFIELD"
+  LS_DUPTYPE=$(sed -n 's/^type[[:space:]][[:space:]]*//p' "$SCHEMA_TXT" \
+    | sed 's/[[:space:]]*$//' | sort | uniq -d)
+  [ -z "$LS_DUPTYPE" ] || err "$SCHEMA_TXT repeats a type id: $(printf '%s' "$LS_DUPTYPE" | tr '\n' ' ')"
+  LS_NOMATCH=$(awk '
+    { sub(/\r$/, ""); line = $0 }
+    line ~ /^#/ { next }
+    { key = line; sub(/[ \t].*$/, "", key)
+      val = line; sub(/^[^ \t]*[ \t]*/, "", val); sub(/[ \t]+$/, "", val) }
+    key == "type" { if (t != "" && m == 0) print t; t = val; m = 0; next }
+    key == "match" { m++ }
+    END { if (t != "" && m == 0) print t }
+  ' "$SCHEMA_TXT")
+  [ -z "$LS_NOMATCH" ] || err "$SCHEMA_TXT has records with no match glob: $(printf '%s' "$LS_NOMATCH" | tr '\n' ' ')"
+  LS_NTYPES=$(grep -c '^type[[:space:]]' "$SCHEMA_TXT")
+  LS_SCHEMA_ABS="$(cd skills/core/references && pwd -P)/schema.txt"
+  LS_SCHEMA_OUT=$(bash "$MC" --schema 2>&1)
+  printf '%s\n' "$LS_SCHEMA_OUT" | grep -qFx "schema: $LS_SCHEMA_ABS" \
+    || err "map-check.sh --schema does not resolve to $LS_SCHEMA_ABS
+got:
+$LS_SCHEMA_OUT"
+  printf '%s\n' "$LS_SCHEMA_OUT" | grep -qx "records: $LS_NTYPES" \
+    || err "map-check.sh --schema counts a different number of records than $SCHEMA_TXT holds ($LS_NTYPES)
+got:
+$LS_SCHEMA_OUT"
+fi
+grep -q '^HEADINGS=' "$MC" \
+  && err "$MC embeds a HEADINGS constant again; the schema file is the one copy"
+grep -q 'references/schema\.txt' "$MC" \
+  || err "$MC does not read references/schema.txt"
+for f in skills/core/references/topics.md skills/core/references/protocols/map.md \
+         docs/commands.md CONTRIBUTING.md; do
+  grep -q 'schema\.txt' "$f" || err "$f does not name references/schema.txt"
+done
 
 [ "$FAIL" -eq 0 ] && echo "lint-sync: all invariants hold" || echo "lint-sync: FAILURES above"
 exit $FAIL

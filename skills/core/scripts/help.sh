@@ -20,10 +20,11 @@ Usage: /capstone:<command>
                         data-flow, dependencies, testing, operations, glossary,
                         interfaces)
   map check            Read-only trust report in two halves: a bash script
-                       (staleness, ledger fragments, schema: stamps, headings,
-                       edge sites, payload sections, model references, secret
-                       shapes -> "MAP CHECK:") and the model's review (pointer
-                       drift, absorption, re-vetting, coverage -> "MAP REVIEW:")
+                       (staleness, ledger fragments, schema: stamps, headings
+                       and their order, table columns, edge sites, payload
+                       sections, model references, secret shapes ->
+                       "MAP CHECK:") and the model's review (pointer drift,
+                       absorption, re-vetting, coverage -> "MAP REVIEW:")
   doctor               Verify and repair the docs area: torn writes, index
                        drift, voided approvals, absorption gaps
   review [be|fe]       Opt-in judgment -> review.md; no arg does both sides,
@@ -54,7 +55,8 @@ Docs are strictly descriptive; only review judges.
 Every command that writes records itself in docs/capstone/changelog.md.
 A command that needs the reference and finds none builds it first.
 CI gate: skills/core/scripts/map-check.sh [docs_dir] runs the script
-half alone, no API key; templates/ carries both workflows.
+half alone, no API key, checking every page against the output schema
+in skills/core/references/schema.txt; templates/ carries both workflows.
 
 Interview commands accept an optional artifact argument (a PRD, notes,
 screenshots) that pre-fills answers for your confirmation.

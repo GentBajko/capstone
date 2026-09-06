@@ -1,0 +1,252 @@
+# The output schema: one record per kind of file capstone writes under a
+# docs area, in the machine-readable form the gate can read without a
+# model.
+#
+# skills/core/scripts/map-check.sh reads this file at runtime and keeps
+# no copy of it. references/topics.md and the protocol files under
+# references/protocols/ carry the prose a model follows while writing a
+# page; lint-sync checks 15, 20 and 21 assert that the prose and this
+# file still say the same thing, so changing one alone turns the lint
+# red.
+#
+# A change here reaches pages already on disk the ordinary way. Their
+# `capstone_version` now sits below the plugin's, part 1 calls them
+# "written by an older capstone", and the next `map` run rewrites them
+# against the current template.
+#
+# Format. One record per output type. Records are separated by a blank
+# line, fields are one per line, and a line whose first character is `#`
+# is a comment. The fields:
+#
+#   type      <id>                  the record's name, unique
+#   match     <glob>                a path relative to the docs dir, as a
+#                                   shell glob; a record may carry more
+#                                   than one
+#   keys      <k> <k> ...           frontmatter keys required inside git
+#   keys!     <k> <k> ...           frontmatter keys required always
+#   opt       <k> <k> ...           keys from `keys` that a page carrying
+#                                   no `paths_covered` does not owe
+#   head      <H>|<H>|...           required `## ` headings, in this order
+#   table     <Heading>:<C>|<C>     the first table under `## <Heading>`
+#                                   must carry these columns
+#   subtable  <Heading>:<n>:<C>|<C> every heading at level `<n>` under
+#                                   `## <Heading>` must carry a table
+#                                   with these columns
+#   from      <file>|<section>      the protocol section `head` was
+#                                   copied from; lint check 20 reads it
+#
+# Matching. The first `match` glob that fits the path decides the
+# record, and records are tried in file order, so specific patterns sit
+# above general ones. The last record is a catch-all: every markdown
+# page under a docs area owes `generated_date` even when nothing more
+# specific claims it. The resolved index file is looked up by the `index`
+# record whatever `index_file` names it, so a docs area that renames its
+# index still gets the index rules rather than a chapter's.
+#
+# Headings. `head` is an ordered sequence. A heading that is not there is
+# the finding `## <H>`. A heading that sits ahead of one that should
+# precede it is `## <H> out of order (before ## <Prev>)`. Extra `## `
+# headings are never a finding, so a chapter may carry sections beyond
+# the ones the template names.
+#
+# Tables. The heading and the level are split off a `table` or
+# `subtable` value at its first colon, so a heading holding a colon
+# cannot be named by either field; no template heading holds one.
+# Columns are matched by lowercased header name, never by position, and
+# extra columns are allowed. A missing column is the finding
+# `table <Heading> missing <Column>`. A heading whose `head`
+# entry is itself absent reports the heading alone and no columns, so one
+# gap is one finding. `table` says nothing about a section that carries
+# no table: topics.md tells a deep-dive to write "None found" plus where
+# it looked, so an empty section is the sanctioned answer. `subtable` is
+# strict the other way, because topics.md gives a `### <Entity>` section
+# no such out - it holds a field table or it holds nothing anyone can
+# read. All of these land in part 8's missing-headings column and count
+# toward the stale verdict.
+#
+# Waivers. `mode: prescriptive` waives `keys` outright: a design written
+# before the code has no commit to stamp. Outside git `keys` is waived
+# for the same reason, and `keys!` is owed under both. `opt` waives its
+# keys on a page with no `paths_covered`, which is how an interview's
+# output and the same file written by extraction are told apart.
+
+type    index
+match   00-index.md
+# core-authoring.md's Index maintenance rule: the index carries no
+# stamps, `generated_date` included, because freshness lives in each
+# chapter's own frontmatter and a second copy would only drift. It has
+# no required headings either. Secret-shaped strings are still scanned,
+# the way they are in every file.
+
+type    logic-scenario
+match   logic/*.md
+keys    generated_at_commit content_hash paths_covered
+keys!   generated_date
+opt     generated_at_commit content_hash paths_covered
+head    Trigger & preconditions|Steps|Branches|Unhappy paths|State transitions|Invariants|Outcomes & side effects|Dimensions not in play
+from    logic.md|Phase B
+
+type    mockup-readme
+match   mockup/README.md
+keys!   generated_date
+# Phase E's tail requires a product brief and three tables, Screens,
+# Journeys and Scenarios for `logic`. It names no `## ` heading for any
+# of them, so there is nothing here to pin yet; spelling the headings out
+# is a mockup.md change, and the record gains a `head` when that lands.
+
+type    mockup-screen
+match   mockup/[0-9][0-9]-*.md
+keys!   generated_date
+head    Layout|Elements|States
+from    mockup.md|Phase E
+
+type    uiux-readme
+match   uiux/README.md
+keys!   generated_date
+# Phase E asks this file for one table, design chapter to mockup screen
+# to logic scenarios, under no named heading.
+
+type    uiux-direction
+match   uiux/01-direction.md
+keys    generated_at_commit content_hash paths_covered
+keys!   generated_date
+opt     generated_at_commit content_hash paths_covered
+# Phase E describes the design read, the mode map and the four contract
+# blocks in prose and names no `## ` heading, so this record pins the
+# stamps only.
+
+type    uiux-system
+match   uiux/02-system.md
+keys    generated_at_commit content_hash paths_covered
+keys!   generated_date
+opt     generated_at_commit content_hash paths_covered
+head    Implementation constraints
+from    uiux.md|Phase E
+
+type    uiux-experience
+match   uiux/03-experience.md
+keys    generated_at_commit content_hash paths_covered
+keys!   generated_date
+opt     generated_at_commit content_hash paths_covered
+# Phase E lists the experience rules in prose and names no `## ` heading.
+
+type    uiux-screen
+match   uiux/screens/*.md
+keys    generated_at_commit content_hash paths_covered
+keys!   generated_date
+opt     generated_at_commit content_hash paths_covered
+head    Mode & job|Composition|States|Motion|Copy
+from    uiux.md|Phase E
+
+type    chapter-architecture
+match   [0-9][0-9]-architecture.md
+match   [0-9][0-9]-architecture-*.md
+keys    generated_at_commit content_hash paths_covered
+keys!   generated_date
+head    Layers|Module boundaries|Entry points|Communication|Composition|Frontend
+from    topics.md|architecture.md
+
+type    chapter-models
+match   [0-9][0-9]-models.md
+match   [0-9][0-9]-models-*.md
+keys    generated_at_commit content_hash paths_covered
+keys!   generated_date
+head    Entities|Fields and types|Relationships|Boundaries|Validation|Schema
+subtable Fields and types:3:Field|Type|Required
+from    topics.md|models.md
+# The Entities table's columns are prose in topics.md ("name, definition
+# site, storage, one-line purpose"), not literal header text, and the
+# chapters capstone has written spell the first column both `Name` and
+# `Entity`. Pinning them is a topics.md change first.
+
+type    chapter-conventions
+match   [0-9][0-9]-conventions.md
+match   [0-9][0-9]-conventions-*.md
+keys    generated_at_commit content_hash paths_covered
+keys!   generated_date
+head    Paradigm|Typing|Error handling|Dependency injection
+from    topics.md|conventions.md
+
+type    chapter-data-flow
+match   [0-9][0-9]-data-flow.md
+match   [0-9][0-9]-data-flow-*.md
+keys    generated_at_commit content_hash paths_covered
+keys!   generated_date
+head    Lifecycles|State|Side-effect boundaries|Failure paths
+from    topics.md|data-flow.md
+
+type    chapter-dependencies
+match   [0-9][0-9]-dependencies.md
+match   [0-9][0-9]-dependencies-*.md
+keys    generated_at_commit content_hash paths_covered
+keys!   generated_date
+head    Dev and tooling|External services
+from    topics.md|dependencies.md
+
+type    chapter-testing
+match   [0-9][0-9]-testing.md
+match   [0-9][0-9]-testing-*.md
+keys    generated_at_commit content_hash paths_covered
+keys!   generated_date
+head    Layout|Doubles|Coverage shape
+from    topics.md|testing.md
+
+type    chapter-operations
+match   [0-9][0-9]-operations.md
+match   [0-9][0-9]-operations-*.md
+keys    generated_at_commit content_hash paths_covered
+keys!   generated_date
+head    Processes|Configuration|Infrastructure|Developer workflow
+from    topics.md|operations.md
+
+type    chapter-glossary
+match   [0-9][0-9]-glossary.md
+match   [0-9][0-9]-glossary-*.md
+keys    generated_at_commit content_hash paths_covered
+keys!   generated_date
+head    Concepts
+from    topics.md|glossary.md
+
+type    chapter-interfaces
+match   [0-9][0-9]-interfaces.md
+match   [0-9][0-9]-interfaces-*.md
+keys    generated_at_commit content_hash paths_covered
+keys!   generated_date known_as
+head    Produces|Consumes
+table   Produces:Kind|Name|To|Site
+table   Consumes:Kind|Name|From|Site
+from    topics.md|interfaces.md
+# `known_as` sits under `keys!` because topics.md makes the key owed
+# whatever the mode and inside git or out: `known_as: []` is a recorded
+# observation, and a scalar value makes quarry register no alias at all.
+# The chapter's payload sections get no `subtable`, because topics.md
+# gives a `### <Name>` section two legal forms and `Model: <Entity>`
+# carries no table; part 8 reads them with the rule that knows both.
+
+type    standards
+match   standards.md
+keys!   generated_date
+# standards.md carries no `paths_covered` by design, per
+# protocols/standards.md: it records decisions rather than observations,
+# so no glob makes it stale. Its domain list is prose in that protocol
+# and is not pinned yet; the standards inventory work settles it.
+
+type    implementation
+match   implementation.md
+keys!   generated_date
+
+type    review
+match   review.md
+match   be-review.md
+match   fe-review.md
+keys!   generated_date
+# The review outputs are gitignored, and map-check's skip list drops
+# them before any record is looked up. The record is what a committed
+# one would be held to if the skip list ever lets it through.
+
+type    page
+match   *
+keys!   generated_date
+# The catch-all. Any other markdown page a docs area carries still owes
+# a date, which is what part 8 asked of every unclassified file before
+# this file existed.

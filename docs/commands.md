@@ -109,7 +109,8 @@ fragments (part 7, informational only; fragments never flip the
 verdict) and the mechanical schema pass (part 8: required frontmatter
 keys, `09-interfaces.md`'s `known_as` among them, which is a finding
 when the key is absent and when its value is a scalar instead of a
-list; required headings per chapter; and, read off `09-interfaces.md`'s
+list; required headings, in order, per the record for that kind of
+file; table columns matched by header name; and, read off `09-interfaces.md`'s
 frontmatter `edges:` block, four edge findings - a row with no `site`,
 a `site` whose path fails `git ls-files --error-unmatch` or names
 something other than one tracked file so a directory and a wildcard
@@ -124,9 +125,20 @@ MAP CHECK: current
 MAP CHECK: stale (<N> findings)
 ```
 
+What the pass checks each file against is one record in
+`skills/core/references/schema.txt`: the frontmatter keys that kind of
+file owes, its `## ` headings in order, and its table columns. The
+script reads that file at runtime, so `logic/` scenarios, `mockup/`
+screens and `uiux/` chapters are held to their section lists the way a
+chapter is, and `lint-sync.sh` keeps the records equal to the prose in
+`topics.md` and in the protocols. A schema file that cannot be read
+costs the headings and the tables alone; the run says so and finishes
+with the same verdict and exit code.
+
 Exit 0 on current, 1 on stale, 2 on a usage error. `--headings` prints
-the required-headings list the script embeds (`lint-sync.sh` keeps it
-equal to `topics.md`); `--patterns` prints the secret patterns by name:
+the required-headings list from the schema (`lint-sync.sh` keeps it
+equal to `topics.md`); `--schema` prints the resolved schema path and
+its record count; `--patterns` prints the secret patterns by name:
 `aws-access-key`, `github-token`, `slack-token`, `stripe-key`,
 `google-api-key`, `private-key`. Findings name the file and the
 pattern, never the matched text.
