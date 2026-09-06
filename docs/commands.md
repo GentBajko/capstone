@@ -354,14 +354,19 @@ extraction passes run (`["logic"]` skips the expensive uiux pass;
 the `09-interfaces.md` chapter; `cross_repo` controls whether
 `groom`, `plan`, the `architecture` interview, and `map`'s interfaces
 pass consult the `quarry` CLI for cross-repo contracts (`auto` uses
-it only when the CLI is on PATH, and for `groom`/`plan` the repo also
-has a `09-interfaces.md`).
+it only when the CLI is on PATH, and for `groom`/`plan` the docs area
+in play also has a `09-interfaces.md`). `workspaces` (project-scoped)
+names each monorepo workspace; the name doubles as its quarry target.
 
 **Cross-repo contracts.** With `cross_repo: "auto"` and quarry
 installed, `groom` runs `quarry docs deps <repo> --downstream --json`
-and reads each consumer's contract section before its first question,
-and `plan` writes the constraint into every task that crosses a repo
-boundary. The `architecture` interview looks up any existing system
+and reads each consumer's contract section before its first question.
+In a monorepo with `workspaces` configured, `<repo>` is the
+workspace name - the same name `quarry init --name` registers as a
+target, chosen by which workspace's `path` contains the files the
+feature touches (one call per workspace when several). `plan` writes
+the constraint into every task that crosses a repo boundary.
+The `architecture` interview looks up any existing system
 a greenfield design will talk to (`quarry docs search`, then the
 contract section) and writes the planned edges into a prescriptive
 `09-interfaces.md`, so the feature chain can consult quarry from day

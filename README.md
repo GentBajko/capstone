@@ -367,7 +367,9 @@ record; any global key set there overrides the global file for that
 repo. `pipeline` records the one-time pipeline-or-map choice on repos
 that already have code, and `workspaces` gives each monorepo workspace
 its own docs area with the root project's `00-index.md` as an
-index-of-indexes.
+index-of-indexes; a workspace's name is also its folder in a quarry
+docs repo (`quarry init --name <name> --docs-dir <path>/docs/capstone`),
+so `groom` and `plan` query quarry by workspace name.
 
 </details>
 

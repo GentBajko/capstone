@@ -69,6 +69,16 @@ workspace's index), `map` iterates the workspaces (an
 argument targets one), and other
 commands operate on the workspace whose paths the request touches,
 asking when ambiguous.
+**The workspace name is the quarry target name**: quarry registers
+each workspace with
+`quarry init --name <name> --docs-dir <path>/docs/capstone` and
+imports it under that folder, so a protocol passing `<repo>` to
+quarry passes the workspace name whenever the request's files fall
+inside a workspace, and the origin URL's last path segment otherwise
+(the single-rooted case, and the root index-of-indexes, which quarry
+imports under the origin name). A consumer in another repo therefore
+writes the workspace name in its `From` cell, never the monorepo's
+name.
 
 `docs_in_git` (`"commit" | "ignore" | "ask"`) pre-answers the
 commit-or-gitignore question **for the factual reference only**: the
@@ -114,7 +124,7 @@ consult the `quarry` CLI (their protocols carry the exact calls: deps
 and section lookups for the first three, `quarry docs list --json`
 for `map`, which spells every `To`/`From` cell as a registered repo
 name or `known_as` alias). `auto` means: use it only when the CLI is
-on PATH **and**, for `groom` and `plan`, the repo has a
+on PATH **and**, for `groom` and `plan`, the docs area in play has a
 `09-interfaces.md` (`architecture` and `map` drop that second
 condition - a greenfield repo has no chapter yet, and writing the
 chapter is `map`'s job), so a machine without quarry behaves exactly

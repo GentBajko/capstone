@@ -65,6 +65,7 @@ narrate and teach while working), docs_dir, index_file,
 subagent_threshold, docs_in_git, language, cross_repo (auto = map,
 groom, plan and architecture consult quarry when it is on PATH).
 Per-project state and overrides live in an optional
-docs/capstone/capstone.json: pipeline, workspaces, or any global key
-to override for that repo.
+docs/capstone/capstone.json: pipeline, workspaces (each name doubles as
+the workspace's quarry target), or any global key to override for that
+repo.
 EOF

@@ -205,6 +205,26 @@ sed -n '/^`cross_repo` (/,/^$/p' skills/core/references/core.md \
   | grep -q '`map`' \
   || err "core.md cross_repo paragraph does not name map"
 
+# 7c. the <repo> a protocol hands to quarry is the workspace name in a
+#     monorepo. core.md states the contract once; every protocol that
+#     runs `quarry docs deps <repo>` must apply it, or groom and plan
+#     query the monorepo's name and see no consumers.
+#     All three phrase pins below are matched against the file flattened
+#     to one line (newlines to spaces, runs of spaces squeezed) so
+#     re-wrapping a paragraph without changing a word cannot turn the
+#     gate red.
+tr '\n' ' ' < skills/core/references/core.md | tr -s ' ' \
+  | grep -q 'The workspace name is the quarry target name' \
+  || err "core.md lost the workspace/quarry naming contract"
+PROTOS=$(grep -l 'quarry docs deps <repo>' skills/core/references/protocols/*.md)
+[ -n "$PROTOS" ] || err "no protocol runs quarry docs deps <repo>"
+for p in $PROTOS; do
+  tr '\n' ' ' < "$p" | tr -s ' ' | grep -q 'when `workspaces` is configured' \
+    || err "$(basename "$p") runs quarry docs deps <repo> without core.md's workspaces naming rule"
+done
+tr '\n' ' ' < docs/commands.md | tr -s ' ' | grep -q 'workspace name' \
+  || err "docs/commands.md does not say quarry is queried by workspace name"
+
 # 8. no .ps1 anywhere: the scripts are bash-only by design (see header).
 #    A returning twin means someone re-created the hand-mirroring that
 #    shipped silently-missing checks three times.

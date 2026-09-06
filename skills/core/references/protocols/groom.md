@@ -83,9 +83,14 @@ recorded `§Q` decisions, without re-interviewing.
    Never ask what these already answer.
 4. **Cross-repo constraints, before the first question.** When config
    `cross_repo` is `auto` (the default), the `quarry` CLI is on PATH,
-   and the repo has a `09-interfaces.md`: run
-   `quarry docs deps <repo> --downstream --json` (`<repo>` = the last
-   path segment of this repo's origin URL), then
+   and the docs area in play has a `09-interfaces.md`: run
+   `quarry docs deps <repo> --downstream --json` (`<repo>` per
+   core.md's `workspaces` rule: when `workspaces` is configured, the
+   name of the workspace whose `path` contains the files the feature
+   touches, one deps call per workspace when it touches several, and
+   that workspace's `<path>/docs/capstone/09-interfaces.md` is the
+   chapter that must exist; otherwise the last path segment of this
+   repo's origin URL), then
    `quarry docs section <consumer> "<contract>"` for each consumer
    the deps call returns, to read the contract fields each downstream
    repo actually depends on. When the feature touches an interface no
