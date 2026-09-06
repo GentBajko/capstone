@@ -21,7 +21,7 @@ jobs:
         with:
           fetch-depth: 0 # stamped commits must be reachable for git diff
       - name: Fetch capstone
-        run: git clone --depth 1 --branch v6.1.0 https://github.com/GentBajko/capstone "$RUNNER_TEMP/capstone"
+        run: git clone --depth 1 --branch v6.2.0 https://github.com/GentBajko/capstone "$RUNNER_TEMP/capstone"
       - name: Map check
         run: |
           out=$(bash "$RUNNER_TEMP/capstone/skills/core/scripts/map-check.sh" docs/capstone 2>&1) || true

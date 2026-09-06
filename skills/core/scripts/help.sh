@@ -17,7 +17,8 @@ Usage: /capstone:<command>
                        uiux/ surfaces the map is missing
   map rebuild          Force a full rewrite of a reference that looks current
   map <topic>          Rebuild one chapter (architecture, models, conventions,
-                        data-flow, dependencies, testing, operations, glossary)
+                        data-flow, dependencies, testing, operations, glossary,
+                        interfaces)
   map check            Read-only trust report in two halves: a bash script
                        (staleness, ledger fragments, schema: stamps, headings,
                        Site paths, secret shapes -> "MAP CHECK:") and the

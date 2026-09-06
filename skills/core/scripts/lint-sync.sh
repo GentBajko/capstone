@@ -218,8 +218,8 @@ sed -n '/^`cross_repo` (/,/^$/p' skills/core/references/core.md \
 #     monorepo. core.md states the contract once; every protocol that
 #     runs `quarry docs deps <repo>` must apply it, or groom and plan
 #     query the monorepo's name and see no consumers.
-#     All three phrase pins below are matched against the file flattened
-#     to one line (newlines to spaces, runs of spaces squeezed) so
+#     Every phrase pin below is matched against the file flattened to
+#     one line (newlines to spaces, runs of spaces squeezed) so
 #     re-wrapping a paragraph without changing a word cannot turn the
 #     gate red.
 tr '\n' ' ' < skills/core/references/core.md | tr -s ' ' \
@@ -233,6 +233,12 @@ for p in $PROTOS; do
 done
 tr '\n' ' ' < docs/commands.md | tr -s ' ' | grep -q 'workspace name' \
   || err "docs/commands.md does not say quarry is queried by workspace name"
+#     topics.md's interfaces format rule is the one surface a doc author
+#     reads while filling a From/To cell, so the join key must name the
+#     workspace spelling there too.
+tr '\n' ' ' < skills/core/references/topics.md | tr -s ' ' \
+  | grep -q 'the workspace name (which is also the quarry target name' \
+  || err "topics.md interfaces join-key rule lost the workspace-name clause"
 
 # 7d. redact's default list is spelled once. init-config.sh's and
 #     core.md's config templates and README's block carry it as a config

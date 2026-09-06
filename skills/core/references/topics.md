@@ -265,7 +265,9 @@ and never inside a fenced code block, so a chapter documenting the
 format declares nothing. `kind`, `name`, and `to`/`from` are
 required per row; a repo name is the last path segment of that
 repo's origin URL, or one of the names that repo lists under
-`known_as`; `map`'s interfaces pass (`protocols/map.md`, Phase 2)
+`known_as`, or, in a monorepo with `workspaces` configured, the
+workspace name (which is also the quarry target name; see
+`core.md`); `map`'s interfaces pass (`protocols/map.md`, Phase 2)
 takes the registered spelling from quarry when it is installed.
 Either side of an edge may declare it; when both do and disagree,
 the disagreement stays visible in each repo's own chapter rather
