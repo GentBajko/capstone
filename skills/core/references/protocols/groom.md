@@ -68,12 +68,15 @@ recorded `§Q` decisions, without re-interviewing.
 1. Per core.md: read the config; expertise governs the conversation.
 2. From the index, pick the topics the feature touches:
    architecture and models almost always; the rest as the idea
-   implies. Run `map check`'s staleness test on just those topics
-   and refresh any stale ones first (as `ask` does): a spec groomed
-   against a stale reference is stale on arrival. For
-   `mode: prescriptive` chapters the refresh protocol's verdict
-   governs: no tracked source yet → current by definition; code now
-   exists → stale by definition, refresh first.
+   implies. Run the `core` skill's `scripts/map-check.sh <docs_dir>`
+   via bash (`map check`'s staleness pass: `git diff --name-only`
+   from each stamp over its globs, plus untracked files) and read
+   its part 1 rows for just those topics; refresh any stale ones
+   first: a spec groomed against a stale reference is stale on
+   arrival. For `mode: prescriptive` chapters the script's verdict
+   governs: `current` means no tracked source yet, current by
+   definition; `prescriptive, pending first observation` means code
+   now exists, stale by definition, refresh first.
 3. Read the picked chapters, plus whichever companion docs bear on the
    feature: the `logic/` scenarios it extends, the `mockup/` screens
    it changes, the `uiux/` chapters it touches, `standards.md`.

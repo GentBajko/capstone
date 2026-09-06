@@ -81,17 +81,38 @@ full rebuild.
 claims get extracted. Interview-derived files in either folder are
 never overwritten by extraction.
 
-`map check` reports eight things - staleness, pointer drift,
-absorption drift, dependency re-vetting, logic coverage, design
-coverage, unfolded `changelog.d/` fragments (informational only;
-fragments never flip the verdict), and a mechanical schema pass
-(required frontmatter keys and required headings per file, grep
-only) - and
-ends with a machine-parseable verdict:
+`map check` reports eight things in two halves. The script half,
+`skills/core/scripts/map-check.sh [docs_dir ...]` (bash; no model, no
+API key; default `docs/capstone`, several arguments for a monorepo's
+workspaces), does staleness (part 1), unfolded `changelog.d/`
+fragments (part 7, informational only; fragments never flip the
+verdict) and the mechanical schema pass (part 8: required frontmatter
+keys, required headings per chapter, `Site` paths checked with
+`git ls-files --error-unmatch` and required to name one tracked file,
+so a directory or a wildcard is a finding, and secret-shaped strings
+reported by pattern name), then ends with a machine-parseable verdict:
 
 ```text
 MAP CHECK: current
 MAP CHECK: stale (<N> findings)
+```
+
+Exit 0 on current, 1 on stale, 2 on a usage error. `--headings` prints
+the required-headings list the script embeds (`lint-sync.sh` keeps it
+equal to `topics.md`); `--patterns` prints the secret patterns by name:
+`aws-access-key`, `github-token`, `slack-token`, `stripe-key`,
+`google-api-key`, `private-key`. Findings name the file and the
+pattern, never the matched text.
+
+The model half - pointer drift (a fixed sample: the first five
+`file:line` pointers in the files part 1 reported stale, in index
+order), absorption drift, dependency re-vetting, logic coverage,
+design coverage - runs the script first, quotes its output, and ends
+with its own line, which only the review workflow reads:
+
+```text
+MAP REVIEW: clean
+MAP REVIEW: <N> findings
 ```
 
 **Ledger key** `map/<topic|all>@<stamp>`.
@@ -113,7 +134,8 @@ approvals, truncated plans), torn wraps (a feature folder left behind
 after its entry landed), index ↔ disk drift, lifecycle validity,
 housekeeping (missing `.gitignore` or config keys, an untracked
 ledger), absorption drift, logic coverage, ledger size, schema
-(missing frontmatter keys or required headings), and unfolded
+(`map-check.sh`'s part 8: missing frontmatter keys or required
+headings, untracked `Site` paths, secret-shaped strings), and unfolded
 `changelog.d/` fragments.
 
 **Ledger key** `doctor/<scope>@<stamp>` - only when something was
@@ -380,10 +402,13 @@ a considered trade-off from an oversight.
 
 ## CI
 
-Copy `templates/capstone-map-check.yml` into `.github/workflows/` and
-add an `ANTHROPIC_API_KEY` secret. It runs `map check` on every PR and
-fails when the reference is stale, by parsing the `MAP CHECK:` verdict
-line. The template writes a config with `non_interactive: true` so
-the headless run resolves every prompt to its default; unfolded
-`changelog.d/` fragments are reported but never fail the gate, so a
-PR carrying its own ledger entry still passes.
+Two templates. `templates/capstone-map-check.yml` is the per-PR gate:
+it clones capstone at the pinned release tag and runs
+`skills/core/scripts/map-check.sh docs/capstone`, no API key, failing
+on the `MAP CHECK:` verdict line. Unfolded `changelog.d/` fragments
+are reported but never fail it, so a PR carrying its own ledger entry
+still passes. `templates/capstone-map-review.yml` is the model half:
+nightly and on `workflow_dispatch`, with an `ANTHROPIC_API_KEY`
+secret, failing on the `MAP REVIEW:` line and ignoring the script's.
+It writes a config with `non_interactive: true` so the headless run
+resolves every prompt to its default.

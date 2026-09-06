@@ -71,9 +71,11 @@ preserving the design decision and rationale inline beside the observed
 implementation (`file:line`).
 
 **`map check` writes nothing**, including no changelog entry - nothing
-was done, only read. Six parts: staleness, pointer drift, absorption
-drift, coverage gaps, stack re-vetting, and a machine-readable verdict
-line CI can grep.
+was done, only read. Eight parts in two halves: a bash script
+(`skills/core/scripts/map-check.sh`) does staleness, unfolded
+fragments and the schema pass and prints the `MAP CHECK:` line CI
+greps; the model does pointer drift, absorption drift, re-vetting and
+coverage and prints its own `MAP REVIEW:` line.
 
 ---
 

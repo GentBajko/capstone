@@ -168,7 +168,7 @@ instead of sending you off to run something else.
 | Command | What it does |
 | --- | --- |
 | `/capstone:map` | Build the reference, or refresh only what drifted. `rebuild` forces a full rewrite; a topic name targets one chapter |
-| `/capstone:map check` | Read-only trust report: staleness, pointer drift, absorption drift, coverage gaps, stack re-vetting, schema. Writes nothing |
+| `/capstone:map check` | Read-only trust report in two halves: a bash script (staleness, ledger fragments, schema: stamps, headings, `Site` paths, secret shapes; the CI gate, no API key) and the model's review (pointer drift, absorption, re-vetting, coverage). Writes nothing |
 | `/capstone:doctor` | Diagnose and repair the docs area: torn writes, index drift, voided approvals, absorption gaps |
 | `/capstone:review [be\|fe]` | The opt-in judgment → `review.md`. No argument does both sides; `backend` takes architecture, `frontend` grades the UI against your own design docs |
 
@@ -433,9 +433,24 @@ ARGUMENTS: $ARGUMENTS
 <details>
 <summary>CI</summary>
 
-Copy `templates/capstone-map-check.yml` into `.github/workflows/`,
-add an `ANTHROPIC_API_KEY` secret, and every PR fails when the
-reference is stale.
+Copy `templates/capstone-map-check.yml` into `.github/workflows/` and
+every PR fails when the reference is stale. It needs no API key: the
+gate is a bash script, `skills/core/scripts/map-check.sh`, cloned at
+the pinned release tag and run over `docs/capstone`. For the model
+half (pointer drift, absorption, re-vetting, coverage) copy
+`templates/capstone-map-review.yml` too and add an
+`ANTHROPIC_API_KEY` secret; it runs nightly or on demand and fails on
+its own `MAP REVIEW:` line.
+
+**Upgrading from 6.1:** replace your `capstone-map-check.yml` with
+the new template. The old one still runs the model on every PR and
+still passes, but it spends a key and tokens the gate no longer
+needs. The gate's verdict line is unchanged (`MAP CHECK:`); the
+model's run now prints a second one, `MAP REVIEW:`, which only the
+review template reads. `content_hash` stamps written by 6.1 or
+earlier were computed over a file set that never included wildcard
+matches, so the first check after a squash merge may report such a
+chapter stale once; `map` regenerates it with the new hash.
 
 **Upgrading from 5.x:** nothing to migrate by hand. Existing
 `changelog.md` entries, `<NN>-<slug>` feature keys, and

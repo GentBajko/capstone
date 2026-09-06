@@ -7,10 +7,12 @@ template drift). A full build additionally reads Phase 1's recon set
 (manifests, type/lint configs, README/CLAUDE/AGENTS, tree, entry
 points); the deep-dive reads source per topic, and the extractions
 read the composed chapters (per logic.md and uiux.md). For `check`
-additionally: the ledger - `changelog.md`, its rotation files, and
-`changelog.d/` fragments (absorption drift, unfolded fragments) -
-and `05-dependencies.md`
-plus the manifests and lockfile (re-vetting). Nothing else unprompted.
+the script half (`scripts/map-check.sh`, the `core` skill) reads the
+stamped files' frontmatter, `changelog.d/`, and `09-interfaces.md`'s
+`Site` cells; the model half also reads the ledger -
+`changelog.md`, its rotation files, and `changelog.d/` fragments
+(absorption drift) - and `05-dependencies.md` plus the manifests and
+lockfile (re-vetting). Nothing else unprompted.
 
 The descriptive reference for the current project: a lean
 `00-index.md` index and chapterized topic files in `<docs_dir>/`,
@@ -132,9 +134,11 @@ paths_covered:
 ```
 
    `content_hash` is computed per core.md's stamps rule:
-   `git ls-tree -r HEAD -- <this file's globs> | git hash-object
-   --stdin`, first 12 chars. It is the stamp that survives a squash
-   or rebase merge making `generated_at_commit` unreachable.
+   `git ls-files -s --full-name -- <this file's globs> | git hash-object --stdin`,
+   first 12 chars (the index entries under the globs: mode, blob,
+   stage, root-relative path; `ls-tree` does not expand `*`). It is
+   the stamp that survives a squash or rebase merge making
+   `generated_at_commit` unreachable.
 
 2. Choose `paths_covered` globs deliberately; they drive the Refresh's
    staleness. Cover every directory the topic's content was derived
@@ -278,15 +282,21 @@ Then, for each stamped file with `paths_covered`:
    user's researched stack decisions must never vanish because the
    code hasn't caught up.
 3. Otherwise check staleness against the **working tree**, not just
-   commits: from the repo root, `git diff --stat <stamp> -- <globs>`
+   commits: from the repo root, `git diff --name-only <stamp> -- <globs>`
    (commit vs working tree) plus `git status --porcelain -- <globs>`
    for untracked files. **Stamp unreachable** (squash or rebase merge
    erased the branch commit): fall back to `content_hash` - recompute
-   it per core.md's stamps rule and compare. Equal, and the working
-   tree is clean over the globs → current; different → stale,
-   regenerate this file only. Only a file with neither a reachable
-   stamp nor a `content_hash` (written by an older capstone) is
-   stale-by-unknowable and regenerates.
+   it per core.md's stamps rule
+   (`git ls-files -s --full-name -- <globs> | git hash-object --stdin`,
+   first 12 chars) and compare. Equal, and the working tree is clean
+   over the globs → current; different → stale, regenerate this file
+   only. A `content_hash` equal to the empty-input hash
+   `e69de29bb2d1` was written by a 6.1 or earlier recipe that never
+   expanded the globs; treat it as absent. Only a file with neither a
+   reachable stamp nor a `content_hash` (written by an older
+   capstone) is stale-by-unknowable and regenerates. `check`'s script
+   half (`scripts/map-check.sh`) runs this same test and prints the
+   verdict per file; its part 1 rows are that test's output.
 4. **No changes** → skip; leave the file and its stamp untouched.
    **Changes** → regenerate it through Phases 2-3; a stale
    extraction-mode `logic/` or `uiux/` file regenerates per its own
@@ -358,25 +368,88 @@ targets one) and re-verify the root index-of-indexes' workspace table.
 
 No writes, and no changelog entry: nothing was done, only read - it
 reports leftover `changelog.d/` fragments (part 7) rather than
-folding them. Eight parts:
+folding them. Eight parts in two halves. Parts 1, 7 and 8 are
+mechanical - `git diff` over globs, a directory listing, grep - and
+live in a script, so a CI gate runs them with no model and no API
+key. Parts 2-6 need judgment and stay here.
 
-1. **Staleness**: for each stamped file with `paths_covered`, read
-   its stamp and globs, then from the repo root run
-   `git diff --stat <stamp> -- <globs>` (commit vs **working tree**,
-   so uncommitted work counts) plus `git status --porcelain --
-   <globs>` for untracked files. A stamp unreachable (squash or
-   rebase merge) falls back to recomputing `content_hash` per
-   core.md's stamps rule: equal and clean → current, different →
-   stale; unreachable with no `content_hash` → verdict "stamp
-   unreachable". Report a table: file | stamp |
-   capstone_version | files changed since | verdict (current / stale /
-   stamp unreachable / written by an older capstone, for a
-   `capstone_version` behind the running plugin's or absent /
-   prescriptive, pending first observation, for any file whose
-   frontmatter still has `mode: prescriptive` while tracked source
-   exists).
-2. **Pointer drift**: sample ≥5 `file:line` pointers across different
-   topic files, check each against the source, and report hits and
+**The script half first.** From the repo root, run the `core` skill's
+`scripts/map-check.sh <docs_dir>` via bash (Git Bash on Windows). With
+config `workspaces` set, pass every workspace's docs area as its own
+argument in one call, so the script prints one verdict. Include its
+stdout verbatim, unedited, as the report's parts 1, 7 and 8; never
+recompute, restate, or re-verdict any of it. What it prints, listed
+by the part numbers this protocol uses and not in a sequence of its
+own:
+
+- Part 1, staleness: one row per stamped file with
+   `paths_covered` - file | stamp | capstone_version | files changed
+   since | verdict.
+   The verdict is `current`; `stale` (`git diff --name-only <stamp>
+   -- <globs>` against the **working tree**, so uncommitted work
+   counts, plus `git status --porcelain -- <globs>` for untracked
+   files, found changes; a stamp made unreachable by a squash or
+   rebase merge falls back to recomputing `content_hash` per
+   core.md's stamps rule,
+   `git ls-files -s --full-name -- <globs> | git hash-object --stdin`
+   first 12 chars, and comparing, with the legacy empty-input hash
+   `e69de29bb2d1` read as absent); `stamp unreachable` (no reachable
+   stamp and no `content_hash`); `written by an older capstone`
+   (`capstone_version` absent or below the plugin's, read from the
+   plugin's own manifest); or `prescriptive, pending first
+   observation` (`mode: prescriptive` while tracked source exists
+   under its globs; with no tracked source yet the file is `current`
+   by definition). Outside git every verdict is `unknowable (not a
+   git repo)` and counts for nothing. A docs area without its index
+   is one finding, `no index at <path>`, and gets no rows.
+- Part 7, unfolded fragments: every file in `changelog.d/` with
+   its key and the repair (any writing run folds them; so does
+   `doctor`). Informational only: fragments are the designed state on a branch,
+   so they never count toward the verdict - a doc-carrying PR must
+   not fail a freshness gate for carrying its own ledger entry.
+- Part 8, schema: a mechanical pass over every generated file, grep
+   only, no judgment. Four columns per file: missing frontmatter keys
+   (`generated_date` everywhere; inside git also `generated_at_commit`
+   and `content_hash` for stamped files and `paths_covered` for
+   chapters; prescriptive and interview-derived files are held to
+   `generated_date` only, since they carry no commit stamps or globs
+   by design; `capstone_version` absent is part 1's older-capstone
+   verdict, not re-reported here); missing required `## ` headings
+   per `../topics.md` (a section may be satisfied by "None found"
+   text, but the heading itself must exist; the list is embedded in
+   the script and lint-sync keeps it equal to `../topics.md`); `Site`
+   cells in `09-interfaces.md`'s Produces and Consumes tables whose
+   path, once a trailing `:<line>` or `:<from>-<to>` is stripped,
+   fails `git ls-files --error-unmatch` or matches something other
+   than itself, so a directory and a wildcard are both findings
+   (skipped for a prescriptive chapter, whose sites are planned;
+   quarry runs the same test at import, so a site this pass rejects
+   is the one `quarry update --strict` refuses); and secret-shaped
+   strings, reported by pattern name and never by the matched text,
+   in every file, the index itself included. Every item counts toward the
+   verdict: a missing heading is template drift, a missing stamp
+   breaks the refresh, an unknown site is a dead edge, and a leaked
+   credential must not ship; the repair for the first three is
+   `map`, which regenerates the file against the current template.
+
+The script ends with exactly one of
+
+    MAP CHECK: current
+    MAP CHECK: stale (<N> findings)
+
+and exits 1 on stale, 2 on a usage error. That line is the CI gate's
+contract (`templates/capstone-map-check.yml` greps it): never omit,
+reword, recompute, or repeat it.
+
+**The model half.** Then, reading only what each part names:
+
+2. **Pointer drift**: the sample is fixed, so two runs on one commit
+   report the same drift. Take the files part 1 reported `stale`, in
+   index order (the order of their rows in `<index_file>`), and
+   within each file its `file:line` pointers in order of appearance;
+   the sample is the first five. When part 1 reported no stale file,
+   the sample is the first five pointers of the first chapter in
+   index order. Check each against the source and report hits and
    misses with the drifted lines' new locations when findable.
 3. **Absorption drift**: interview-derived `logic/`, `mockup/`, and
    `uiux/` files carry no globs; their staleness signal is shipped
@@ -402,39 +475,18 @@ folding them. Eight parts:
    them). A repo with no frontend reports the section as not
    applicable rather than as a gap; `"uiux"` absent from the config
    `extract` list reports it as disabled by config.
-7. **Unfolded fragments**: list any files in `changelog.d/`, with
-   their keys, and name the repair (any writing run folds them; so
-   does `doctor`). Informational only: fragments are the designed
-   state on a branch, so they never count toward the stale verdict
-   below - a doc-carrying PR must not fail a freshness gate for
-   carrying its own ledger entry.
-8. **Schema**: a mechanical pass over every generated file, grep
-   only, no judgment. Two halves:
-   - Frontmatter keys: each indexed chapter, `logic/` and `uiux/`
-     extraction file carries `generated_date` plus, inside git,
-     `generated_at_commit`, `content_hash`, and `paths_covered`
-     (`capstone_version` absent is already part 1's older-capstone
-     verdict, not re-reported here). Interview-derived files are
-     checked for `generated_date` only, since they carry no globs by
-     design.
-   - Required headings: each chapter's `^## ` lines cover every
-     required section `../topics.md` defines for that topic (a
-     section may be satisfied by "None found" text, but the heading
-     itself must exist).
-   Report file | missing keys | missing headings. Every finding here
-   counts toward the stale verdict: a missing heading is template
-   drift and a missing stamp breaks the refresh, and the repair for
-   both is `map`, which regenerates the file against the current
-   template.
 
 End with one sentence (whether the reference can be trusted as-is,
-needs `map`, or needs `map rebuild`) followed by the machine
-verdict line, exactly one of:
+needs `map`, or needs `map rebuild`), then your own machine verdict
+line, after the script's, exactly one of:
 
-    MAP CHECK: current
-    MAP CHECK: stale (<N> findings)
+    MAP REVIEW: clean
+    MAP REVIEW: <N> findings
 
-(CI templates parse that line; never omit or reword it.)
+`<N>` is the count across parts 2-6: pointer misses, unabsorbed
+features, dependency flags, unclaimed entry points, unclaimed
+surfaces. `templates/capstone-map-review.yml` parses that line and
+never the script's; never omit or reword either.
 
 ## Workspaces
 
@@ -451,5 +503,6 @@ creating it holding just that key if absent); never silently.
 ## Non-git projects
 
 Use `generated_date` only (no commit stamps). There are no stamps to
-diff, so every run is a full build; `check` reports staleness as
-unknowable and falls back to pointer drift alone.
+diff, so every run is a full build; `check`'s script half prints
+`unknowable (not a git repo)` for every stamped file and skips site
+verification; the model half falls back to pointer drift alone.

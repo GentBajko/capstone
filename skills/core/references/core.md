@@ -243,8 +243,10 @@ Everything a subcommand writes carries the topic-file frontmatter
 stamps (`generated_at_commit`, `generated_date`, `capstone_version`,
 plus `paths_covered` and `content_hash` where the refresh protocol
 applies; date-only outside git). `content_hash` is
-`git ls-tree -r HEAD -- <the file's paths_covered globs>` piped
-through `git hash-object --stdin`, truncated to 12 chars. It exists
+`git ls-files -s --full-name -- <the file's paths_covered globs>`
+piped through `git hash-object --stdin`, truncated to 12 chars
+(`ls-files` expands the globs; `ls-tree` does not, and would hash
+nothing). It exists
 because squash and rebase merges make every branch-commit stamp
 unreachable: a refresh that cannot diff from `generated_at_commit`
 recomputes this hash instead, and an unchanged hash means current,

@@ -70,9 +70,12 @@ documented rules it proposes, never applies.
    unstarted and an id freed for reuse. A legacy
    `changelog-archive-<YYYY>.md` with a stripped-key `## Archived`
    section is left as-is and searched like any other ledger file.
-9. **Schema**: `map check`'s part-8 grep (frontmatter keys and
-   required headings per file); repair = the `map` refresh, which
-   regenerates a file missing either against the current template.
+9. **Schema**: the part-8 pass of `map check`'s script
+   (`scripts/map-check.sh`: frontmatter keys, required headings,
+   `Site` paths, secret-shaped strings per file); repair = the `map`
+   refresh, which regenerates a file missing a key or heading against
+   the current template; a secret is removed by hand, never
+   regenerated around.
 10. **Unfolded fragments**: files sitting in `changelog.d/`; repair =
    fold them per core.md's ledger rule. Doctor applying any approved
    repair is a writing run and folds anyway; on a non-default branch

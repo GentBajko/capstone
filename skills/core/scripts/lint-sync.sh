@@ -131,6 +131,8 @@ for d in skills/*/; do
 done
 grep -q 'MAP CHECK: current' docs/commands.md \
   || err "docs/commands.md does not show the MAP CHECK verdict line"
+grep -q 'MAP REVIEW: clean' docs/commands.md \
+  || err "docs/commands.md does not show the MAP REVIEW verdict line"
 
 # 5b. the dispatcher's reserved-word list carries every routable
 #     subcommand (on Gemini, skills/core/references/dispatcher.md is the only entry point)
@@ -416,21 +418,50 @@ grep -q 'Invoked by `map`' skills/core/references/protocols/logic.md \
 grep -q 'never touched here' skills/core/references/protocols/map.md \
   || err "map.md does not protect interview-derived uiux/ files from extraction"
 
-# 12g. the machine verdict line is a contract between map.md (which
-#      promises it) and the CI template (which greps for it). A reworded
-#      verdict silently turns every downstream CI job green.
-grep -q 'MAP CHECK: current' skills/core/references/protocols/map.md \
-  || err "map.md lost the MAP CHECK verdict line"
-grep -q 'MAP CHECK: stale' skills/core/references/protocols/map.md \
-  || err "map.md lost the stale MAP CHECK verdict line"
-[ -f templates/capstone-map-check.yml ] \
-  || err "templates/capstone-map-check.yml is missing"
-grep -q 'MAP CHECK: ' templates/capstone-map-check.yml \
-  || err "CI template does not parse the MAP CHECK verdict line"
-grep -q 'capstone:map check' templates/capstone-map-check.yml \
-  || err "CI template does not invoke map check"
-grep -q 'templates/capstone-map-check.yml' README.md \
-  || err "README does not point at the CI template by its current name"
+# 12g. the machine verdict lines are a contract. map.md promises both;
+#      the gate template (script half, no API key) greps only MAP CHECK:
+#      and the review template (model half) greps only MAP REVIEW:, so a
+#      reworded line, or a template reading the other half's line, would
+#      silently turn CI green or red.
+for s in 'MAP CHECK: current' 'MAP CHECK: stale' 'MAP REVIEW: clean' 'MAP REVIEW: <N> findings'; do
+  grep -qF "$s" skills/core/references/protocols/map.md \
+    || err "map.md lost the verdict line: $s"
+done
+grep -q 'scripts/map-check\.sh' skills/core/references/protocols/map.md \
+  || err "map.md check section does not run map-check.sh"
+# the protocol promises the Site test the script performs
+grep -q 'ls-files --error-unmatch' skills/core/scripts/map-check.sh \
+  || err "map-check.sh does not verify Site paths with git ls-files"
+grep -q 'ls-files --error-unmatch' skills/core/references/protocols/map.md \
+  || err "map.md check part 8 does not name the Site test"
+CHK=templates/capstone-map-check.yml
+REV=templates/capstone-map-review.yml
+[ -f "$CHK" ] || err "$CHK is missing"
+[ -f "$REV" ] || err "$REV is missing"
+grep -q 'MAP CHECK: ' "$CHK" || err "$CHK does not parse the MAP CHECK verdict line"
+grep -q 'MAP REVIEW' "$CHK" && err "$CHK must never read the MAP REVIEW line"
+grep -q 'map-check\.sh' "$CHK" || err "$CHK does not run map-check.sh"
+grep -q 'fetch-depth: 0' "$CHK" || err "$CHK lost fetch-depth: 0 (stamps must be reachable)"
+grep -q 'ANTHROPIC_API_KEY' "$CHK" && err "$CHK needs no API key (the gate is a script)"
+grep -q 'capstone:map check' "$CHK" && err "$CHK still invokes the model"
+grep -q 'MAP REVIEW: ' "$REV" || err "$REV does not parse the MAP REVIEW verdict line"
+grep -q 'MAP CHECK' "$REV" && err "$REV must never read the MAP CHECK line"
+grep -q 'capstone:map check' "$REV" || err "$REV does not invoke map check"
+grep -q 'ANTHROPIC_API_KEY' "$REV" || err "$REV does not pass the API key"
+grep -q '^  schedule:' "$REV" || err "$REV has no schedule trigger"
+grep -q 'workflow_dispatch' "$REV" || err "$REV has no workflow_dispatch trigger"
+for t in capstone-map-check capstone-map-review; do
+  grep -q "templates/$t\.yml" README.md || err "README does not point at templates/$t.yml"
+  grep -q "templates/$t\.yml" docs/commands.md || err "docs/commands.md does not point at templates/$t.yml"
+done
+grep -q 'Upgrading from 6.1' README.md \
+  || err "README lost the 'Upgrading from 6.1' note (the gate template changed shape)"
+# the gate clones the release tag that ships the script; the pin must
+# move with the manifests (check 2's version) or every user runs an old
+# script against new templates
+V=$(printf '%s\n' "$UNIQ" | grep '.' | head -1)
+grep -q -- "--branch v$V " "$CHK" \
+  || err "$CHK does not pin --branch v$V (the manifest version)"
 
 # 12h. generate and sync merged into map: one verb, because the branch is
 #      readable off disk. Both old names must stay unroutable, and map must
@@ -568,6 +599,222 @@ for f in skills/core/scripts/help.sh skills/start/SKILL.md; do
 done
 grep -qF 'mockup → logic → uiux → architecture → standards → stack → build' README.md \
   || err "README.md missing the pipeline-order string"
+
+# 15. the required-headings list is embedded in map-check.sh (the gate
+#     runs with no model, so it cannot read topics.md's prose) and must
+#     equal topics.md's `## ...` bullets, the way check 14 pins the
+#     pipeline string. Compared sorted so section order is free.
+EXPECT=$(LC_ALL=C awk '
+  /^## [a-z-]+\.md$/ { if (t != "") print t ": " h; t = $2; sub(/\.md$/, "", t); h = ""; next }
+  /^- `## / { s = $0; sub(/^- `## /, "", s); sub(/`.*/, "", s); h = (h == "" ? s : h "|" s) }
+  END { if (t != "") print t ": " h }' skills/core/references/topics.md | LC_ALL=C sort)
+GOT=$(bash skills/core/scripts/map-check.sh --headings | LC_ALL=C sort)
+[ "$EXPECT" = "$GOT" ] || err "map-check.sh --headings disagrees with topics.md
+expected:
+$EXPECT
+got:
+$GOT"
+# 15b. the content_hash recipe is spelled once and the same in the two
+#      protocol files and the script; ls-tree does not glob, so the old
+#      recipe hashed nothing and must not come back anywhere
+for f in skills/core/references/core.md skills/core/references/protocols/map.md \
+         skills/core/scripts/map-check.sh; do
+  grep -q 'git ls-files -s --full-name -- ' "$f" \
+    || err "$f lost the content_hash recipe (git ls-files -s --full-name)"
+  grep -q 'ls-tree -r HEAD -- ' "$f" \
+    && err "$f still carries the ls-tree content_hash recipe (it does not glob)"
+done
+
+# 16. map-check.sh is the CI gate: its flags, exit codes, verdict line
+#     and the P8 secret patterns are a contract with the templates, the
+#     docs, and quarry's src/secrets.rs (spelled identically there).
+MC=skills/core/scripts/map-check.sh
+[ -f "$MC" ] || err "$MC is missing"
+bash "$MC" --headings >/dev/null 2>&1 || err "$MC --headings failed"
+bash "$MC" --patterns >/dev/null 2>&1 || err "$MC --patterns failed"
+bash "$MC" --no-such-flag >/dev/null 2>&1; [ $? -eq 2 ] || err "$MC unknown flag does not exit 2"
+for n in aws-access-key github-token slack-token stripe-key google-api-key private-key; do
+  bash "$MC" --patterns | grep -q "^$n	" || err "$MC --patterns lacks $n"
+  grep -q "\`$n\`" docs/commands.md || err "docs/commands.md does not list secret pattern $n"
+done
+for f in skills/core/scripts/help.sh docs/commands.md README.md skills/core/SKILL.md \
+         skills/core/references/protocols/groom.md skills/core/references/protocols/doctor.md; do
+  grep -q 'map-check\.sh' "$f" || err "$f does not name map-check.sh"
+done
+# 16b. smoke runs. First outside git (headings, generated_date, secrets,
+#      the verdict and the exit code), then inside a throwaway git repo
+#      for every part-1 branch and the Site test. The global config is
+#      pointed at an empty folder so the machine's own index_file cannot
+#      leak into the fixture. Every case asserts the verdict line and the
+#      exit code. The secret literal is split across printf arguments so
+#      this file never contains a matching string. Every sandbox lives
+#      under a directory named `g[1]`, so an unquoted path prefix in the
+#      script would be read as a glob and mangle displayed paths and the
+#      skip list.
+MCABS="$PWD/$MC"
+T=$(mktemp -d 2>/dev/null || mktemp -d -t capstone)
+G="$T/g[1]"
+mkdir -p "$T/global" "$G/ok/docs/changelog.d" "$G/bad/docs" "$G/crlf/docs" "$G/noidx/docs"
+mc_run() { # label expected_rc expected_verdict dir [args...]; sets MC_OUT
+  local label="$1" rc_want="$2" want="$3" dir="$4" rc; shift 4
+  MC_OUT=$(cd "$dir" && CAPSTONE_GLOBAL_DIR="$T/global" bash "$MCABS" "$@" 2>&1); rc=$?
+  [ "$rc" -eq "$rc_want" ] || err "map-check.sh $label exited $rc, wanted $rc_want"
+  printf '%s\n' "$MC_OUT" | tail -1 | grep -qx "$want" \
+    || err "map-check.sh $label verdict: $(printf '%s\n' "$MC_OUT" | tail -1), wanted: $want"
+}
+mc_row() { printf '%s\n' "$MC_OUT" | grep -q "$1" || err "map-check.sh $2: no row matching $1"; }
+mc_index() { printf '# i\n\n| Topic | File |\n| --- | --- |\n| glossary | [08-glossary.md](08-glossary.md) |\n' > "$1/00-index.md"; }
+mc_gloss() { # dir stamp hash version [extra frontmatter line]
+  printf -- '---\ngenerated_at_commit: %s\ngenerated_date: 2026-01-01\ncapstone_version: %s\ncontent_hash: %s\npaths_covered:\n  - ":(top)src/**"\n%s---\n# g\n\n## Concepts\n\nnone\n' \
+    "$2" "$4" "$3" "${5:-}" > "$1/08-glossary.md"
+}
+mc_index "$G/ok/docs"
+printf -- '---\ngenerated_date: 2026-01-01\n---\n# g\n\n## Concepts\n\nnone\n' > "$G/ok/docs/08-glossary.md"
+# the ledger is skipped entirely, secrets included; an unfolded fragment
+# is listed but never counted
+printf -- '- AKIA%s pasted into the ledger\n' "ABCDEFGHIJKLMNOP" > "$G/ok/docs/changelog.md"
+printf 'key: map/all@abc123def456\n' > "$G/ok/docs/changelog.d/2026-01-01-map-all.md"
+cp "$G/ok/docs/00-index.md" "$G/bad/docs/00-index.md"
+printf -- '---\ngenerated_date: 2026-01-01\n---\n# g\n\nAKIA%s\n' "ABCDEFGHIJKLMNOP" > "$G/bad/docs/08-glossary.md"
+mc_run 'non-git clean' 0 'MAP CHECK: current' "$G/ok" docs
+mc_row '^- changelog.d/2026-01-01-map-all.md: key map/all@abc123def456$' 'non-git clean'
+mc_row '^unfolded fragments: 1 ' 'non-git clean'
+mc_run 'non-git stale' 1 'MAP CHECK: stale (2 findings)' "$G/bad" docs
+mc_row '| docs/08-glossary.md | - | ## Concepts | - | secret: aws-access-key |' 'non-git stale'
+# a CRLF checkout reads as LF: frontmatter fences and headings still match
+mc_index "$G/crlf/docs"
+printf -- '---\r\ngenerated_date: 2026-01-01\r\n---\r\n# g\r\n\r\n## Concepts\r\n\r\nnone\r\n' > "$G/crlf/docs/08-glossary.md"
+mc_run 'non-git crlf' 0 'MAP CHECK: current' "$G/crlf" docs
+# outside git the missing-index path is shown as given
+mc_run 'non-git missing index' 1 'MAP CHECK: stale (1 findings)' "$G/noidx" docs
+mc_row '^no index at docs/00-index.md$' 'non-git missing index'
+if command -v git >/dev/null 2>&1; then
+  # the sandbox must not inherit the developer's git config, the way
+  # CAPSTONE_GLOBAL_DIR keeps the machine's capstone.json out: with
+  # commit.gpgsign on, or a global hooks path that rejects the commit,
+  # `git commit` fails, SHA and H come back empty, and every part-1 case
+  # reports a verdict mismatch instead of the real cause. GIT_CONFIG_*
+  # covers git 2.32 and later; the empty template and the per-command
+  # -c cover older builds.
+  mkdir -p "$T/gittemplate"
+  export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null GIT_CONFIG_NOSYSTEM=1
+  GC='-c commit.gpgsign=false'
+  S="$G/repo"; mkdir -p "$S/src" "$S/docs/capstone"
+  git -C "$S" init -q --template="$T/gittemplate" 2>/dev/null
+  git -C "$S" config user.email lint@capstone; git -C "$S" config user.name lint
+  printf 'fn main(){}\n' > "$S/src/main.rs"
+  git -C "$S" add src; git -C "$S" $GC commit -qm one
+  git -C "$S" rev-parse --verify -q HEAD >/dev/null \
+    || err "map-check.sh git fixture: the sandbox commit failed, so every case below is unreliable"
+  SHA=$(git -C "$S" rev-parse --short=12 HEAD)
+  H=$(git -C "$S" ls-files -s --full-name -- ':(top)src/**' | git hash-object --stdin | cut -c1-12)
+  MANIFEST_V=$(printf '%s\n' "$UNIQ" | grep '.' | head -1)
+  mc_index "$S/docs/capstone"; mc_gloss "$S/docs/capstone" "$SHA" "$H" "$MANIFEST_V"
+  git -C "$S" add docs; git -C "$S" $GC commit -qm docs
+  mc_run 'git current' 0 'MAP CHECK: current' "$S"
+  mc_row "| docs/capstone/08-glossary.md | $SHA | $MANIFEST_V | 0 | current |" 'git current'
+  printf 'x\n' >> "$S/src/main.rs"
+  mc_run 'git working-tree drift' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| 1 | stale |' 'git working-tree drift'
+  git -C "$S" checkout -q -- src/main.rs
+  touch "$S/src/new.rs"
+  mc_run 'git untracked file' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| 1 | stale |' 'git untracked file'
+  rm "$S/src/new.rs"
+  # a stamp no object carries: the squash-merge case
+  mc_gloss "$S/docs/capstone" ffffffffffff "$H" "$MANIFEST_V"
+  mc_run 'unreachable stamp, hash matches' 0 'MAP CHECK: current' "$S"
+  mc_gloss "$S/docs/capstone" ffffffffffff 000000000000 "$MANIFEST_V"
+  mc_run 'unreachable stamp, hash differs' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| - | stale |' 'unreachable stamp, hash differs'
+  mc_gloss "$S/docs/capstone" ffffffffffff e69de29bb2d1 "$MANIFEST_V"
+  mc_run 'legacy empty hash' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| stamp unreachable |' 'legacy empty hash'
+  # no reachable stamp and no version: the missing stamp is the verdict,
+  # ahead of the version gap (map.md's part-1 order)
+  mc_gloss "$S/docs/capstone" ffffffffffff e69de29bb2d1 ""
+  mc_run 'unreachable stamp without a version' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| ffffffffffff | - | - | stamp unreachable |' 'unreachable stamp without a version'
+  mc_gloss "$S/docs/capstone" "$SHA" "$H" 5.2.1
+  mc_run 'older capstone' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| written by an older capstone |' 'older capstone'
+  mc_gloss "$S/docs/capstone" "$SHA" "$H" "$MANIFEST_V" 'mode: prescriptive
+'
+  mc_run 'prescriptive with tracked source' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| prescriptive, pending first observation |' 'prescriptive with tracked source'
+  mc_gloss "$S/docs/capstone" "$SHA" "$H" "$MANIFEST_V"
+  mv "$S/docs/capstone/00-index.md" "$S/docs/capstone/INDEX.md"
+  mc_run 'missing index' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '^no index at docs/capstone/00-index.md$' 'missing index'
+  printf '{ "index_file": "docs/capstone/INDEX.md" }\n' > "$S/docs/capstone/capstone.json"
+  mc_run 'config index_file' 0 'MAP CHECK: current' "$S"
+  rm "$S/docs/capstone/capstone.json"
+  mv "$S/docs/capstone/INDEX.md" "$S/docs/capstone/00-index.md"
+  # a project index_file one level down is legal: the capstone.json that
+  # names it sits inside the docs area it configures
+  mkdir -p "$S/docs/capstone/index"
+  mv "$S/docs/capstone/00-index.md" "$S/docs/capstone/index/00-index.md"
+  printf '{ "index_file": "docs/capstone/index/00-index.md" }\n' > "$S/docs/capstone/capstone.json"
+  mc_run 'nested project index_file' 0 'MAP CHECK: current' "$S"
+  # and one that names no file is reported at that path, not swapped for
+  # <docs_dir>/00-index.md
+  printf '{ "index_file": "docs/capstone/index/NOPE.md" }\n' > "$S/docs/capstone/capstone.json"
+  mc_run 'nested project index_file names no file' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '^no index at docs/capstone/index/NOPE.md$' 'nested project index_file names no file'
+  rm "$S/docs/capstone/capstone.json"
+  mv "$S/docs/capstone/index/00-index.md" "$S/docs/capstone/00-index.md"
+  rmdir "$S/docs/capstone/index"
+  printf '{ "index_file": "docs/other/00-index.md" }\n' > "$T/global/capstone.json"
+  mc_run 'global index_file outside the docs dir' 0 'MAP CHECK: current' "$S"
+  rm "$T/global/capstone.json"
+  # the stock global index_file names a file one level down; a project
+  # whose docs area is `docs` keeps its own docs/00-index.md
+  printf '{ "index_file": "docs/capstone/00-index.md" }\n' > "$T/global/capstone.json"
+  mc_run 'global index_file in a subdirectory' 1 'MAP CHECK: stale (1 findings)' "$S" docs
+  mc_row '^no index at docs/00-index.md$' 'global index_file in a subdirectory'
+  rm "$T/global/capstone.json"
+  mkdir -p "$S/docs/two"; mc_index "$S/docs/two"
+  mc_gloss "$S/docs/two" ffffffffffff 000000000000 "$MANIFEST_V"
+  touch "$S/src/new.rs"
+  mc_run 'two docs dirs' 1 'MAP CHECK: stale (2 findings)' "$S" docs/capstone docs/two
+  [ "$(printf '%s\n' "$MC_OUT" | grep -c '^# map check:')" -eq 2 ] || err "map-check.sh two docs dirs: not two sections"
+  [ "$(printf '%s\n' "$MC_OUT" | grep -c '^MAP CHECK:')" -eq 1 ] || err "map-check.sh two docs dirs: not exactly one verdict line"
+  rm "$S/src/new.rs"; rm -r "$S/docs/two"
+  # Site cells: tracked, an escaped pipe in an earlier cell, a link cell
+  # with a :from-to range, a fenced decoy
+  {
+    printf -- '---\ngenerated_at_commit: %s\ngenerated_date: 2026-01-01\ncapstone_version: %s\ncontent_hash: %s\npaths_covered:\n  - ":(top)src/**"\n---\n' "$SHA" "$MANIFEST_V" "$H"
+    printf '# Interfaces\n\n## Produces\n\n| Kind | Name | To | Site |\n| --- | --- | --- | --- |\n| http | GET /a | other | `src/main.rs:12` |\n'
+    printf '%s\n\n' '| http | GET /b \| GET /c | other | `src/main.rs:1` |'
+    printf '## Consumes\n\n| Kind | Name | From | Site |\n| --- | --- | --- | --- |\n| sqs | ingest | other | [src/main.rs](../../src/main.rs):57-60 |\n\n'
+    printf '```markdown\n| Kind | Name | To | Site |\n| --- | --- | --- | --- |\n| http | decoy | other | `src/decoy.rs:1` |\n```\n'
+  } > "$S/docs/capstone/09-interfaces.md"
+  git -C "$S" add docs; git -C "$S" $GC commit -qm iface
+  mc_run 'tracked sites' 0 'MAP CHECK: current' "$S"
+  sed 's|`src/main.rs:12`|`src/gone.rs:12`|' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$S/docs/capstone/09-interfaces.md"
+  mc_run 'untracked site' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/09-interfaces.md | - | - | site src/gone.rs:12 | - |' 'untracked site'
+  printf '%s\n' "$MC_OUT" | grep -q 'decoy' && err "map-check.sh read the fenced decoy table"
+  # a Site cell has to name one file. `ls-files --error-unmatch` on its
+  # own accepts a tracked directory and a wildcard, both of which name
+  # none, and quarry's blob-set test rejects them.
+  cp "$S/docs/capstone/09-interfaces.md" "$T/iface-gone.md"
+  sed 's|`src/gone.rs:12`|`src`|' "$T/iface-gone.md" > "$S/docs/capstone/09-interfaces.md"
+  mc_run 'site names a directory' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/09-interfaces.md | - | - | site src | - |' 'site names a directory'
+  sed 's|`src/gone.rs:12`|`src/*.rs`|' "$T/iface-gone.md" > "$S/docs/capstone/09-interfaces.md"
+  mc_run 'site names a glob' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/09-interfaces.md | - | - | site src/[*][.]rs | - |' 'site names a glob'
+  cp "$T/iface-gone.md" "$S/docs/capstone/09-interfaces.md"
+  sed '3a\
+mode: prescriptive' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$S/docs/capstone/09-interfaces.md"
+  mc_run 'prescriptive page skips sites' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/09-interfaces.md | .* | prescriptive, pending first observation |' 'prescriptive page skips sites'
+  printf '%s\n' "$MC_OUT" | grep -q 'site src/gone.rs' && err "map-check.sh verified sites on a prescriptive page"
+else
+  echo "note: map-check.sh git fixture skipped (no git)"
+fi
+rm -rf "$T"
 
 [ "$FAIL" -eq 0 ] && echo "lint-sync: all invariants hold" || echo "lint-sync: FAILURES above"
 exit $FAIL

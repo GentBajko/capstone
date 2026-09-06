@@ -18,6 +18,17 @@ after any surface change; CI runs it on every push:
 bash skills/core/scripts/lint-sync.sh
 ```
 
+## Releasing
+
+Bump the version in all six manifests (check 2), then in
+`templates/capstone-map-check.yml`'s `--branch v<version>` (check 12g
+ties the two), and tag the release commit `v<version>`: the CI gate
+template clones that tag to get `map-check.sh`, so an untagged release
+breaks every downstream gate with "no MAP CHECK verdict found". Lint
+check 16 runs `map-check.sh` through a throwaway git repo on every
+lint run; before tagging, run it once on a macOS machine as well,
+since bash 3.2 is the floor the script promises.
+
 ## Every script is bash
 
 There are no PowerShell twins, and check 8 fails if one reappears.

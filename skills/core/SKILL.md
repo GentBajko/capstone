@@ -7,7 +7,8 @@ description: Internal to the capstone suite - carries the shared rules (referenc
 
 This folder is the capstone suite's shared brain: `references/`
 (core rules, protocols, craft files) and `scripts/` (help, config
-initializer, lint). Every other capstone skill resolves it as
+initializer, lint, and `map-check.sh`, the script half of `map check`
+that the CI gate runs). Every other capstone skill resolves it as
 `../core/` from its own base directory, so install the whole suite;
 a lone capstone skill without `core` cannot run.
 
