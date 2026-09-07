@@ -2,8 +2,11 @@
 
 **Reads:** config → each stage's interview file (status frontmatter)
 and the presence of its outputs; the six pre-`build` stages' final
-outputs, plus core.md's Stage ownership table, once, for the readback
-pass (step 7); nothing else until a stage's own protocol runs.
+outputs, plus core.md's Stage ownership table and the five inventories
+step 7's coverage half walks (`logic-craft.md`, `uiux-inventory.md`,
+`interview.md`, `standards-inventory.md`, `protocols/stack.md` Phase A),
+once, for the readback pass (step 7); nothing else until a stage's own
+protocol runs.
 
 Entry point when the user says just "capstone" or asks to start or
 continue the pipeline. Runs the interview chain in order, resuming
@@ -78,10 +81,10 @@ wherever it stopped:
    Stopping is always safe: every stage persists its interview file,
    and the next `start` resumes exactly here.
 7. **Before `build`, read the final outputs back.** No stage can see
-   every later stage while it runs, so this pass checks ownership and
-   contradictions across the completed body of work. The final files
-   are the only decision sources: completed interview bodies are not
-   opened, cited, or amended.
+   every later stage while it runs, so this pass checks coverage,
+   ownership and contradictions across the completed body of work. The
+   final files are the only decision sources: completed interview
+   bodies are not opened, cited, or amended.
 
    Run it when the stack output is formalized and the ledger
    (`changelog.md` and unfolded `changelog.d/` fragments, per
@@ -91,9 +94,46 @@ wherever it stopped:
    the six stage outputs, so unchanged outputs skip and any amended
    stage runs the pass again.
    Read the final `mockup/`, `logic/`, `uiux/`, architecture chapters,
-   `standards.md`, and `05-dependencies.md`, then run the two halves in
-   order: misplacement first, so the contradiction half cites final
-   locations.
+   `standards.md`, and `05-dependencies.md`, then run the three halves
+   in order: coverage first, because a decision nobody made is cheaper
+   to settle before the other two argue about what is there, then
+   misplacement, so the contradiction half cites final locations.
+
+   **Coverage: what nobody asked.** Each stage was gated on an
+   inventory. Walk each one against that stage's final outputs and
+   collect every required item those outputs neither decide nor rule
+   out:
+
+   | Stage | Inventory | Final outputs |
+   | --- | --- | --- |
+   | logic | `logic-craft.md` §3's dimensions D1-D16 | `logic/*.md`, each file's `## Dimensions not in play` |
+   | uiux | `uiux-inventory.md` §3's system items and §4's screen items | the `uiux/` chapters and `screens/`, each file's `## Not in play` |
+   | architecture | `interview.md` §0-§4 | the prescriptive chapters |
+   | standards | `standards-inventory.md` §3's domains and §4's items | `standards.md` and its `## Not in play` |
+   | stack | the capability list `stack.md` Phase A derives | `05-dependencies.md` |
+
+   An item is covered when an output records a decision for it, or
+   records it inapplicable with a reason. An item another stage's
+   output settles and this one cites is covered as well. Everything
+   left over is a finding.
+
+   Nothing is being argued here, only asked, so this half is **one
+   digest rather than a debate** like misplacement: a numbered list,
+   each line naming the stage, the item, and the final file the answer
+   would land in ("3. standards, S65 idempotency → `standards.md`, API
+   conventions"). The user answers, skips, or rules one out. Every
+   answer is written into the owning final file with its
+   rationale, that file's stamp refreshed, and the owning stage's
+   changelog entry appended; an item ruled out is written as an
+   inapplicable line in the file its own inventory names for that.
+   Skipped items are named in the pass's own entry, so the next run
+   raises them again.
+
+   The digest is short by construction: an item its output already
+   answers never reaches it, and on a project whose stages each ran
+   their own gate the digest is empty. Report an empty one in a single
+   line ("coverage: nothing uncovered across the five inventories")
+   rather than passing over it in silence, so the user knows it ran.
 
    **Misplacement: move it to its owner.** Against core.md's Stage
    ownership table, collect every decision whose subject belongs to a
@@ -128,8 +168,10 @@ wherever it stopped:
 
    Close the pass with its own entry, key
    `readback/all@<stamp>`, even when it found nothing: it names the
-   final files read, every decision relocated and where it went, every
-   finding, and how each was settled. Stopping mid-pass is safe:
+   final files read, every uncovered item the coverage half raised with
+   how each was answered, skipped or ruled out, every decision relocated
+   and where it went, every finding, and how each was settled. Stopping
+   mid-pass is safe:
    applied resolutions stand, the key goes unwritten, and the next
    `start` re-runs the pass.
 8. After `build`, close out: the project runs. Point at everything

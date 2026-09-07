@@ -287,11 +287,17 @@ dead session loses nothing, and re-running never re-asks.
   re-vets recorded picks later. Ledger keys `stack/all@Q<n>` and
   `stack/refresh@Q<n>`.
 - **Between `stack` and `build`** the pipeline reads all six stages'
-  final outputs in two halves. First it **re-files what landed in the
-  wrong stage** against core.md's Stage ownership table - a business
-  rule in an architecture chapter belongs in `logic`, while a library
-  in `standards.md` belongs in `05-dependencies.md` - as one digest you
-  confirm, since nothing is being re-decided. Then it **raises what one
+  final outputs in three halves. First it **names what nobody asked**:
+  every item of a stage's own inventory - `logic`'s dimensions, the
+  uiux and standards inventories, the architecture question list,
+  `stack`'s derived capability list - that no final output decides or
+  rules out, as one numbered digest you answer, skip, or strike, and
+  as one line saying so when nothing is uncovered. Then it **re-files
+  what landed in the wrong stage** against core.md's Stage ownership
+  table - a business rule in an architecture chapter belongs in
+  `logic`, while a library in `standards.md` belongs in
+  `05-dependencies.md` - as one digest you
+  confirm, since nothing is being re-decided. Last it **raises what one
   final output says that contradicts another**. Same terms as any
   interview's pushback: evidence and final-file citations, two rounds
   at most, then your answer stands. The affected final outputs, index,

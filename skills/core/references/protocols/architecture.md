@@ -28,7 +28,10 @@ now gets it, with the exchange recorded.
 only when (a) every applicable item in `../interview.md`, the merged
 question inventory, has been asked, answered, or recorded as
 not-applicable, AND (b) every required section of every applicable topic
-in `../topics.md` can be written from recorded answers. Both are
+in `../topics.md` can be written from recorded answers. Payloads sit
+inside (b): every `schema` a planned `09-interfaces.md` row names must
+have its `02-models.md` `### <Entity>` field table answerable from
+recorded decisions, or the row's inline fields must be. Both are
 checkable conditions: sweep them and ask about whatever is not yet
 answerable. Never assume: any default you want to apply must be surfaced
 as a question or an explicitly-confirmed default, not silently adopted.

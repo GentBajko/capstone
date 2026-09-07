@@ -123,7 +123,12 @@ from recorded decisions.
 - Communication: protocols per edge (REST/GraphQL/gRPC/WebSocket/SSE/
   webhooks); API style rules (pagination, errors (RFC 9457?), versioning,
   deprecation policy); messaging (queue vs stream, broker, delivery
-  semantics, ordering, DLQs); API gateway/BFF?
+  semantics, ordering, DLQs); API gateway/BFF? Then the **payload** per
+  channel, in both directions: which entity or DTO crosses it, or the
+  fields inline with their types and optionality when no type will
+  declare one. A named entity's fields land in `02-models.md`'s
+  `### <Entity>` section, settled under → models.md below, and the
+  `schema` on that row of `09-interfaces.md` is what points at them.
 - Composition: how dependencies are wired (DI style, composition roots).
 - Frontend (products with a UI): the §4 Frontend/clients module fills
   this chapter's Frontend section; walk it before closing this
@@ -131,6 +136,10 @@ from recorded decisions.
 
 ### → models.md
 - Core entities and their relationships; aggregate/invariant boundaries.
+  Each entity's **fields** are settled here too, one per line with its
+  type and whether it is optional, because `02-models.md` pins a
+  `### <Entity>` table per entity and a field nobody asked about is a
+  field the chapter invents. An enum field lists its accepted values.
 - Storage paradigm per workload (relational, document, KV, graph,
   time-series, vector, search, blob, ledger).
 - Consistency needs per operation: strong vs eventual, where staleness is

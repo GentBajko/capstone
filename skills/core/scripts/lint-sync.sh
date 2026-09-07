@@ -1637,5 +1637,76 @@ printf '%s\n' "$ST_FLAT" | grep -qF 'write it ourselves' \
 printf '%s\n' "$ST_FLAT" | grep -qF 'presents first and recommends' \
   || err "$ST's ladder still gates the capability instead of ranking the options"
 
+# 24. the readback's coverage half, and the payload questions upstream
+#     of it. Every stage now finishes against an inventory, so the one
+#     thing the readback could not see was an item nobody asked about:
+#     the pass runs three halves, and the first is only runnable if
+#     start.md names each inventory it walks. Upstream of that,
+#     02-models.md pins a `### <Entity>` field table per entity and
+#     09-interfaces.md's `schema` resolves through it, so the
+#     architecture interview has to ask for the fields rather than let
+#     the chapter infer them - a guess there is what the first
+#     `quarry check` compares against.
+SBK=skills/core/references/protocols/start.md
+SBK_FLAT=$(tr '\n' ' ' < "$SBK" | tr -s ' ')
+printf '%s\n' "$SBK_FLAT" | grep -qF 'three halves' \
+  || err "$SBK step 7 still runs two halves of the readback"
+SBK_COV=$(awk '
+  /\*\*Coverage: what nobody asked\.\*\*/ { inp = 1 }
+  inp && /\*\*Misplacement: move it to its owner\.\*\*/ { exit }
+  inp { print }
+' "$SBK" | tr '\n' ' ' | tr -s ' ')
+if [ -z "$SBK_COV" ]; then
+  err "$SBK step 7 lost the coverage half (Coverage: what nobody asked)"
+else
+  for s in '`logic-craft.md` §3' '`uiux-inventory.md` §3' \
+           '`interview.md` §0-§4' '`standards-inventory.md` §3' \
+           '`stack.md` Phase A'; do
+    printf '%s\n' "$SBK_COV" | grep -qF "$s" \
+      || err "$SBK's coverage half does not walk $s"
+  done
+  printf '%s\n' "$SBK_COV" | grep -qF 'one digest rather than a debate' \
+    || err "$SBK's coverage half is a debate rather than one digest"
+  printf '%s\n' "$SBK_COV" | grep -qF 'empty' \
+    || err "$SBK's coverage half never says an empty digest is still reported"
+fi
+grep -qF 'names what nobody asked' docs/commands.md \
+  || err "docs/commands.md does not carry the readback's coverage half"
+IVF=skills/core/references/interview.md
+IV_COMM=$(sed -n '/^- Communication: protocols per edge/,/^- Composition:/p' "$IVF" \
+  | tr '\n' ' ' | tr -s ' ')
+if [ -z "$IV_COMM" ]; then
+  err "$IVF has no Communication bullet under → architecture.md"
+else
+  for s in 'payload' '02-models.md' '### <Entity>' 'schema'; do
+    printf '%s\n' "$IV_COMM" | grep -qF "$s" \
+      || err "$IVF's Communication bullet asks for no payload, or names no $s"
+  done
+fi
+IV_MOD=$(sed -n '/^- Core entities and their relationships/,/^- Storage paradigm/p' "$IVF" \
+  | tr '\n' ' ' | tr -s ' ')
+if [ -z "$IV_MOD" ]; then
+  err "$IVF has no core-entities bullet under → models.md"
+else
+  for s in 'fields' 'type' 'optional' 'accepted values'; do
+    printf '%s\n' "$IV_MOD" | grep -qF "$s" \
+      || err "$IVF's core-entities bullet settles no per-field $s"
+  done
+fi
+ARC=skills/core/references/protocols/architecture.md
+ARC_CRIT=$(awk '
+  /^\*\*The exhaustiveness criterion/ { inp = 1 }
+  inp && /^$/ { exit }
+  inp { print }
+' "$ARC" | tr '\n' ' ' | tr -s ' ')
+if [ -z "$ARC_CRIT" ]; then
+  err "$ARC lost the exhaustiveness criterion paragraph"
+else
+  for s in 'schema' '09-interfaces.md' '### <Entity>'; do
+    printf '%s\n' "$ARC_CRIT" | grep -qF "$s" \
+      || err "$ARC's exhaustiveness criterion does not reach payloads via $s"
+  done
+fi
+
 [ "$FAIL" -eq 0 ] && echo "lint-sync: all invariants hold" || echo "lint-sync: FAILURES above"
 exit $FAIL
