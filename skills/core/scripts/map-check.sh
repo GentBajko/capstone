@@ -86,9 +86,12 @@ DOCS_ABS=""
 # Skipped entirely (brief P10): never stamped, or local working state.
 # Matched on the path relative to docs_dir. The index is skipped for
 # stamps, headings and sites but still secret-scanned (see run_dir).
+# uiux/preview.html is the design preview protocols/uiux.md Phase D'
+# writes: gitignored, no frontmatter, no schema record, and a rendering
+# of 02-system.md rather than a page of its own.
 is_skipped() {
   case "$1" in
-    changelog*.md|changelog.d/*|*-interview.md|*/*-interview.md|features/*|review.md|be-review.md|fe-review.md|capstone.json|.gitignore) return 0 ;;
+    changelog*.md|changelog.d/*|*-interview.md|*/*-interview.md|features/*|review.md|be-review.md|fe-review.md|capstone.json|.gitignore|uiux/preview.html) return 0 ;;
   esac
   return 1
 }
@@ -780,7 +783,17 @@ check_part1() {
   hash=$(fm_value "$fm" content_hash)
   [ "$hash" = "$EMPTY_HASH" ] && hash=""
   changed="-"; verdict=""; fallback=""
-  if [ "$IN_GIT" -eq 0 ]; then
+  if [ ${#ga[@]} -eq 0 ]; then
+    # No globs, so there is nothing to diff and staleness is not a
+    # question this page can answer. Which capstone wrote it still is,
+    # and for a page no refresh path regenerates that is the only signal
+    # there will ever be.
+    if [ -n "$PLUGIN_VERSION" ] && version_lt "$ver" "$PLUGIN_VERSION"; then
+      verdict="written by an older capstone"
+    else
+      verdict=current
+    fi
+  elif [ "$IN_GIT" -eq 0 ]; then
     verdict="unknowable (not a git repo)"
   elif [ "$mode" = prescriptive ]; then
     if has_source "${ga[@]}"; then verdict="prescriptive, pending first observation"
@@ -809,9 +822,20 @@ check_part1() {
       fi
     fi
   fi
+  # A page with no globs cannot be stale against code, and no refresh
+  # path regenerates one: `standards.md` and every interview-derived
+  # scenario or screen are rewritten by re-running their own stage. The
+  # version gap is worth showing and worth nobody's failed build, so it
+  # is reported the way part 7 reports a waiting fragment.
   case "$verdict" in
     current|"unknowable (not a git repo)") ;;
-    *) FINDINGS=$((FINDINGS + 1)); P1_FINDINGS=$((P1_FINDINGS + 1)) ;;
+    *)
+      if [ ${#ga[@]} -eq 0 ]; then
+        verdict="$verdict (informational)"
+      else
+        FINDINGS=$((FINDINGS + 1)); P1_FINDINGS=$((P1_FINDINGS + 1))
+      fi
+      ;;
   esac
   P1_ROWS="$P1_ROWS| $disp | ${stamp:--} | ${ver:--} | $changed | $verdict |
 "
@@ -825,9 +849,18 @@ check_part8() {
   local f="$1" disp="$2" fm="$3" globs="$4" record="$5" only_secrets="$6"
   local keys="" heads="" sites="" secrets="" mode cell p line name re seen k base items=0
   local rows="" models="" rowsites="" edir ekind ename esite eschema pname pform pmodel
-  local hl opts spec col lvl
+  local hl opts spec col lvl older fmver
   mode=$(fm_value "$fm" mode)
   base=$(basename "$f")
+  # A page written by an older capstone is measured against a template it
+  # never saw, so its every heading would be reported at once. Part 1
+  # names that page and its repair already; the section list is checked
+  # again once the owning stage has rewritten it.
+  older=0
+  fmver=$(fm_value "$fm" capstone_version)
+  if [ -n "$fmver" ] && [ -n "$PLUGIN_VERSION" ] && version_lt "$fmver" "$PLUGIN_VERSION"; then
+    older=1
+  fi
   if [ "$only_secrets" -eq 0 ]; then
     # keys!: owed on every page, inside git or out, prescriptive or not.
     # `known_as` is spelled in the schema like any other key and read
@@ -879,7 +912,7 @@ check_part8() {
         keys="${keys:+$keys, }$k"; items=$((items + 1))
       done <<< "$(schema_field "$record" keys | tr ' ' '\n')"
     fi
-    if [ "$SCHEMA_OK" -eq 1 ] && [ -n "$record" ]; then
+    if [ "$SCHEMA_OK" -eq 1 ] && [ -n "$record" ] && [ "$older" -eq 0 ]; then
       hl=$(schema_field "$record" head | head -1)
       if [ -n "$hl" ]; then
         while IFS= read -r line; do
@@ -1131,7 +1164,9 @@ run_dir() {
     fm=$(frontmatter_of "$f")
     globs=$(fm_globs "$fm")
     record=$(schema_type_for "$rel")
-    [ -n "$globs" ] && check_part1 "$dfile" "$fm" "$globs"
+    if [ -n "$globs" ] || [ -n "$(fm_value "$fm" capstone_version)" ]; then
+      check_part1 "$dfile" "$fm" "$globs"
+    fi
     check_part8 "$f" "$dfile" "$fm" "$globs" "$record" 0
   done <<< "$files"
   # the index is looked up by record rather than by path, because

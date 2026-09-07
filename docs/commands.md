@@ -222,7 +222,7 @@ dead session loses nothing, and re-running never re-asks.
 | --- | --- | --- |
 | `mockup` | `mockup/` - one file per screen: wireframe, elements, and a state inventory; `README.md` indexes the screens, the journeys, and the scenario list `logic` works from | `mockup-interview.md` |
 | `logic` | `logic/` - one file per scenario: triggers, exact rules, branches, unhappy paths, invariants, and the dimensions ruled out | `logic-interview.md` |
-| `uiux` | `uiux/01-direction.md`, `02-system.md`, `03-experience.md`, `screens/` | `uiux-interview.md` |
+| `uiux` | `uiux/01-direction.md`, `02-system.md` (tokens, the `## Assets` manifest), `03-experience.md`, `screens/`, the brand SVGs in `uiux/assets/`, and `preview.html` | `uiux-interview.md` |
 | `architecture` | The numbered chapters, marked `mode: prescriptive` (`09-interfaces.md` too when the design declares cross-repo edges) | `architecture-interview.md` |
 | `standards` | `standards.md` | `standards-interview.md` |
 | `stack` | `05-dependencies.md` | `stack-interview.md` |
@@ -248,12 +248,44 @@ dead session loses nothing, and re-running never re-asks.
   questions: what does not apply is confirmed in one batch, not
   sixteen turns. Without the sweep, a rule nobody thought to ask about
   reads exactly like a rule that does not exist.
-- **`uiux`** requires a formalized `mockup`. On a repo that already has
+- **`uiux`** requires a formalized `mockup`. It sweeps the product
+  against `uiux-inventory.md`'s twenty-seven system items and every
+  screen against its eleven screen items, and finishes when each one
+  is answered, cited to an earlier answer, or recorded inapplicable in
+  the owning file's `## Not in play` section - the same completion test
+  `logic` gets from its dimensions. Before the gate it writes
+  `uiux/preview.html`, one self-contained page rendering the committed
+  tokens as the flagship first viewport plus a style tile, so the user
+  steers by looking rather than by reading hex values; it is
+  regenerated whenever a token changes and never committed. The brand
+  files it plans go in `uiux/assets/` and are listed row by row in
+  `02-system.md`'s `## Assets` table, with the SVGs committed and the
+  raster exports ignored. On a repo that already has
   a frontend it runs in **extraction mode** instead: it documents the
   design that exists rather than interviewing for one.
-- **`stack`** researches real options per capability with licenses and
-  pricing; you pick. `stack refresh` re-vets recorded picks later.
-  Ledger keys `stack/all@Q<n>` and `stack/refresh@Q<n>`.
+- **`standards`** sweeps the seventeen domains in
+  `standards-inventory.md`: the nine it always walked plus security,
+  logging and privacy, API conventions, accessibility, performance
+  budgets, documentation, versioning and release, and CI gates. Each
+  domain holds items carrying the probe that turns them into a question
+  and the `code-craft.md` rule they default to, so most are settled by
+  an earlier answer or by the craft file and never asked. It finishes
+  when every item is answered, cited to `code-craft.md` as accepted
+  unchanged, or recorded in `standards.md`'s closing `## Not in play`
+  with its reason.
+- **`stack`** derives the capability list from your own documents
+  rather than from a stock list: every External services row, every
+  Communication channel, every store and queue in the data-flow
+  chapter, every process and environment variable in the operations
+  chapter, every logic scenario reaching outside the process, and the
+  `uiux/02-system.md` commitments. Each row is shown with the source
+  that produced it, and you add or strike. Every capability then
+  reaches you as two to four researched options with licenses and
+  pricing, plus one more in every list: write it ourselves, priced in
+  code and in what the project then maintains. The `code-craft.md`
+  ladder recommends and names its rung; you pick. `stack refresh`
+  re-vets recorded picks later. Ledger keys `stack/all@Q<n>` and
+  `stack/refresh@Q<n>`.
 - **Between `stack` and `build`** the pipeline reads all six stages'
   final outputs in two halves. First it **re-files what landed in the
   wrong stage** against core.md's Stage ownership table - a business
@@ -353,6 +385,8 @@ docs/capstone/
 ├── logic/                 business logic, one file per scenario
 ├── mockup/                one file per screen
 ├── uiux/                  direction, design system, per-screen chapters
+│   ├── assets/            the brand SVGs - committed; rasters gitignored
+│   └── preview.html       the rendered style tile           (gitignored)
 ├── changelog.md           the folded ledger - always committed
 ├── changelog.d/           one fragment per new entry, folded on main - committed
 ├── standards.md           how code should be written here

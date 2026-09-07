@@ -120,22 +120,30 @@ match   uiux/02-system.md
 keys    generated_at_commit content_hash paths_covered
 keys!   generated_date
 opt     generated_at_commit content_hash paths_covered
-head    Implementation constraints
+head    Implementation constraints|Assets
+table   Assets:Asset|File|Source|Status
 from    uiux.md|Phase E
+# The Assets table is the brand-asset manifest uiux-inventory.md's S15
+# fills and `build` consumes: a row whose `Status` is `awaited` stops
+# the build rather than shipping a placeholder, so the column is pinned
+# here the way the interfaces tables' are.
 
 type    uiux-experience
 match   uiux/03-experience.md
 keys    generated_at_commit content_hash paths_covered
 keys!   generated_date
 opt     generated_at_commit content_hash paths_covered
-# Phase E lists the experience rules in prose and names no `## ` heading.
+head    Not in play
+from    uiux.md|Phase E
+# Phase E lists the experience rules themselves in prose and names no
+# `## ` heading for them; the closing section is the one it does name.
 
 type    uiux-screen
 match   uiux/screens/*.md
 keys    generated_at_commit content_hash paths_covered
 keys!   generated_date
 opt     generated_at_commit content_hash paths_covered
-head    Mode & job|Composition|States|Motion|Copy
+head    Mode & job|Composition|States|Motion|Copy|Not in play
 from    uiux.md|Phase E
 
 type    chapter-architecture
@@ -226,10 +234,16 @@ from    topics.md|interfaces.md
 type    standards
 match   standards.md
 keys!   generated_date
+head    Typing|Libraries vs reinventing|Paradigm|Error handling|Organization|Documentation|Testing|Tooling|CI gates|Security|Logging and privacy|API conventions|Accessibility|Performance budgets|Versioning and release|Process|Agent rules|Not in play
+from    standards-inventory.md|3. The domains
 # standards.md carries no `paths_covered` by design, per
 # protocols/standards.md: it records decisions rather than observations,
-# so no glob makes it stale. Its domain list is prose in that protocol
-# and is not pinned yet; the standards inventory work settles it.
+# so no glob makes it stale. The seventeen domains and their order are
+# references/standards-inventory.md's §3, which is why `from` names a
+# reference rather than a protocol. Every heading is written even when
+# the domain was ruled out - the section holds one sentence pointing at
+# `Not in play` - so a missing one is a real gap rather than a project
+# that had nothing to say.
 
 type    implementation
 match   implementation.md

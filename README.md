@@ -244,7 +244,10 @@ when a charge fails after the money moved.
 the tokens, each screen's composition and states. The method is
 vendored, distilled from `impeccable` (Apache-2.0) and
 `design-taste-frontend` (MIT), so the same product designs the same
-way on any machine.
+way on any machine. Before the gate it writes `uiux/preview.html`, a
+single self-contained page showing the committed tokens as the
+flagship first viewport and a style tile, so you steer the design by
+looking at it rather than by reading hex values.
 
 **architecture**. The big interview. Done only when every section of
 the future docs is answerable from your recorded decisions. Writes
@@ -252,12 +255,19 @@ the same numbered chapters, marked prescriptive; once code exists,
 `map` replaces intent with observation.
 
 **standards**. Typing strictness, library versus hand-rolled, error
-handling, what an AI must never do in your repo. Also a decent
-starting point for a CLAUDE.md.
+handling, what an AI must never do in your repo. It sweeps seventeen
+domains from an inventory - security, logging and privacy, API
+conventions, accessibility, performance budgets and the rest - and is
+finished only when every item is answered, accepted from the craft
+file, or written down as not in play. Also a decent starting point for
+a CLAUDE.md.
 
 **stack, then build**. `stack` researches real options per
 capability, licenses and prices included; you pick, and
-`stack refresh` re-vets the picks months later. `build` writes an
+`stack refresh` re-vets the picks months later. The capability list
+comes from your own chapters rather than a stock list, and every
+capability reaches you as options, writing it yourselves among them,
+with the ladder recommending rather than deciding for you. `build` writes an
 implementation plan, stops for your approval, then writes the code:
 one subagent per step with fresh context, or inline, whichever you
 pick when it starts.
@@ -356,8 +366,10 @@ user, shared by every project.
 | `cross_repo` | `auto` or `off`: whether `groom`, `plan`, the `architecture` interview, and `map`'s interfaces pass consult the `quarry` CLI; `map` reads the edges quarry could not join and asks you about those, and writes the `known_as` aliases quarry resolves names against |
 | `redact` | Env-var name patterns (`*` at either end) whose values `map` writes as `<redacted>` and never quotes; case-insensitive |
 
-Interviews, `features/`, and `review.md` stay local via a generated
-`.gitignore`. **The ledger - `changelog.md` and its `changelog.d/`
+Interviews, `features/`, `review.md`, `uiux/preview.html` and the
+raster exports under `uiux/assets/` stay local via a generated
+`.gitignore`; the brand SVGs beside those exports are committed, since
+`build` moves them into the app. **The ledger - `changelog.md` and its `changelog.d/`
 fragments - is always
 committed**: `implement` deletes a feature's folder once its ledger
 entry is written, so the ledger is the only surviving record of why

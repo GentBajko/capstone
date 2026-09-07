@@ -203,6 +203,28 @@ if [ -f "$IGNORE" ]; then
     echo "unignored: capstone.json in $IGNORE"
     migrated=1
   fi
+  # 6.4 added the uiux stage's preview and its raster brand assets.
+  # Appended rather than rewritten, so a hand-edited ignore file keeps
+  # its own rules; each rule is added only when it is absent, so a
+  # second run adds nothing. uiux/assets/*.svg is never added: the mark
+  # is committed, for the reason the template's header gives.
+  added=""
+  for rule in uiux/preview.html 'uiux/assets/*.png' 'uiux/assets/*.jpg' \
+              'uiux/assets/*.jpeg' 'uiux/assets/*.webp' uiux/assets/references/; do
+    if ! grep -qxF "$rule" "$IGNORE"; then
+      added="$added$rule
+"
+    fi
+  done
+  if [ -n "$added" ]; then
+    { cat "$IGNORE"
+      echo
+      echo "# The uiux preview and raster brand assets; the SVG sources are committed"
+      printf '%s' "$added"; } > "$IGNORE.capstone-tmp" \
+      && mv "$IGNORE.capstone-tmp" "$IGNORE"
+    echo "ignored: the uiux preview and raster assets in $IGNORE"
+    migrated=1
+  fi
   [ "$migrated" -eq 1 ] || echo "exists: $IGNORE"
 else
   cat > "$IGNORE" <<'EOF'
@@ -215,6 +237,10 @@ else
 # the strength of its entry. capstone.json is not here either: it is
 # the project's shared config, committed for the same reason a
 # standard is written down rather than kept on one machine.
+# uiux/assets/*.svg is deliberately NOT here either and must never be
+# added: the SVG is the mark itself, the file build moves into the
+# app and rasterises the favicon from, and a logo that lives on one
+# machine is not a brand.
 
 # Feature working files: interviews, specs, plans, review ledgers
 features/
@@ -228,6 +254,18 @@ review.md
 # Superseded by review.md; listed so older repos stay ignored
 be-review.md
 fe-review.md
+
+# The uiux stage's rendered preview: a picture of 02-system.md, not a
+# deliverable, and hard rule 4 says the outputs are markdown
+uiux/preview.html
+
+# Raster brand assets and reference material. The SVG sources beside
+# them are committed (see above); these are exports and mood boards.
+uiux/assets/*.png
+uiux/assets/*.jpg
+uiux/assets/*.jpeg
+uiux/assets/*.webp
+uiux/assets/references/
 EOF
   echo "created: $IGNORE"
 fi

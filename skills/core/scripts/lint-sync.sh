@@ -1095,16 +1095,90 @@ mode: prescriptive' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$
   mc_run 'logic scenario missing a section' 1 'MAP CHECK: stale (1 findings)' "$S"
   mc_row '| docs/capstone/logic/01-scenario.md | - | ## Invariants | - | - |' 'logic scenario missing a section'
   rm -r "$S/docs/capstone/logic"
-  # a uiux screen chapter, the same way
+  # a uiux screen chapter, the same way. `## Not in play` closes it:
+  # uiux-inventory.md's gate records the items that had nothing to
+  # decide, and a screen file without the section cannot tell "no
+  # motion here" from "nobody asked".
   mkdir -p "$S/docs/capstone/uiux/screens"
-  printf -- '---\ngenerated_date: 2026-01-01\n---\n# s\n\n## Mode & job\n\nx\n\n## Composition\n\nx\n\n## States\n\nx\n\n## Motion\n\nx\n\n## Copy\n\nx\n' \
-    > "$S/docs/capstone/uiux/screens/01-screen.md"
+  mc_screen() { # dir: one complete screen chapter
+    printf -- '---\ngenerated_date: 2026-01-01\n---\n# s\n\n## Mode & job\n\nx\n\n## Composition\n\nx\n\n## States\n\nx\n\n## Motion\n\nx\n\n## Copy\n\nx\n\n## Not in play\n\nx\n' \
+      > "$1/01-screen.md"
+  }
+  mc_screen "$S/docs/capstone/uiux/screens"
   mc_run 'uiux screen complete' 0 'MAP CHECK: current' "$S"
   grep -v '^## States$' "$S/docs/capstone/uiux/screens/01-screen.md" > "$S/x" \
     && mv "$S/x" "$S/docs/capstone/uiux/screens/01-screen.md"
   mc_run 'uiux screen missing a section' 1 'MAP CHECK: stale (1 findings)' "$S"
   mc_row '| docs/capstone/uiux/screens/01-screen.md | - | ## States | - | - |' 'uiux screen missing a section'
+  mc_screen "$S/docs/capstone/uiux/screens"
+  grep -v '^## Not in play$' "$S/docs/capstone/uiux/screens/01-screen.md" > "$S/x" \
+    && mv "$S/x" "$S/docs/capstone/uiux/screens/01-screen.md"
+  mc_run 'uiux screen with no ruled-out record' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/uiux/screens/01-screen.md | - | ## Not in play | - | - |' 'uiux screen with no ruled-out record'
+  mc_screen "$S/docs/capstone/uiux/screens"
+  # the system chapter's Assets manifest: the section is required and
+  # its four columns are pinned, because `build` reads Status to decide
+  # whether it may ship at all
+  mc_system() { # dir assets-body
+    printf -- '---\ngenerated_date: 2026-01-01\n---\n# y\n\n## Implementation constraints\n\nx\n\n%s\n' \
+      "$2" > "$1/02-system.md"
+  }
+  mc_system "$S/docs/capstone/uiux" '## Assets
+
+| Asset | File | Source | Status |
+| --- | --- | --- | --- |
+| logo mark | assets/logo.svg | supplied | present |'
+  mc_run 'uiux system complete' 0 'MAP CHECK: current' "$S"
+  mc_system "$S/docs/capstone/uiux" '## Tokens
+
+x'
+  mc_run 'uiux system with no asset manifest' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/uiux/02-system.md | - | ## Assets | - | - |' 'uiux system with no asset manifest'
+  mc_system "$S/docs/capstone/uiux" '## Assets
+
+| Asset | File | Source |
+| --- | --- | --- |
+| logo mark | assets/logo.svg | supplied |'
+  mc_run 'assets table missing a column' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/uiux/02-system.md | - | table Assets missing Status | - | - |' 'assets table missing a column'
+  # the preview is skipped entirely: no frontmatter, no record, and a
+  # rendering of the chapter rather than a page of its own
+  mc_system "$S/docs/capstone/uiux" '## Assets
+
+| Asset | File | Source | Status |
+| --- | --- | --- | --- |
+| logo mark | assets/logo.svg | supplied | present |'
+  printf -- '<!doctype html>\nAWS_ACCESS_KEY_ID=AKIA%s\n' "ABCDEFGHIJKLMNOP" \
+    > "$S/docs/capstone/uiux/preview.html"
+  git -C "$S" add docs/capstone/uiux/preview.html
+  mc_run 'uiux preview is skipped' 0 'MAP CHECK: current' "$S"
+  git -C "$S" rm -q --cached docs/capstone/uiux/preview.html
   rm -r "$S/docs/capstone/uiux"
+  # standards.md's seventeen domains plus `## Not in play`. The
+  # interview stops when the inventory's gate is met, so a run that
+  # stopped early shows up as a heading that is not there; the sections
+  # are generated from the schema record itself, which is what the gate
+  # reads, so the fixture cannot drift from the contract it tests.
+  mc_standards() { # dir [domain heading to omit]
+    { printf -- '---\ngenerated_date: 2026-01-01\n---\n# s\n\n'
+      awk -v skip="${2:-}" '
+        { sub(/\r$/, "") }
+        /^type[ \t]+standards$/ { inr = 1; next }
+        /^type[ \t]/ { inr = 0 }
+        inr && /^head[ \t]/ {
+          sub(/^head[ \t]+/, "")
+          n = split($0, H, "|")
+          for (i = 1; i <= n; i++) if (H[i] != skip) printf "## %s\n\nx\n\n", H[i]
+          exit
+        }' skills/core/references/schema.txt
+    } > "$1/standards.md"
+  }
+  mc_standards "$S/docs/capstone"
+  mc_run 'standards domains complete' 0 'MAP CHECK: current' "$S"
+  mc_standards "$S/docs/capstone" Security
+  mc_run 'standards missing a domain' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/standards.md | - | ## Security | - | - |' 'standards missing a domain'
+  rm "$S/docs/capstone/standards.md"
   # heading order: every required section is there, two of them swapped.
   # The finding names both positions, so the repair is obvious without
   # opening the file.
@@ -1381,8 +1455,10 @@ else
       err "schema record $rty has a from without a section: $rfrom"
       continue
     fi
+    # a `from` naming topics.md or an inventory is a shared reference;
+    # anything else is a protocol file
     case "$rfile" in
-      topics.md) rpath="skills/core/references/$rfile" ;;
+      topics.md|*-inventory.md) rpath="skills/core/references/$rfile" ;;
       *) rpath="skills/core/references/protocols/$rfile" ;;
     esac
     if [ ! -f "$rpath" ]; then
@@ -1460,6 +1536,106 @@ for f in skills/core/references/topics.md skills/core/references/protocols/map.m
          docs/commands.md CONTRIBUTING.md; do
   grep -q 'schema\.txt' "$f" || err "$f does not name references/schema.txt"
 done
+
+# 22. the uiux completion test. logic finishes when logic-craft's
+#     dimensions are each answered, cited or ruled out; uiux finishes
+#     the same way or it finishes whenever the model runs out of ideas,
+#     which is silent and early. So: the inventory exists, both its
+#     lists carry items, the protocol reads it by name, and the two
+#     artifacts it introduces - preview.html and the Assets manifest -
+#     are named where they are written, ignored where they are local,
+#     and consumed where build acts on them. The SVG sources are the
+#     one thing under uiux/assets/ that must never be ignored.
+UIUX_INV=skills/core/references/uiux-inventory.md
+if [ ! -f "$UIUX_INV" ]; then
+  err "$UIUX_INV is missing (uiux.md reads it as the completion test)"
+else
+  n=$(grep -cE '^\*\*S[0-9]+ ' "$UIUX_INV")
+  [ "${n:-0}" -gt 0 ] || err "$UIUX_INV lists no system items (**S<n> ...)"
+  n=$(grep -cE '^\*\*P[0-9]+ ' "$UIUX_INV")
+  [ "${n:-0}" -gt 0 ] || err "$UIUX_INV lists no screen items (**P<n> ...)"
+  grep -q 'uiux-inventory\.md' skills/core/references/protocols/uiux.md \
+    || err "uiux.md does not read uiux-inventory.md by name"
+fi
+for s in 'preview.html' '## Assets' 'Not in play'; do
+  grep -qF "$s" skills/core/references/protocols/uiux.md \
+    || err "uiux.md does not name $s"
+done
+grep -qF 'Assets' skills/core/references/protocols/build.md \
+  || err "build.md does not name the Assets manifest it moves and rasterizes"
+grep -qF 'docs/capstone/uiux/assets/' skills/core/references/protocols/build.md \
+  || err "build.md does not name the asset move out of docs/capstone/uiux/assets/"
+for r in 'uiux/preview.html' 'uiux/assets/*.png' 'uiux/assets/references/'; do
+  grep -qxF "$r" skills/core/scripts/init-config.sh \
+    || err "init-config.sh ignore template missing rule $r"
+done
+grep -qxF 'uiux/assets/*.svg' skills/core/scripts/init-config.sh \
+  && err "init-config.sh ignores uiux/assets/*.svg (the mark itself is committed)"
+tr '\n' ' ' < skills/core/references/core-authoring.md | tr -s ' ' \
+  | grep -qF '`uiux/assets/*.svg` is **NOT** on this list' \
+  || err "core-authoring.md does not keep uiux/assets/*.svg off the local-only list"
+
+# 23. the standards inventory and stack's derivation. standards.md
+#     walked nine domains of inline prose and stopped when the model ran
+#     out of questions; the domains now live in one inventory with a
+#     gate, and three copies have to agree - the inventory's §3 list,
+#     the `### ` blocks holding its items, and the schema record the
+#     gate enforces. Check 20 ties the schema's `head` to §3; this ties
+#     §3 to §4 and pins the eight domains the nine-domain version was
+#     missing. The stack half asserts that the capability list is
+#     derived from the documents rather than recalled, and that every
+#     capability reaches the user as options.
+SI=skills/core/references/standards-inventory.md
+if [ ! -f "$SI" ]; then
+  err "$SI is missing (protocols/standards.md reads it before its first question)"
+else
+  grep -q 'standards-inventory\.md' skills/core/references/protocols/standards.md \
+    || err "standards.md does not read standards-inventory.md by name"
+  SI_DOMAINS=$(sed -n 's/^### //p' "$SI")
+  SI_N=$(printf '%s\n' "$SI_DOMAINS" | grep -c '.')
+  [ "$SI_N" -ge 17 ] \
+    || err "$SI carries $SI_N domains; the sweep needs at least 17"
+  for d in Security Accessibility 'API conventions' 'Logging and privacy' \
+           'Performance budgets' Documentation 'Versioning and release' \
+           'CI gates'; do
+    printf '%s\n' "$SI_DOMAINS" | grep -qx "$d" \
+      || err "$SI has no '### $d' domain"
+  done
+  SI_LIST=$(sed -n '/^## 3\. The domains/,/^## 4\./p' "$SI" \
+    | sed -n 's/^- \*\*\([^*]*\)\*\*.*/\1/p' | grep -v '^Not in play$')
+  [ "$SI_LIST" = "$SI_DOMAINS" ] || err "$SI section 3's list differs from its ### blocks
+section 3:
+$SI_LIST
+section 4:
+$SI_DOMAINS"
+  SI_HEAD=$(awk '
+    { sub(/\r$/, "") }
+    /^type[ \t]+standards$/ { inr = 1; next }
+    /^type[ \t]/ { inr = 0 }
+    inr && /^head[ \t]/ { sub(/^head[ \t]+/, ""); print; exit }
+  ' skills/core/references/schema.txt)
+  if [ -z "$SI_HEAD" ]; then
+    err "schema.txt's standards record carries no head (the gate cannot check the domains)"
+  else
+    SI_WANT=$(printf '%s\n' "$SI_DOMAINS" | tr '\n' '|')'Not in play'
+    [ "$SI_HEAD" = "$SI_WANT" ] || err "schema.txt's standards head differs from $SI
+schema:    $SI_HEAD
+inventory: $SI_WANT"
+  fi
+fi
+ST=skills/core/references/protocols/stack.md
+grep -q 'typically' "$ST" \
+  && err "$ST recalls capabilities from a 'typically' list instead of deriving them"
+ST_FLAT=$(tr '\n' ' ' < "$ST" | tr -s ' ')
+for s in 'External services' 'Communication' 'Side-effect boundaries' \
+         '07-operations.md' 'uiux/02-system.md'; do
+  printf '%s\n' "$ST_FLAT" | grep -qF "$s" \
+    || err "$ST does not derive the capability list from $s"
+done
+printf '%s\n' "$ST_FLAT" | grep -qF 'write it ourselves' \
+  || err "$ST does not offer the write-it-ourselves option in every list"
+printf '%s\n' "$ST_FLAT" | grep -qF 'presents first and recommends' \
+  || err "$ST's ladder still gates the capability instead of ranking the options"
 
 [ "$FAIL" -eq 0 ] && echo "lint-sync: all invariants hold" || echo "lint-sync: FAILURES above"
 exit $FAIL

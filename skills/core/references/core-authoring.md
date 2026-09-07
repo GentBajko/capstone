@@ -11,7 +11,18 @@ Some outputs are personal working state and are **never committed**,
 whatever `docs_in_git` says: `features/` (the whole feature chain:
 interviews, specs, plans, review ledgers), every `*-interview.md`,
 and `review.md` (plus the legacy `be-review.md` and
-`fe-review.md` older versions wrote). `changelog.md` and the
+`fe-review.md` older versions wrote). Two more join them from the
+`uiux` stage: `uiux/preview.html`, the rendered picture of
+`02-system.md` that Phase D' writes for the user to steer by (hard
+rule 4 says the outputs are markdown, and a picture of a decision is
+not the decision), and the raster brand assets under `uiux/assets/` -
+`*.png`, `*.jpg`, `*.jpeg`, `*.webp`, and the whole
+`uiux/assets/references/` folder of screenshots and mood boards, which
+are exports and reference material rather than sources.
+`uiux/assets/*.svg` is **NOT** on this list and must never be added:
+the SVG is the mark itself, the file `build` moves into the app and
+rasterizes the favicon, app icon and `og.png` from, and a logo that
+lives on one machine is not a brand. `changelog.md` and the
 `changelog.d/` fragment folder are NOT on this
 list, and unlike the chapters they do not follow `docs_in_git`
 either: **the ledger is always committed** (core.md's Changelog
