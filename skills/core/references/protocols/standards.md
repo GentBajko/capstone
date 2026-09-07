@@ -87,6 +87,16 @@ toggle each ledger box as its domain closes. Nothing is skipped
 silently: a domain the user rules out is recorded with its reason, per
 the inventory's §5.
 
+Several domains here ask what someone else decides: the compliance
+regime Security answers to, the retention window Logging and privacy
+needs, the release cadence Process is bound by. An item the user
+cannot answer earns a questionnaire per core.md's Questionnaires
+section, and its ledger box stays unchecked with the recipient named
+on the line (`- [ ] Logging and privacy - retention window, sent to
+the data team 2026-09-07`). An item awaiting an answer is neither
+answered nor ruled out, so Phase D writes it into `## Not in play` as
+open with its recipient, and a later run picks it up from there.
+
 **Overriding the craft file.** `../code-craft.md` governs everything
 these domains leave open, and this file outranks it - but only by a
 decision that *names what it overrides* (code-craft's Precedence
@@ -120,7 +130,11 @@ ruled out, holding one sentence that points at the `Not in play` line
 for it, so a reader who opens the file for the API rules finds an
 answer where they looked. Each decision and any needed rationale goes
 directly into its domain's section. `Not in play` lists every item and
-every domain the sweep ruled out, one line each with the reason.
+every domain the sweep ruled out, one line each with the reason, then
+every item still awaiting a questionnaire answer, one line each naming
+the recipient and the date it was sent. Those two groups read
+differently on purpose: one is settled, the other is a gap with a name
+attached to it.
 
 Then append the changelog entry per core.md's ledger: key
 `standards/all@Q<n>` from the interview's highest `### Q<n>`; record

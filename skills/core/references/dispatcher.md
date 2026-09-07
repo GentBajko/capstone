@@ -9,7 +9,7 @@ protocol files.
    user config. Then `core-authoring.md`, unless the route below lands
    on `start` or `feature`, which route rather than write.
 2. Route on the first argument. The reserved subcommand words
-   (`map`, `doctor`, `review`, `mockup`,
+   (`map`, `doctor`, `review`, `retro`, `mockup`,
    `logic`, `uiux`, `architecture`, `standards`, `stack`, `build`,
    `groom`, `plan`, `implement`, `feature`, `start`)
    each route to `protocols/<name>.md`: execute that one protocol

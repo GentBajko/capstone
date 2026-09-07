@@ -70,7 +70,11 @@ Seed the ledger with the confirmed list.
    dependency, which is exactly why the user decides it rather than
    the model. Where they choose against the rung, core.md's Pushback
    rule caps you at two rounds; record the rung and their answer
-   either way.
+   either way. Where the pick turns on something they do not hold -
+   the license the legal team will accept, the seat count finance has
+   budgeted, whether procurement has already signed with a vendor -
+   offer a questionnaire per core.md's Questionnaires section and
+   leave the capability open in the ledger.
 1. **Research current options**: web search when the harness has it:
    OSS packages, hosted services, paidware. Check maintenance activity,
    license, and real pricing. Without web access, use model knowledge

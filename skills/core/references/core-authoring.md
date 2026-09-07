@@ -32,7 +32,10 @@ permanent loss). `capstone.json` is off the list too: it is the
 project's shared config, committed for the same kind of reason - it
 holds the settings every run on the repo follows and the project's
 state, and a config that lives on one machine is not a standard
-(core.md's Project config paragraph). The
+(core.md's Project config paragraph). `questionnaires/` stays off the
+list as well (core.md's Questionnaires section): each file is a real
+artifact sent to a real person and the record of what was asked of
+them, and a record that lives on one machine is no record at all. The
 initializer's per-project run writes `<docs_dir>/.gitignore` listing
 exactly the local-only set, and deletes the `changelog.md` and
 `capstone.json` lines older versions wrote; whenever you write into
@@ -117,7 +120,10 @@ writes under `<docs_dir>` must be listed there:
   an absence is a fact, and no file can record it.
 - **Companion docs**, a `| File | What it is |` table: everything else
   (review, changelog, standards, implementation,
-  mockup/, uiux/, features/).
+  mockup/, uiux/, features/, questionnaires/). The
+  `questionnaires/` row is one row for the folder, whatever it holds,
+  and the stage that writes the first file adds it (core.md's
+  Questionnaires section).
 
 **The index carries no stamps.** Freshness lives in each file's own
 frontmatter (`generated_at_commit`, `generated_date`,

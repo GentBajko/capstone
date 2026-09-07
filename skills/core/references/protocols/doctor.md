@@ -58,6 +58,11 @@ documented rules it proposes, never applies.
    `expertise` or `teaching_mode` in the project config (repair =
    delete the key there; it is personal, the global file keeps it,
    and a run ignores it wherever it sits);
+   a file in `questionnaires/` whose questions all still carry empty
+   answer stubs while the stage that sent it has moved on (repair =
+   report it and name the recipient and the send date, so the user can
+   chase the answer or strike the open item; never fill a stub in, and
+   never delete the file, which is the record of what was asked);
    `capstone.json` invalid JSON (`//` line comments are permitted
    per core.md and are never a finding) or keys outside their ranges;
    a row in `uiux/02-system.md`'s `## Assets` table whose `Status` is

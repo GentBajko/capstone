@@ -9,6 +9,18 @@ changes, plus the core skill's `scripts/help.sh` and
 the reference: a command doc that silently omits a command is worse
 than none, because it reads as complete.
 
+A new command also owes a page at `docs/commands/<name>.md`, which
+check 26 requires along with its four fixed headings in order
+(`## What it does`, `## When to reach for it`, `## Common questions`,
+`## It's working if`). `docs/commands.md` answers what a command's
+arguments are; the page answers which command to reach for and how to
+tell a run worked. Source the questions from `docs/commands.md`, the
+README's caveats and upgrade notes, and the commit history for
+anything renamed or removed - a question nobody has asked teaches
+nobody, so a thin command earns one or two and never gets padded to
+match a busier one. Installation lives in `README.md` alone; check 26
+fails a page that repeats it.
+
 ## Running the lint
 
 `scripts/lint-sync.sh` asserts every cross-file invariant. Run it

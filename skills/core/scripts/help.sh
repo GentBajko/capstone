@@ -29,6 +29,9 @@ Usage: /capstone:<command>
                        drift, voided approvals, absorption gaps
   review [be|fe]       Opt-in judgment -> review.md; no arg does both sides,
                        backend (architecture) and frontend (UI vs your design docs)
+  retro [session]      Read a finished session for evidence, then propose edits
+                       to standards.md and your AGENTS.md/CLAUDE.md, one
+                       approved row at a time; never touches code
   mockup               Product discovery: seed + adaptive interview -> traceable markdown mockup
   logic                Business-logic interview, scenario by scenario -> docs/capstone/logic/
   uiux                 How the UI looks and the UX behaves, from the mockup + logic

@@ -26,7 +26,11 @@ question as an open thread addressed to `logic`, and move on. What
 this stage settles is what the user sees, what they can act on, and
 where that leads. A number nobody stated is never the answer to a
 mockup question: `logic` asks it with the rigor it needs, and a guess
-recorded here outranks nothing and contradicts everything.
+recorded here outranks nothing and contradicts everything. Where the
+question is this stage's own and the answer sits with someone else -
+the sales targets, the contractual SLA, what the incumbent tool costs
+today - offer a questionnaire per core.md's Questionnaires section
+and log the thread open.
 
 The one exception is the **commercial model** (tiers, prices, grants,
 the rate and runway equations): the business-plan angle settles it

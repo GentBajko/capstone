@@ -664,6 +664,78 @@ conversation, never the generated docs: the outputs stay factual per
 hard rule 1, recording the decision and that it was challenged, never
 grading it.
 
+## Questionnaires: what the user cannot answer alone
+
+Pushback assumes the user holds the answer and is choosing badly.
+Some questions are not that. The compliance regime, last quarter's
+real load numbers, the retention policy another team owns - on those
+the user can only guess, and a guess recorded as a decision is worse
+than a recorded gap. The person who knows is not in this
+conversation, so the useful output of the question is a document they
+can be sent.
+
+**Grill the send, not the subject.** Never interview the user about
+the thing they have just told you they do not know. Ask only what
+they can always answer: who holds the knowledge, and what you need
+back. Two exchanges, no more.
+
+1. Who can answer this? A name or a team is enough.
+2. Is there a date you need it back by, and does the recipient need
+   anything to make sense of the ask?
+
+Then write the file, say where it is, and go to the next question.
+
+The trigger is narrow. An answer of "I don't know", "ask X", or a
+guess the user flags as a guess, on a question whose `### Q<n>` entry
+would otherwise record a fabricated decision. One offer per question
+and never repeated: the user may decline and leave the item open,
+which is recorded as an open question exactly as it is today.
+
+The output is `<docs_dir>/questionnaires/<YYYY-MM-DD>-<slug>.md`, the
+slug naming the recipient rather than the question, so several
+stalled questions from one interview batch into one document. Its
+sections, in this order:
+
+- `## Purpose` - why the document exists and the decision riding on
+  the answers.
+- `## Context` - one paragraph orienting a reader who was not in the
+  interview: what the project is, what stage it has reached, and why
+  they are being asked.
+- `## How to answer` - the deadline if there is one, roughly how much
+  work this is, and that a partial answer or an explicit "I don't
+  know" is more useful than a skipped question.
+- `## Questions` - one `### ` heading per question, most important
+  first, each a single idea and never compound, each followed by an
+  empty blockquote for the answer to be written into. A one-line
+  italic *Why this matters* goes under a question that could be
+  misread or that invites a throwaway, and nowhere else.
+- `## Anything else?` - the closing catch-all.
+
+**Never invent a question to fill the document out.** The count is
+honest to what stalled: one stalled question is a one-question
+questionnaire. Padding spends the recipient's attention on questions
+nobody was blocked on, and the answers you actually needed are the
+ones they then skip.
+
+The interview records the send as its `### Q<n>` entry, naming the
+file and the recipient, and the item stays open in the stage's ledger
+until an answer arrives. Formalization is not blocked by it: the
+stage closes with those items recorded open, like any other open
+question. When the user comes back with answers, resume the interview
+at those questions and write the answers into the stage's own output;
+the questionnaire file stays on disk as the record of what was asked.
+
+`questionnaires/` is committed, like the ledger and `capstone.json`
+(core-authoring.md's Local-only outputs), and the folder gets a
+Companion docs row.
+
+Vocabulary follows `expertise` in the two exchanges, like any
+interview turn. The document itself is pitched at its recipient
+instead, spelling out what a stranger to the project needs and
+dropping the shorthand the interview has been speaking in.
+`architecture`, `logic`, `mockup`, `stack`, `standards` and `uiux`
+each name this section at the point they record an answer.
+
 ## Voice per output
 
 `map check` is facts only, as are the changelog entries every

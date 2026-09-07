@@ -16,7 +16,7 @@ project-level):
 ```
 
 Restart OpenCode. The plugin registers all capstone skills (map,
-doctor, review, mockup, logic, uiux,
+doctor, review, retro, mockup, logic, uiux,
 architecture, standards, stack, build, groom, plan, implement,
 feature, start, help).
 

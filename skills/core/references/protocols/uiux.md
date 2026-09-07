@@ -339,6 +339,11 @@ the way `logic`'s scenarios record their own ruled-out dimensions, and
 it is there for the same reason: a later reader can tell "no motion
 here" from "nobody asked". An item the user declined to settle is an
 open question rather than an inapplicable one, and is named as open.
+An item they cannot settle - the accessibility conformance level
+someone else committed to, the brand rules held by a design team,
+the localizations marketing has promised - earns a questionnaire per
+core.md's Questionnaires section, and is named as open with its
+recipient until the answer lands.
 
 Brand assets live in `docs/capstone/uiux/assets/`. **The SVGs are
 committed** - they are the design of record for the mark, and a

@@ -1,8 +1,9 @@
 # implement - execute the approved feature plan
 
 **Reads:** config → the feature interview's approval frontmatter → `plan.md`
-→ `spec.md` → `standards.md` → `../code-craft.md` → the operations
-chapter its verifications rely on → `review-ledger.md` (resume).
+→ `spec.md` → `../code-craft.md` → the operations
+chapter its verifications rely on → `standards.md` (Phase C only, the
+review lens) → `review-ledger.md` (resume).
 
 Last stage of the feature chain: turns the approved `plan.md` into
 code. With `build`, one of the two commands allowed to write source
@@ -44,15 +45,22 @@ Git section (`<type>/<slug>`, the slug the feature's own). Record
 `base_commit` in the feature-interview frontmatter: the branch
 point, or HEAD before Task 1 on a consented main run; Phase C reviews
 the diff from it. Read
-`plan.md`, `spec.md`, `standards.md`, `../code-craft.md` (the
-TDD + YAGNI discipline the code follows; standards wins on
-conflict), and the operations chapter the plan's verification steps
+`plan.md`, `spec.md`, `../code-craft.md` (the
+TDD + YAGNI discipline the code follows; the plan's global
+constraints win on conflict), and the operations chapter the plan's verification steps
 rely on (`07-operations.md`'s Processes and Developer workflow
 sections carry the verified commands). Review the plan critically:
 a contradiction between tasks, or between plan and spec, goes to the
 user before Task 1, batched, not one interrupt per discovery mid-run.
 
 ## Phase B - execute
+
+This phase reads `plan.md`, `spec.md` and `../code-craft.md`, and
+never `standards.md`. The plan's Header carries that file's global
+constraints copied verbatim (`protocols/plan.md`'s Header bullet), so
+the rules binding this feature sit in front of the executor with none
+of the seventeen domains behind them; Phase C is where the rest is
+enforced.
 
 **Ask the mode once, before Task 1**, and record it as
 `execution: subagent | inline` in the feature-interview frontmatter
@@ -91,9 +99,9 @@ reference:
 1. The task's full text from `plan.md`: its `Create:`/`Modify:`/
    `Test:` paths, the interfaces it consumes and produces, and every
    checkbox step with its code and exact commands.
-2. `standards.md`'s rules, and `../code-craft.md`'s ladder, TDD
-   scoping, **Comments section, and Git section in full**. A pointer
-   to a file is useless here: a subagent that never reads
+2. The plan's Header constraints, verbatim, and `../code-craft.md`'s
+   ladder, TDD scoping, **Comments section, and Git section in full**.
+   A pointer to a file is useless here: a subagent that never reads
    `code-craft.md` commits however it likes, and comments every line
    it writes.
 3. The conventions chapter's paradigm, typing, and error-handling
@@ -116,8 +124,8 @@ Execute the tasks yourself in the same order, under the same rules,
 checking each box as its verification passes.
 
 Either way, code lands in the repository's source tree (never under
-the docs area), and every code decision follows `standards.md` and
-`code-craft.md`.
+the docs area), and every code decision follows the plan's Header
+constraints and `code-craft.md`.
 
 ## Phase C - review until dry
 
@@ -138,7 +146,11 @@ restarting at round one.
    `code-craft.md` (unearned abstractions, unclimbed ladder rungs,
    and comments that only restate the code are findings), and
    the conventions chapter, and the spec's unhappy paths actually
-   exercised by the tests. Fresh eyes every round: with subagents,
+   exercised by the tests. **This is the run's only read of
+   `standards.md`, and enforcement lives here on purpose**: the
+   reviewer has the budget for it and the implementer, which explores,
+   writes and debugs against a plan, does not. Fresh eyes every
+   round: with subagents,
    dispatch one reviewer per lens; without, re-read the diff once per
    lens, coldly.
 2. **Verify**: adversarially check each finding before acting: try
