@@ -4,8 +4,10 @@
 `docs/capstone/mockup/` (the brief and screens) →
 `docs/capstone/logic/` (states, unhappy paths) → the existing
 `uiux/` outputs when re-entering → `../uiux-craft.md` (the method,
-in full) → in extraction mode: the conventions and architecture
-chapters, then the frontend token, component, and route sources.
+in full) → `../uiux-inventory.md` (the completion test, in full,
+before the first question) → in extraction mode: the conventions and
+architecture chapters, then the frontend token, component, and route
+sources.
 
 Sits between `logic` and `architecture`: turns the mockup's screens
 and the logic's rules into a committed frontend design (direction,
@@ -22,6 +24,13 @@ craft rules; §7 the refuse list and rulings; §8 the pre-flight; §9 the
 extraction pass. No installed skill substitutes for it, so the same
 project designs the same way on any machine and a resume elsewhere
 reaches the same questions.
+
+`../uiux-inventory.md` is the completion test beside it, read in full
+before the first question: §3's system items, §4's screen items, and
+§5's gate. The method decides how well this stage designs; the
+inventory decides when it is allowed to stop. Its items generate
+questions rather than being read out, and what does not apply is
+confirmed in one batch per its §2.
 
 **Capabilities, not method.** Two things the harness may or may not
 have change what this stage can *do*, never how it decides: image
@@ -40,10 +49,17 @@ before the next question.
 State: `docs/capstone/uiux-interview.md` (standard resumable format
 and lifecycle per core.md: numbered `### Q<n>` entries with question,
 answer as given, and normalized decision, plus an `## Open threads`
-ledger seeded once with three areas: direction, system, screens).
-Resume = read the file, never re-ask. An artifact argument (brand
-book, Figma export, reference screenshots) seeds the interview per
-core-authoring.md's Artifact seeding rule.
+ledger). Seed the ledger once from `../uiux-inventory.md`, the way
+`architecture` seeds its own from `../interview.md`: a checkbox line
+per system item (`- [ ] S1 Faces`), then one per screen in the
+mockup's order (`- [ ] screen 03-invoice`), whose box closes when
+that screen has swept §4's eleven items. Direction sits above both as
+its own box. Maintain it with appends and toggles, never whole-file
+rewrites; a box closes when the item is answered, cited, or recorded
+inapplicable, and an item the user declines to settle stays open here
+with its reason. Resume = read the file, never re-ask. An artifact
+argument (brand book, Figma export, reference screenshots) seeds the
+interview per core-authoring.md's Artifact seeding rule.
 
 Prerequisite: either `docs/capstone/mockup/` is formalized and on disk
 (greenfield: the screens are this
@@ -127,6 +143,15 @@ The seeds (the only predetermined questions):
    correction.
 2. "What brand material already exists and is binding: name, logo,
    colors, fonts, references you want honored?"
+2b. The asset question, asked here and never skipped: "Will you supply
+   the logo as SVG, or should this stage attempt one?" Say plainly
+   that most harnesses cannot draw, so an attempt yields a shaped
+   placeholder rather than an identity, and it stands only until you
+   replace it. The answer fills the `Source` column of `02-system.md`'s
+   `## Assets` table for every logo row. **Never generate a mark
+   before this answer exists.** An unanswered asset row stays
+   `awaited`, which stops `build` with the list; a placeholder nobody
+   asked for ships silently and is discovered in production.
 3. The use scene: who uses this, where, under what ambient light;
    and let the answer force light, dark, or both. Never a category
    default.
@@ -183,6 +208,45 @@ produces a good-looking product nobody can operate.
 Drill until concrete. The user may stop at any time; jump to Phase D
 and record remaining vagueness honestly.
 
+**The exit test.** The two generation rules above still order the
+questions; `../uiux-inventory.md` decides when there are none left.
+Phase C is over when every one of its §3 system items and, per screen,
+every one of its §4 screen items is answered, cited to an earlier
+answer, or recorded inapplicable with its reason - not when nothing
+further comes to mind. Sweep per that file's §2: generate, eliminate
+what the mockup and the earlier answers already settle, and put the
+items that do not apply into **one** confirmation rather than one
+question each. A correction inside that batch turns an empty back into
+a real question. Close each ledger box as its item lands.
+
+## Phase D' - the preview
+
+Run once the direction is committed and the §3 system items are
+answered, before the gate. Skip it when either is still open; say so
+in one line rather than previewing a design that is half decided.
+
+Write one self-contained HTML file to
+`docs/capstone/uiux/preview.html`: the flagship surface's first
+viewport rendered from the committed tokens, plus a style tile showing
+the palette, the type scale, the buttons in every hierarchy, one form
+field through its validation states, and the loading and empty
+vocabularies. No external requests and no CDN; fonts are a system
+stack with the chosen faces named in an HTML comment. It renders
+decisions already recorded. A value the interview has not settled goes
+back to Phase C as a question rather than into this file.
+
+Where the harness can publish an artifact, publish it and hand the
+user the link. Where it cannot, say the file's path in one line.
+Either way the user steers before the gate: each correction is
+recorded as a `### Q<n>` entry like any other answer, and the file is
+rewritten from the corrected tokens. Regenerate it whenever a system
+item changes after it was first written, so the gate never presents a
+picture of a superseded palette.
+
+`preview.html` is working state: gitignored, carrying no frontmatter,
+and skipped by the schema pass. `02-system.md` stays the design of
+record, and the preview is regenerated from it.
+
 ## Phase D - the gate
 
 Set `status: awaiting-formalization`; present the summary: the read
@@ -221,9 +285,19 @@ marked "assumed" inline):
   iconography (one family, one stroke weight); motion (the authored
   moment, 150-250ms Operate transitions, state-conveying only,
   reduced-motion behavior); the component-library / design-system
-  pick with its reasoning; and `## Implementation constraints`:
+  pick with its reasoning; `## Implementation constraints`:
   uiux-craft §8's build-time checklist copied in, plus any
-  project-specific additions.
+  project-specific additions; and last, `## Assets`.
+  `## Assets` is a table, columns
+  `Asset | File | Source | Status`, one row per file the brand needs:
+  logo mark, logo wordmark, logo mono, logo on dark, favicon source,
+  `og.png` source, app icon source, email header, and one row per
+  empty-state illustration a screen calls for. `File` is the path
+  under `docs/capstone/uiux/assets/`; `Source` is `supplied`,
+  `generated` or `placeholder`, from the Phase B asset seed; `Status`
+  is `present` when the file is on disk and `awaited` when it is not.
+  A row is never dropped for being unfulfilled: `awaited` is the fact
+  `build` stops on.
 - `03-experience.md`: the Phase C Experience answers as rules the
   screens apply rather than re-decide: navigation model and
   orientation; feedback thresholds (what is optimistic, what waits,
@@ -234,7 +308,8 @@ marked "assumed" inline):
   expectations; the accessibility floor. `build` reads this beside
   `02-system.md`; `review`'s frontend
   side judges the shipped UX against it, the same way it judges the
-  shipped UI against the system chapter.
+  shipped UI against the system chapter. It closes with
+  `## Not in play`.
 - `screens/<NN>-<screen>.md`: one per mockup screen, same number and
   slug as its mockup file (the subfolder exists so numbering can
   mirror `mockup/` exactly). Frontmatter names the mockup file, the
@@ -247,13 +322,31 @@ marked "assumed" inline):
   treatment:
   empty states teach, loading is skeletal, errors name the problem
   and the recovery); `## Motion` (each moment and what it
-  communicates); `## Copy` (register, key labels, tone rules). Where a
+  communicates); `## Copy` (register, key labels, tone rules); and
+  last, `## Not in play`. Where a
   screen needs an interaction `03-experience.md` already rules on,
   cite the rule instead of restating it; a screen that contradicts it
   is a question for the user, not a local exception.
 - `README.md`: the folder's index, like the mockup's: a table design
   chapter → mockup screen → logic scenarios, with every
   "assumed" item collected for the user to review.
+
+The closing section of `02-system.md`, `03-experience.md` and every
+screen file holds the inventory items that file had nothing to decide,
+one line each with its reason ("S17 reduced motion: nothing on any
+surface animates"). The rule is `../uiux-inventory.md` §5's, worded
+the way `logic`'s scenarios record their own ruled-out dimensions, and
+it is there for the same reason: a later reader can tell "no motion
+here" from "nobody asked". An item the user declined to settle is an
+open question rather than an inapplicable one, and is named as open.
+
+Brand assets live in `docs/capstone/uiux/assets/`. **The SVGs are
+committed** - they are the design of record for the mark, and a
+frontend cannot be built from a file that lives on one machine.
+Raster exports, screenshots and mood boards under that folder are
+local working state and are ignored, along with `preview.html`.
+`build` moves the SVGs into the scaffolded tree and rasterizes the
+favicon, app icon and `og.png` from them.
 
 Only after every file is on disk, append the changelog entry per
 core.md's ledger (key `uiux/all@Q<n>`, `<n>` the highest `### Q<n>`

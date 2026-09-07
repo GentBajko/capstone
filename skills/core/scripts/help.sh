@@ -17,9 +17,14 @@ Usage: /capstone:<command>
                        uiux/ surfaces the map is missing
   map rebuild          Force a full rewrite of a reference that looks current
   map <topic>          Rebuild one chapter (architecture, models, conventions,
-                        data-flow, dependencies, testing, operations, glossary)
-  map check            Read-only trust report: staleness, pointer drift, absorption
-                       drift, logic and design coverage, stack re-vetting
+                        data-flow, dependencies, testing, operations, glossary,
+                        interfaces)
+  map check            Read-only trust report in two halves: a bash script
+                       (staleness, ledger fragments, schema: stamps, headings
+                       and their order, table columns, edge sites, payload
+                       sections, model references, secret shapes ->
+                       "MAP CHECK:") and the model's review (pointer drift,
+                       absorption, re-vetting, coverage -> "MAP REVIEW:")
   doctor               Verify and repair the docs area: torn writes, index
                        drift, voided approvals, absorption gaps
   review [be|fe]       Opt-in judgment -> review.md; no arg does both sides,
@@ -49,6 +54,9 @@ freshness and `map` refreshes only what drifted.
 Docs are strictly descriptive; only review judges.
 Every command that writes records itself in docs/capstone/changelog.md.
 A command that needs the reference and finds none builds it first.
+CI gate: skills/core/scripts/map-check.sh [docs_dir] runs the script
+half alone, no API key, checking every page against the output schema
+in skills/core/references/schema.txt; templates/ carries both workflows.
 
 Interview commands accept an optional artifact argument (a PRD, notes,
 screenshots) that pre-fills answers for your confirmation.
@@ -57,7 +65,18 @@ Config: capstone.json in the agent's global folder (~/.claude; created
 at install): expertise 1-5 (vibe coder ... architect; how technical
 conversations are, asked once then saved), teaching_mode (true =
 narrate and teach while working), docs_dir, index_file,
-subagent_threshold, docs_in_git, language. Per-project state and
-overrides live in an optional docs/capstone/capstone.json: pipeline,
-workspaces, or any global key to override for that repo.
+subagent_threshold, docs_in_git, language, redact (env-var name
+patterns whose values the docs never quote), cross_repo (auto = map,
+groom, plan and architecture consult quarry when it is on PATH).
+The optional docs/capstone/capstone.json is the project's own shared
+config, committed like the ledger: pipeline, workspaces (each name
+doubles as the workspace's quarry target), or any global key to
+override for that repo. expertise and teaching_mode are personal and
+stay in the global file.
+
+Cross-repo edges: 09-interfaces.md's frontmatter edges block is the
+record. map writes kind, name, site and schema from the code and never
+to/from - no repo holds another repo's name - quarry fills those by
+joining the two halves on (kind, name), and you are asked only where
+that join finds several candidates.
 EOF

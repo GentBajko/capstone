@@ -18,6 +18,25 @@ after any surface change; CI runs it on every push:
 bash skills/core/scripts/lint-sync.sh
 ```
 
+## The output schema
+
+`skills/core/references/schema.txt` is the machine-readable form of the
+format rules `references/topics.md` and the protocol files teach.
+`map-check.sh` reads it at runtime. Change the schema and the prose in
+the same commit: checks 15, 20 and 21 fail when a heading, a column or a
+required key reads one way in the prose and another in the schema.
+
+## Releasing
+
+Bump the version in all six manifests (check 2), then in
+`templates/capstone-map-check.yml`'s `--branch v<version>` (check 12g
+ties the two), and tag the release commit `v<version>`: the CI gate
+template clones that tag to get `map-check.sh`, so an untagged release
+breaks every downstream gate with "no MAP CHECK verdict found". Lint
+check 16 runs `map-check.sh` through a throwaway git repo on every
+lint run; before tagging, run it once on a macOS machine as well,
+since bash 3.2 is the floor the script promises.
+
 ## Every script is bash
 
 There are no PowerShell twins, and check 8 fails if one reappears.

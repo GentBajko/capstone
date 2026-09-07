@@ -71,9 +71,11 @@ preserving the design decision and rationale inline beside the observed
 implementation (`file:line`).
 
 **`map check` writes nothing**, including no changelog entry - nothing
-was done, only read. Six parts: staleness, pointer drift, absorption
-drift, coverage gaps, stack re-vetting, and a machine-readable verdict
-line CI can grep.
+was done, only read. Eight parts in two halves: a bash script
+(`skills/core/scripts/map-check.sh`) does staleness, unfolded
+fragments and the schema pass and prints the `MAP CHECK:` line CI
+greps; the model does pointer drift, absorption drift, re-vetting and
+coverage and prints its own `MAP REVIEW:` line.
 
 ---
 
@@ -90,27 +92,34 @@ Typing bare `capstone` runs this.
 | 4 | `architecture` | How the system is built | The 8 chapters, `mode: prescriptive` |
 | 5 | `standards` | How code is written here | `standards.md` |
 | 6 | `stack` | What it is built with | `05-dependencies.md` |
-| — | *readback* | Nothing. It re-files and reconciles what stages 1-6 recorded | Amended final outputs |
+| — | *readback* | Nothing. It names the gaps in, re-files, and reconciles what stages 1-6 recorded | Amended final outputs |
 | 7 | `build` | The implementation plan, then the code | `implementation.md`, source |
 
 Each stage feeds the next, and skipping ahead is not possible: `uiux`
 requires a formalized `mockup`, `build` requires a formalized `stack`.
 
 **The readback, between `stack` and `build`.** Earlier stages cannot
-see every later final output, which leaves two things nobody catches.
-It runs in two halves, misplacement first so the second cites final
-locations:
+see every later final output, which leaves three things nobody catches.
+It runs in three halves, coverage first because a decision nobody made
+is cheaper to settle before the other two argue about what is there,
+then misplacement so the last one cites final locations:
 
-1. **Re-file.** Against core.md's Stage ownership table, every decision
+1. **Cover.** Every item of a stage's own inventory - `logic`'s
+   dimensions, the uiux and standards inventories, the architecture
+   question list, `stack`'s derived capabilities - that no final output
+   decides or rules out, as one numbered digest you answer, skip, or
+   strike. On a project whose stages each ran their own gate this is
+   empty, and you get one line saying so.
+2. **Re-file.** Against core.md's Stage ownership table, every decision
   whose subject belongs to another stage - a business rule in an
   architecture chapter, a library choice in `standards.md`.
    Re-filing is not re-deciding, so it arrives as one digest you
    confirm, not a finding per turn.
-2. **Reconcile.** Every decision contradicting one recorded elsewhere,
+3. **Reconcile.** Every decision contradicting one recorded elsewhere,
    raised one per turn with both citations, under the usual two-round
    cap. Then your answer stands.
 
-Either half amends the owning final outputs, their index boundaries,
+Every half amends the owning final outputs, their index boundaries,
 stamps, and changelog entries. Completed interview bodies are not read
 or amended. The pass records a stable hash of the six latest stage
 keys under `readback/all@<stamp>`, so unchanged outputs skip.

@@ -48,13 +48,18 @@ exact lines, or where a chapter labels its coverage shallow.
 
 **Cross-repo constraints, before writing a task.** Under the same
 conditions as `groom`'s Phase A step 4 (config `cross_repo: "auto"`,
-the `quarry` CLI on PATH, a `09-interfaces.md` present): run
-`quarry docs deps <repo> --downstream --json`, then
+the `quarry` CLI on PATH, a `09-interfaces.md` in the docs area in
+play), with `<repo>` named as that step names it - the workspace whose
+`path` contains the files the spec's Reference impact and the plan's
+file map touch when `workspaces` is configured, else the origin's last
+path segment: run `quarry docs deps <repo> --downstream --json`, then
 `quarry docs section <consumer> "<contract>"` for each consumer of an
 interface the spec touches; fall back to
-`quarry docs search "<name>"` where no edge is declared. Any
-condition unmet → skip silently. This lives in protocol text, never
-as a harness hook.
+`quarry docs search "<name>"` where no edge is declared. A deps row
+with `by_name: true` is a possible consumer found by name only, not a
+declared edge: cite it as a lead, and a `quarry docs section`
+refusal on such a row is not an error. Any condition unmet → skip
+silently. This lives in protocol text, never as a harness hook.
 
 ## Phase B - write the plan
 

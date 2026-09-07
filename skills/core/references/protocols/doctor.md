@@ -4,7 +4,8 @@
 (`<docs_dir>/changelog.md`, its rotation files, and `changelog.d/`
 fragments) → every interview file's frontmatter → the outputs each done marker
 implies (presence, stamps, and final bodies for authority check 4b) →
-`<docs_dir>/.gitignore`.
+`<docs_dir>/.gitignore` → `uiux/02-system.md`'s `## Assets` table and
+the `uiux/assets/` folder it names.
 
 Read-only diagnosis first, then offered repairs. Every repair doctor
 performs is a rule some protocol already defines; doctor centralizes
@@ -47,13 +48,23 @@ documented rules it proposes, never applies.
    repair; if it is unavailable, report the omission as unrecoverable
    and never guess.
 5. **Housekeeping**: `<docs_dir>/.gitignore` or config keys missing,
-   or the ignore file still listing `changelog.md` (repair = run the
-   initializer, core.md's rule); `changelog.md` untracked inside a git
-   repo whatever `docs_in_git` says (the ledger is always committed,
-   core.md; repair = stage it, and report it loudly: every shipped
-   feature's reasoning was one disk away from gone);
+   or the ignore file still listing `changelog.md` or `capstone.json`
+   (repair = run the
+   initializer, core.md's rule); `changelog.md` or the project
+   `docs/capstone/capstone.json` untracked inside a git
+   repo whatever `docs_in_git` says (both are always committed,
+   core.md; repair = stage it, and report an untracked ledger loudly:
+   every shipped feature's reasoning was one disk away from gone);
+   `expertise` or `teaching_mode` in the project config (repair =
+   delete the key there; it is personal, the global file keeps it,
+   and a run ignores it wherever it sits);
    `capstone.json` invalid JSON (`//` line comments are permitted
-   per core.md and are never a finding) or keys outside their ranges.
+   per core.md and are never a finding) or keys outside their ranges;
+   a row in `uiux/02-system.md`'s `## Assets` table whose `Status` is
+   `present` while its `File` is not in `uiux/assets/` (repair = set
+   that row to `awaited`, or supply the file; `build` stops on an
+   `awaited` row, and a `present` row that is not there stops it
+   later and further from the cause).
 6. **Absorption drift**: `map check`'s absorption count; repair =
    re-run `implement`'s absorb step (its Phase D step 2) per missed
    feature, reading that feature's `spec.md` if still on disk; a
@@ -70,9 +81,16 @@ documented rules it proposes, never applies.
    unstarted and an id freed for reuse. A legacy
    `changelog-archive-<YYYY>.md` with a stripped-key `## Archived`
    section is left as-is and searched like any other ledger file.
-9. **Schema**: `map check`'s part-8 grep (frontmatter keys and
-   required headings per file); repair = the `map` refresh, which
-   regenerates a file missing either against the current template.
+9. **Schema**: the part-8 pass of `map check`'s script
+   (`scripts/map-check.sh`: frontmatter keys, `known_as` included,
+   required headings, and on `09-interfaces.md` the `edges:` block's
+   four edge findings - a row with no `site`, a `site` the tree does
+   not hold, a missing or empty `### <Name>` payload section, and a
+   `schema` naming an entity `02-models.md` has none of - plus
+   secret-shaped strings per file); repair = the `map`
+   refresh, which regenerates a file missing a key or heading against
+   the current template; a secret is removed by hand, never
+   regenerated around.
 10. **Unfolded fragments**: files sitting in `changelog.d/`; repair =
    fold them per core.md's ledger rule. Doctor applying any approved
    repair is a writing run and folds anyway; on a non-default branch

@@ -68,30 +68,50 @@ recorded `§Q` decisions, without re-interviewing.
 1. Per core.md: read the config; expertise governs the conversation.
 2. From the index, pick the topics the feature touches:
    architecture and models almost always; the rest as the idea
-   implies. Run `map check`'s staleness test on just those topics
-   and refresh any stale ones first (as `ask` does): a spec groomed
-   against a stale reference is stale on arrival. For
-   `mode: prescriptive` chapters the refresh protocol's verdict
-   governs: no tracked source yet → current by definition; code now
-   exists → stale by definition, refresh first.
+   implies. Run the `core` skill's `scripts/map-check.sh <docs_dir>`
+   via bash (`map check`'s staleness pass: `git diff --name-only`
+   from each stamp over its globs, plus untracked files) and read
+   its part 1 rows for just those topics; refresh any stale ones
+   first: a spec groomed against a stale reference is stale on
+   arrival. For `mode: prescriptive` chapters the script's verdict
+   governs: `current` means no tracked source yet, current by
+   definition; `prescriptive, pending first observation` means code
+   now exists, stale by definition, refresh first.
 3. Read the picked chapters, plus whichever companion docs bear on the
    feature: the `logic/` scenarios it extends, the `mockup/` screens
    it changes, the `uiux/` chapters it touches, `standards.md`.
    Never ask what these already answer.
 4. **Cross-repo constraints, before the first question.** When config
    `cross_repo` is `auto` (the default), the `quarry` CLI is on PATH,
-   and the repo has a `09-interfaces.md`: run
-   `quarry docs deps <repo> --downstream --json` (`<repo>` = the last
-   path segment of this repo's origin URL), then
+   and the docs area in play has a `09-interfaces.md`: run
+   `quarry docs deps <repo> --downstream --json` (`<repo>` per
+   core.md's `workspaces` rule: when `workspaces` is configured, the
+   name of the workspace whose `path` contains the files the feature
+   touches, one deps call per workspace when it touches several, and
+   that workspace's `<path>/docs/capstone/09-interfaces.md` is the
+   chapter that must exist; otherwise the last path segment of this
+   repo's origin URL), then
    `quarry docs section <consumer> "<contract>"` for each consumer
    the deps call returns, to read the contract fields each downstream
    repo actually depends on. When the feature touches an interface no
    declared edge covers, fall back to
-   `quarry docs search "<name>"`. Any condition unmet (config `off`,
-   no CLI, no chapter) → skip silently and groom exactly as before.
+   `quarry docs search "<name>"`. A deps row with `by_name: true` is
+   a possible consumer found by name only, not a declared edge: cite
+   it as a lead, and a `quarry docs section` refusal on such a row
+   is not an error. Any condition unmet (config `off`, no CLI, no
+   chapter) → skip silently and groom exactly as before.
    This lives here, in protocol text, deliberately - never as a
    harness hook, because capstone also runs on harnesses without
    hooks.
+   In the same pass, run `quarry docs index --json` and take its
+   `ambiguous` rows for this repo that name an interface the feature
+   adds or changes. Put those to the user as core.md's Edge
+   confirmation describes, one digest, before the first question:
+   the answer decides which consumer the interview is holding the
+   feature to. Record each answer in the spec's Reference impact so
+   `implement`'s wrap writes it into `09-interfaces.md`'s `edges:`
+   block; this stage never edits the chapter itself. Nothing
+   ambiguous, or any condition unmet → ask nothing.
 5. An artifact argument (a ticket, a PRD, notes) seeds the interview
    per core-authoring.md's Artifact seeding rule.
 
@@ -139,7 +159,10 @@ edge-case posture, what's out of scope) and set
   `logic/` scenarios it adds or amends, the `mockup/` screens it
   changes, the `uiux/` chapters it touches (`plan` reads this to
   scope its study; `implement`'s wrap performs the absorption; the
-  `map` refresh settles the chapters).
+  `map` refresh settles the chapters). Every edge Phase A step 4's
+  confirmation settled is one line here - direction, kind, name, and
+  the repo name the user gave - because `09-interfaces.md`'s `to`
+  and `from` are the one thing the `map` refresh will not derive.
 - **Out of scope**: non-goals, recorded as decisions.
 
 Self-review before handing the file over (fix inline, don't re-gate):

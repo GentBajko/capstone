@@ -1,6 +1,7 @@
 # standards - how code must be written here
 
-**Reads:** config → `standards-interview.md` (resume) → lazily, per
+**Reads:** config → `../standards-inventory.md`, in full, before the
+first question → `standards-interview.md` (resume) → lazily, per
 domain: `03-conventions.md`; the index plus `01-architecture.md` and
 `05-dependencies.md`; `mockup/README.md`, never bulk-read upfront.
 
@@ -18,10 +19,10 @@ wrong, not this file: that gap is what `review` reports.
 Interview state: `docs/capstone/standards-interview.md`, same resumable
 format as the other interviews (status frontmatter per core.md's
 Interview lifecycle, `### Q<n>` entries appended before the next
-question, and an `## Open questions` ledger seeded once with the nine
-Phase B domains as checkboxes, maintained by appends and toggles,
-never whole-file rewrites). Interview files are never indexed. Output:
-`docs/capstone/standards.md`, indexed under Companion docs.
+question, and an `## Open questions` ledger seeded once from
+`../standards-inventory.md`'s domain list, maintained by appends and
+toggles, never whole-file rewrites). Interview files are never indexed.
+Output: `docs/capstone/standards.md`, indexed under Companion docs.
 
 ## Phase A - setup / resume
 
@@ -29,8 +30,17 @@ Read the interview file if it exists and is unfinished, then resume;
 never re-ask. If it is formalized, read `standards.md` instead and open
 the interview body only to repair a proven omission. An artifact
 argument (a style guide, an existing CLAUDE.md) seeds the
-interview per core-authoring.md's Artifact seeding rule. Then
-ground the interview in whatever already exists, each source read
+interview per core-authoring.md's Artifact seeding rule.
+
+Creating the file seeds `## Open questions` **once**, one unchecked box
+per domain in `../standards-inventory.md`'s §3 order, seventeen lines
+and no more; split a domain into sub-items only when part of it is
+settled and part is not (`- [ ] Security - S53 advisories, S55 auth
+review`). A domain the sweep rules out entirely is checked off with its
+reason on the same line, so the ledger records the decision rather than
+losing it.
+
+Then ground the interview in whatever already exists, each source read
 lazily, only when the current question domain touches it, and only if
 present:
 
@@ -52,41 +62,30 @@ needs it.
 
 One question per turn; offer concrete options when enumerable; adaptive
 follow-ups until each answer is concrete; record the normalized decision
-immediately. Walk these domains, skipping any the user rules out:
+immediately.
 
-- **Typing**: strict or loose; escape-hatch policy (`Any`, casts,
-  ignores); structural (protocols/interfaces) vs nominal; enums vs raw
-  strings; annotation coverage expectations.
-- **Libraries vs reinventing**: `../code-craft.md`'s ladder is the
-  default posture (stdlib and native platform features before a
-  dependency; never a new one for what a few lines can do). Ask what
-  the user changes about it: preferred libraries per capability (HTTP,
-  validation, ORM, testing, state, CLI, ...), the vetting bar
-  (maturity, license, bus factor), the dependency budget, and where
-  hand-rolling wins instead.
-- **Paradigm**: OO / functional / procedural mix; immutability stance;
-  inheritance policy; dependency-injection style.
-- **Error handling**: exceptions vs result types; error taxonomy;
-  logging rules; what must never be swallowed.
-- **Organization**: package-by-feature vs by-layer; file-size
-  discipline; naming conventions. Comment and docstring policy
-  defaults to `../code-craft.md`'s Comments section (a comment earns
-  its line only by saying what the code can't; self-explanatory code
-  gets none): ask what the user changes about it, and on which
-  surfaces docstrings are mandatory.
-- **Testing**: `../code-craft.md`'s TDD, YAGNI-scoped, is the default
-  (failing test → minimum code to green → verify → commit; non-trivial
-  logic always leaves its check behind, trivial one-liners need none).
-  Ask what the user changes about it: fakes vs mocks, coverage
-  philosophy, what must always have tests. Dropping test-first is an
-  override, recorded as one.
-- **Tooling**: formatter, linter and strictness, type-checker config.
-- **Process**: commit message style, branch naming, and commit
-  density; PR conventions (keep light). `../code-craft.md`'s Git
-  section is the default: ask what the user changes about it, not
-  the whole convention from scratch.
-- **Agent rules**: anything an AI assistant must always or never do in
-  this codebase.
+`../standards-inventory.md` holds the seventeen domains and the items
+inside them. Each item carries the probe that turns it into a question,
+the `../code-craft.md` rule it defaults to when one exists, and the
+`standards.md` section its answer lands in. Read it in full before the
+first question; do not read it aloud.
+
+Run its §2 sweep per domain, as you reach that domain rather than once
+at the start:
+
+- Deduce what an earlier answer, `../code-craft.md`, or
+  `03-conventions.md` already settles, and record the value with its
+  source instead of asking.
+- Batch every inapplicable item in the domain into **one**
+  confirmation, not one question each. A correction turns a batched
+  empty back into a real question.
+- Ask what remains, one item per turn.
+
+Order the domains by what this project makes urgent - a payments
+service earns Security and API conventions before Accessibility - and
+toggle each ledger box as its domain closes. Nothing is skipped
+silently: a domain the user rules out is recorded with its reason, per
+the inventory's §5.
 
 **Overriding the craft file.** `../code-craft.md` governs everything
 these domains leave open, and this file outranks it - but only by a
@@ -99,7 +98,10 @@ saying so, is not an override: the ladder still stands.
 
 ## Phase C - the gate
 
-When the queue is empty (or the user stops), set
+The interview is finished when `../standards-inventory.md`'s §5 gate is
+satisfied: every item answered, cited to `../code-craft.md` as accepted
+unchanged, or recorded inapplicable with its reason. Not when nothing
+more comes to mind. When the gate is met (or the user stops), set
 `status: awaiting-formalization`, present the decision summary by
 domain, and ask the user to formalize. Do not write the output until
 they do.
@@ -109,9 +111,16 @@ they do.
 Write `docs/capstone/standards.md`: frontmatter stamps (no
 `paths_covered`: standards don't go stale with code, and no refresh
 path may regenerate them); banner "Standards the user set: binding,
-not a description of current code."; rules organized by the domains
-above, with each decision and any needed rationale written directly
-into the file; imperative voice.
+not a description of current code."; imperative voice.
+
+The section list is fixed: one `## <Domain>` heading per domain in
+`../standards-inventory.md`'s §3 order, then a closing
+`## Not in play`. Every heading is written even when its domain was
+ruled out, holding one sentence that points at the `Not in play` line
+for it, so a reader who opens the file for the API rules finds an
+answer where they looked. Each decision and any needed rationale goes
+directly into its domain's section. `Not in play` lists every item and
+every domain the sweep ruled out, one line each with the reason.
 
 Then append the changelog entry per core.md's ledger: key
 `standards/all@Q<n>` from the interview's highest `### Q<n>`; record

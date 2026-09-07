@@ -1,7 +1,15 @@
-# Capstone reference trust check, a TEMPLATE for your repo's CI.
-# Copy into .github/workflows/, add an ANTHROPIC_API_KEY repo secret.
-# Fails the job when the reference is stale, by parsing the report's
-# final "MAP CHECK:" verdict line (map.md guarantees that line).
+# Capstone reference freshness gate, a TEMPLATE for your repo's CI.
+# Copy into .github/workflows/. No API key: the gate is a bash script
+# (skills/core/scripts/map-check.sh in the capstone repo, cloned at the
+# release tag below) that diffs each chapter's stamp against the working
+# tree, lists unfolded ledger fragments, and greps the schema. It ends
+# with a "MAP CHECK:" verdict line (map.md guarantees it) and this job
+# fails when that line says stale. Pointer drift, absorption, re-vetting
+# and coverage need a model: see capstone-map-review.yml.
+# A repo with no docs/capstone/00-index.md fails (there is no reference
+# to trust); run /capstone:map once before enabling the gate.
+# Monorepos with config `workspaces`: pass every workspace's docs area,
+# e.g. `map-check.sh services/a/docs/capstone services/b/docs/capstone`.
 name: capstone-map-check
 on:
   pull_request:
@@ -12,37 +20,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # stamped commits must be reachable for git diff
-      - name: Install Claude Code + capstone
-        run: |
-          npm install -g @anthropic-ai/claude-code
-          claude plugin marketplace add GentBajko/capstone
-          claude plugin install capstone@capstone-marketplace
-      - name: Headless config
-        # non_interactive resolves every prompt to its default so the
-        # run never hangs waiting for an answer (core.md's config key)
-        run: |
-          mkdir -p ~/.claude
-          cat > ~/.claude/capstone.json <<'EOF'
-          {
-            "expertise": null,
-            "teaching_mode": false,
-            "docs_dir": "docs/capstone",
-            "index_file": "docs/capstone/00-index.md",
-            "subagent_threshold": 150,
-            "docs_in_git": "ask",
-            "language": "en",
-            "non_interactive": true,
-            "extract": ["logic", "uiux"],
-            "interfaces": "auto",
-            "interfaces_frontmatter": false,
-            "cross_repo": "auto"
-          }
-          EOF
+      - name: Fetch capstone
+        run: git clone --depth 1 --branch v6.4.0 https://github.com/GentBajko/capstone "$RUNNER_TEMP/capstone"
       - name: Map check
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          out=$(claude -p "/capstone:map check" 2>&1) || true
+          out=$(bash "$RUNNER_TEMP/capstone/skills/core/scripts/map-check.sh" docs/capstone 2>&1) || true
           printf '%s\n' "$out"
           line=$(printf '%s\n' "$out" | grep -E '^MAP CHECK: ' | tail -1)
           if [ -z "$line" ]; then echo "no MAP CHECK verdict found"; exit 1; fi

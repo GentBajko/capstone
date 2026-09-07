@@ -127,6 +127,26 @@ verification, same commits.
 Either mode: a harness without subagents takes inline, said out loud
 rather than asked.
 
+**Brand assets**, once the step that scaffolds the frontend tree has
+run and before the first screen is built:
+
+1. Read `uiux/02-system.md`'s `## Assets` table. Every row whose
+   `Status` is `awaited` **stops the build**: list those rows, say
+   what each file is for, and ask for them. Never substitute a
+   placeholder for an awaited asset - the table records what the user
+   decided to supply, and shipping around it hides the gap in a
+   binary nobody re-reads.
+2. Move each SVG from `docs/capstone/uiux/assets/` to its place in the
+   scaffolded tree (the framework's static or public directory,
+   whichever Phase A's research established), and rewrite that row's
+   `File` cell to the destination path, so the table keeps pointing at
+   the file rather than at where it used to live.
+3. Rasterize from those SVG sources at that point: the favicon at the
+   sizes the framework's head expects, the app icon per platform
+   target, and `og.png`. The rasters are generated output and are
+   ignored per core-authoring.md's Local-only outputs; the SVGs stay
+   the source of record.
+
 Either way, code lands in the repository's source tree (never under
 the docs area). Append the changelog entry per core.md's ledger, key
 `build/code@Q<n>`, same `<n>`; record which build-order steps are

@@ -168,7 +168,13 @@ Entered when Phase C goes dry.
 
 1. The spec's Reference impact chapters are now stale by construction:
    run the `map` refresh on them so the reference records what was
-   actually built, divergences included.
+   actually built, divergences included. Where that list carries a
+   confirmed cross-repo edge (`groom` Phase A step 4), write the
+   repo name into that row's `to` or `from` in
+   `09-interfaces.md`'s `edges:` block afterwards: the refresh writes
+   `kind`, `name`, `site` and `schema` and never those two values
+   (core.md's Edge confirmation), so an answer the user already gave
+   lands here or nowhere.
 2. **Absorb the spec**: `features/` is local-only, so this is where
    its knowledge becomes durable. Per the spec's Reference impact
    list: merge the Behavior section into `logic/` (a new

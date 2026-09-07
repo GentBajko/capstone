@@ -7,10 +7,17 @@ template drift). A full build additionally reads Phase 1's recon set
 (manifests, type/lint configs, README/CLAUDE/AGENTS, tree, entry
 points); the deep-dive reads source per topic, and the extractions
 read the composed chapters (per logic.md and uiux.md). For `check`
-additionally: the ledger - `changelog.md`, its rotation files, and
-`changelog.d/` fragments (absorption drift, unfolded fragments) -
-and `05-dependencies.md`
-plus the manifests and lockfile (re-vetting). Nothing else unprompted.
+the script half (`scripts/map-check.sh`, the `core` skill) reads the
+stamped files' frontmatter, `changelog.d/`, `09-interfaces.md`'s
+`edges:` block and `02-models.md`'s entity headings; the model half
+also reads the ledger -
+`changelog.md`, its rotation files, and `changelog.d/` fragments
+(absorption drift) - and `05-dependencies.md` plus the manifests and
+lockfile (re-vetting). When config `cross_repo` is `auto` and the
+`quarry` CLI is on PATH, Phase 2's interfaces pass also reads the
+existing `09-interfaces.md` and the output of
+`quarry docs index --json` and `quarry docs list --json`. Nothing
+else unprompted.
 
 The descriptive reference for the current project: a lean
 `00-index.md` index and chapterized topic files in `<docs_dir>/`,
@@ -106,6 +113,54 @@ Do this in the main session with cheap reads only:
   3. The rules: read-only, modify nothing; facts only; a `file:line`
      pointer for every claim; no recommendations; return raw markdown
      matching the required sections, no preamble.
+  4. For the operations topic, the resolved config `redact` list
+     (project file over global), verbatim, so the deep-dive knows
+     which variables get `<redacted>` in the Default column.
+
+**Interfaces pass.** Whichever branch runs, the `interfaces` topic
+(when applicable) works in a fixed order, because the chapter's
+`edges:` frontmatter block is the canonical record and only part of
+each row is this run's to write (`../topics.md`'s interfaces
+section).
+
+1. **Read the existing chapter first**, if there is one, and keep its
+   `edges:` block: every row's `to` and `from` is an answer a person
+   or a confirmation gave, and **no run writes or edits one** (core.md
+   hard rule 3).
+2. **Derive this run's rows from the code**: `kind`, `name`, `site`
+   as a repo-relative path with no line number, and `schema` naming
+   the `### <Entity>` section `02-models.md` holds for that payload,
+   or no `schema` where the payload is ad-hoc and the row's
+   `### <Name>` section carries its own field table instead.
+3. **Merge by `(direction, kind, name)`**: a row the block already
+   carries keeps its `to`/`from` untouched and takes this run's
+   `site` and `schema`; a row the code has and the block lacks is
+   added with neither; a row the block has and the code no longer
+   does is dropped and named in the run report
+   (`dropped: sqs old-topic (was to record-store)`).
+4. **Fill the chapter's `known_as`** from the deploy sources the
+   operations topic reads - compose files, ingress and gateway
+   manifests, Kubernetes manifests, service-discovery config - per
+   `../topics.md`.
+5. **Ask about what the registry could not join.** When config
+   `cross_repo` is `auto` (the default) and the `quarry` CLI is on
+   PATH, run `quarry docs index --json` once in the main session and
+   read its `ambiguous` rows for this repo (the workspace name when
+   `workspaces` is configured, per core.md); each is a contract
+   several sibling repos sit on, which the join cannot settle alone.
+   Put them to the user as core.md's Edge confirmation describes -
+   one digest, one line per row - and write each answer into that
+   row's `to` or `from`. Run `quarry docs list --json` in the same
+   pass to confirm this repo is registered; when it is not, say so in
+   one report line, because an unregistered repo is one no join will
+   ever reach. No `09-interfaces.md` is required for either call,
+   unlike `groom` and `plan`. Any condition unmet (config `off`, no
+   CLI, a command that fails, an empty `ambiguous` list) → skip
+   silently and leave those rows without a `to` or a `from`, which is
+   what quarry expects to resolve later.
+6. **Render the tables and the payload sections from the merged
+   block**, and the legacy top-level mirror too when config
+   `interfaces_frontmatter` is on.
 
 ## Phase 3 - compose
 
@@ -132,9 +187,22 @@ paths_covered:
 ```
 
    `content_hash` is computed per core.md's stamps rule:
-   `git ls-tree -r HEAD -- <this file's globs> | git hash-object
-   --stdin`, first 12 chars. It is the stamp that survives a squash
-   or rebase merge making `generated_at_commit` unreachable.
+   `git ls-files -s --full-name -- <this file's globs> | git hash-object --stdin`,
+   first 12 chars (the index entries under the globs: mode, blob,
+   stage, root-relative path; `ls-tree` does not expand `*`). It is
+   the stamp that survives a squash or rebase merge making
+   `generated_at_commit` unreachable.
+
+   `09-interfaces.md` carries two more frontmatter keys, `known_as`
+   and the canonical `edges:` block, per `../topics.md`'s interfaces
+   section; the Produces and Consumes tables are rendered from that
+   block, and each row gets a `### <Name>` section holding
+   either `Model: <Entity>` (the row's `schema`, resolved against
+   `02-models.md`) or its own `Field`, `Type`, `Required` table
+   (topics.md's Payload sections). The
+   producer's `quarry check` compares exactly those fields, so a row
+   with no section, or a section naming a model `02-models.md` does
+   not hold, is a chapter that fails the schema pass.
 
 2. Choose `paths_covered` globs deliberately; they drive the Refresh's
    staleness. Cover every directory the topic's content was derived
@@ -143,7 +211,9 @@ paths_covered:
    Some topics (architecture, conventions) are legitimately
    repo-wide. Anchor every glob at the repository root with the
    `:(top)` magic pathspec (e.g. `:(top)src/api/**`) so staleness
-   checks work from any cwd.
+   checks work from any cwd. `09-interfaces.md`'s globs also cover
+   the deploy sources its `known_as` was read from, so a renamed
+   service marks the chapter stale.
 3. Ensure the global config and the docs area's `.gitignore` exist by
    running the platform-appropriate initializer from the `core`
    skill's `scripts/` directory (idempotent, never overwrites
@@ -233,10 +303,11 @@ paths_covered:
    against the actual source.
 3. Report to the user: files written, topics skipped or absent and
    why.
-4. The local-only outputs (`features/`, interviews, `review.md`,
-   `capstone.json`) are already covered by
+4. The local-only outputs (`features/`, interviews, `review.md`) are
+   already covered by
    `<docs_dir>/.gitignore`; this question is only about the factual
-   reference (`changelog.md` included). If those generated files are
+   reference (`changelog.md` and the project config `capstone.json`
+   included, both always committed per core.md). If those generated files are
    untracked and not covered by `.gitignore`: honor the `docs_in_git`
    config key when set (`commit` or `ignore`); when it is `ask` or
    unset, ask the user whether to commit them or add
@@ -278,15 +349,21 @@ Then, for each stamped file with `paths_covered`:
    user's researched stack decisions must never vanish because the
    code hasn't caught up.
 3. Otherwise check staleness against the **working tree**, not just
-   commits: from the repo root, `git diff --stat <stamp> -- <globs>`
+   commits: from the repo root, `git diff --name-only <stamp> -- <globs>`
    (commit vs working tree) plus `git status --porcelain -- <globs>`
    for untracked files. **Stamp unreachable** (squash or rebase merge
    erased the branch commit): fall back to `content_hash` - recompute
-   it per core.md's stamps rule and compare. Equal, and the working
-   tree is clean over the globs → current; different → stale,
-   regenerate this file only. Only a file with neither a reachable
-   stamp nor a `content_hash` (written by an older capstone) is
-   stale-by-unknowable and regenerates.
+   it per core.md's stamps rule
+   (`git ls-files -s --full-name -- <globs> | git hash-object --stdin`,
+   first 12 chars) and compare. Equal, and the working tree is clean
+   over the globs → current; different → stale, regenerate this file
+   only. A `content_hash` equal to the empty-input hash
+   `e69de29bb2d1` was written by a 6.1 or earlier recipe that never
+   expanded the globs; treat it as absent. Only a file with neither a
+   reachable stamp nor a `content_hash` (written by an older
+   capstone) is stale-by-unknowable and regenerates. `check`'s script
+   half (`scripts/map-check.sh`) runs this same test and prints the
+   verdict per file; its part 1 rows are that test's output.
 4. **No changes** → skip; leave the file and its stamp untouched.
    **Changes** → regenerate it through Phases 2-3; a stale
    extraction-mode `logic/` or `uiux/` file regenerates per its own
@@ -358,25 +435,150 @@ targets one) and re-verify the root index-of-indexes' workspace table.
 
 No writes, and no changelog entry: nothing was done, only read - it
 reports leftover `changelog.d/` fragments (part 7) rather than
-folding them. Eight parts:
+folding them. Eight parts in two halves. Parts 1, 7 and 8 are
+mechanical - `git diff` over globs, a directory listing, grep - and
+live in a script, so a CI gate runs them with no model and no API
+key. Parts 2-6 need judgment and stay here.
 
-1. **Staleness**: for each stamped file with `paths_covered`, read
-   its stamp and globs, then from the repo root run
-   `git diff --stat <stamp> -- <globs>` (commit vs **working tree**,
-   so uncommitted work counts) plus `git status --porcelain --
-   <globs>` for untracked files. A stamp unreachable (squash or
-   rebase merge) falls back to recomputing `content_hash` per
-   core.md's stamps rule: equal and clean → current, different →
-   stale; unreachable with no `content_hash` → verdict "stamp
-   unreachable". Report a table: file | stamp |
-   capstone_version | files changed since | verdict (current / stale /
-   stamp unreachable / written by an older capstone, for a
-   `capstone_version` behind the running plugin's or absent /
-   prescriptive, pending first observation, for any file whose
-   frontmatter still has `mode: prescriptive` while tracked source
-   exists).
-2. **Pointer drift**: sample ≥5 `file:line` pointers across different
-   topic files, check each against the source, and report hits and
+**The script half first.** From the repo root, run the `core` skill's
+`scripts/map-check.sh <docs_dir>` via bash (Git Bash on Windows). With
+config `workspaces` set, pass every workspace's docs area as its own
+argument in one call, so the script prints one verdict. Include its
+stdout verbatim, unedited, as the report's parts 1, 7 and 8; never
+recompute, restate, or re-verdict any of it. What it prints, listed
+by the part numbers this protocol uses and not in a sequence of its
+own:
+
+- Part 1, staleness: one row per stamped file with
+   `paths_covered` - file | stamp | capstone_version | files changed
+   since | verdict.
+   The verdict is `current`; `stale` (`git diff --name-only <stamp>
+   -- <globs>` against the **working tree**, so uncommitted work
+   counts, plus `git status --porcelain -- <globs>` for untracked
+   files, found changes; a stamp made unreachable by a squash or
+   rebase merge falls back to recomputing `content_hash` per
+   core.md's stamps rule,
+   `git ls-files -s --full-name -- <globs> | git hash-object --stdin`
+   first 12 chars, and comparing, with the legacy empty-input hash
+   `e69de29bb2d1` read as absent); `stamp unreachable` (no reachable
+   stamp and no `content_hash`); `written by an older capstone`
+   (`capstone_version` absent or below the plugin's, read from the
+   plugin's own manifest); or `prescriptive, pending first
+   observation` (`mode: prescriptive` while tracked source exists
+   under its globs; with no tracked source yet the file is `current`
+   by definition). Outside git every verdict is `unknowable (not a
+   git repo)` and counts for nothing. A docs area without its index
+   is one finding, `no index at <path>`, and gets no rows.
+- Part 7, unfolded fragments: every file in `changelog.d/` with
+   its key and the repair (any writing run folds them; so does
+   `doctor`). Informational only: fragments are the designed state on a branch,
+   so they never count toward the verdict - a doc-carrying PR must
+   not fail a freshness gate for carrying its own ledger entry.
+- Part 8, schema: a mechanical pass over every generated file, grep
+   only, no judgment. The definition it runs against is
+   `../schema.txt`, one record per output type naming the frontmatter
+   keys that type owes, its `## ` headings in order, and the columns
+   its tables carry; the script reads that file at runtime and holds no
+   copy of it, and `lint-sync` checks 15, 20 and 21 keep it equal to
+   `../topics.md` and to the protocols that write `logic/`, `mockup/`
+   and `uiux/`. Every file the index reaches is checked against its
+   record, so a scenario file and a screen chapter are held to their
+   section lists the way a chapter is. A schema that cannot be read
+   costs the headings and the tables and nothing else: the run prints
+   `schema: <path> unreadable; headings and tables not checked`, holds
+   every page to `generated_date`, and reaches the same verdict line
+   with the same exit code. Four columns per file: missing frontmatter
+   keys
+   (`generated_date` everywhere; inside git also `generated_at_commit`
+   and `content_hash` for stamped files and `paths_covered` for
+   chapters; prescriptive and interview-derived files are held to
+   `generated_date` only, since they carry no commit stamps or globs
+   by design; on `09-interfaces.md` also `known_as`, reported missing
+   when the key is absent and `known_as not a list` when its value is
+   a scalar instead of a bracketed or `- ` list, whatever the mode and
+   inside git or out, because quarry registers no alias at all for
+   that page and says so only on `docs index --force`;
+   `capstone_version` absent is part 1's older-capstone
+   verdict, not re-reported here); missing required `## ` headings
+   per the record's `head` list, which `../topics.md` and the owning
+   protocol spell in prose (a section may be satisfied by "None found"
+   text, but the heading itself must exist), reported as
+   `## <Heading>`; a heading that sits ahead of one the record puts
+   before it, `## <Heading> out of order (before ## <Previous>)`, since
+   a template read out of order is drift a reader meets before the
+   content does; a table under a required heading whose header row
+   lacks a column the record names,
+   `table <Heading> missing <Column>`, matched by lowercased header
+   name rather than position, with a section carrying no table at all
+   left alone; on `09-interfaces.md`, the edge findings below; and secret-shaped
+   strings, reported by pattern name and never by the matched text,
+   in every file, the index itself included. Every item counts toward the
+   verdict: a missing heading is template drift, a missing stamp
+   breaks the refresh, an unknown site is a dead edge, and a leaked
+   credential must not ship; the repair for the first three is
+   `map`, which regenerates the file against the current template.
+   - Edges, on `09-interfaces.md` only: the pass reads the
+     frontmatter `edges:` block, and falls back to the Produces and
+     Consumes tables on a page written before the block existed. Four
+     findings, none of them a judgment call. A row with no `site`
+     (`no site for <kind> <name>`, in the sites column): the chapter
+     cannot point at the code. A `site` whose path, once a trailing
+     `:<line>` or `:<from>-<to>` is stripped, fails
+     `git ls-files --error-unmatch` or matches something other than
+     itself, so a directory and a wildcard are both findings
+     (`site <cell>`; skipped for a prescriptive chapter, whose sites
+     are planned, and outside git; quarry runs the same test at
+     import, so a site this pass rejects is the one
+     `quarry update --strict` refuses). A row with no `### <Name>`
+     payload section (`### <Name>`, in the headings column), and a
+     section holding neither a field table nor a `Model:` line
+     (`payload ### <Name>`): `quarry check` has nothing to compare
+     either way. And a `schema` or `Model:` naming an entity this
+     docs area's `02-models.md` has no `### <Entity>` section for
+     (`model <Entity>`, in the headings column), which is a payload
+     reference pointing at nothing. The last three are checked
+     outside git and on a prescriptive chapter too: they are text the
+     page owes, not paths the tree has to hold. `to` and `from` are
+     never checked here - they are quarry's to resolve and the user's
+     to settle, and this pass never reads them.
+   - Secret-shaped strings: every file the pass visits is grepped for
+     the six shapes below, and so is every non-markdown file the docs
+     area carries (inside git, every one it tracks). The skip list the
+     rest of the pass applies holds here too - `changelog*.md`,
+     `changelog.d/`, `*-interview.md`, `features/`, `review.md`,
+     `be-review.md`, `fe-review.md`, `capstone.json` and `.gitignore`
+     are never opened by either pass, so a credential parked in one of
+     them is not reported. A hit is reported as `secret: <name>`, never
+     the matched text, and counts toward the stale verdict. The repair
+     is to remove the value from the source the chapter quoted, add its
+     variable to the config `redact` list, and run `map`.
+     | Shape | Pattern |
+     | --- | --- |
+     | aws-access-key | `AKIA[0-9A-Z]{16}` |
+     | github-token | `gh[pousr]_[A-Za-z0-9]{36,}` |
+     | slack-token | `xox[abprs]-[A-Za-z0-9-]{10,}` |
+     | stripe-key | `sk_(live\|test)_[A-Za-z0-9]{16,}` |
+     | google-api-key | `AIza[0-9A-Za-z_-]{35}` |
+     | private-key | `-----BEGIN [A-Z ]*PRIVATE KEY-----` |
+
+The script ends with exactly one of
+
+    MAP CHECK: current
+    MAP CHECK: stale (<N> findings)
+
+and exits 1 on stale, 2 on a usage error. That line is the CI gate's
+contract (`templates/capstone-map-check.yml` greps it): never omit,
+reword, recompute, or repeat it.
+
+**The model half.** Then, reading only what each part names:
+
+2. **Pointer drift**: the sample is fixed, so two runs on one commit
+   report the same drift. Take the files part 1 reported `stale`, in
+   index order (the order of their rows in `<index_file>`), and
+   within each file its `file:line` pointers in order of appearance;
+   the sample is the first five. When part 1 reported no stale file,
+   the sample is the first five pointers of the first chapter in
+   index order. Check each against the source and report hits and
    misses with the drifted lines' new locations when findable.
 3. **Absorption drift**: interview-derived `logic/`, `mockup/`, and
    `uiux/` files carry no globs; their staleness signal is shipped
@@ -402,39 +604,18 @@ folding them. Eight parts:
    them). A repo with no frontend reports the section as not
    applicable rather than as a gap; `"uiux"` absent from the config
    `extract` list reports it as disabled by config.
-7. **Unfolded fragments**: list any files in `changelog.d/`, with
-   their keys, and name the repair (any writing run folds them; so
-   does `doctor`). Informational only: fragments are the designed
-   state on a branch, so they never count toward the stale verdict
-   below - a doc-carrying PR must not fail a freshness gate for
-   carrying its own ledger entry.
-8. **Schema**: a mechanical pass over every generated file, grep
-   only, no judgment. Two halves:
-   - Frontmatter keys: each indexed chapter, `logic/` and `uiux/`
-     extraction file carries `generated_date` plus, inside git,
-     `generated_at_commit`, `content_hash`, and `paths_covered`
-     (`capstone_version` absent is already part 1's older-capstone
-     verdict, not re-reported here). Interview-derived files are
-     checked for `generated_date` only, since they carry no globs by
-     design.
-   - Required headings: each chapter's `^## ` lines cover every
-     required section `../topics.md` defines for that topic (a
-     section may be satisfied by "None found" text, but the heading
-     itself must exist).
-   Report file | missing keys | missing headings. Every finding here
-   counts toward the stale verdict: a missing heading is template
-   drift and a missing stamp breaks the refresh, and the repair for
-   both is `map`, which regenerates the file against the current
-   template.
 
 End with one sentence (whether the reference can be trusted as-is,
-needs `map`, or needs `map rebuild`) followed by the machine
-verdict line, exactly one of:
+needs `map`, or needs `map rebuild`), then your own machine verdict
+line, after the script's, exactly one of:
 
-    MAP CHECK: current
-    MAP CHECK: stale (<N> findings)
+    MAP REVIEW: clean
+    MAP REVIEW: <N> findings
 
-(CI templates parse that line; never omit or reword it.)
+`<N>` is the count across parts 2-6: pointer misses, unabsorbed
+features, dependency flags, unclaimed entry points, unclaimed
+surfaces. `templates/capstone-map-review.yml` parses that line and
+never the script's; never omit or reword either.
 
 ## Workspaces
 
@@ -451,5 +632,6 @@ creating it holding just that key if absent); never silently.
 ## Non-git projects
 
 Use `generated_date` only (no commit stamps). There are no stamps to
-diff, so every run is a full build; `check` reports staleness as
-unknowable and falls back to pointer drift alone.
+diff, so every run is a full build; `check`'s script half prints
+`unknowable (not a git repo)` for every stamped file and skips site
+verification; the model half falls back to pointer drift alone.

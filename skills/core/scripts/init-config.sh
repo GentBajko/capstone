@@ -5,13 +5,15 @@
 #       unless it creates)
 #   1. migrates a legacy docs/design tree to docs/capstone
 #   2. creates <docs_dir>/.gitignore if absent; drops the stale
-#      changelog.md rule from an existing one
+#      changelog.md and capstone.json rules from an existing one, one
+#      report line each (both may fire in one run)
 # The global folder is ~/.claude, or $CLAUDE_CONFIG_DIR when the agent
 # sets it ($CAPSTONE_GLOBAL_DIR overrides both, for non-Claude agents).
 # The per-project docs/capstone/capstone.json is never created here:
-# it is optional override/state, written by protocols only when a
-# project-scoped key gets recorded (see core.md). The .gitignore goes
-# in the docs area, which the docs_dir argument may relocate.
+# it is the project's shared config, committed whatever docs_in_git
+# says, and written by protocols only when a project-scoped key gets
+# recorded (see core.md). The .gitignore goes in the docs area, which
+# the docs_dir argument may relocate.
 # Never overwrites an existing config; only the stale-rule removal
 # above touches an existing ignore file.
 # Usage: init-config.sh [--global] [docs_dir]
@@ -41,7 +43,8 @@ if [ ! -f "$GLOBAL_FILE" ]; then
   "extract": ["logic", "uiux"],       // map's extraction passes: ["logic","uiux"] both | ["logic"] skip uiux | [] skip both
   "interfaces": "auto",               // "auto" = write 09-interfaces.md when the repo talks to another repo | "off" = never
   "interfaces_frontmatter": false,    // true = also mirror the interface tables into frontmatter, for machine consumers
-  "cross_repo": "auto"                // "auto" = groom/plan/architecture consult quarry when installed (groom/plan also need 09-interfaces.md) | "off" = never
+  "cross_repo": "auto",               // "auto" = groom/plan/architecture/map consult quarry when installed (groom/plan also need 09-interfaces.md) | "off" = never
+  "redact": ["*_SECRET", "*_TOKEN", "*_PASSWORD", "*_KEY"] // env-var name patterns whose values the docs never quote; * matches any prefix or suffix
 }
 EOF
   echo "created: $GLOBAL_FILE"
@@ -169,6 +172,7 @@ fi
 mkdir -p "$DOCS_DIR"
 IGNORE="$DOCS_DIR/.gitignore"
 if [ -f "$IGNORE" ]; then
+  migrated=0
   # Older versions ignored changelog.md. It is part of the reference
   # now (follows docs_in_git), so drop the stale rule. sed, not
   # grep -v: grep exits 1 when nothing survives, which set -e would
@@ -177,9 +181,51 @@ if [ -f "$IGNORE" ]; then
     sed '/^changelog\.md$/d' "$IGNORE" > "$IGNORE.capstone-tmp" \
       && mv "$IGNORE.capstone-tmp" "$IGNORE"
     echo "unignored: changelog.md in $IGNORE"
-  else
-    echo "exists: $IGNORE"
+    migrated=1
   fi
+  # 6.2 and earlier ignored capstone.json. The project config is the
+  # team's shared settings now and is always committed (core.md), so
+  # the rule goes the same way. The awk also drops the template's own
+  # "# Local settings" comment when it sits directly above the rule,
+  # and the blank line the pair leaves behind, so a migrated file
+  # reads like a fresh one; a comment with anything else under it is
+  # kept. Both migrations may fire in one run, one line each.
+  if grep -q '^capstone\.json$' "$IGNORE"; then
+    awk '
+      held == 1 && $0 == "capstone.json" { held = 0; eat = 1; next }
+      held == 1 { print "# Local settings"; held = 0 }
+      $0 == "# Local settings" { held = 1; next }
+      $0 == "capstone.json" { next }
+      eat == 1 { eat = 0; if ($0 == "" && blank == 1) next }
+      { print; blank = ($0 == "") }
+      END { if (held == 1) print "# Local settings" }' "$IGNORE" \
+      > "$IGNORE.capstone-tmp" && mv "$IGNORE.capstone-tmp" "$IGNORE"
+    echo "unignored: capstone.json in $IGNORE"
+    migrated=1
+  fi
+  # 6.4 added the uiux stage's preview and its raster brand assets.
+  # Appended rather than rewritten, so a hand-edited ignore file keeps
+  # its own rules; each rule is added only when it is absent, so a
+  # second run adds nothing. uiux/assets/*.svg is never added: the mark
+  # is committed, for the reason the template's header gives.
+  added=""
+  for rule in uiux/preview.html 'uiux/assets/*.png' 'uiux/assets/*.jpg' \
+              'uiux/assets/*.jpeg' 'uiux/assets/*.webp' uiux/assets/references/; do
+    if ! grep -qxF "$rule" "$IGNORE"; then
+      added="$added$rule
+"
+    fi
+  done
+  if [ -n "$added" ]; then
+    { cat "$IGNORE"
+      echo
+      echo "# The uiux preview and raster brand assets; the SVG sources are committed"
+      printf '%s' "$added"; } > "$IGNORE.capstone-tmp" \
+      && mv "$IGNORE.capstone-tmp" "$IGNORE"
+    echo "ignored: the uiux preview and raster assets in $IGNORE"
+    migrated=1
+  fi
+  [ "$migrated" -eq 1 ] || echo "exists: $IGNORE"
 else
   cat > "$IGNORE" <<'EOF'
 # Capstone's local-only outputs. Committed docs are the factual
@@ -188,7 +234,13 @@ else
 # changelog.md and changelog.d/ are deliberately NOT here and must
 # never be added: the ledger is always committed, whatever
 # docs_in_git says, because implement deletes each feature folder on
-# the strength of its entry.
+# the strength of its entry. capstone.json is not here either: it is
+# the project's shared config, committed for the same reason a
+# standard is written down rather than kept on one machine.
+# uiux/assets/*.svg is deliberately NOT here either and must never be
+# added: the SVG is the mark itself, the file build moves into the
+# app and rasterises the favicon from, and a logo that lives on one
+# machine is not a brand.
 
 # Feature working files: interviews, specs, plans, review ledgers
 features/
@@ -196,15 +248,24 @@ features/
 # Interview transcripts for every other stage
 *-interview.md
 
-# Local settings
-capstone.json
-
 # Opinionated and personal outputs
 review.md
 
 # Superseded by review.md; listed so older repos stay ignored
 be-review.md
 fe-review.md
+
+# The uiux stage's rendered preview: a picture of 02-system.md, not a
+# deliverable, and hard rule 4 says the outputs are markdown
+uiux/preview.html
+
+# Raster brand assets and reference material. The SVG sources beside
+# them are committed (see above); these are exports and mood boards.
+uiux/assets/*.png
+uiux/assets/*.jpg
+uiux/assets/*.jpeg
+uiux/assets/*.webp
+uiux/assets/references/
 EOF
   echo "created: $IGNORE"
 fi

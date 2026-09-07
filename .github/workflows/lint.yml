@@ -21,6 +21,7 @@ jobs:
           if [ -f docs/capstone/capstone.json ]; then echo "per-project config should not be created"; exit 1; fi
           if [ ! -f docs/capstone/.gitignore ]; then echo ".gitignore not created"; exit 1; fi
           if grep -q '^changelog\.md$' docs/capstone/.gitignore; then echo "fresh template ignores changelog.md"; exit 1; fi
+          if grep -q '^capstone\.json$' docs/capstone/.gitignore; then echo "fresh template ignores capstone.json"; exit 1; fi
           out=$(bash "$GITHUB_WORKSPACE/skills/core/scripts/init-config.sh" docs/capstone)
           case "$out" in *"exists:"*) ;; *) echo "second run not idempotent: $out"; exit 1;; esac
           printf 'changelog.md\n' >> docs/capstone/.gitignore
@@ -28,3 +29,13 @@ jobs:
           case "$out" in *"unignored: changelog.md"*) ;; *) echo "unignore migration did not report: $out"; exit 1;; esac
           if grep -q '^changelog\.md$' docs/capstone/.gitignore; then echo "stale changelog.md rule not removed"; exit 1; fi
           if ! grep -q '^features/$' docs/capstone/.gitignore; then echo "migration dropped other rules"; exit 1; fi
+          printf '# Local settings\ncapstone.json\n' >> docs/capstone/.gitignore
+          out=$(bash "$GITHUB_WORKSPACE/skills/core/scripts/init-config.sh" docs/capstone)
+          case "$out" in *"unignored: capstone.json"*) ;; *) echo "capstone.json unignore migration did not report: $out"; exit 1;; esac
+          if grep -q '^capstone\.json$' docs/capstone/.gitignore; then echo "stale capstone.json rule not removed"; exit 1; fi
+          if grep -q '^# Local settings$' docs/capstone/.gitignore; then echo "migration left the orphaned comment"; exit 1; fi
+          if ! grep -q '^features/$' docs/capstone/.gitignore; then echo "capstone.json migration dropped other rules"; exit 1; fi
+          printf 'changelog.md\ncapstone.json\n' >> docs/capstone/.gitignore
+          out=$(bash "$GITHUB_WORKSPACE/skills/core/scripts/init-config.sh" docs/capstone)
+          case "$out" in *"unignored: changelog.md"*"unignored: capstone.json"*) ;; *) echo "both migrations in one run did not report one line each: $out"; exit 1;; esac
+          if grep -Eq '^(changelog\.md|capstone\.json)$' docs/capstone/.gitignore; then echo "a stale rule survived the double migration"; exit 1; fi

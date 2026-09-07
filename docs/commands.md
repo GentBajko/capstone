@@ -64,11 +64,11 @@ means refresh only what drifted.
 | `<topic>` | Rebuild one chapter: `architecture`, `models`, `conventions`, `data-flow`, `dependencies`, `testing`, `operations`, `glossary`, `interfaces`. |
 
 **Writes** `docs/capstone/00-index.md`, the numbered chapters
-(`09-interfaces.md`, the cross-repo produces/consumes tables, appears
-when the repo talks to another repo; the `interfaces` config key can
-turn it off), `logic/` (business-logic scenarios) and `uiux/`
-(surface chapters); the `extract` config key can skip either
-extraction pass.
+(`09-interfaces.md`, the cross-repo produces/consumes tables with one
+`### <Name>` payload section per row, appears when the repo talks to
+another repo; the `interfaces` config key can turn it off), `logic/`
+(business-logic scenarios) and `uiux/` (surface chapters); the
+`extract` config key can skip either extraction pass.
 Every file carries `generated_at_commit`, `generated_date`,
 `capstone_version`, `content_hash` and `paths_covered` in
 frontmatter; those globs are what a later refresh diffs against, and
@@ -76,22 +76,82 @@ the content hash is the stamp that survives squash and rebase merges,
 so an unreachable commit degrades to a per-file check instead of a
 full rebuild.
 
+`09-interfaces.md`'s frontmatter carries the canonical `edges:` block:
+one row per cross-repo edge with its `kind`, `name`, `site` (a path,
+no line number) and `schema`, and the Produces and Consumes tables
+below it are rendered from those rows. `map` writes exactly those four
+fields and never a `to` or a `from`, because no repo holds another
+repo's name; quarry supplies them by joining every registered repo's
+rows on `(kind, name)`. The frontmatter also records what other
+systems call this repo: a
+`known_as` list, read from the deploy config the
+operations chapter cites (compose service names, ingress hosts,
+Kubernetes manifests), so quarry can resolve a consumer's
+`from: records.internal` to this repo's folder. Where the join finds
+several candidates on one contract, and `cross_repo: "auto"` has
+quarry on PATH, the interfaces pass reads
+`quarry docs index --json`'s `ambiguous` rows and asks you, once, in
+one digest; the answer is written into that row and no run edits it
+afterwards. `unknown` is a legal answer and means no sibling repo sits
+on the other side: quarry keeps the row as a publication and lists
+possible consumers by name.
+
 **A refresh also fills gaps**, not just staleness: entry points no
 `logic/` scenario claims and surfaces no `uiux/screens/` chapter
 claims get extracted. Interview-derived files in either folder are
 never overwritten by extraction.
 
-`map check` reports eight things - staleness, pointer drift,
-absorption drift, dependency re-vetting, logic coverage, design
-coverage, unfolded `changelog.d/` fragments (informational only;
-fragments never flip the verdict), and a mechanical schema pass
-(required frontmatter keys and required headings per file, grep
-only) - and
-ends with a machine-parseable verdict:
+`map check` reports eight things in two halves. The script half,
+`skills/core/scripts/map-check.sh [docs_dir ...]` (bash; no model, no
+API key; default `docs/capstone`, several arguments for a monorepo's
+workspaces), does staleness (part 1), unfolded `changelog.d/`
+fragments (part 7, informational only; fragments never flip the
+verdict) and the mechanical schema pass (part 8: required frontmatter
+keys, `09-interfaces.md`'s `known_as` among them, which is a finding
+when the key is absent and when its value is a scalar instead of a
+list; required headings, in order, per the record for that kind of
+file; table columns matched by header name; and, read off `09-interfaces.md`'s
+frontmatter `edges:` block, four edge findings - a row with no `site`,
+a `site` whose path fails `git ls-files --error-unmatch` or names
+something other than one tracked file so a directory and a wildcard
+both count, a row with no `### <Name>` payload section or one holding
+neither a field table nor a `Model:` line, and a `schema` or `Model:`
+naming an entity `02-models.md` has no `### <Entity>` section for;
+plus secret-shaped strings reported by pattern name), then ends with a
+machine-parseable verdict:
 
 ```text
 MAP CHECK: current
 MAP CHECK: stale (<N> findings)
+```
+
+What the pass checks each file against is one record in
+`skills/core/references/schema.txt`: the frontmatter keys that kind of
+file owes, its `## ` headings in order, and its table columns. The
+script reads that file at runtime, so `logic/` scenarios, `mockup/`
+screens and `uiux/` chapters are held to their section lists the way a
+chapter is, and `lint-sync.sh` keeps the records equal to the prose in
+`topics.md` and in the protocols. A schema file that cannot be read
+costs the headings and the tables alone; the run says so and finishes
+with the same verdict and exit code.
+
+Exit 0 on current, 1 on stale, 2 on a usage error. `--headings` prints
+the required-headings list from the schema (`lint-sync.sh` keeps it
+equal to `topics.md`); `--schema` prints the resolved schema path and
+its record count; `--patterns` prints the secret patterns by name:
+`aws-access-key`, `github-token`, `slack-token`, `stripe-key`,
+`google-api-key`, `private-key`. Findings name the file and the
+pattern, never the matched text.
+
+The model half - pointer drift (a fixed sample: the first five
+`file:line` pointers in the files part 1 reported stale, in index
+order), absorption drift, dependency re-vetting, logic coverage,
+design coverage - runs the script first, quotes its output, and ends
+with its own line, which only the review workflow reads:
+
+```text
+MAP REVIEW: clean
+MAP REVIEW: <N> findings
 ```
 
 **Ledger key** `map/<topic|all>@<stamp>`.
@@ -113,7 +173,10 @@ approvals, truncated plans), torn wraps (a feature folder left behind
 after its entry landed), index ↔ disk drift, lifecycle validity,
 housekeeping (missing `.gitignore` or config keys, an untracked
 ledger), absorption drift, logic coverage, ledger size, schema
-(missing frontmatter keys or required headings), and unfolded
+(`map-check.sh`'s part 8: missing frontmatter keys, `known_as`
+included, or required headings, a Produces or Consumes row on
+`09-interfaces.md` with no `### <Name>` payload section, untracked
+`Site` paths, secret-shaped strings), and unfolded
 `changelog.d/` fragments.
 
 **Ledger key** `doctor/<scope>@<stamp>` - only when something was
@@ -159,7 +222,7 @@ dead session loses nothing, and re-running never re-asks.
 | --- | --- | --- |
 | `mockup` | `mockup/` - one file per screen: wireframe, elements, and a state inventory; `README.md` indexes the screens, the journeys, and the scenario list `logic` works from | `mockup-interview.md` |
 | `logic` | `logic/` - one file per scenario: triggers, exact rules, branches, unhappy paths, invariants, and the dimensions ruled out | `logic-interview.md` |
-| `uiux` | `uiux/01-direction.md`, `02-system.md`, `03-experience.md`, `screens/` | `uiux-interview.md` |
+| `uiux` | `uiux/01-direction.md`, `02-system.md` (tokens, the `## Assets` manifest), `03-experience.md`, `screens/`, the brand SVGs in `uiux/assets/`, and `preview.html` | `uiux-interview.md` |
 | `architecture` | The numbered chapters, marked `mode: prescriptive` (`09-interfaces.md` too when the design declares cross-repo edges) | `architecture-interview.md` |
 | `standards` | `standards.md` | `standards-interview.md` |
 | `stack` | `05-dependencies.md` | `stack-interview.md` |
@@ -185,18 +248,56 @@ dead session loses nothing, and re-running never re-asks.
   questions: what does not apply is confirmed in one batch, not
   sixteen turns. Without the sweep, a rule nobody thought to ask about
   reads exactly like a rule that does not exist.
-- **`uiux`** requires a formalized `mockup`. On a repo that already has
+- **`uiux`** requires a formalized `mockup`. It sweeps the product
+  against `uiux-inventory.md`'s twenty-seven system items and every
+  screen against its eleven screen items, and finishes when each one
+  is answered, cited to an earlier answer, or recorded inapplicable in
+  the owning file's `## Not in play` section - the same completion test
+  `logic` gets from its dimensions. Before the gate it writes
+  `uiux/preview.html`, one self-contained page rendering the committed
+  tokens as the flagship first viewport plus a style tile, so the user
+  steers by looking rather than by reading hex values; it is
+  regenerated whenever a token changes and never committed. The brand
+  files it plans go in `uiux/assets/` and are listed row by row in
+  `02-system.md`'s `## Assets` table, with the SVGs committed and the
+  raster exports ignored. On a repo that already has
   a frontend it runs in **extraction mode** instead: it documents the
   design that exists rather than interviewing for one.
-- **`stack`** researches real options per capability with licenses and
-  pricing; you pick. `stack refresh` re-vets recorded picks later.
-  Ledger keys `stack/all@Q<n>` and `stack/refresh@Q<n>`.
+- **`standards`** sweeps the seventeen domains in
+  `standards-inventory.md`: the nine it always walked plus security,
+  logging and privacy, API conventions, accessibility, performance
+  budgets, documentation, versioning and release, and CI gates. Each
+  domain holds items carrying the probe that turns them into a question
+  and the `code-craft.md` rule they default to, so most are settled by
+  an earlier answer or by the craft file and never asked. It finishes
+  when every item is answered, cited to `code-craft.md` as accepted
+  unchanged, or recorded in `standards.md`'s closing `## Not in play`
+  with its reason.
+- **`stack`** derives the capability list from your own documents
+  rather than from a stock list: every External services row, every
+  Communication channel, every store and queue in the data-flow
+  chapter, every process and environment variable in the operations
+  chapter, every logic scenario reaching outside the process, and the
+  `uiux/02-system.md` commitments. Each row is shown with the source
+  that produced it, and you add or strike. Every capability then
+  reaches you as two to four researched options with licenses and
+  pricing, plus one more in every list: write it ourselves, priced in
+  code and in what the project then maintains. The `code-craft.md`
+  ladder recommends and names its rung; you pick. `stack refresh`
+  re-vets recorded picks later. Ledger keys `stack/all@Q<n>` and
+  `stack/refresh@Q<n>`.
 - **Between `stack` and `build`** the pipeline reads all six stages'
-  final outputs in two halves. First it **re-files what landed in the
-  wrong stage** against core.md's Stage ownership table - a business
-  rule in an architecture chapter belongs in `logic`, while a library
-  in `standards.md` belongs in `05-dependencies.md` - as one digest you
-  confirm, since nothing is being re-decided. Then it **raises what one
+  final outputs in three halves. First it **names what nobody asked**:
+  every item of a stage's own inventory - `logic`'s dimensions, the
+  uiux and standards inventories, the architecture question list,
+  `stack`'s derived capability list - that no final output decides or
+  rules out, as one numbered digest you answer, skip, or strike, and
+  as one line saying so when nothing is uncovered. Then it **re-files
+  what landed in the wrong stage** against core.md's Stage ownership
+  table - a business rule in an architecture chapter belongs in
+  `logic`, while a library in `standards.md` belongs in
+  `05-dependencies.md` - as one digest you
+  confirm, since nothing is being re-decided. Last it **raises what one
   final output says that contradicts another**. Same terms as any
   interview's pushback: evidence and final-file citations, two rounds
   at most, then your answer stands. The affected final outputs, index,
@@ -290,6 +391,8 @@ docs/capstone/
 ├── logic/                 business logic, one file per scenario
 ├── mockup/                one file per screen
 ├── uiux/                  direction, design system, per-screen chapters
+│   ├── assets/            the brand SVGs - committed; rasters gitignored
+│   └── preview.html       the rendered style tile           (gitignored)
 ├── changelog.md           the folded ledger - always committed
 ├── changelog.d/           one fragment per new entry, folded on main - committed
 ├── standards.md           how code should be written here
@@ -297,7 +400,7 @@ docs/capstone/
 ├── review.md              opinionated findings          (gitignored)
 ├── *-interview.md         interview transcripts         (gitignored)
 ├── features/              specs, plans, review ledgers   (gitignored)
-└── capstone.json          project-scoped overrides       (gitignored)
+└── capstone.json          the project's settings and state - committed
 ```
 
 `docs_dir` relocates all of it; `capstone.json`'s own path never
@@ -318,20 +421,47 @@ CI runs (approval gates still stop). `extract` picks which of `map`'s
 extraction passes run (`["logic"]` skips the expensive uiux pass;
 `[]` skips both). `interfaces` and `interfaces_frontmatter` control
 the `09-interfaces.md` chapter; `cross_repo` controls whether
-`groom`, `plan`, and the `architecture` interview consult the
-`quarry` CLI for cross-repo contracts (`auto` uses it only when the
-CLI is on PATH, and for `groom`/`plan` the repo also has a
-`09-interfaces.md`).
+`groom`, `plan`, the `architecture` interview, and `map`'s interfaces
+pass consult the `quarry` CLI for cross-repo contracts (`auto` uses
+it only when the CLI is on PATH, and for `groom`/`plan` the docs area
+in play also has a `09-interfaces.md`). `redact` lists env-var name
+patterns whose values never reach the docs; `07-operations.md` writes
+`<redacted>` for them. `workspaces` (project-scoped)
+names each monorepo workspace; the name doubles as its quarry target.
+`docs/capstone/capstone.json` is the project's own
+shared config, committed like the ledger whatever `docs_in_git` says,
+holding `pipeline`, `workspaces`, and any global key this repo
+overrides; `expertise` and `teaching_mode` are personal, live in the
+global file, and are ignored if found here.
 
 **Cross-repo contracts.** With `cross_repo: "auto"` and quarry
 installed, `groom` runs `quarry docs deps <repo> --downstream --json`
-and reads each consumer's contract section before its first question,
-and `plan` writes the constraint into every task that crosses a repo
-boundary. The `architecture` interview looks up any existing system
+and reads each consumer's contract section before its first question.
+In a monorepo with `workspaces` configured, `<repo>` is the
+workspace name - the same name `quarry init --name` registers as a
+target, chosen by which workspace's `path` contains the files the
+feature touches (one call per workspace when several). `plan` writes
+the constraint into every task that crosses a repo boundary.
+The `architecture` interview looks up any existing system
 a greenfield design will talk to (`quarry docs search`, then the
 contract section) and writes the planned edges into a prescriptive
 `09-interfaces.md`, so the feature chain can consult quarry from day
-one. Without quarry, everything behaves exactly as before.
+one. Going the other way, `quarry check` runs in the producer's CI:
+it reads the working tree's `09-interfaces.md`, pairs each Produces
+payload section with the matching Consumes section in every consumer
+the quarry knows, and exits 1 when a field a consumer reads is gone
+or changed type. `quarry update` runs the same comparison as advisory
+notes. Both read the `### <Name>` sections `map` writes, which is why
+the chapter, and not `01-architecture.md`'s Communication section,
+holds the fields for a cross-repo channel - as a table, or as
+`Model: <Entity>` naming a `### <Entity>` section in this repo's
+`02-models.md`. `map` runs `quarry docs index --json` and
+`quarry docs list --json` while writing `09-interfaces.md`, to find
+the edges the registry's join could not settle and to check that this
+repo is registered at all. Without
+quarry, everything behaves exactly as before: the rows are written
+with no `to` and no `from`, and the join happens whenever the repo
+reaches a quarry.
 
 **Interview lifecycle.** `interviewing` → `awaiting-formalization` →
 `formalized`. The final state is written only *after* outputs are on
@@ -380,10 +510,19 @@ a considered trade-off from an oversight.
 
 ## CI
 
-Copy `templates/capstone-map-check.yml` into `.github/workflows/` and
-add an `ANTHROPIC_API_KEY` secret. It runs `map check` on every PR and
-fails when the reference is stale, by parsing the `MAP CHECK:` verdict
-line. The template writes a config with `non_interactive: true` so
-the headless run resolves every prompt to its default; unfolded
-`changelog.d/` fragments are reported but never fail the gate, so a
-PR carrying its own ledger entry still passes.
+Two templates. `templates/capstone-map-check.yml` is the per-PR gate:
+it clones capstone at the pinned release tag and runs
+`skills/core/scripts/map-check.sh docs/capstone`, no API key, failing
+on the `MAP CHECK:` verdict line. Unfolded `changelog.d/` fragments
+are reported but never fail it, so a PR carrying its own ledger entry
+still passes. The script's schema pass also fails the gate on a
+secret-shaped string in any generated file.
+`templates/capstone-map-review.yml` is the model half: nightly and on
+`workflow_dispatch`, with an `ANTHROPIC_API_KEY` secret, failing on
+the `MAP REVIEW:` line and ignoring the script's. It writes a config
+with `non_interactive: true` so the headless run resolves every
+prompt to its default.
+
+A repo registered in a quarry adds `quarry init` and `quarry check`
+to the same pull-request workflow; that gate reads the payload
+sections, needs no API key, and is documented in quarry's README.

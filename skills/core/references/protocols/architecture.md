@@ -28,7 +28,10 @@ now gets it, with the exchange recorded.
 only when (a) every applicable item in `../interview.md`, the merged
 question inventory, has been asked, answered, or recorded as
 not-applicable, AND (b) every required section of every applicable topic
-in `../topics.md` can be written from recorded answers. Both are
+in `../topics.md` can be written from recorded answers. Payloads sit
+inside (b): every `schema` a planned `09-interfaces.md` row names must
+have its `02-models.md` `### <Entity>` field table answerable from
+recorded decisions, or the row's inline fields must be. Both are
 checkable conditions: sweep them and ask about whatever is not yet
 answerable. Never assume: any default you want to apply must be surfaced
 as a question or an explicitly-confirmed default, not silently adopted.
@@ -116,8 +119,12 @@ status: interviewing   # see core.md "Interview lifecycle"
   endpoint names and fields, cite them in the recorded decision, and
   record what the lookup settled as a `### D<n>` derived entry
   rather than asking the user to recite a contract that is already
-  written down. Lookup misses, config `off`, or no CLI → interview
-  exactly as before. Protocol text, never a harness hook.
+  written down. When the search returns several repos on one
+  contract, that is an edge the registry cannot settle: confirm it
+  here, in the interview, per core.md's Edge confirmation, and
+  record the answer as the `### D<n>` entry Phase D writes into the
+  chapter's `to` or `from`. Lookup misses, config `off`, or no CLI →
+  interview exactly as before. Protocol text, never a harness hook.
 - **Question order:** walk `../interview.md` top to bottom: Framing
   (§0), then the one-way-door shape decisions (§1, with 2-3 candidates
   for macro-structure), then the topic-mapped checklists (§2), quality
@@ -157,11 +164,17 @@ these differences:
 - A banner on each file: "Prescriptive design intent; code does not
   exist yet."
 - `09-interfaces.md` is applicable when the design declares any
-  cross-repo edge (and config `interfaces` is `auto`): the planned
-  Produces/Consumes tables per `../topics.md`, `Site` cells naming
-  planned paths from the decided layout, consumer contract fields
-  taken from the interview's quarry lookups where they ran. Writing
-  it here is what lets `groom` and `plan` consult quarry from day
+  cross-repo edge (and config `interfaces` is `auto`): the
+  frontmatter `edges:` block per `../topics.md`, `site` naming a
+  planned path from the decided layout with no line number, `schema`
+  naming the entity `02-models.md` declares for that payload, and the
+  Produces/Consumes tables rendered from the block. Contract fields
+  come from the interview's quarry lookups where they ran. This is
+  the one stage that writes `to` and `from` as it writes the rows,
+  because the interview settled each one with the user (the Edge
+  confirmation bullet above); a `map` run over the same chapter later
+  leaves them exactly as they are. Writing the chapter here is what
+  lets `groom` and `plan` consult quarry from day
   one, and gives `map` a declared design to check the observed edges
   against once code exists.
 
