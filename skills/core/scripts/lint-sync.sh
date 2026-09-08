@@ -414,15 +414,20 @@ grep -q '^## Git: branches, commits' skills/core/references/code-craft.md \
 grep -q "Git section" skills/core/references/protocols/implement.md \
   || err "implement.md does not cite code-craft's Git section"
 
-# 12c. execution is capstone's own: the two code-writing stages ask the
-#      user for subagent-vs-inline and record it, and no protocol
+# 12c. execution is capstone's own: both routers and code-writing
+#      stages use the shared choice gate; executors record the answer,
+#      map inherits it, and no protocol
 #      invokes a superpowers skill at runtime (prose attribution in
 #      groom/plan is fine; a `superpowers:<skill>` call is not)
+grep -q '^## Execution choice$' skills/core/references/core.md \
+  || err "core.md has no shared execution choice rule"
+for n in feature start implement build map; do
+  grep -qF '[Execution choice](../core.md#execution-choice)' "skills/core/references/protocols/$n.md" \
+    || err "protocol $n.md does not reference the shared execution choice rule"
+done
 for n in implement build; do
   grep -q 'execution: subagent | inline' "skills/core/references/protocols/$n.md" \
     || err "protocol $n.md does not record the execution mode"
-  grep -q 'Ask the mode once' "skills/core/references/protocols/$n.md" \
-    || err "protocol $n.md does not ask subagent-vs-inline before executing"
 done
 if grep -rl 'superpowers:' skills/core/references/protocols/ >/dev/null 2>&1; then
   err "a protocol invokes a superpowers skill: $(grep -rl 'superpowers:' skills/core/references/protocols/ | tr '\n' ' ')"

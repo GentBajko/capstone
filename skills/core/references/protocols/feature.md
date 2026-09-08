@@ -10,7 +10,10 @@ an existing feature's slug.
 
 ## Procedure
 
-1. Per core.md: read the config.
+1. Per core.md: read the config, then apply
+   [Execution choice](../core.md#execution-choice). Always ask
+   subagents or inline on entry, including a resumed feature, and
+   wait for the answer before stage work or reference bootstrap.
 2. Resolve the feature: match the argument against
    `docs/capstone/features/*/` ids and spec titles **and against the
    `implement/*` keys in the ledger** (`changelog.md`, its rotation
@@ -51,8 +54,9 @@ an existing feature's slug.
    (`groom.md`, `plan.md`, `implement.md`) exactly, including its own
    gate. Do not blend stages. A cross-repo edge the feature adds is
    confirmed inside `groom` per core.md's Edge confirmation;
-   `feature` routes and asks nothing of its own. A stage counts as done only when its
-   marker AND its changelog key are both present; a marker with no
+   `feature` carries its execution choice into every stage. A stage
+   counts as done only when its marker AND its changelog key are both
+   present; a marker with no
    key is a torn write: append that stage's missing entry per
    core.md, never re-run the stage.
 5. When a stage completes, announce it in one line and continue

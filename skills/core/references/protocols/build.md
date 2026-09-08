@@ -11,6 +11,13 @@ first, then frontend. With `implement`, one of the **two commands
 allowed to write source code** (core.md hard rule 2), and only after
 its plan gate.
 
+**Entry gate:** apply [Execution choice](../core.md#execution-choice)
+before prerequisite stages, research or resumed work. Inherit the
+current `start` run's explicit answer; a standalone invocation always
+asks and waits, including a resume. Record the chosen
+`execution: subagent | inline` in `build-interview.md`'s frontmatter
+as soon as the file exists; a saved value never skips the entry gate.
+
 State: `docs/capstone/build-interview.md` (standard lifecycle per
 core.md; `formalized` here means the walking-skeleton slice runs).
 Plan output: `docs/capstone/implementation.md` (companion, indexed).
@@ -103,12 +110,8 @@ against it.
 
 ## Phase C - write the code
 
-**Ask the mode once, before the first step**, and record it as
-`execution: subagent | inline` in `build-interview.md`'s frontmatter
-so a resumed run never re-asks:
-
-> "Run the build steps in subagents (fresh context per step,
-> recommended) or inline in this session?"
+Use the execution mode explicitly chosen at entry for this run.
+Reaching the coding phase does not ask again or change that choice.
 
 This phase reads `implementation.md` and `../code-craft.md`, and
 never `standards.md`: Phase A already copied that file's constraints
@@ -137,9 +140,6 @@ dispatching the next.
 
 **Inline mode** runs the same steps in this session, same order, same
 verification, same commits.
-
-Either mode: a harness without subagents takes inline, said out loud
-rather than asked.
 
 **Brand assets**, once the step that scaffolds the frontend tree has
 run and before the first screen is built:

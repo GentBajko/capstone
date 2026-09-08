@@ -50,6 +50,12 @@ Usage: /capstone:<command>
 
   help                 Show this message
 
+start and feature always ask inline or subagents on each new or resumed
+run, before stage work. Inline avoids extra agent usage; subagents can
+consume your allowance faster. No default: the run waits for your answer.
+The choice covers every stage, review and reference refresh. Standalone
+build and implement ask too; pipeline handoffs inherit the current choice.
+
 Output: everything lands in docs/capstone/ - 00-index.md, the numbered
 topic chapters, and the logic/ scenario map. Chapters carry the commit
 they were derived at; the index carries none, so there is one copy of

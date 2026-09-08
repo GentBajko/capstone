@@ -99,6 +99,12 @@ Do this in the main session with cheap reads only:
 
 ## Phase 2 - deep-dive
 
+An inherited [Execution choice](../core.md#execution-choice) governs
+every dispatch below, including Phase 3's scenario and surface
+extraction. In inline mode, analyze all of them in this conversation
+regardless of the threshold. Standalone `map` keeps its usual
+threshold behavior; a pipeline's inline choice overrides that behavior.
+
 - **At or below the subagent threshold (default 150 source files):**
   analyze each applicable topic inline yourself, against that topic's
   required sections and checklist in `../topics.md`.

@@ -32,9 +32,15 @@ Capstone docs for the project, since `groom` interviews against them.
 Where there is no index, `groom` builds the reference first rather
 than refusing, so this resolves itself at the cost of a `map` run.
 
-## Two gates, not one
+## Execution choice and approvals
 
-The chain stops twice, and both stops are yours. `groom` stops for
+Every new or resumed run first asks **inline or subagents** and waits
+for your answer. Inline avoids extra agent usage; subagents use fresh
+contexts and can consume your allowance faster. Your choice covers
+the whole chain, including reference setup, planning, reviews and
+refreshes. It is carried between stages, with no automatic default.
+
+The stage approvals remain separate. `groom` stops for
 spec approval. `plan` stops for plan approval, recorded with a
 checksum of the spec, and no code is written before it. `implement`
 runs to completion after that, reviewing its own diff until two
@@ -50,6 +56,8 @@ them.
 **My session died mid-chain.** Run the same command again. It reads
 the feature's state off disk and resumes at the first unfinished
 stage, and interview answers are written before the next question.
+You choose inline or subagents again for the resumed run; saved
+progress and plan approvals still stand.
 
 **Can two features run in parallel?** Their ids are derived from the
 groom date and slug rather than allocated from a counter, so two

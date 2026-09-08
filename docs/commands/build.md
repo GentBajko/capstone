@@ -39,9 +39,11 @@ brand file.
 The plan lands in `docs/capstone/implementation.md` and the run stops
 there. Nothing is written until you approve it.
 
-After approval you are asked once, before the first step, whether the
-code should be written by subagents with fresh context per step or
-inline in this session. Code lands in the repository's own source
+Before research or prerequisite work, a standalone `build` always
+asks whether to work inline or use subagents, including when you
+resume. In the greenfield pipeline it carries the answer already
+given to `start`. That choice applies throughout the run, including
+plan review and coding. Code lands in the repository's own source
 tree, never under the docs area.
 
 ## Common questions
@@ -50,9 +52,9 @@ tree, never under the docs area.
 and the approval is explicit.
 
 **Subagents or inline: which should I pick?** Subagents give each step
-a fresh context, which matters on a long plan; inline keeps everything
-in one conversation, which is easier to steer. The question is asked
-once, before the first step.
+a fresh context and can consume your allowance faster; inline keeps
+everything in one conversation and avoids extra agent usage. There
+is no automatic default, and each new run asks again.
 
 **It stopped saying an asset is awaited.** `02-system.md`'s
 `## Assets` table marks each brand file `present` or `awaited`, and an

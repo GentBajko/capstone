@@ -9,6 +9,14 @@ Last stage of the feature chain: turns the approved `plan.md` into
 code. With `build`, one of the two commands allowed to write source
 code (core.md hard rule 2), and only after its plan gate.
 
+**Entry gate:** apply [Execution choice](../core.md#execution-choice)
+before prerequisite stages, reference bootstrap or resumed work.
+Inherit the current `feature` run's explicit answer; a standalone
+invocation always asks and waits, including a review-only or wrap-only
+resume. Record the chosen `execution: subagent | inline` in the
+feature-interview frontmatter as soon as the file exists; a saved
+value never skips the entry gate.
+
 Prerequisite, checked in this order (resolve a `<feature>` argument
 as `groom`'s Resume rule does): no folder but an
 `implement/<id>` key in the ledger (`changelog.md`, its rotation
@@ -62,18 +70,8 @@ the rules binding this feature sit in front of the executor with none
 of the seventeen domains behind them; Phase C is where the rest is
 enforced.
 
-**Ask the mode once, before Task 1**, and record it as
-`execution: subagent | inline` in the feature-interview frontmatter
-so a resumed run never re-asks:
-
-> "Run the tasks in subagents (fresh context per task, recommended) or
-> inline in this session?"
-
-Subagent is the recommendation: a task executed in its own context
-cannot drift on the previous task's leftovers, and the plan was
-written so each task carries everything its executor needs. Inline is
-the right pick for a short plan, a harness without subagents (state
-that and take it, don't ask), or a user who wants to watch each step.
+Use the execution mode explicitly chosen at entry for this run.
+Reaching Task 1 does not ask again or change that choice.
 
 Both modes obey the same rules: tasks in dependency order, steps
 exactly as written, every verification run and **passing** before its
@@ -150,9 +148,9 @@ restarting at round one.
    `standards.md`, and enforcement lives here on purpose**: the
    reviewer has the budget for it and the implementer, which explores,
    writes and debugs against a plan, does not. Fresh eyes every
-   round: with subagents,
-   dispatch one reviewer per lens; without, re-read the diff once per
-   lens, coldly.
+   round: in the user's selected subagent mode, dispatch one reviewer
+   per lens; in inline mode, re-read the diff yourself once per lens,
+   coldly, even when subagent tools are available.
 2. **Verify**: adversarially check each finding before acting: try
    to refute it against the spec, the plan, and the reference. Every
    finding goes into the ledger, confirmed or refuted; a round counts
@@ -179,8 +177,9 @@ parallel, one reviewer per lens, each reading the full diff.
 Entered when Phase C goes dry.
 
 1. The spec's Reference impact chapters are now stale by construction:
-   run the `map` refresh on them so the reference records what was
-   actually built, divergences included. Where that list carries a
+   run the `map` refresh on them in this run's chosen execution mode
+   so the reference records what was actually built, divergences
+   included. Where that list carries a
    confirmed cross-repo edge (`groom` Phase A step 4), write the
    repo name into that row's `to` or `from` in
    `09-interfaces.md`'s `edges:` block afterwards: the refresh writes

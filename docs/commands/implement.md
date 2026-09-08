@@ -11,6 +11,13 @@ reviews its own diff, refreshes the chapters the change affected, and
 absorbs the shipped behavior back into `logic/`, `mockup/` and
 `uiux/`.
 
+A standalone invocation always asks **inline or subagents** before
+prerequisite work or execution, including resumes with only review or
+wrap left. When entered through `feature`, it carries that run's
+answer. Inline covers every task, review and reference refresh, even
+when subagent tools are available. Subagents use fresh contexts and
+can consume your allowance faster; neither mode is chosen for you.
+
 The review loop runs until two consecutive rounds find nothing new.
 One clean round is not enough, because the round that fixes a finding
 is the round most likely to introduce the next one. Only after that

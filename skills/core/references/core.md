@@ -108,8 +108,8 @@ prompt resolves to its recommended default without being asked, so
 carries a default (a confirm, a mode ask, `docs_in_git: "ask"`'s
 commit-or-ignore question) takes the default and is noted in the
 report. A question with no default - an approval gate (`plan`'s,
-`build`'s, a spec gate), consent to write main, an interview question
-- is never answered by inventing consent: the run says what it is
+`build`'s, a spec gate), the execution choice below, consent to write
+main, an interview question - is never answered by inventing consent: the run says what it is
 blocked on and stops. It changes how prompts resolve, never what gets
 written.
 
@@ -243,6 +243,45 @@ level 3 without asking and leave `expertise` null.
 5. **Record what you did**: every run that writes or changes a durable
    output writes its entry as a `<docs_dir>/changelog.d/` fragment
    before setting its done marker (Changelog ledger, below).
+
+## Execution choice
+
+**Always ask at the start of every `feature` or `start` run, including
+a new invocation that resumes unfinished work, and wait for the
+user's explicit choice before starting any stage work:**
+
+> "Run this pipeline inline in this conversation, or use subagents
+> with fresh contexts? Inline avoids extra agent usage; subagents can
+> consume your plan's allowance faster."
+
+This is a required choice with **no default**, at every expertise
+level. Do not infer it from plan size, tool availability, a saved
+`execution` value, an earlier run, silence, or a generic "go ahead".
+`non_interactive` cannot answer it: report the missing choice and
+stop. If subagents are unavailable, say so when asking; wait for the
+user to choose inline or pause rather than selecting inline for them.
+
+The answer governs the **whole current run**: research, prerequisite
+stages, reference bootstrap or refresh, planning, readback, coding,
+review and wrap. Inline means no subagent dispatch, including
+explorers and reviewers, even when tools are available or `map` is
+above `subagent_threshold`. Perform that work in this conversation.
+Subagent mode permits dispatch where the stage calls for it, under
+that stage's existing ordering and concurrency limits.
+
+Carry the explicit answer through stage handoffs and continuation of
+the same active run, including context compaction; do not ask again
+at each stage. A standalone `implement` or `build` invocation follows
+this same choice gate before any prerequisite work or execution,
+including a resume that has only review or wrap left. When reached
+from `feature` or `start`, it inherits that run's answer instead.
+
+The executor records the choice in its interview frontmatter when
+that file exists. That value records the last choice; it never
+authorizes a new run. Progress, interview answers and plan approvals
+still resume under their own rules. If the user changes mode during
+the run, apply the new explicit choice to remaining work; do not
+restart completed work or silently change modes yourself.
 
 ## Progress tasks: every run shows where it stands
 

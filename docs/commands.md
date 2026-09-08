@@ -270,13 +270,21 @@ stage output before `build`. Also what a bare `capstone`
 triggers. On a repo that already has code it asks once whether you
 want the pipeline or `map`, and records the answer.
 
+Every new or resumed `start` run first asks **inline or subagents**
+and waits for an explicit answer, with no default. Inline avoids
+extra agent usage; subagents use fresh contexts and can consume your
+allowance faster. The answer governs every stage, research, readback,
+build, review and reference refresh; handoffs keep it, later runs ask
+again.
+
 ```text
 mockup → logic → uiux → architecture → standards → stack → build
 ```
 
 Each stage below is individually invocable. Every one is a resumable
 interview: answers are written to disk before the next question, so a
-dead session loses nothing, and re-running never re-asks.
+dead session preserves recorded design answers. The execution choice
+is asked again when starting a new run to resume the pipeline.
 
 | Stage | Produces | State file |
 | --- | --- | --- |
@@ -367,8 +375,10 @@ dead session loses nothing, and re-running never re-asks.
   stamp and skip.
 - **`build`** requires a formalized `stack`. It writes an
   implementation plan, **stops for your approval**, then writes code -
-  in subagents (fresh context per step) or inline, asked once before
-  the first step. Ledger keys `build/plan@Q<n>` and `build/code@Q<n>`.
+  in the execution mode chosen for this run. A standalone `build`
+  asks inline or subagents before research or prerequisites, including
+  resumes; entry through `start` inherits its answer. Ledger keys
+  `build/plan@Q<n>` and `build/code@Q<n>`.
 
 `build` and `implement` are the **only two commands allowed to write
 source code**, and only after their plan gates.
@@ -385,6 +395,13 @@ Takes one feature from idea to shipped code, chaining the three
 stages and resuming at the first unfinished one. Accepts a
 description for a new feature or a slug for an existing one; with no
 argument it lists features in flight and asks.
+
+Every new or resumed `feature` run first asks **inline or subagents**
+and waits for an explicit answer, with no default. Inline avoids extra
+agent usage throughout grooming, prerequisite mapping, planning,
+implementation, review and refresh. Subagents use fresh contexts and
+can consume your allowance faster. Stages inherit the current run's
+answer; a saved choice does not authorize a later run.
 
 ```text
 groom → plan → implement
@@ -405,7 +422,10 @@ recorded decision.
 zero context could execute. Approval is recorded with a checksum of
 the spec; editing the spec afterwards voids it.
 
-**`implement`** executes tasks in dependency order, one commit each,
+**`implement`** inherits the current `feature` run's execution choice;
+a standalone invocation asks again before prerequisite work or
+execution, including review-only and wrap-only resumes. It executes
+tasks in dependency order, one commit each,
 then **reviews the diff recursively until two consecutive rounds find
 nothing new**. It then refreshes the affected chapters, absorbs the
 spec into `logic/`, `mockup/` and `uiux/`, writes its ledger entry,

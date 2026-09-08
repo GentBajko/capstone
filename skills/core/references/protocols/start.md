@@ -30,6 +30,10 @@ wherever it stopped:
 
 1. Per core.md: read the config (expertise governs every stage's
    conversation; `pipeline` records the fork below).
+   Apply [Execution choice](../core.md#execution-choice): always ask
+   subagents or inline on entry, including a resumed pipeline, and
+   wait for the answer before stage work, readback or the fork's
+   `map` run. Carry the answer through every stage.
 2. Determine each stage's state from its interview file and outputs,
    per core.md's Interview lifecycle:
    - **not started**: no interview file, no complete final outputs, and
@@ -75,7 +79,7 @@ wherever it stopped:
    own formalization gate. Do not blend stages. `build.md` runs only
    after step 7's readback pass. A cross-repo edge the design
    declares is confirmed inside `architecture` per core.md's Edge
-   confirmation; `start` routes and asks nothing of its own.
+   confirmation; `start` carries its execution choice into the stage.
 6. When a stage formalizes, announce it in one line and continue to
    the next ("mockup done; moving to logic; say stop to pause").
    Stopping is always safe: every stage persists its interview file,

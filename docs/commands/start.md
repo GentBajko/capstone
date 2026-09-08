@@ -10,10 +10,17 @@ reference](../commands.md#start).
 It is also what a bare `capstone` with no argument triggers.
 
 It reads which stages already finished off disk and resumes at the
-first incomplete one, so running it again never re-asks a question you
-have answered. Every answer is written to the stage's interview file
+first incomplete one, preserving the design answers you have already
+given. Every answer is written to the stage's interview file
 before the next question is asked, which is why a dead session costs
 you the question in flight and nothing behind it.
+
+Every new or resumed run first asks **inline or subagents** and waits
+for your answer. Inline avoids extra agent usage; subagents use fresh
+contexts and can consume your allowance faster. The answer covers
+all stages, research, readback, build and any reviews or reference
+refreshes. Stage handoffs keep that choice; a later invocation asks
+again instead of treating the previous run's choice as permission.
 
 ## When to reach for it
 

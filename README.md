@@ -272,7 +272,10 @@ capability reaches you as options, writing it yourselves among them,
 with the ladder recommending rather than deciding for you. `build` writes an
 implementation plan, stops for your approval, then writes the code:
 one subagent per step with fresh context, or inline, whichever you
-pick when it starts.
+pick at the start of the pipeline. Every new or resumed run asks and
+waits for your answer. Inline avoids extra agent usage; subagents can
+consume your allowance faster. That choice covers all stages,
+research, readback, build and any reviews or reference refreshes.
 
 Between the two, the pipeline reads all six stages' final outputs. It
 moves what landed in the wrong file to the stage that owns it - a
@@ -293,6 +296,13 @@ ladder on conflict. `implement` executes, reviews the diff until two
 consecutive rounds find nothing new, then absorbs the shipped
 behavior back into the scenario docs. A dead session resumes
 mid-chain.
+
+Every new or resumed feature run asks **inline or subagents** before
+stage work and waits for your answer. Inline stays in one conversation
+through planning, implementation, review and reference refreshes.
+Subagents use fresh contexts and can consume your allowance faster.
+There is no automatic default; stages carry the current run's answer,
+and a later run asks again.
 
 ## What `review` is
 
