@@ -66,6 +66,7 @@
 </p>
 
 <p align="center">
+  <strong><a href="https://archways.dev/docs/capstone/">Read the complete user manual</a></strong> · <a href="docs/manual/README.md">Markdown source</a><br>
   Full detail on every command: <strong><a href="docs/commands.md">docs/commands.md</a></strong>.<br>
   How the three run, in diagrams: <strong><a href="docs/flows.md">docs/flows.md</a></strong>.
 </p>

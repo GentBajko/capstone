@@ -1,0 +1,74 @@
+{
+  "title": "Capstone",
+  "version": "6.4.1",
+  "commit": "4210f6cab09dc5c3b742147d8714795b026e1cd9",
+  "sourceRepository": "https://github.com/GentBajko/capstone",
+  "researchDate": "2026-09-09",
+  "chapters": [
+    {
+      "file": "README.md",
+      "title": "Capstone user manual",
+      "description": "Choose an entry point and find every command in the manual."
+    },
+    {
+      "file": "01-install-and-invoke.md",
+      "title": "Install and invoke Capstone",
+      "description": "Install all skills, invoke commands in your agent, update, and locate global settings."
+    },
+    {
+      "file": "02-map-and-refresh.md",
+      "title": "Map an existing repository and refresh it",
+      "description": "Map existing code, choose refresh/check/rebuild, and understand extraction and staleness."
+    },
+    {
+      "file": "03-files-and-lifecycle.md",
+      "title": "Generated files, schemas, and lifecycle",
+      "description": "Understand every generated file, required schemas, consumers, Git policy, and retention."
+    },
+    {
+      "file": "04-feature-workflow.md",
+      "title": "Take a feature from idea to code",
+      "description": "Groom, plan, implement, review, absorb, and resume an existing-product feature."
+    },
+    {
+      "file": "05-new-product-discovery.md",
+      "title": "Design a new product: start, mockup, and logic",
+      "description": "Run start, define a mockup, specify business scenarios, and collect outside answers."
+    },
+    {
+      "file": "06-design-and-stack.md",
+      "title": "Choose the design, architecture, standards, and stack",
+      "description": "Choose UI/UX, architecture, coding standards, packages, and services; reconcile decisions."
+    },
+    {
+      "file": "07-build.md",
+      "title": "Build the designed product",
+      "description": "Approve and execute the whole-product implementation plan, including brand assets and resume."
+    },
+    {
+      "file": "08-configuration.md",
+      "title": "Configure Capstone and monorepos",
+      "description": "Configure all supported keys, global/project precedence, headless behavior, and workspaces."
+    },
+    {
+      "file": "09-interfaces-and-quarry.md",
+      "title": "Interfaces, payload contracts, and Quarry",
+      "description": "Write exact edge/payload schemas and feed cross-repository constraints into implementation."
+    },
+    {
+      "file": "10-checks-and-ci.md",
+      "title": "Freshness checks, schema checks, and CI",
+      "description": "Run literal check commands, interpret output and exits, install CI, and understand limits."
+    },
+    {
+      "file": "11-review-repair-and-retro.md",
+      "title": "Review code, repair documentation, and improve instructions",
+      "description": "Review code and UI, repair documentation state, and approve evidence-backed instruction edits."
+    },
+    {
+      "file": "12-version-and-edge-cases.md",
+      "title": "Version notes and less obvious behaviors",
+      "description": "Resolve upgrades and obscure behavior, including source discrepancies, hashes, index paths, and lifecycle traps."
+    }
+  ]
+}
