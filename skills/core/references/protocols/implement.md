@@ -1,12 +1,21 @@
 # implement - execute the approved feature plan
 
 **Reads:** config → the feature interview's approval frontmatter → `plan.md`
-→ `spec.md` → `standards.md` → `../code-craft.md` → the operations
-chapter its verifications rely on → `review-ledger.md` (resume).
+→ `spec.md` → `../code-craft.md` → the operations
+chapter its verifications rely on → `standards.md` (Phase C only, the
+review lens) → `review-ledger.md` (resume).
 
 Last stage of the feature chain: turns the approved `plan.md` into
 code. With `build`, one of the two commands allowed to write source
 code (core.md hard rule 2), and only after its plan gate.
+
+**Entry gate:** apply [Execution choice](../core.md#execution-choice)
+before prerequisite stages, reference bootstrap or resumed work.
+Inherit the current `feature` run's explicit answer; a standalone
+invocation always asks and waits, including a review-only or wrap-only
+resume. Record the chosen `execution: subagent | inline` in the
+feature-interview frontmatter as soon as the file exists; a saved
+value never skips the entry gate.
 
 Prerequisite, checked in this order (resolve a `<feature>` argument
 as `groom`'s Resume rule does): no folder but an
@@ -44,9 +53,9 @@ Git section (`<type>/<slug>`, the slug the feature's own). Record
 `base_commit` in the feature-interview frontmatter: the branch
 point, or HEAD before Task 1 on a consented main run; Phase C reviews
 the diff from it. Read
-`plan.md`, `spec.md`, `standards.md`, `../code-craft.md` (the
-TDD + YAGNI discipline the code follows; standards wins on
-conflict), and the operations chapter the plan's verification steps
+`plan.md`, `spec.md`, `../code-craft.md` (the
+TDD + YAGNI discipline the code follows; the plan's global
+constraints win on conflict), and the operations chapter the plan's verification steps
 rely on (`07-operations.md`'s Processes and Developer workflow
 sections carry the verified commands). Review the plan critically:
 a contradiction between tasks, or between plan and spec, goes to the
@@ -54,18 +63,15 @@ user before Task 1, batched, not one interrupt per discovery mid-run.
 
 ## Phase B - execute
 
-**Ask the mode once, before Task 1**, and record it as
-`execution: subagent | inline` in the feature-interview frontmatter
-so a resumed run never re-asks:
+This phase reads `plan.md`, `spec.md` and `../code-craft.md`, and
+never `standards.md`. The plan's Header carries that file's global
+constraints copied verbatim (`protocols/plan.md`'s Header bullet), so
+the rules binding this feature sit in front of the executor with none
+of the seventeen domains behind them; Phase C is where the rest is
+enforced.
 
-> "Run the tasks in subagents (fresh context per task, recommended) or
-> inline in this session?"
-
-Subagent is the recommendation: a task executed in its own context
-cannot drift on the previous task's leftovers, and the plan was
-written so each task carries everything its executor needs. Inline is
-the right pick for a short plan, a harness without subagents (state
-that and take it, don't ask), or a user who wants to watch each step.
+Use the execution mode explicitly chosen at entry for this run.
+Reaching Task 1 does not ask again or change that choice.
 
 Both modes obey the same rules: tasks in dependency order, steps
 exactly as written, every verification run and **passing** before its
@@ -91,9 +97,9 @@ reference:
 1. The task's full text from `plan.md`: its `Create:`/`Modify:`/
    `Test:` paths, the interfaces it consumes and produces, and every
    checkbox step with its code and exact commands.
-2. `standards.md`'s rules, and `../code-craft.md`'s ladder, TDD
-   scoping, **Comments section, and Git section in full**. A pointer
-   to a file is useless here: a subagent that never reads
+2. The plan's Header constraints, verbatim, and `../code-craft.md`'s
+   ladder, TDD scoping, **Comments section, and Git section in full**.
+   A pointer to a file is useless here: a subagent that never reads
    `code-craft.md` commits however it likes, and comments every line
    it writes.
 3. The conventions chapter's paradigm, typing, and error-handling
@@ -116,8 +122,8 @@ Execute the tasks yourself in the same order, under the same rules,
 checking each box as its verification passes.
 
 Either way, code lands in the repository's source tree (never under
-the docs area), and every code decision follows `standards.md` and
-`code-craft.md`.
+the docs area), and every code decision follows the plan's Header
+constraints and `code-craft.md`.
 
 ## Phase C - review until dry
 
@@ -138,9 +144,13 @@ restarting at round one.
    `code-craft.md` (unearned abstractions, unclimbed ladder rungs,
    and comments that only restate the code are findings), and
    the conventions chapter, and the spec's unhappy paths actually
-   exercised by the tests. Fresh eyes every round: with subagents,
-   dispatch one reviewer per lens; without, re-read the diff once per
-   lens, coldly.
+   exercised by the tests. **This is the run's only read of
+   `standards.md`, and enforcement lives here on purpose**: the
+   reviewer has the budget for it and the implementer, which explores,
+   writes and debugs against a plan, does not. Fresh eyes every
+   round: in the user's selected subagent mode, dispatch one reviewer
+   per lens; in inline mode, re-read the diff yourself once per lens,
+   coldly, even when subagent tools are available.
 2. **Verify**: adversarially check each finding before acting: try
    to refute it against the spec, the plan, and the reference. Every
    finding goes into the ledger, confirmed or refuted; a round counts
@@ -167,8 +177,9 @@ parallel, one reviewer per lens, each reading the full diff.
 Entered when Phase C goes dry.
 
 1. The spec's Reference impact chapters are now stale by construction:
-   run the `map` refresh on them so the reference records what was
-   actually built, divergences included. Where that list carries a
+   run the `map` refresh on them in this run's chosen execution mode
+   so the reference records what was actually built, divergences
+   included. Where that list carries a
    confirmed cross-repo edge (`groom` Phase A step 4), write the
    repo name into that row's `to` or `from` in
    `09-interfaces.md`'s `edges:` block afterwards: the refresh writes

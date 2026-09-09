@@ -70,6 +70,10 @@ everything. `plan.md`:
 - **Header**: goal in one sentence; approach in 2-3; the stack pieces
   touched; global constraints copied verbatim from the spec and
   `standards.md` (version floors, naming rules, banned patterns).
+  `implement` no longer reads `standards.md` while it writes code
+  (`protocols/implement.md`'s Phase B), so a rule this feature must
+  follow is only binding if the plan copies it: copy every rule that
+  bears on these tasks, not a sample of the interesting ones.
 - **File map**: every file created or modified, one responsibility
   each, before any task is defined.
 - **Tasks**: numbered `### Task N: <name>` headings, each the

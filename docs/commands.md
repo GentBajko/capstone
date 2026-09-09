@@ -5,11 +5,17 @@ must exist first. For installation and updating see the
 [README](../README.md); for contributing see
 [CONTRIBUTING](../CONTRIBUTING.md).
 
+Every command also has a page of its own under `docs/commands/`, linked
+from its section below. Those pages answer the questions this file
+does not: which command to reach for, what the sibling command next to
+it is for, and how to tell a run worked. This file stays the
+argument-by-argument reference.
+
 **Jump to:**
 
 1. [Invocation](#invocation)
 2. [Three entry points](#three-entry-points)
-3. [Reference commands](#reference-commands) — [`map`](#map) · [`doctor`](#doctor) · [`review`](#review)
+3. [Reference commands](#reference-commands) — [`map`](#map) · [`doctor`](#doctor) · [`review`](#review) · [`retro`](#retro)
 4. [The greenfield pipeline](#the-greenfield-pipeline) — [`start`](#start)
 5. [The feature chain](#the-feature-chain) — [`feature`](#feature-description)
 6. [`help`](#help) and [`core`](#core)
@@ -51,6 +57,8 @@ when you want to enter mid-chain.
 ## Reference commands
 
 ### `map`
+
+[Page: when to reach for it, and how to tell it worked](commands/map.md)
 
 Builds the factual reference, and keeps it true. **One verb because
 the branch is readable off disk:** no index means build, an index
@@ -158,6 +166,8 @@ MAP REVIEW: <N> findings
 
 ### `doctor`
 
+[Page: when to reach for it, and how to tell it worked](commands/doctor.md)
+
 Diagnoses and repairs the docs area's own consistency. Read-only
 first, then offers repairs; every repair is a rule some protocol
 already defines.
@@ -184,6 +194,8 @@ actually repaired.
 
 ### `review`
 
+[Page: when to reach for it, and how to tell it worked](commands/review.md)
+
 The one command allowed opinions, and only when you ask for them.
 
 | Argument | Behavior |
@@ -198,11 +210,59 @@ section. **Gitignored by default:** it is judgment, not reference.
 
 **Ledger key** `review/<side>@<stamp>`.
 
+### `retro`
+
+[Page: when to reach for it, and how to tell it worked](commands/retro.md)
+
+Reads a finished session for evidence, then proposes edits to the
+files the agent works from. `review` judges the code; `retro` judges
+the instructions, the checks and the docs the agent had while writing
+it.
+
+| Argument | Behavior |
+| --- | --- |
+| *(none)* | Read the session in progress. |
+| `<session>` | Read the session the harness resolves that name to. A harness that cannot open a past session says so and runs on the current one. |
+
+**Reads** `standards.md`, `03-conventions.md`, the project's
+`AGENTS.md` and `CLAUDE.md` where either exists, the ledger, and the
+session.
+
+**Candidates**, seven of them, each needing evidence from the session:
+navigation (a fact the reference held and the run reached late),
+automated checks (a defect a lint, type rule or test could have caught
+instead of a human), standards rules (a rule to add, remove or
+sharpen, named to its `standards-inventory.md` domain), steering-file
+bloat (a line in `AGENTS.md` that belongs in `standards.md` or in a
+check), tool economy (repeated or expensive calls a recorded command
+would replace), no-ops (a steering rule that changed no behavior),
+and information access (what the agent needed and could not reach). A
+candidate with no evidence behind it is reported clear, never filled
+in.
+
+**Writes** one findings table - candidate, category, evidence,
+proposed edit, owning file - ordered by severity, approved row by row.
+Approved rules land in `docs/capstone/standards.md` under the domain
+that owns them. Everything else comes back as text to place by hand:
+`AGENTS.md`, linter configs, workflows and test files sit outside the
+docs area, and no capstone command writes there.
+
+Where a rule could live on either side, the protocol places it with
+the reviewer rather than the implementer, and says so: the
+implementing agent holds the plan, the diff and the standards at once,
+while the reviewer starts fresh on a diff.
+
+**Ledger key** `retro/<scope>@<stamp>` - only when `standards.md` was
+actually changed. A run whose findings are all declined writes
+nothing.
+
 ---
 
 ## The greenfield pipeline
 
 ### `start`
+
+[Page: when to reach for it, and how to tell it worked](commands/start.md)
 
 Runs the seven stages in order, detecting what is finished and
 resuming at the first incomplete one, then reconciles every final
@@ -210,23 +270,31 @@ stage output before `build`. Also what a bare `capstone`
 triggers. On a repo that already has code it asks once whether you
 want the pipeline or `map`, and records the answer.
 
+Every new or resumed `start` run first asks **inline or subagents**
+and waits for an explicit answer, with no default. Inline avoids
+extra agent usage; subagents use fresh contexts and can consume your
+allowance faster. The answer governs every stage, research, readback,
+build, review and reference refresh; handoffs keep it, later runs ask
+again.
+
 ```text
 mockup → logic → uiux → architecture → standards → stack → build
 ```
 
 Each stage below is individually invocable. Every one is a resumable
 interview: answers are written to disk before the next question, so a
-dead session loses nothing, and re-running never re-asks.
+dead session preserves recorded design answers. The execution choice
+is asked again when starting a new run to resume the pipeline.
 
 | Stage | Produces | State file |
 | --- | --- | --- |
-| `mockup` | `mockup/` - one file per screen: wireframe, elements, and a state inventory; `README.md` indexes the screens, the journeys, and the scenario list `logic` works from | `mockup-interview.md` |
-| `logic` | `logic/` - one file per scenario: triggers, exact rules, branches, unhappy paths, invariants, and the dimensions ruled out | `logic-interview.md` |
-| `uiux` | `uiux/01-direction.md`, `02-system.md` (tokens, the `## Assets` manifest), `03-experience.md`, `screens/`, the brand SVGs in `uiux/assets/`, and `preview.html` | `uiux-interview.md` |
-| `architecture` | The numbered chapters, marked `mode: prescriptive` (`09-interfaces.md` too when the design declares cross-repo edges) | `architecture-interview.md` |
-| `standards` | `standards.md` | `standards-interview.md` |
-| `stack` | `05-dependencies.md` | `stack-interview.md` |
-| `build` | `implementation.md`, then source code | `build-interview.md` |
+| [`mockup`](commands/mockup.md) | `mockup/` - one file per screen: wireframe, elements, and a state inventory; `README.md` indexes the screens, the journeys, and the scenario list `logic` works from | `mockup-interview.md` |
+| [`logic`](commands/logic.md) | `logic/` - one file per scenario: triggers, exact rules, branches, unhappy paths, invariants, and the dimensions ruled out | `logic-interview.md` |
+| [`uiux`](commands/uiux.md) | `uiux/01-direction.md`, `02-system.md` (tokens, the `## Assets` manifest), `03-experience.md`, `screens/`, the brand SVGs in `uiux/assets/`, and `preview.html` | `uiux-interview.md` |
+| [`architecture`](commands/architecture.md) | The numbered chapters, marked `mode: prescriptive` (`09-interfaces.md` too when the design declares cross-repo edges) | `architecture-interview.md` |
+| [`standards`](commands/standards.md) | `standards.md` | `standards-interview.md` |
+| [`stack`](commands/stack.md) | `05-dependencies.md` | `stack-interview.md` |
+| [`build`](commands/build.md) | `implementation.md`, then source code | `build-interview.md` |
 
 **Stage notes**
 
@@ -307,8 +375,10 @@ dead session loses nothing, and re-running never re-asks.
   stamp and skip.
 - **`build`** requires a formalized `stack`. It writes an
   implementation plan, **stops for your approval**, then writes code -
-  in subagents (fresh context per step) or inline, asked once before
-  the first step. Ledger keys `build/plan@Q<n>` and `build/code@Q<n>`.
+  in the execution mode chosen for this run. A standalone `build`
+  asks inline or subagents before research or prerequisites, including
+  resumes; entry through `start` inherits its answer. Ledger keys
+  `build/plan@Q<n>` and `build/code@Q<n>`.
 
 `build` and `implement` are the **only two commands allowed to write
 source code**, and only after their plan gates.
@@ -319,10 +389,19 @@ source code**, and only after their plan gates.
 
 ### `feature <description>`
 
+[Page: when to reach for it, and how to tell it worked](commands/feature.md)
+
 Takes one feature from idea to shipped code, chaining the three
 stages and resuming at the first unfinished one. Accepts a
 description for a new feature or a slug for an existing one; with no
 argument it lists features in flight and asks.
+
+Every new or resumed `feature` run first asks **inline or subagents**
+and waits for an explicit answer, with no default. Inline avoids extra
+agent usage throughout grooming, prerequisite mapping, planning,
+implementation, review and refresh. Subagents use fresh contexts and
+can consume your allowance faster. Stages inherit the current run's
+answer; a saved choice does not authorize a later run.
 
 ```text
 groom → plan → implement
@@ -330,9 +409,9 @@ groom → plan → implement
 
 | Stage | Produces | Gate |
 | --- | --- | --- |
-| `groom <feature>` | `features/<date>-<slug>/spec.md` | Spec approval |
-| `plan <feature>` | `features/<date>-<slug>/plan.md` | **Plan approval, before any code** |
-| `implement <feature>` | Source code, then reference updates | - |
+| [`groom <feature>`](commands/groom.md) | `features/<date>-<slug>/spec.md` | Spec approval |
+| [`plan <feature>`](commands/plan.md) | `features/<date>-<slug>/plan.md` | **Plan approval, before any code** |
+| [`implement <feature>`](commands/implement.md) | Source code, then reference updates | - |
 
 **`groom`** requires a stamped index; without one it builds the
 reference first rather than refusing. It interviews a spec out of you
@@ -343,7 +422,10 @@ recorded decision.
 zero context could execute. Approval is recorded with a checksum of
 the spec; editing the spec afterwards voids it.
 
-**`implement`** executes tasks in dependency order, one commit each,
+**`implement`** inherits the current `feature` run's execution choice;
+a standalone invocation asks again before prerequisite work or
+execution, including review-only and wrap-only resumes. It executes
+tasks in dependency order, one commit each,
 then **reviews the diff recursively until two consecutive rounds find
 nothing new**. It then refreshes the affected chapters, absorbs the
 spec into `logic/`, `mockup/` and `uiux/`, writes its ledger entry,
@@ -362,6 +444,8 @@ parallel feature branches can't mint the same one.
 ---
 
 ## `help`
+
+[Page: when to reach for it, and how to tell it worked](commands/help.md)
 
 Prints the usage block. In Claude Code a hook answers it before the
 model is invoked, so it costs zero tokens.
@@ -395,6 +479,7 @@ docs/capstone/
 │   └── preview.html       the rendered style tile           (gitignored)
 ├── changelog.md           the folded ledger - always committed
 ├── changelog.d/           one fragment per new entry, folded on main - committed
+├── questionnaires/        one file per recipient, for what the user cannot answer - committed
 ├── standards.md           how code should be written here
 ├── implementation.md      build's plan
 ├── review.md              opinionated findings          (gitignored)
@@ -411,9 +496,13 @@ moves, so a custom location stays discoverable.
 **Config.** `~/.claude/capstone.json`, created on first session by a
 hook. `expertise` (1–5) calibrates the conversation only, never the
 docs. `teaching_mode` narrates what is happening and why.
-`docs_in_git` governs whether the reference is committed -
-the ledger (`changelog.md` and `changelog.d/`) is the sole exception
-and is always committed.
+`docs_in_git` governs whether the reference is committed. The ledger
+(`changelog.md` and `changelog.d/`), `capstone.json` and
+`questionnaires/` ignore it and are always committed: the ledger
+because `implement` deletes a feature folder on the strength of its
+entry, the config because a setting on one machine is not a project
+standard, and the questionnaires because each one is a record of what
+was asked of a real person.
 `subagent_threshold` (default 150 source files) is where `map` fans
 out to subagents, and where an unrequested full build asks first.
 `non_interactive` resolves every prompt to its default for headless

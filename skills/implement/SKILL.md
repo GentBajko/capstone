@@ -9,3 +9,7 @@ From this skill's base directory, read `../core/references/core.md`
 and `../core/references/core-authoring.md`, then execute
 `../core/references/protocols/implement.md`
 exactly.
+
+Inherit the current feature run's explicit execution choice. On a
+standalone invocation, including a resume, always ask subagents or
+inline and wait before prerequisite work, coding, review or refresh.

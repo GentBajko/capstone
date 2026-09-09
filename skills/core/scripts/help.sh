@@ -29,6 +29,9 @@ Usage: /capstone:<command>
                        drift, voided approvals, absorption gaps
   review [be|fe]       Opt-in judgment -> review.md; no arg does both sides,
                        backend (architecture) and frontend (UI vs your design docs)
+  retro [session]      Read a finished session for evidence, then propose edits
+                       to standards.md and your AGENTS.md/CLAUDE.md, one
+                       approved row at a time; never touches code
   mockup               Product discovery: seed + adaptive interview -> traceable markdown mockup
   logic                Business-logic interview, scenario by scenario -> docs/capstone/logic/
   uiux                 How the UI looks and the UX behaves, from the mockup + logic
@@ -46,6 +49,12 @@ Usage: /capstone:<command>
                        implement, resuming at the first unfinished stage
 
   help                 Show this message
+
+start and feature always ask inline or subagents on each new or resumed
+run, before stage work. Inline avoids extra agent usage; subagents can
+consume your allowance faster. No default: the run waits for your answer.
+The choice covers every stage, review and reference refresh. Standalone
+build and implement ask too; pipeline handoffs inherit the current choice.
 
 Output: everything lands in docs/capstone/ - 00-index.md, the numbered
 topic chapters, and the logic/ scenario map. Chapters carry the commit

@@ -342,7 +342,7 @@ hit=$(grep -Eo "^\*\*($DEAD_NAMES)\*\*" README.md | head -1)
 #     ones say so, and the old opt-in is gone (core.md hard rule 5 is
 #     only as good as its sites)
 for n in groom plan implement mockup logic uiux architecture \
-         standards stack build review \
+         standards stack build review retro \
          map doctor; do
   grep -q 'changelog entry' "skills/core/references/protocols/$n.md" \
     || err "protocol $n.md has no changelog-entry step"
@@ -414,15 +414,20 @@ grep -q '^## Git: branches, commits' skills/core/references/code-craft.md \
 grep -q "Git section" skills/core/references/protocols/implement.md \
   || err "implement.md does not cite code-craft's Git section"
 
-# 12c. execution is capstone's own: the two code-writing stages ask the
-#      user for subagent-vs-inline and record it, and no protocol
+# 12c. execution is capstone's own: both routers and code-writing
+#      stages use the shared choice gate; executors record the answer,
+#      map inherits it, and no protocol
 #      invokes a superpowers skill at runtime (prose attribution in
 #      groom/plan is fine; a `superpowers:<skill>` call is not)
+grep -q '^## Execution choice$' skills/core/references/core.md \
+  || err "core.md has no shared execution choice rule"
+for n in feature start implement build map; do
+  grep -qF '[Execution choice](../core.md#execution-choice)' "skills/core/references/protocols/$n.md" \
+    || err "protocol $n.md does not reference the shared execution choice rule"
+done
 for n in implement build; do
   grep -q 'execution: subagent | inline' "skills/core/references/protocols/$n.md" \
     || err "protocol $n.md does not record the execution mode"
-  grep -q 'Ask the mode once' "skills/core/references/protocols/$n.md" \
-    || err "protocol $n.md does not ask subagent-vs-inline before executing"
 done
 if grep -rl 'superpowers:' skills/core/references/protocols/ >/dev/null 2>&1; then
   err "a protocol invokes a superpowers skill: $(grep -rl 'superpowers:' skills/core/references/protocols/ | tr '\n' ' ')"
@@ -1095,6 +1100,32 @@ mode: prescriptive' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$
   mc_run 'logic scenario missing a section' 1 'MAP CHECK: stale (1 findings)' "$S"
   mc_row '| docs/capstone/logic/01-scenario.md | - | ## Invariants | - | - |' 'logic scenario missing a section'
   rm -r "$S/docs/capstone/logic"
+  # a questionnaire (core.md's Questionnaires section). It is committed
+  # rather than local working state, so the gate holds it to its five
+  # sections; `## How to answer` is the one dropped here, because a send
+  # with no deadline and no effort estimate is the one that comes back
+  # too late to use.
+  mkdir -p "$S/docs/capstone/questionnaires"
+  mc_questionnaire() { # dir [section heading to omit]
+    { printf -- '---\ngenerated_date: 2026-01-01\n---\n# q\n\n'
+      awk -v skip="${2:-}" '
+        { sub(/\r$/, "") }
+        /^type[ \t]+questionnaire$/ { inr = 1; next }
+        /^type[ \t]/ { inr = 0 }
+        inr && /^head[ \t]/ {
+          sub(/^head[ \t]+/, "")
+          n = split($0, H, "|")
+          for (i = 1; i <= n; i++) if (H[i] != skip) printf "## %s\n\nx\n\n", H[i]
+          exit
+        }' skills/core/references/schema.txt
+    } > "$1/2026-01-01-data-team.md"
+  }
+  mc_questionnaire "$S/docs/capstone/questionnaires"
+  mc_run 'questionnaire complete' 0 'MAP CHECK: current' "$S"
+  mc_questionnaire "$S/docs/capstone/questionnaires" 'How to answer'
+  mc_run 'questionnaire missing How to answer' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/questionnaires/2026-01-01-data-team.md | - | ## How to answer | - | - |' 'questionnaire missing How to answer'
+  rm -r "$S/docs/capstone/questionnaires"
   # a uiux screen chapter, the same way. `## Not in play` closes it:
   # uiux-inventory.md's gate records the items that had nothing to
   # decide, and a screen file without the section cannot tell "no
@@ -1706,6 +1737,203 @@ else
     printf '%s\n' "$ARC_CRIT" | grep -qF "$s" \
       || err "$ARC's exhaustiveness criterion does not reach payloads via $s"
   done
+fi
+
+# 25. two moves that only work if several files agree. First: the
+#     questionnaire. core.md owns the section list, schema.txt's
+#     `questionnaire` record is what the gate enforces, and the six
+#     interview protocols are the only places the offer is ever made,
+#     so a section renamed in one of the three is a send the gate
+#     rejects or a rule nobody reaches. Check 20 cannot tie these two
+#     together, because it resolves a `from` file to topics.md, an
+#     inventory or a protocol, and this list lives in core.md.
+#     Second: standards enforcement moved to the reviewer. implement.md
+#     must not load standards.md into the implementation path, plan.md
+#     must copy every rule that binds the feature, and build.md's
+#     code-writing phase must work off implementation.md's copy - or
+#     the rules silently stop binding anything.
+CQ=skills/core/references/core.md
+CQ_SECT=$(awk '
+  { sub(/\r$/, "") }
+  /^## Questionnaires/ { inp = 1; next }
+  inp && /^## / { exit }
+  inp { print }' "$CQ")
+if [ -z "$CQ_SECT" ]; then
+  err "$CQ has no ## Questionnaires section"
+else
+  printf '%s\n' "$CQ_SECT" | tr '\n' ' ' | tr -s ' ' \
+    | grep -qF 'Never invent a question to fill the document out' \
+    || err "$CQ's Questionnaires section does not forbid padding the document"
+  CQ_HEADS=$(printf '%s\n' "$CQ_SECT" | awk '
+    { rest = $0
+      while (match(rest, /`## [^`]+`/)) {
+        print substr(rest, RSTART + 4, RLENGTH - 5)
+        rest = substr(rest, RSTART + RLENGTH)
+      } }' | tr '\n' '|' | sed 's/|$//')
+  CQ_SCHEMA=$(awk '
+    { sub(/\r$/, "") }
+    /^type[ \t]+questionnaire$/ { inr = 1; next }
+    /^type[ \t]/ { inr = 0 }
+    inr && /^head[ \t]/ { sub(/^head[ \t]+/, ""); print; exit }
+  ' "$SCHEMA_TXT")
+  if [ -z "$CQ_SCHEMA" ]; then
+    err "$SCHEMA_TXT has no questionnaire record carrying a head list"
+  else
+    [ "$CQ_HEADS" = "$CQ_SCHEMA" ] \
+      || err "$SCHEMA_TXT's questionnaire head disagrees with $CQ's section list
+core.md:    $CQ_HEADS
+schema.txt: $CQ_SCHEMA"
+  fi
+  awk '
+    { sub(/\r$/, "") }
+    /^type[ \t]+questionnaire$/ { inr = 1; next }
+    /^type[ \t]/ { inr = 0 }
+    inr { print }' "$SCHEMA_TXT" | grep -q '^match[ \t]*questionnaires/\*\.md$' \
+    || err "$SCHEMA_TXT's questionnaire record does not match questionnaires/*.md"
+fi
+grep -q 'questionnaires/' skills/core/references/core-authoring.md \
+  || err "core-authoring.md does not place questionnaires/ (committed, and a Companion docs row)"
+for p in architecture logic mockup stack standards uiux; do
+  tr '\n' ' ' < "skills/core/references/protocols/$p.md" | tr -s ' ' \
+    | grep -qF "core.md's Questionnaires" \
+    || err "protocol $p.md never offers a questionnaire (core.md's Questionnaires)"
+done
+IMP=skills/core/references/protocols/implement.md
+IMP_READS=$(awk '/^\*\*Reads:\*\*/ { inp = 1 } inp { print; if (/^$/) exit }' "$IMP" \
+  | tr '\n' ' ' | tr -s ' ')
+if [ -z "$IMP_READS" ]; then
+  err "$IMP has no **Reads:** block to check"
+else
+  printf '%s\n' "$IMP_READS" | grep -qF '`standards.md` (Phase C' \
+    || err "$IMP's Reads block does not park standards.md in Phase C"
+  IMP_N=$(printf '%s\n' "$IMP_READS" | grep -o 'standards\.md' | grep -c '.')
+  [ "$IMP_N" -eq 1 ] \
+    || err "$IMP's Reads block names standards.md $IMP_N times; once, in Phase C"
+fi
+IMP_AB=$(awk '/^## Phase A/ { inp = 1 } /^## Phase C/ { exit } inp { print }' "$IMP" \
+  | grep -v 'never `standards.md`')
+[ -n "$IMP_AB" ] || err "$IMP has no Phase A or Phase B to check"
+printf '%s\n' "$IMP_AB" | grep -qF 'standards.md' \
+  && err "$IMP still loads standards.md into the implementation path (Phase A or B)"
+printf '%s\n' "$IMP_AB" | grep -qF "plan's Header" \
+  || err "$IMP's implementation path cites no constraints from the plan's Header"
+IMP_C=$(awk '/^## Phase C/ { inp = 1; next } inp && /^## Phase D/ { exit } inp { print }' "$IMP" \
+  | tr '\n' ' ' | tr -s ' ')
+if [ -z "$IMP_C" ]; then
+  err "$IMP has no Phase C to check"
+else
+  printf '%s\n' "$IMP_C" | grep -qF 'standards.md' \
+    || err "$IMP's Phase C lost the standards.md review lens"
+  printf '%s\n' "$IMP_C" | grep -qF 'enforcement lives here' \
+    || err "$IMP's Phase C does not say why enforcement lives with the reviewer"
+fi
+PLN=skills/core/references/protocols/plan.md
+tr '\n' ' ' < "$PLN" | tr -s ' ' \
+  | grep -qF 'only binding if the plan copies it' \
+  || err "$PLN's Header bullet does not require every binding rule to be copied"
+BLD=skills/core/references/protocols/build.md
+BLD_C=$(awk '/^## Phase C/ { inp = 1; next } inp && /^## After/ { exit } inp { print }' "$BLD" \
+  | grep -v 'never `standards.md`')
+[ -n "$BLD_C" ] || err "$BLD has no Phase C to check"
+printf '%s\n' "$BLD_C" | grep -qF 'standards.md' \
+  && err "$BLD still loads standards.md into its code-writing phase"
+printf '%s\n' "$BLD_C" | grep -qF 'Global constraints' \
+  || err "$BLD's Phase C cites no Global constraints from implementation.md"
+tr '\n' ' ' < "$BLD" | tr -s ' ' | grep -qF '**Global constraints**' \
+  || err "$BLD's Phase A does not make implementation.md carry a Global constraints section"
+
+# 26. every command owes a page in docs/commands/, each page carries the
+#     four fixed headings in order, no page teaches installation, and
+#     docs/commands.md points at the folder. docs/commands.md answers
+#     "what are this command's arguments"; it does not answer "which
+#     command do I reach for now" or "how do I know it worked", and
+#     those are the questions a user-invoked command generates, because
+#     nothing fires it on the user's behalf. A missing page is a command
+#     nobody can choose; a page whose headings drifted is a page a
+#     reader cannot skim next to its siblings; an install command there
+#     is a second copy of README.md's install block, which is exactly
+#     the kind of duplicate that goes stale unread.
+DOCPAGE_HEADS="## What it does|## When to reach for it|## Common questions|## It's working if"
+for d in skills/*/; do
+  n=$(basename "$d")
+  case "$n" in core) continue;; esac
+  dp="docs/commands/$n.md"
+  if [ ! -f "$dp" ]; then
+    err "$dp is missing (every command except core owes a page)"
+    continue
+  fi
+  DP_HAVE=0
+  for h in '## What it does' '## When to reach for it' \
+           '## Common questions' "## It's working if"; do
+    if grep -qx "$h" "$dp"; then
+      DP_HAVE=$((DP_HAVE + 1))
+    else
+      err "$dp has no '$h' heading"
+    fi
+  done
+  if [ "$DP_HAVE" -eq 4 ]; then
+    DP_SEQ=$(grep '^## ' "$dp" | awk -v req="$DOCPAGE_HEADS" '
+      { g[++c] = $0 }
+      END {
+        m = split(req, R, "|"); j = 1
+        for (i = 1; i <= m; i++) {
+          hit = 0
+          while (j <= c) { if (g[j++] == R[i]) { hit = 1; break } }
+          if (!hit) { print R[i]; break }
+        }
+      }')
+    [ -z "$DP_SEQ" ] \
+      || err "$dp carries the fixed headings out of order: $DP_SEQ is out of sequence"
+  fi
+  DP_INST=$(grep -En 'npx skills add|gh skill install|plugin install|plugin marketplace add|extensions install|agy plugin' "$dp" | head -1)
+  [ -n "$DP_INST" ] \
+    && err "$dp carries an install command ($DP_INST); installing lives in README.md alone"
+done
+for dp in docs/commands/*.md; do
+  [ -e "$dp" ] || continue
+  n=$(basename "$dp" .md)
+  [ -d "skills/$n" ] || err "$dp documents $n, which is not a skill (a page for a retired command)"
+done
+grep -q 'docs/commands/' docs/commands.md \
+  || err "docs/commands.md does not name the docs/commands/ folder its pages live in"
+
+# 27. retro's wiring, named rather than derived. Checks 5, 5b and 5c
+#     iterate over whatever skills/ happens to hold, so deleting
+#     skills/retro/ makes all three pass again with the command gone
+#     from every surface. This names it, the way check 10b names the
+#     commands that must stay gone. The protocol's own load-bearing
+#     parts are asserted here too: seven candidates, because a retro
+#     that walks five reports a clean environment it never looked at,
+#     and the placement rule, which is the one sentence that decides
+#     where an approved rule lands.
+[ -f skills/retro/SKILL.md ] || err "skills/retro/SKILL.md is missing"
+RETRO_MD=skills/core/references/protocols/retro.md
+[ -f "$RETRO_MD" ] || err "$RETRO_MD is missing"
+bash skills/core/scripts/help.sh | grep -Eq '^  retro( |$)' \
+  || err "help.sh has no retro command line"
+grep -q '/capstone:retro[` ]' README.md \
+  || err "README command table missing /capstone:retro"
+sed -n '/matches a capstone skill/,/invoke capstone:/p' README.md \
+  | grep -Eq '(^|[ (])retro[,)]' \
+  || err "README routing snippet missing retro"
+grep -Eq '(^|[ (])retro[,)]' .opencode/INSTALL.md \
+  || err "INSTALL.md skill list missing retro"
+sed -n '/The reserved subcommand words/,/each route to/p' \
+  skills/core/references/dispatcher.md | grep -q '`retro`' \
+  || err "dispatcher.md routing list missing retro"
+grep -q '^### `retro`' docs/commands.md \
+  || err "docs/commands.md has no retro section"
+if [ -f "$RETRO_MD" ]; then
+  for s in 'Navigation' 'Automated checks' 'Standards rules' \
+           'Steering-file bloat' 'Tool economy' 'No-ops' \
+           'Information access'; do
+    grep -qF "**$s.**" "$RETRO_MD" \
+      || err "$RETRO_MD lost the candidate category: $s"
+  done
+  grep -qF 'the reviewer wherever a reviewer can check it' "$RETRO_MD" \
+    || err "$RETRO_MD lost the implementation-versus-review placement rule"
+  grep -qF 'retro/<scope>@<stamp>' "$RETRO_MD" \
+    || err "$RETRO_MD does not name its ledger key"
 fi
 
 [ "$FAIL" -eq 0 ] && echo "lint-sync: all invariants hold" || echo "lint-sync: FAILURES above"

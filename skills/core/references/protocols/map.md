@@ -99,6 +99,12 @@ Do this in the main session with cheap reads only:
 
 ## Phase 2 - deep-dive
 
+An inherited [Execution choice](../core.md#execution-choice) governs
+every dispatch below, including Phase 3's scenario and surface
+extraction. In inline mode, analyze all of them in this conversation
+regardless of the threshold. Standalone `map` keeps its usual
+threshold behavior; a pipeline's inline choice overrides that behavior.
+
 - **At or below the subagent threshold (default 150 source files):**
   analyze each applicable topic inline yourself, against that topic's
   required sections and checklist in `../topics.md`.
@@ -482,8 +488,8 @@ own:
    copy of it, and `lint-sync` checks 15, 20 and 21 keep it equal to
    `../topics.md` and to the protocols that write `logic/`, `mockup/`
    and `uiux/`. Every file the index reaches is checked against its
-   record, so a scenario file and a screen chapter are held to their
-   section lists the way a chapter is. A schema that cannot be read
+   record, so a scenario file, a screen chapter and a questionnaire
+   are held to their section lists the way a chapter is. A schema that cannot be read
    costs the headings and the tables and nothing else: the run prints
    `schema: <path> unreadable; headings and tables not checked`, holds
    every page to `generated_date`, and reaches the same verdict line

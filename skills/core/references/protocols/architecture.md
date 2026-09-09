@@ -55,6 +55,12 @@ a rule `logic/` already settled is cited, never restated. What this
 stage settles is how the system is built, not what it decides at
 runtime.
 
+A different kind of stall is a question this stage does own and the
+user cannot answer: the compliance regime, the real load numbers, the
+retention window another team sets. Offer a questionnaire per
+core.md's Questionnaires section rather than recording a guess as a
+quality-attribute target.
+
 ## Phase A - setup / resume
 
 The interview state lives in `docs/capstone/architecture-interview.md`.

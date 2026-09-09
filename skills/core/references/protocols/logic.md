@@ -130,7 +130,10 @@ A scenario is finished when logic-craft §4's gate passes - every
 dimension answered, cited to an earlier scenario, or recorded
 inapplicable - not when nothing further comes to mind. A dimension the
 user declines to settle is an open question, recorded as one, never an
-inapplicable one.
+inapplicable one. A dimension the user *cannot* settle - the rule
+belongs to finance, legal, or an operator nobody in the room is -
+earns a questionnaire first, per core.md's Questionnaires section,
+and stays open until the answer comes back.
 
 Then present the summary, get the user's confirmation ("formalize?"),
 and write `docs/capstone/logic/<NN>-<scenario>.md` immediately:

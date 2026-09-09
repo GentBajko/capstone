@@ -61,10 +61,12 @@
   <a href="#the-greenfield-pipeline">Pipeline</a> ·
   <a href="#the-feature-chain">Feature chain</a> ·
   <a href="#what-review-is">Review</a> ·
+  <a href="#what-retro-is">Retro</a> ·
   <a href="#not-technical-still-yours">Not technical?</a>
 </p>
 
 <p align="center">
+  <strong><a href="https://archways.dev/docs/capstone/">Read the complete user manual</a></strong> · <a href="docs/manual/README.md">Markdown source</a><br>
   Full detail on every command: <strong><a href="docs/commands.md">docs/commands.md</a></strong>.<br>
   How the three run, in diagrams: <strong><a href="docs/flows.md">docs/flows.md</a></strong>.
 </p>
@@ -171,6 +173,7 @@ instead of sending you off to run something else.
 | `/capstone:map check` | Read-only trust report in two halves: a bash script (staleness, ledger fragments, schema: stamps, `known_as`, headings, edge sites, payload sections, model references, secret shapes; the CI gate, no API key) and the model's review (pointer drift, absorption, re-vetting, coverage). Writes nothing |
 | `/capstone:doctor` | Diagnose and repair the docs area: torn writes, index drift, voided approvals, absorption gaps |
 | `/capstone:review [be\|fe]` | The opt-in judgment → `review.md`. No argument does both sides; `backend` takes architecture, `frontend` grades the UI against your own design docs |
+| `/capstone:retro [session]` | Read a finished session for evidence, then propose edits to `standards.md` and your `AGENTS.md`/`CLAUDE.md`, one approved row at a time |
 
 **Greenfield pipeline** - `/capstone:start` runs these in order
 
@@ -270,7 +273,10 @@ capability reaches you as options, writing it yourselves among them,
 with the ladder recommending rather than deciding for you. `build` writes an
 implementation plan, stops for your approval, then writes the code:
 one subagent per step with fresh context, or inline, whichever you
-pick when it starts.
+pick at the start of the pipeline. Every new or resumed run asks and
+waits for your answer. Inline avoids extra agent usage; subagents can
+consume your allowance faster. That choice covers all stages,
+research, readback, build and any reviews or reference refreshes.
 
 Between the two, the pipeline reads all six stages' final outputs. It
 moves what landed in the wrong file to the stage that owns it - a
@@ -292,6 +298,13 @@ consecutive rounds find nothing new, then absorbs the shipped
 behavior back into the scenario docs. A dead session resumes
 mid-chain.
 
+Every new or resumed feature run asks **inline or subagents** before
+stage work and waits for your answer. Inline stays in one conversation
+through planning, implementation, review and reference refreshes.
+Subagents use fresh contexts and can consume your allowance faster.
+There is no automatic default; stages carry the current run's answer,
+and a later run asks again.
+
 ## What `review` is
 
 The one command allowed opinions, only when invoked. Two sides, one
@@ -310,6 +323,23 @@ the same codebase is judged the same way on any machine. One rule
 outranks the craft baseline: **your recorded decisions beat generic
 best practice.** Gitignored by default - it is judgment, not
 reference.
+
+## What `retro` is
+
+`review` judges the code. `retro` judges what the agent had to work
+with. Run it after a session and it reads that session for evidence,
+then walks seven candidates: reference navigation, checks a machine
+could run instead of a human, standards rules to add or sharpen,
+steering-file lines that belong somewhere else, repeated calls a
+recorded command would replace, rules that changed no behavior, and
+facts the agent needed and could not reach. Each finding cites what
+actually happened in the session; a candidate with no evidence behind
+it is reported clear rather than filled in.
+
+You approve the findings one row at a time. Approved rules land in
+`standards.md` under the domain that owns them; anything outside the
+docs area - your `AGENTS.md`, a linter config, a workflow - comes back
+as text to paste, because no capstone command writes there.
 
 ## Not technical? Still yours
 
@@ -381,7 +411,9 @@ a config that lives on one machine is not a standard. It is created
 only when there is something to record, and any global key set there
 overrides the global file for that repo. `expertise` and
 `teaching_mode` are personal, stay in the global file, and are
-ignored if they turn up here.
+ignored if they turn up here. `docs/capstone/questionnaires/` is
+committed for the same kind of reason: each file is a real document
+sent to a real person, and the record of what was asked.
 `pipeline` records the one-time pipeline-or-map choice on repos
 that already have code, and `workspaces` gives each monorepo workspace
 its own docs area with the root project's `00-index.md` as an
@@ -440,7 +472,7 @@ argument-hint: [command] [args...]
 ---
 
 No arguments: invoke the capstone:start skill. If the first argument
-matches a capstone skill (map, doctor, review,
+matches a capstone skill (map, doctor, review, retro,
 mockup, logic, uiux, architecture, standards,
 stack, build, groom, plan, implement, feature, start, help),
 invoke capstone:<that skill> with the remaining arguments.

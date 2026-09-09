@@ -1,7 +1,8 @@
 # build - implementation research, then working code
 
 **Reads:** config → `build-interview.md` (resume) → the index and
-chapters → `logic/`, `mockup/`, `uiux/`, `standards.md`,
+chapters → `logic/`, `mockup/`, `uiux/`, `standards.md` (Phase A
+only, to copy its constraints into the plan),
 `../code-craft.md` → the stack chapter → the existing
 `implementation.md` (resume).
 
@@ -9,6 +10,13 @@ The last stage: turns the whole reference into running code, backend
 first, then frontend. With `implement`, one of the **two commands
 allowed to write source code** (core.md hard rule 2), and only after
 its plan gate.
+
+**Entry gate:** apply [Execution choice](../core.md#execution-choice)
+before prerequisite stages, research or resumed work. Inherit the
+current `start` run's explicit answer; a standalone invocation always
+asks and waits, including a resume. Record the chosen
+`execution: subagent | inline` in `build-interview.md`'s frontmatter
+as soon as the file exists; a saved value never skips the entry gate.
 
 State: `docs/capstone/build-interview.md` (standard lifecycle per
 core.md; `formalized` here means the walking-skeleton slice runs).
@@ -35,6 +43,10 @@ between the picks (auth ↔ framework, ORM ↔ database, deploy target),
 official quickstarts for anything unfamiliar. Then write
 `docs/capstone/implementation.md`:
 
+- **Global constraints**, copied verbatim from `standards.md` and the
+  stack chapter (version floors, naming rules, banned patterns), at
+  the top of the file. Phase C writes code without `standards.md` in
+  front of it, so a rule not copied here binds nothing.
 - The module/file layout to create: backend tree, then frontend tree.
 - Per component: what it does, its key files, and real code sketches
   for the load-bearing seams (the wiring, not the boilerplate),
@@ -98,12 +110,16 @@ against it.
 
 ## Phase C - write the code
 
-**Ask the mode once, before the first step**, and record it as
-`execution: subagent | inline` in `build-interview.md`'s frontmatter
-so a resumed run never re-asks:
+Use the execution mode explicitly chosen at entry for this run.
+Reaching the coding phase does not ask again or change that choice.
 
-> "Run the build steps in subagents (fresh context per step,
-> recommended) or inline in this session?"
+This phase reads `implementation.md` and `../code-craft.md`, and
+never `standards.md`: Phase A already copied that file's constraints
+into the plan's Global constraints section, and a session that
+scaffolds, wires and debugs has no budget for seventeen domains
+beside the work. Follow the copied constraints; when one of them is
+wrong, fix `implementation.md` and say so, rather than reading around
+it.
 
 Then execute `implementation.md` directly: its build-order steps in
 order, the walking-skeleton slice first, backend before the frontend
@@ -114,7 +130,8 @@ one per step.
 **Subagent mode** works exactly as `implement.md`'s Phase B describes
 it: one subagent per build-order step, dispatched fresh and never in
 parallel, with the step's full text, its code sketches, the verified
-commands, `standards.md`'s rules, and `../code-craft.md`'s ladder,
+commands, `implementation.md`'s Global constraints, and
+`../code-craft.md`'s ladder,
 TDD scoping, Comments section, and Git section **copied into the
 prompt** rather than referenced. Nothing else crosses into a
 subagent's context, so a pointer to a file it will never open buys
@@ -123,9 +140,6 @@ dispatching the next.
 
 **Inline mode** runs the same steps in this session, same order, same
 verification, same commits.
-
-Either mode: a harness without subagents takes inline, said out loud
-rather than asked.
 
 **Brand assets**, once the step that scaffolds the frontend tree has
 run and before the first screen is built:

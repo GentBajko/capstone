@@ -258,6 +258,18 @@ keys!   generated_date
 # them before any record is looked up. The record is what a committed
 # one would be held to if the skip list ever lets it through.
 
+type    questionnaire
+match   questionnaires/*.md
+keys!   generated_date
+head    Purpose|Context|How to answer|Questions|Anything else?
+# The send core.md's Questionnaires section governs. It is committed
+# rather than local working state, so the gate holds it to its five
+# sections the way it holds a logic scenario to its eight; a send
+# missing `## How to answer` is the one that comes back late or not at
+# all. There is no `from` line because the section list lives in
+# core.md, which is neither a protocol nor an inventory and so is not a
+# path check 20 resolves; lint check 25 compares the two lists instead.
+
 type    page
 match   *
 keys!   generated_date
