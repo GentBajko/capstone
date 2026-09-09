@@ -2,7 +2,7 @@
 
 Capstone is a collection of coding-agent skills. It can document an existing repository, guide a new product through design and implementation, or take one feature through specification, planning, code, and documentation updates. The agent reads the source and writes the documents; Capstone is not a background indexing service.
 
-This manual describes **6.4.1**, from source commit `4210f6cab09dc5c3b742147d8714795b026e1cd9`. The remote default branch was still **6.4.0** as of 9 September 2026, so unpinned installs may omit newer behavior described here. The 6.4.1 tag exists; it is not a GitHub Release entry. See [version details and less obvious behaviors](12-version-and-edge-cases.md).
+This manual describes **6.4.1**, from source commit `4210f6cab09dc5c3b742147d8714795b026e1cd9`. The documented changes and this manual were merged into `main` on 9 September 2026. The `v6.4.1` tag identifies the original source revision; a tag is separate from a GitHub Release entry. See [version details and less obvious behaviors](12-version-and-edge-cases.md).
 
 Commands prefixed `/capstone:` are instructions to your coding agent, not shell executables. Bash, Git, installer, and `quarry` examples are terminal commands. Product names, repository names, feature identifiers, paths, and payloads in examples are illustrative; only explicitly labeled script output is literal.
 
