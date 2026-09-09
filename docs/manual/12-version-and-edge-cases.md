@@ -4,9 +4,9 @@ This appendix records practical details that are easy to miss in a normal walkth
 
 ## Version baseline and installing the documented behavior
 
-This manual targets **6.4.1**, tag `v6.4.1`, source commit `4210f6cab09dc5c3b742147d8714795b026e1cd9`. During the 9 September 2026 research check, the remote default branch was still at `82094d42c4bfa9d6ffdeb569e3b971394765e6fc` with a **6.4.0** manifest. The 6.4.1 tag existed, but a GitHub Release entry for it was not found. A tag and a GitHub Release are different publication artifacts.
+This manual targets **6.4.1**, tag `v6.4.1`, source commit `4210f6cab09dc5c3b742147d8714795b026e1cd9`. The documented changes and manual were merged into `main` on 9 September 2026 in [PR #19](https://github.com/GentBajko/capstone/pull/19). The earlier research check found the default branch at `82094d42c4bfa9d6ffdeb569e3b971394765e6fc` with a **6.4.0** manifest; that branch difference is now resolved. The 6.4.1 tag existed at that check, but a GitHub Release entry for it was not found. A tag and a GitHub Release are different publication artifacts.
 
-Default-branch installation commands may therefore install 6.4.0 and omit newer behavior. Check the version in the installed plugin manifest or the generated files' `capstone_version`; do not infer it from this manual or from the existence of a tag. To inspect this exact source version independently, a terminal command is:
+Default-branch installations now include the documented 6.4.1 changes. Existing installations still need an update through their original installer. Check the version in the installed plugin manifest or the generated files' `capstone_version`; do not infer it from this manual or from the existence of a tag. To inspect this exact source version independently, a terminal command is:
 
 ```sh
 git clone --branch v6.4.1 https://github.com/GentBajko/capstone capstone-6.4.1
@@ -14,7 +14,7 @@ git clone --branch v6.4.1 https://github.com/GentBajko/capstone capstone-6.4.1
 
 This clones source; it does not install the skills into every agent. Use your harness's supported installation mechanism for a selected checkout/version. The per-PR template explicitly clones the tag; the nightly model-review template installs from the marketplace without a version pin.
 
-Two commits distinguish the inspected checkout from that default branch:
+These two commits introduced the changes since the previously published 6.4.0 source:
 
 | Commit | User-visible changes |
 | --- | --- |
