@@ -247,10 +247,12 @@ when a charge fails after the money moved.
 the tokens, each screen's composition and states. The method is
 vendored, distilled from `impeccable` (Apache-2.0) and
 `design-taste-frontend` (MIT), so the same product designs the same
-way on any machine. Before the gate it writes `uiux/preview.html`, a
-single self-contained page showing the committed tokens as the
-flagship first viewport and a style tile, so you steer the design by
-looking at it rather than by reading hex values.
+way on any machine. Before the gate it asks whether to make a first-pass
+logo in SVG and a page mockup for review. It keeps the SVG and pure
+self-contained HTML in `uiux/assets/references/`, presents them with
+Claude Code artifacts, GPT Sites, or the local HTML fallback, and waits
+for explicit approval before `architecture`. It also writes
+`uiux/preview.html`, a separate token/style tile.
 
 **architecture**. The big interview. Done only when every section of
 the future docs is answerable from your recorded decisions. Writes
@@ -405,10 +407,12 @@ for interactive questions so options are clickable and `Other` accepts
 typed text. Harnesses without that capability receive the same
 one-question prompt in normal conversation.
 
-Interviews, `features/`, `review.md`, `uiux/preview.html` and the
-raster exports under `uiux/assets/` stay local via a generated
-`.gitignore`; the brand SVGs beside those exports are committed, since
-`build` moves them into the app. **The ledger - `changelog.md` and its `changelog.d/`
+Interviews, `features/`, `review.md`, `uiux/preview.html`, the review
+artifacts under `uiux/assets/references/` and the raster exports under
+`uiux/assets/` stay local via a generated `.gitignore`; the accepted
+brand SVGs beside those exports are committed, since `build` moves them
+into the app. Review artifacts remain until no longer needed.
+**The ledger - `changelog.md` and its `changelog.d/`
 fragments - is always
 committed**: `implement` deletes a feature's folder only when
 `delete_feature_folders` is `true`; otherwise it remains ignored local

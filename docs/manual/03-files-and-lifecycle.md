@@ -53,9 +53,10 @@ The machine schema requires `generated_date` on generated Markdown other than th
 | `uiux/02-system.md` | Tokens, components, Implementation constraints, Assets table; consumed by stack/build/review | Final reference |
 | `uiux/03-experience.md` | Navigation, feedback, recovery, input, accessibility; consumed by build/review | Final reference |
 | `uiux/screens/NN-screen.md` | Mode & job, Composition, States, Motion, Copy, Not in play | Final reference; numbering mirrors mockup screens |
-| `uiux/preview.html` | Self-contained first viewport/style tile for steering decisions | Local, ignored, regenerated; not the design authority |
+| `uiux/preview.html` | Self-contained token/style tile for steering decisions | Local, ignored, regenerated; not the design authority |
 | `uiux/assets/*.svg` | Source brand marks | Kept in Git; build moves them into the app |
-| `uiux/assets/*.{png,jpg,jpeg,webp}` and `uiux/assets/references/` | Raster exports and inspiration/reference material | Local and ignored |
+| `uiux/assets/references/logo.svg` and `page-mockup.html` | User-reviewable first-pass logo and flagship page mockup | Local and ignored; retained until later phases no longer need them |
+| `uiux/assets/*.{png,jpg,jpeg,webp}` | Raster exports and inspiration/reference material | Local and ignored |
 | `standards.md` | User-chosen binding coding rules; used in planning and review | No coverage globs; map never regenerates it from code |
 | `implementation.md` | Whole-product build plan and verification steps | Indexed instructional output retained by build |
 

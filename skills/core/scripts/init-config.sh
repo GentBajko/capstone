@@ -204,7 +204,8 @@ if [ -f "$IGNORE" ]; then
     echo "unignored: capstone.json in $IGNORE"
     migrated=1
   fi
-  # 6.4 added the uiux stage's preview and its raster brand assets.
+  # 6.4 added the uiux stage's preview and its raster brand assets;
+  # later releases also retain review artifacts in the references dir.
   # Appended rather than rewritten, so a hand-edited ignore file keeps
   # its own rules; each rule is added only when it is absent, so a
   # second run adds nothing. uiux/assets/*.svg is never added: the mark
@@ -220,7 +221,7 @@ if [ -f "$IGNORE" ]; then
   if [ -n "$added" ]; then
     { cat "$IGNORE"
       echo
-      echo "# The uiux preview and raster brand assets; the SVG sources are committed"
+      echo "# The uiux preview, review artifacts and raster brand assets; the SVG sources are committed"
       printf '%s' "$added"; } > "$IGNORE.capstone-tmp" \
       && mv "$IGNORE.capstone-tmp" "$IGNORE"
     echo "ignored: the uiux preview and raster assets in $IGNORE"
@@ -262,8 +263,9 @@ fe-review.md
 # deliverable, and hard rule 4 says the outputs are markdown
 uiux/preview.html
 
-# Raster brand assets and reference material. The SVG sources beside
-# them are committed (see above); these are exports and mood boards.
+# Review artifacts, raster brand assets and reference material. The
+# accepted SVG sources beside them are committed (see above); these
+# working files stay until later phases no longer need them.
 uiux/assets/*.png
 uiux/assets/*.jpg
 uiux/assets/*.jpeg

@@ -32,12 +32,18 @@ inventory decides when it is allowed to stop. Its items generate
 questions rather than being read out, and what does not apply is
 confirmed in one batch per its §2.
 
-**Capabilities, not method.** Two things the harness may or may not
-have change what this stage can *do*, never how it decides: image
+**Capabilities, not method.** The harness may or may not have image
 generation (the direction's sketches, offered when it exists and
-skipped in one line when it does not) and a live browser (screenshots
+skipped in one line when it does not) or a live browser (screenshots
 of an existing frontend in extraction mode). Their absence never
-changes a design decision.
+changes a design decision. At the end of a greenfield run, the review
+artifacts are capability-gated: Claude Code uses its artifact
+publishing tools, GPT uses Sites, and every other harness writes the
+same pure, self-contained HTML locally. Detect what the current
+harness actually exposes; never claim an artifact or Site was
+published when it was not. In every case keep the canonical working
+copies in `uiux/assets/references/` until a later phase no longer
+needs them.
 
 Conversation cadence: one question per turn, expertise-calibrated per
 core.md (level 1 hears "calm or bold?", never "what
@@ -144,14 +150,14 @@ The seeds (the only predetermined questions):
 2. "What brand material already exists and is binding: name, logo,
    colors, fonts, references you want honored?"
 2b. The asset question, asked here and never skipped: "Will you supply
-   the logo as SVG, or should this stage attempt one?" Say plainly
-   that most harnesses cannot draw, so an attempt yields a shaped
-   placeholder rather than an identity, and it stands only until you
-   replace it. The answer fills the `Source` column of `02-system.md`'s
-   `## Assets` table for every logo row. **Never generate a mark
-   before this answer exists.** An unanswered asset row stays
-   `awaited`, which stops `build` with the list; a placeholder nobody
-   asked for ships silently and is discovered in production.
+   the logo as SVG, or should this stage make a first-pass SVG during
+   the final review?" Say plainly that a generated mark is a review
+   candidate, not a finished identity, and stands only until the user
+   accepts or replaces it. The answer fills the `Source` column of
+   `02-system.md`'s `## Assets` table for every logo row. **Never
+   generate a mark before this answer exists.** An unanswered asset row
+   stays `awaited`, which stops `build` with the list; a placeholder
+   nobody asked for ships silently and is discovered in production.
 3. The use scene: who uses this, where, under what ambient light;
    and let the answer force light, dark, or both. Never a category
    default.
@@ -219,41 +225,81 @@ items that do not apply into **one** confirmation rather than one
 question each. A correction inside that batch turns an empty back into
 a real question. Close each ledger box as its item lands.
 
-## Phase D' - the preview
+## Phase D' - review artifacts
 
-Run once the direction is committed and the §3 system items are
-answered, before the gate. Skip it when either is still open; say so
-in one line rather than previewing a design that is half decided.
+Run once the direction is committed, the §3 system items are answered,
+and the screen sweep is complete, before the gate. Skip it when any of
+those is still open; say so in one line rather than presenting a design
+that is half decided.
 
-Write one self-contained HTML file to
-`docs/capstone/uiux/preview.html`: the flagship surface's first
-viewport rendered from the committed tokens, plus a style tile showing
-the palette, the type scale, the buttons in every hierarchy, one form
-field through its validation states, and the loading and empty
-vocabularies. No external requests and no CDN; fonts are a system
-stack with the chosen faces named in an HTML comment. It renders
-decisions already recorded. A value the interview has not settled goes
-back to Phase C as a question rather than into this file.
+First ask the user, using core.md's structured question tool when the
+harness provides it: "Should I make a first-pass logo in SVG and a
+page mockup for you to review now?" Offer selectable answers such as
+`Make both (Recommended)`, `Use the supplied SVG and make the mockup`,
+and `I will provide the assets first`, while keeping the native
+`Other`/free-text path. A normal-conversation fallback uses the same
+options. Do not create a logo until the user has chosen a path that
+allows it. If the user supplies the SVG, copy that exact file into the
+reference folder for the review; do not redraw it. If the user chooses
+to provide the assets first and no SVG is present, record the row as
+`awaited` and stop; do not invent a logo or continue to the next phase.
 
-Where the harness can publish an artifact, publish it and hand the
-user the link. Where it cannot, say the file's path in one line.
-Either way the user steers before the gate: each correction is
-recorded as a `### Q<n>` entry like any other answer, and the file is
-rewritten from the corrected tokens. Regenerate it whenever a system
-item changes after it was first written, so the gate never presents a
-picture of a superseded palette.
+Write the canonical working copies here:
 
-`preview.html` is working state: gitignored, carrying no frontmatter,
-and skipped by the schema pass. `02-system.md` stays the design of
-record, and the preview is regenerated from it.
+- `docs/capstone/uiux/assets/references/logo.svg`: the supplied logo or
+  the clearly marked first-pass SVG candidate. It is a real standalone
+  SVG, not a raster image, data URL, or prose description.
+- `docs/capstone/uiux/assets/references/page-mockup.html`: a pure,
+  self-contained HTML page for the flagship surface. Inline the SVG
+  mark, CSS, and any small interaction needed for the review; use no
+  external requests, CDN, framework, or build step. It must show the
+  committed first viewport, the key states the screen chapter names,
+  and enough responsive behavior for the user to assess the direction.
+- `docs/capstone/uiux/preview.html`: the existing token/style tile,
+  regenerated from the same committed decisions. It remains separate
+  because the style tile is not the page mockup.
+
+Present the artifacts according to the current harness:
+
+- **Claude Code:** publish the SVG and page mockup with its artifact
+  tools, and also leave the two files in the reference folder.
+- **GPT:** publish the page mockup as a Site, with the reviewed SVG
+  inline in that page, and also leave the standalone SVG and HTML in
+  the reference folder.
+- **Other harnesses:** write and hand back the pure HTML path; the
+  page must work from the reference folder with the SVG beside it.
+
+Then ask for review with the structured question tool when available:
+`Approve and continue (Recommended)`, `Request visual changes`, or
+`Replace the logo`, plus its native `Other`/free-text path. The user can
+type suggestions in that response. Do not enter Phase D or hand off to
+`architecture` until the user explicitly approves. A requested change
+is appended as a new `### Q<n>` entry before regenerating both affected
+files; present the revised artifacts and ask again. An approval is not
+inferred from silence, a file existing, or a Site/artifact closing.
+
+After explicit approval, promote the accepted SVG from the reference
+folder to the final `uiux/assets/<file>.svg` path named by `02-system.md`'s
+`## Assets` table and mark that row `present`. Keep
+`uiux/assets/references/` intact and ignored through later phases; do
+not clean it up at formalization. A later phase or the user may remove
+it only after it no longer helps review or implementation. The HTML
+mockup is review material, never the design authority: the chapterized
+UIUX outputs remain authoritative.
+
+`preview.html` and the reference artifacts are working state:
+gitignored, carrying no frontmatter, and skipped by the schema pass.
+`02-system.md` stays the design of record, and all three visual files
+are regenerated from its current decisions.
 
 ## Phase D - the gate
 
-Set `status: awaiting-formalization`; present the summary: the read
+Only after the review-artifact approval, set `status:
+awaiting-formalization`; present the summary: the read
 and mode map, the committed direction (world, the flagship surface's
 first viewport, signature interaction), dials, tokens, the per-screen
 notes, and what is still vague. The user formalizes or amends; do not
-generate until they do.
+write the final design docs until they do.
 
 ## Phase E - the design docs
 
@@ -350,8 +396,11 @@ committed** - they are the design of record for the mark, and a
 frontend cannot be built from a file that lives on one machine.
 Raster exports, screenshots and mood boards under that folder are
 local working state and are ignored, along with `preview.html`.
-`build` moves the SVGs into the scaffolded tree and rasterizes the
-favicon, app icon and `og.png` from them.
+The review copies `logo.svg` and `page-mockup.html` live in
+`assets/references/` until a later phase no longer needs them. The
+approved SVGs in `assets/` are the final source files; `build` moves
+them into the scaffolded tree and rasterizes the favicon, app icon and
+`og.png` from them.
 
 Only after every file is on disk, append the changelog entry per
 core.md's ledger (key `uiux/all@Q<n>`, `<n>` the highest `### Q<n>`

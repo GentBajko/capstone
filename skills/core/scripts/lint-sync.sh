@@ -505,6 +505,25 @@ grep -q 'Invoked by `map`' skills/core/references/protocols/logic.md \
 grep -q 'never touched here' skills/core/references/protocols/map.md \
   || err "map.md does not protect interview-derived uiux/ files from extraction"
 
+# 12f2. uiux's final review is a real gate with a cross-harness
+#       presentation fallback, and its working artifacts stay discoverable
+#       in the ignored reference folder until a later phase no longer needs
+#       them.
+grep -q 'uiux/assets/references/logo\.svg' \
+  skills/core/references/protocols/uiux.md \
+  || err "uiux.md has no retained SVG review artifact"
+grep -q 'uiux/assets/references/page-mockup\.html' \
+  skills/core/references/protocols/uiux.md \
+  || err "uiux.md has no retained HTML page mockup"
+grep -q 'Claude Code:' skills/core/references/protocols/uiux.md \
+  || err "uiux.md has no Claude artifact presentation path"
+grep -q 'GPT:' skills/core/references/protocols/uiux.md \
+  || err "uiux.md has no GPT Sites presentation path"
+grep -q 'Other harnesses:' skills/core/references/protocols/uiux.md \
+  || err "uiux.md has no pure-HTML presentation fallback"
+grep -q 'explicitly approves' skills/core/references/protocols/uiux.md \
+  || err "uiux.md can continue without explicit artifact approval"
+
 # 12g. the machine verdict lines are a contract. map.md promises both;
 #      the gate template (script half, no API key) greps only MAP CHECK:
 #      and the review template (model half) greps only MAP REVIEW:, so a

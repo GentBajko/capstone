@@ -290,7 +290,7 @@ is asked again when starting a new run to resume the pipeline.
 | --- | --- | --- |
 | [`mockup`](commands/mockup.md) | `mockup/` - one file per screen: wireframe, elements, and a state inventory; `README.md` indexes the screens, the journeys, and the scenario list `logic` works from | `mockup-interview.md` |
 | [`logic`](commands/logic.md) | `logic/` - one file per scenario: triggers, exact rules, branches, unhappy paths, invariants, and the dimensions ruled out | `logic-interview.md` |
-| [`uiux`](commands/uiux.md) | `uiux/01-direction.md`, `02-system.md` (tokens, the `## Assets` manifest), `03-experience.md`, `screens/`, the brand SVGs in `uiux/assets/`, and `preview.html` | `uiux-interview.md` |
+| [`uiux`](commands/uiux.md) | `uiux/01-direction.md`, `02-system.md` (tokens, the `## Assets` manifest), `03-experience.md`, `screens/`, approved brand SVGs in `uiux/assets/`, review artifacts in `uiux/assets/references/`, and `preview.html` | `uiux-interview.md` |
 | [`architecture`](commands/architecture.md) | The numbered chapters, marked `mode: prescriptive` (`09-interfaces.md` too when the design declares cross-repo edges) | `architecture-interview.md` |
 | [`standards`](commands/standards.md) | `standards.md` | `standards-interview.md` |
 | [`stack`](commands/stack.md) | `05-dependencies.md` | `stack-interview.md` |
@@ -323,12 +323,15 @@ is asked again when starting a new run to resume the pipeline.
   the owning file's `## Not in play` section - the same completion test
   `logic` gets from its dimensions. Before the gate it writes
   `uiux/preview.html`, one self-contained page rendering the committed
-  tokens as the flagship first viewport plus a style tile, so the user
-  steers by looking rather than by reading hex values; it is
-  regenerated whenever a token changes and never committed. The brand
-  files it plans go in `uiux/assets/` and are listed row by row in
-  `02-system.md`'s `## Assets` table, with the SVGs committed and the
-  raster exports ignored. On a repo that already has
+  tokens as a style tile, and asks the user to review a first-pass SVG
+  logo and a pure HTML page mockup from
+  `uiux/assets/references/` before continuing to `architecture`. Claude
+  Code uses artifacts, GPT uses Sites, and other harnesses use the local
+  HTML file. Requested changes are recorded and regenerated until the
+  user explicitly approves. The accepted brand files go in
+  `uiux/assets/` and are listed row by row in `02-system.md`'s
+  `## Assets` table, with the SVGs committed and the review/raster
+  exports ignored. On a repo that already has
   a frontend it runs in **extraction mode** instead: it documents the
   design that exists rather than interviewing for one.
 - **`standards`** sweeps the seventeen domains in
@@ -477,7 +480,8 @@ docs/capstone/
 ├── logic/                 business logic, one file per scenario
 ├── mockup/                one file per screen
 ├── uiux/                  direction, design system, per-screen chapters
-│   ├── assets/            the brand SVGs - committed; rasters gitignored
+│   ├── assets/            accepted brand SVGs - committed; working files ignored
+│   │   └── references/    logo.svg + page-mockup.html for review (gitignored)
 │   └── preview.html       the rendered style tile           (gitignored)
 ├── changelog.md           the folded ledger - always committed
 ├── changelog.d/           one fragment per new entry, folded on main - committed
