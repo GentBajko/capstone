@@ -295,8 +295,10 @@ reference. `plan` turns it into a task-by-task TDD plan; a vendored
 TDD + YAGNI ladder trims every task, and your standards outrank the
 ladder on conflict. `implement` executes, reviews the diff until two
 consecutive rounds find nothing new, then absorbs the shipped
-behavior back into the scenario docs. A dead session resumes
-mid-chain.
+behavior back into the scenario docs. By default it retains the
+completed feature folder as ignored local history; set
+`delete_feature_folders: true` to remove it after the ledger entry is
+written. A dead session resumes mid-chain.
 
 Every new or resumed feature run asks **inline or subagents** before
 stage work and waits for your answer. Inline stays in one conversation
@@ -372,6 +374,7 @@ user, shared by every project.
   "docs_in_git": "ask",               // "commit" | "ignore" | "ask"
   "language": "en",                   // language of the generated docs
   "non_interactive": false,           // resolve defaulted prompts silently (CI)
+  "delete_feature_folders": false,    // retain completed feature folders; set true to delete them
   "extract": ["logic", "uiux"],       // map's extraction passes; [] skips both
   "interfaces": "auto",               // "auto" | "off" - the 09-interfaces.md chapter
   "interfaces_frontmatter": false,    // also write the legacy top-level produces:/consumes: lists
@@ -390,20 +393,27 @@ user, shared by every project.
 | `docs_in_git` | `commit`, `ignore`, or `ask`, for the factual reference |
 | `language` | The generated docs' language |
 | `non_interactive` | Resolve every prompt to its default, for headless CI runs; approval gates still stop |
+| `delete_feature_folders` | Delete completed `features/<id>/` folders after wrap when `true`; retain ignored local history when `false` |
 | `extract` | Which `map` extraction passes run: `["logic", "uiux"]`, `["logic"]`, or `[]` |
 | `interfaces` | `auto` or `off`: whether `map` writes the cross-repo `09-interfaces.md` chapter |
 | `interfaces_frontmatter` | Also write the legacy top-level `produces:`/`consumes:` lists beside the canonical `edges:` block, for a machine consumer pinned to the 6.2 shape; off by default |
 | `cross_repo` | `auto` or `off`: whether `groom`, `plan`, the `architecture` interview, and `map`'s interfaces pass consult the `quarry` CLI; `map` reads the edges quarry could not join and asks you about those, and writes the `known_as` aliases quarry resolves names against |
 | `redact` | Env-var name patterns (`*` at either end) whose values `map` writes as `<redacted>` and never quotes; case-insensitive |
 
+When the harness exposes a structured question tool, Capstone uses it
+for interactive questions so options are clickable and `Other` accepts
+typed text. Harnesses without that capability receive the same
+one-question prompt in normal conversation.
+
 Interviews, `features/`, `review.md`, `uiux/preview.html` and the
 raster exports under `uiux/assets/` stay local via a generated
 `.gitignore`; the brand SVGs beside those exports are committed, since
 `build` moves them into the app. **The ledger - `changelog.md` and its `changelog.d/`
 fragments - is always
-committed**: `implement` deletes a feature's folder once its ledger
-entry is written, so the ledger is the only surviving record of why
-the feature was built that way. So is the project config below.
+committed**: `implement` deletes a feature's folder only when
+`delete_feature_folders` is `true`; otherwise it remains ignored local
+history. The ledger is always the durable shipped-feature marker. So is
+the project config below.
 
 The project's own `docs/capstone/capstone.json` is the team's
 shared config, committed like the ledger whatever `docs_in_git` says:

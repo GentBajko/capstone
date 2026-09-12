@@ -180,7 +180,7 @@ already defines.
 **Checks**: torn writes (a done marker with no ledger entry, or a
 ledger key whose outputs are missing), approval integrity (voided plan
 approvals, truncated plans), torn wraps (a feature folder left behind
-after its entry landed), index ↔ disk drift, lifecycle validity,
+after its entry landed while deletion is enabled), index ↔ disk drift,
 housekeeping (missing `.gitignore` or config keys, an untracked
 ledger), absorption drift, logic coverage, ledger size, schema
 (`map-check.sh`'s part 8: missing frontmatter keys, `known_as`
@@ -429,12 +429,14 @@ tasks in dependency order, one commit each,
 then **reviews the diff recursively until two consecutive rounds find
 nothing new**. It then refreshes the affected chapters, absorbs the
 spec into `logic/`, `mockup/` and `uiux/`, writes its ledger entry,
-and **deletes the feature folder**.
+and, by default, retains the feature folder as ignored local history.
+Set `delete_feature_folders: true` to delete it after the ledger entry
+and done marker are written.
 
 > The whole `features/` tree is gitignored working state. Once
-> `implement` finishes, its `changelog.md` entry is the only surviving
-> record of why the feature was built that way - which is why the
-> ledger is always committed.
+> `implement` finishes, its `implement/<id>` ledger key is the durable
+> shipped-feature marker. The ledger is always committed; it remains
+> the only surviving record when feature-folder deletion is enabled.
 
 **Ledger key** `implement/<date>-<slug>@Q<n>`. That key is also the
 done marker: the id is retired and never reused. Ids are derived from
@@ -496,13 +498,19 @@ moves, so a custom location stays discoverable.
 **Config.** `~/.claude/capstone.json`, created on first session by a
 hook. `expertise` (1–5) calibrates the conversation only, never the
 docs. `teaching_mode` narrates what is happening and why.
+`delete_feature_folders` defaults to `false`, retaining completed
+feature folders as ignored local history; set it to `true` to delete
+them after implement's wrap.
+When the harness provides a structured question tool, Capstone uses it
+for interactive questions so options are clickable and `Other` accepts
+typed text; otherwise it asks the same question in normal conversation.
 `docs_in_git` governs whether the reference is committed. The ledger
 (`changelog.md` and `changelog.d/`), `capstone.json` and
 `questionnaires/` ignore it and are always committed: the ledger
-because `implement` deletes a feature folder on the strength of its
-entry, the config because a setting on one machine is not a project
-standard, and the questionnaires because each one is a record of what
-was asked of a real person.
+because it is the durable shipped-feature record, the config because a
+setting on one machine is not a project standard, and the
+questionnaires because each one is a record of what was asked of a
+real person.
 `subagent_threshold` (default 150 source files) is where `map` fans
 out to subagents, and where an unrequested full build asks first.
 `non_interactive` resolves every prompt to its default for headless

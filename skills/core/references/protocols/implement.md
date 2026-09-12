@@ -20,9 +20,13 @@ value never skips the entry gate.
 Prerequisite, checked in this order (resolve a `<feature>` argument
 as `groom`'s Resume rule does): no folder but an
 `implement/<id>` key in the ledger (`changelog.md`, its rotation
-files, or an unfolded `changelog.d/` fragment), or `implemented: true`
-in a folder still present → the feature is done; say so, point at the
-changelog entry, and stop. Otherwise require `plan_approved: true` in the
+files, or an unfolded `changelog.d/` fragment), or a folder with
+`implemented: true` and that matching key → the feature is done; say
+so, point at the changelog entry, and stop. If the folder remains and
+`delete_feature_folders` is true, finish its deletion first; when the
+setting is false, retaining it is expected. `implemented: true` without
+the matching key is a torn write for `doctor`; do not re-run or delete
+it. Otherwise require `plan_approved: true` in the
 feature's `feature-interview.md`, with `approved_spec` still matching
 a checksum of the current `spec.md`. No approval → execute
 `protocols/plan.md` first (which chains `groom` when there is no
@@ -206,8 +210,9 @@ Entered when Phase C goes dry.
    merges as its own file - that is the point - and the next writing
    run on main folds it. On a consented main run, fold per the
    ledger rule, this entry included.
-   **Step 6 deletes the feature folder, so this entry is all that
-   survives it: write it to be read without the spec beside it.**
+   **Step 6 may delete the feature folder, so write this entry to be
+   read without the spec beside it when `delete_feature_folders` is
+   enabled.**
    Bullets only, per the ledger's entry format. This is the longest
    entry any stage writes and still never a narrative:
 
@@ -235,17 +240,19 @@ Entered when Phase C goes dry.
    `git log` shows it uses (on a consented main run there is no branch
    to finish, just the repo's push conventions). Ask before opening a
    PR or pushing; neither is implied by the plan's approval.
-6. **Delete `features/<id>/`**, last, once step 3's entry is on
-   disk and the branch is finished. The folder was scaffolding: the
-   spec is absorbed into `logic/`, `mockup/`, and `uiux/`, the plan
-   is spent, the ledger's counts are in the changelog entry, and
-   `features/` is gitignored so nothing here is recoverable from
-   history anyway. Deleting it keeps the folder to features actually
-   in flight.
+6. Apply `delete_feature_folders` (default `false`) last, after step
+   3's entry is on disk and the branch is finished. When it is `true`,
+   delete `features/<id>/`: the spec is absorbed into `logic/`,
+   `mockup/`, and `uiux/`, and the ledger's counts are in the entry.
+   When it is `false`, retain `features/<id>/` as ignored local history
+   and report that it was preserved. In either mode the
+   `implement/<id>` ledger key is the done marker, and a retained folder
+   is not unfinished work.
 
    From here the **changelog key is the done marker**: the id is
    retired and never reused, and every stage-detection rule below
-   reads "folder absent AND an `implement/<id>` key in the ledger
-   (fragments included)" as done. Folder still present with that key is a
-   torn wrap, not an unfinished feature: finish the delete, never
+   reads an `implement/<id>` key in the ledger (fragments included) as
+   done, whether the folder is present or absent. A folder still
+   present with that key is expected when `delete_feature_folders` is
+   false; when it is true, it is a torn wrap: finish the delete, never
    re-run the stage (`doctor` repairs this).

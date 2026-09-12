@@ -40,6 +40,7 @@ if [ ! -f "$GLOBAL_FILE" ]; then
   "docs_in_git": "ask",               // "commit" | "ignore" | "ask" - the factual reference only; the ledger is always committed
   "language": "en",                   // language the generated docs are written in
   "non_interactive": false,           // true = resolve every defaulted prompt silently (CI); approval gates still stop
+  "delete_feature_folders": false,    // true = delete completed feature folders after wrap | false = retain them locally
   "extract": ["logic", "uiux"],       // map's extraction passes: ["logic","uiux"] both | ["logic"] skip uiux | [] skip both
   "interfaces": "auto",               // "auto" = write 09-interfaces.md when the repo talks to another repo | "off" = never
   "interfaces_frontmatter": false,    // true = also mirror the interface tables into frontmatter, for machine consumers
@@ -233,8 +234,10 @@ else
 # The feature chain (groom -> plan -> implement) never commits.
 # changelog.md and changelog.d/ are deliberately NOT here and must
 # never be added: the ledger is always committed, whatever
-# docs_in_git says, because implement deletes each feature folder on
-# the strength of its entry. capstone.json is not here either: it is
+# docs_in_git says. If delete_feature_folders is enabled, implement
+# relies on its entry before deleting a feature folder; otherwise the
+# retained folder remains ignored local history. capstone.json is not
+# here either: it is
 # the project's shared config, committed for the same reason a
 # standard is written down rather than kept on one machine.
 # uiux/assets/*.svg is deliberately NOT here either and must never be

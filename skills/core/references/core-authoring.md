@@ -26,9 +26,10 @@ lives on one machine is not a brand. `changelog.md` and the
 `changelog.d/` fragment folder are NOT on this
 list, and unlike the chapters they do not follow `docs_in_git`
 either: **the ledger is always committed** (core.md's Changelog
-ledger says why - `implement` deletes each feature's folder on the
-strength of its entry, so an untracked ledger makes that deletion
-permanent loss). `capstone.json` is off the list too: it is the
+ledger says why - it is the durable shipped-feature marker, and with
+`delete_feature_folders: true` it is the only record left after
+`implement` deletes a feature's folder). `capstone.json` is off the
+list too: it is the
 project's shared config, committed for the same kind of reason - it
 holds the settings every run on the repo follows and the project's
 state, and a config that lives on one machine is not a standard
@@ -95,14 +96,13 @@ source of truth: every confirmed decision, rationale, constraint, open
 question, and deferral needed by a later reader must be written into
 them.
 
-Final outputs must stand alone. They never cite, link to, name, or
-instruct a reader to consult an interview file or one of its `§Q`,
-`### Q`, or `### D` entries. Question numbers may remain in the
-changelog key required by `core.md` and in the interview itself; they
-do not appear in the final output. Downstream stages read formalized
-outputs, not completed interviews. If a needed decision exists only in
-a completed interview, repair the owning output from that record before
-continuing.
+Final outputs must stand alone and must be written as if interview files do not exist. They never cite, link to, name, or instruct a
+reader to consult an interview file or one of its `§Q`, `### Q`, or
+`### D` entries. Question numbers may remain in the changelog key
+required by `core.md` and in the interview itself; they do not appear
+in the final output. Downstream stages read formalized outputs, not
+completed interviews. If a needed decision exists only in a completed
+interview, repair the owning output from that record before continuing.
 
 ## Index maintenance
 
@@ -155,4 +155,3 @@ area is that layout: move it (`git mv` when tracked), repoint the
 moved docs' cross-references, drop its stamp columns per the rule
 above, and say what you did. Both present → the docs-area index wins;
 resolve the root file with the user.
-

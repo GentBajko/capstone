@@ -18,6 +18,7 @@ The shared project file is always **`docs/capstone/capstone.json`**, even when g
 | `docs_in_git` | `"ask"` | `"commit"`, `"ignore"`, or `"ask"` for factual reference tracking; local-only files and committed exceptions have separate rules |
 | `language` | `"en"` | Language of generated documentation |
 | `non_interactive` | `false` | Resolve prompts that have defaults using those defaults; required decisions without defaults still stop |
+| `delete_feature_folders` | `false` | Retain completed feature folders as ignored local history; set `true` to delete them after implement's wrap |
 | `extract` | `["logic", "uiux"]` | Automatic map extraction/coverage passes; `["logic"]` skips UI extraction; `[]` skips both |
 | `interfaces` | `"auto"` | `"auto"` writes an interfaces chapter when sibling-repo communication exists; `"off"` skips that pass |
 | `interfaces_frontmatter` | `false` | Add legacy top-level produces/consumes mirrors; canonical `edges:` and `known_as` are always written when the chapter exists |
@@ -27,6 +28,13 @@ The shared project file is always **`docs/capstone/capstone.json`**, even when g
 | `workspaces` | absent/null | Project-only list of `{ "name", "path" }` entries; each gets its own reference |
 
 Expertise levels are 1: plain-language guidance, 2: explanations with introduced terminology, 3: normal technical vocabulary and recommended options, 4: terse engineering discussion with explicit numbers, 5: compact architectural tradeoffs. Teaching mode is independent of expertise.
+
+When the current harness exposes a structured question tool, interactive
+questions use it with clickable options and a typed `Other` path. A
+harness without that capability receives the same one-question prompt
+in normal conversation. The answer is persisted before the next
+question; this changes presentation, not the protocol's gates or
+non-interactive behavior.
 
 ## Useful project examples
 

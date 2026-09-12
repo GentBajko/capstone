@@ -40,6 +40,7 @@ jobs:
             "docs_in_git": "ask",
             "language": "en",
             "non_interactive": true,
+            "delete_feature_folders": false,
             "extract": ["logic", "uiux"],
             "interfaces": "auto",
             "interfaces_frontmatter": false,

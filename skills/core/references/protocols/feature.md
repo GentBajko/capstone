@@ -18,7 +18,7 @@ an existing feature's slug.
    `docs/capstone/features/*/` ids and spec titles **and against the
    `implement/*` keys in the ledger** (`changelog.md`, its rotation
    files, and unfolded `changelog.d/` fragments: shipped features,
-   whose folders `implement` deleted). No match → a new feature: id
+   whose folders `implement` may have deleted). No match → a new feature: id
    `<YYYY-MM-DD>-<slug>`, today's date plus a short kebab slug
    derived from the description (per `groom`'s naming rule; derived,
    never allocated from a ledger a parallel branch cannot see). A
@@ -31,10 +31,16 @@ an existing feature's slug.
    - **folder absent with an `implement/<id>` key present anywhere
      in the ledger → shipped**, checked before every row below; say
      so and show the entry. A change request against it is a new feature per `groom`'s
-     Resume rule, never a reopening: there is no folder left to reopen.
-   - folder present with `implemented: true` → done but the wrap tore
-     before its delete (implement.md Phase D step 6); finish the
-     delete, say so, and stop. Never re-run the stage.
+     Resume rule, never a reopening: any retained folder is completed
+     local history, not a plan to reopen.
+   - folder present with `implemented: true` and a matching
+     `implement/<id>` key → shipped. If `delete_feature_folders` is
+     `true`, finish the deletion from implement.md Phase D step 6;
+     if it is `false`, retain the folder as expected local history.
+     Say so and stop. Never re-run the stage.
+   - folder present with `implemented: true` but no matching
+     `implement/<id>` key → torn write; report it for `doctor` rather
+     than re-running the stage or deleting the folder.
    - no directory and no key, or status `interviewing` /
      `awaiting-formalization` → `groom` (its Resume rules govern:
      `awaiting-formalization` re-presents the gate, never generating

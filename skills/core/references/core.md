@@ -32,6 +32,7 @@ write this template yourself:
   "docs_in_git": "ask",               // "commit" | "ignore" | "ask" - the factual reference only; the ledger is always committed
   "language": "en",                   // language the generated docs are written in
   "non_interactive": false,           // true = resolve every defaulted prompt silently (CI); approval gates still stop
+  "delete_feature_folders": false,    // true = delete completed feature folders after wrap | false = retain them locally
   "extract": ["logic", "uiux"],       // map's extraction passes: ["logic","uiux"] both | ["logic"] skip uiux | [] skip both
   "interfaces": "auto",               // "auto" = write 09-interfaces.md when the repo talks to another repo | "off" = never
   "interfaces_frontmatter": false,    // true = also mirror the interface tables into frontmatter, for machine consumers
@@ -161,6 +162,14 @@ project that keeps secrets under other names extends the list in
 `docs/capstone/capstone.json`; the override replaces the list, so
 repeat the defaults you still want.
 
+`delete_feature_folders` (boolean, default `false`) controls the last
+step of `implement`'s wrap. When `false`, a completed
+`features/<id>/` folder remains on disk as ignored local working
+history. When `true`, `implement` deletes it after its ledger entry,
+done marker, and branch flow are complete. In both modes the
+`implement/<id>` ledger key is the durable shipped-feature marker;
+retaining a folder never reopens or reruns a completed feature.
+
 ## `expertise` (1-5): calibrates every conversation, never the docs
 
 **It calibrates the conversation with the user only.** The generated
@@ -202,6 +211,22 @@ comes next. Vocabulary follows `expertise`: level 1 hears the plain
 words first with the term in passing, level 4 just the term. Narration
 is conversation only; the generated docs stay dense per style.md. When
 `false`, no teaching narration: report per your level and move on.
+
+## Structured questions
+
+When the current harness exposes a structured question tool (for
+example, Claude Code's `AskUserQuestion`), use it for every question
+asked of the user. Encode enumerable answers as selectable options and
+keep the tool's native `Other`/free-text path available so the user can
+click an answer or type a different one. If the tool does not provide
+that path, include an `Other` option that accepts text. Use one
+question per tool call, record the returned selection or text exactly
+as the answer, and then persist it before asking the next question.
+This applies to confirmations, approvals, mode choices, digests, and
+interview questions; it does not change any protocol's gates or its
+`non_interactive` behavior. On a harness without a structured question
+tool, ask the same one question in normal conversation with the same
+options and `Other` instruction.
 
 If `expertise` is null or missing and the task is interactive (any
 interview, `review`), ask ONE
@@ -532,12 +557,13 @@ left open are the entry's content, never a reason to skip it.
 **The ledger is always committed, whatever `docs_in_git` says** -
 `changelog.md`, its rotation files, and `changelog.d/` fragments
 alike - and is, with the project config, one of that setting's two
-exemptions. It is the only durable record of
-why a feature was built the way it was: `implement` deletes the
-feature folder - spec, plan, and review ledger - on the strength of
-its entry here, so a local-only ledger would turn that deletion into
-permanent loss on one machine change. `docs_in_git` and the absence
-of git change how an entry is stamped, never whether it is written,
+exemptions. It is the durable record of why a feature was built the
+way it was, and the only surviving record when
+`delete_feature_folders` is true: `implement` deletes the feature
+folder - spec, plan, and review ledger - only when that setting
+permits it, on the strength of its entry here. `docs_in_git` and the
+absence of git change how an entry is stamped, never whether it is
+written,
 and never whether it is tracked.
 
 **Merges:** fragments carry distinct filenames, so two doc-carrying
@@ -560,9 +586,12 @@ stub section. A repo carrying a `changelog-archive-<YYYY>.md` and an
 `## Archived` section from the old body-stripping rotation keeps
 them as-is; key searches include them.
 
-**The keys never leave.** `implement` deletes a feature's folder on
-the strength of its entry here, and `groom` and `feature` resolve
-shipped features from the `implement/*` keys, wherever they live.
+**The keys never leave.** `implement` may delete a feature's folder on
+the strength of its entry here when `delete_feature_folders` is true,
+and `groom` and `feature` resolve shipped features from the
+`implement/*` keys, wherever they live. When the setting is false, the
+folder remains ignored local history but the key is still the done
+marker.
 Deleting an entry - rather than rotating it - makes a shipped
 feature look unstarted and frees its identifier for silent reuse.
 Why not delete old entries instead of rotating: same reason.
@@ -581,7 +610,8 @@ stage's outputs are the source of truth and every later stage consumes
 those outputs. Completed interview bodies are read only to repair a
 proven omission in an owning output; the repair lands before work
 continues. Final outputs never name or cite interview files or question
-numbers. See core-authoring.md's Interviews are working state rule.
+numbers; write them as if interview files do not exist. See
+core-authoring.md's Interviews are working state rule.
 
 An interview file's `status` moves `interviewing` →
 `awaiting-formalization` (set when the summary gate is presented) →
@@ -787,4 +817,3 @@ rule 1 in full); `build`'s `implementation.md` and `plan`'s `plan.md`
 are instructional: they may use imperative voice, but every command
 must be verified and every step cites its files; style.md's density
 and naming rules still bind.
-
