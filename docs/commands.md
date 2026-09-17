@@ -180,7 +180,7 @@ already defines.
 **Checks**: torn writes (a done marker with no ledger entry, or a
 ledger key whose outputs are missing), approval integrity (voided plan
 approvals, truncated plans), torn wraps (a feature folder left behind
-after its entry landed), index ↔ disk drift, lifecycle validity,
+after its entry landed while deletion is enabled), index ↔ disk drift,
 housekeeping (missing `.gitignore` or config keys, an untracked
 ledger), absorption drift, logic coverage, ledger size, schema
 (`map-check.sh`'s part 8: missing frontmatter keys, `known_as`
@@ -290,7 +290,7 @@ is asked again when starting a new run to resume the pipeline.
 | --- | --- | --- |
 | [`mockup`](commands/mockup.md) | `mockup/` - one file per screen: wireframe, elements, and a state inventory; `README.md` indexes the screens, the journeys, and the scenario list `logic` works from | `mockup-interview.md` |
 | [`logic`](commands/logic.md) | `logic/` - one file per scenario: triggers, exact rules, branches, unhappy paths, invariants, and the dimensions ruled out | `logic-interview.md` |
-| [`uiux`](commands/uiux.md) | `uiux/01-direction.md`, `02-system.md` (tokens, the `## Assets` manifest), `03-experience.md`, `screens/`, the brand SVGs in `uiux/assets/`, and `preview.html` | `uiux-interview.md` |
+| [`uiux`](commands/uiux.md) | `uiux/01-direction.md`, `02-system.md` (tokens, the `## Assets` manifest), `03-experience.md`, `screens/`, approved brand SVGs in `uiux/assets/`, review artifacts in `uiux/assets/references/`, and `preview.html` | `uiux-interview.md` |
 | [`architecture`](commands/architecture.md) | The numbered chapters, marked `mode: prescriptive` (`09-interfaces.md` too when the design declares cross-repo edges) | `architecture-interview.md` |
 | [`standards`](commands/standards.md) | `standards.md` | `standards-interview.md` |
 | [`stack`](commands/stack.md) | `05-dependencies.md` | `stack-interview.md` |
@@ -323,12 +323,15 @@ is asked again when starting a new run to resume the pipeline.
   the owning file's `## Not in play` section - the same completion test
   `logic` gets from its dimensions. Before the gate it writes
   `uiux/preview.html`, one self-contained page rendering the committed
-  tokens as the flagship first viewport plus a style tile, so the user
-  steers by looking rather than by reading hex values; it is
-  regenerated whenever a token changes and never committed. The brand
-  files it plans go in `uiux/assets/` and are listed row by row in
-  `02-system.md`'s `## Assets` table, with the SVGs committed and the
-  raster exports ignored. On a repo that already has
+  tokens as a style tile, and asks the user to review a first-pass SVG
+  logo and a pure HTML page mockup from
+  `uiux/assets/references/` before continuing to `architecture`. Claude
+  Code uses artifacts, GPT uses Sites, and other harnesses use the local
+  HTML file. Requested changes are recorded and regenerated until the
+  user explicitly approves. The accepted brand files go in
+  `uiux/assets/` and are listed row by row in `02-system.md`'s
+  `## Assets` table, with the SVGs committed and the review/raster
+  exports ignored. On a repo that already has
   a frontend it runs in **extraction mode** instead: it documents the
   design that exists rather than interviewing for one.
 - **`standards`** sweeps the seventeen domains in
@@ -429,12 +432,14 @@ tasks in dependency order, one commit each,
 then **reviews the diff recursively until two consecutive rounds find
 nothing new**. It then refreshes the affected chapters, absorbs the
 spec into `logic/`, `mockup/` and `uiux/`, writes its ledger entry,
-and **deletes the feature folder**.
+and, by default, retains the feature folder as ignored local history.
+Set `delete_feature_folders: true` to delete it after the ledger entry
+and done marker are written.
 
 > The whole `features/` tree is gitignored working state. Once
-> `implement` finishes, its `changelog.md` entry is the only surviving
-> record of why the feature was built that way - which is why the
-> ledger is always committed.
+> `implement` finishes, its `implement/<id>` ledger key is the durable
+> shipped-feature marker. The ledger is always committed; it remains
+> the only surviving record when feature-folder deletion is enabled.
 
 **Ledger key** `implement/<date>-<slug>@Q<n>`. That key is also the
 done marker: the id is retired and never reused. Ids are derived from
@@ -475,7 +480,8 @@ docs/capstone/
 ├── logic/                 business logic, one file per scenario
 ├── mockup/                one file per screen
 ├── uiux/                  direction, design system, per-screen chapters
-│   ├── assets/            the brand SVGs - committed; rasters gitignored
+│   ├── assets/            accepted brand SVGs - committed; working files ignored
+│   │   └── references/    logo.svg + page-mockup.html for review (gitignored)
 │   └── preview.html       the rendered style tile           (gitignored)
 ├── changelog.md           the folded ledger - always committed
 ├── changelog.d/           one fragment per new entry, folded on main - committed
@@ -496,13 +502,19 @@ moves, so a custom location stays discoverable.
 **Config.** `~/.claude/capstone.json`, created on first session by a
 hook. `expertise` (1–5) calibrates the conversation only, never the
 docs. `teaching_mode` narrates what is happening and why.
+`delete_feature_folders` defaults to `false`, retaining completed
+feature folders as ignored local history; set it to `true` to delete
+them after implement's wrap.
+When the harness provides a structured question tool, Capstone uses it
+for interactive questions so options are clickable and `Other` accepts
+typed text; otherwise it asks the same question in normal conversation.
 `docs_in_git` governs whether the reference is committed. The ledger
 (`changelog.md` and `changelog.d/`), `capstone.json` and
 `questionnaires/` ignore it and are always committed: the ledger
-because `implement` deletes a feature folder on the strength of its
-entry, the config because a setting on one machine is not a project
-standard, and the questionnaires because each one is a record of what
-was asked of a real person.
+because it is the durable shipped-feature record, the config because a
+setting on one machine is not a project standard, and the
+questionnaires because each one is a record of what was asked of a
+real person.
 `subagent_threshold` (default 150 source files) is where `map` fans
 out to subagents, and where an unrequested full build asks first.
 `non_interactive` resolves every prompt to its default for headless

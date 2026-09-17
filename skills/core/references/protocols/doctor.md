@@ -25,11 +25,13 @@ documented rules it proposes, never applies.
    then re-gate); `approved_spec` no longer matching a checksum of
    the current `spec.md` (a voided approval; plan.md's Resume rule:
    drop the stale keys, re-plan).
-2b. **Torn wrap**: a `features/<id>/` folder still on disk
-   while the ledger carries its `implement/<id>` key: the
-   wrap died between recording and deleting. Repair = finish the
-   delete (implement.md Phase D step 6), never re-run the stage. The
-   inverse (`implemented: true` with no key) is a torn write, check 1.
+2b. **Torn wrap**: when `delete_feature_folders` is `true`, a
+   `features/<id>/` folder still on disk while the ledger carries its
+   `implement/<id>` key means the wrap died between recording and
+   deleting. Repair = finish the delete (implement.md Phase D step 6),
+   never re-run the stage. When the setting is `false`, that same
+   folder is retained history and is not a finding. The inverse
+   (`implemented: true` with no key) is a torn write, check 1.
 3. **Index ↔ disk**: index rows pointing at missing files; files
    under `<docs_dir>` with no row (core-authoring.md's Index maintenance); an
    index still at the legacy root `DESIGN.md` (repair = the legacy

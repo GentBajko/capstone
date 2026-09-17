@@ -165,8 +165,8 @@ grep -q 'init-config.sh --global' hooks/hooks.json || err "hooks.json SessionSta
 for f in skills/core/scripts/init-config.sh \
          skills/core/references/core.md README.md; do
   for k in expertise teaching_mode docs_dir index_file subagent_threshold \
-           docs_in_git language non_interactive extract interfaces \
-           interfaces_frontmatter cross_repo redact; do
+           docs_in_git language non_interactive delete_feature_folders \
+           extract interfaces interfaces_frontmatter cross_repo redact; do
     grep -q "\"$k\"" "$f" || err "$f config template missing key $k"
   done
   for k in pipeline workspaces; do
@@ -356,10 +356,10 @@ fi
 # written by every stage, but nothing may route to a protocol for it
 grep -q 'Merges:' skills/core/references/core.md \
   || err "core.md lost the changelog merge-resolution rule"
-# 11b. the ledger's durability, shape, and bound. implement deletes each
-#      feature folder on the strength of its entry, so an untracked or
-#      rotated-away ledger is permanent data loss, and a rambling one is
-#      unreadable at the moment it is the only copy left.
+# 11b. the ledger's durability, shape, and bound. implement may delete a
+#      feature folder when deletion is enabled, so an untracked or
+#      rotated-away ledger is permanent data loss in that mode, and a
+#      rambling one is unreadable at the moment it is the only copy left.
 grep -q 'always committed' skills/core/references/core.md \
   || err "core.md lost the always-committed rule for changelog.md"
 grep -q 'ledger is always committed' skills/core/references/core-authoring.md \
@@ -505,6 +505,25 @@ grep -q 'Invoked by `map`' skills/core/references/protocols/logic.md \
 grep -q 'never touched here' skills/core/references/protocols/map.md \
   || err "map.md does not protect interview-derived uiux/ files from extraction"
 
+# 12f2. uiux's final review is a real gate with a cross-harness
+#       presentation fallback, and its working artifacts stay discoverable
+#       in the ignored reference folder until a later phase no longer needs
+#       them.
+grep -q 'uiux/assets/references/logo\.svg' \
+  skills/core/references/protocols/uiux.md \
+  || err "uiux.md has no retained SVG review artifact"
+grep -q 'uiux/assets/references/page-mockup\.html' \
+  skills/core/references/protocols/uiux.md \
+  || err "uiux.md has no retained HTML page mockup"
+grep -q 'Claude Code:' skills/core/references/protocols/uiux.md \
+  || err "uiux.md has no Claude artifact presentation path"
+grep -q 'GPT:' skills/core/references/protocols/uiux.md \
+  || err "uiux.md has no GPT Sites presentation path"
+grep -q 'Other harnesses:' skills/core/references/protocols/uiux.md \
+  || err "uiux.md has no pure-HTML presentation fallback"
+grep -q 'explicitly approves' skills/core/references/protocols/uiux.md \
+  || err "uiux.md can continue without explicit artifact approval"
+
 # 12g. the machine verdict lines are a contract. map.md promises both;
 #      the gate template (script half, no API key) greps only MAP CHECK:
 #      and the review template (model half) greps only MAP REVIEW:, so a
@@ -588,7 +607,14 @@ grep -q '^## Pushback' skills/core/references/core.md \
 grep -q 'never more than' skills/core/references/core.md \
   || err "core.md's Pushback rule lost its two-round cap"
 
-# 12k. interviews are local working state. Final outputs must survive a
+# 12k. interactive questions use the harness's structured controls when
+# available, while retaining a text fallback for harnesses without them.
+grep -q 'structured question tool' skills/core/references/core.md \
+  || err "core.md has no structured-question-tool rule"
+grep -q 'Other.*free-text' skills/core/references/core.md \
+  || err "core.md structured-question rule has no typed Other path"
+
+# 12l. interviews are local working state. Final outputs must survive a
 #      fresh clone, so authoring instructions cannot make them cite an
 #      interview file or question number.
 grep -q 'Final outputs never name or cite interview files' \
@@ -597,6 +623,9 @@ grep -q 'Final outputs never name or cite interview files' \
 grep -q 'Final outputs must stand alone' \
   skills/core/references/core-authoring.md \
   || err "core-authoring.md lost the standalone-output rule"
+grep -q 'as if interview files do not exist' \
+  skills/core/references/core-authoring.md \
+  || err "core-authoring.md lost the no-interview-output rule"
 for f in README.md docs/*.md skills/core/references/*.md \
          skills/core/references/protocols/*.md; do
   hit=$(awk 'BEGIN { ORS="" } /^$/ { print "\n"; next } { print $0 " " } END { print "\n" }' "$f" \

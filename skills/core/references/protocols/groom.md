@@ -39,16 +39,18 @@ feature is built.
 `docs/capstone/features/*/` ids and spec titles **and against the
 `implement/*` keys in the ledger** (`changelog.md`, its rotation
 files, and unfolded `changelog.d/` fragments, per core.md), whose
-features are shipped and whose folders `implement` deleted. Never
-reuse a shipped feature's id, legacy `<NN>-<slug>` ids included.
+features are shipped and whose folders `implement` may have deleted.
+Never reuse a shipped feature's id, legacy `<NN>-<slug>` ids included.
 
-A match on a changelog key only (no folder) is a **shipped** feature:
-say so and show that entry. A request to change it is a new feature
-grooming against the shipped behavior now recorded in `logic/` and the
-chapters, not a reopening: give it its own date-slug id, and have its
-`§Q` entries cite the earlier key as the thing being amended. There is no
-folder to reopen, and re-deriving one from the changelog would invent
-decisions the user never restated.
+A match on an `implement/<id>` changelog key is a **shipped** feature,
+whether its folder is absent or retained by
+`delete_feature_folders: false`: say so and show that entry. A request
+to change it is a new feature grooming against the shipped behavior
+now recorded in `logic/` and the chapters, not a reopening: give it its
+own date-slug id, and have its `§Q` entries cite the earlier key as the
+thing being amended. Do not reopen or re-derive the completed working
+files from the changelog; that would invent decisions the user never
+restated.
 
 A match on a folder still present continues as before: read its
 `feature-interview.md` and continue: `interviewing` resumes the

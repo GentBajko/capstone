@@ -68,7 +68,8 @@ single-writer: two capstone runs writing it at once will interleave.
 ## It's working if
 
 The feature reached `implement` and finished it: the code is in the
-source tree, `features/<date>-<slug>/` is gone, and the ledger carries
-`groom/<id>`, `plan/<id>` and `implement/<id>` entries at the same id.
+source tree, the ledger carries `groom/<id>`, `plan/<id>` and
+`implement/<id>` entries at the same id, and the completed feature
+folder is retained or deleted according to `delete_feature_folders`.
 A chain stopped at a gate is waiting on you, and re-running the same
 command resumes there.

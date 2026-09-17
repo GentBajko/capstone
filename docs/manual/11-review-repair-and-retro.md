@@ -35,7 +35,7 @@ Doctor first presents a findings table with the check, finding, owning rule, and
 | A key exists but its output is missing | Regenerate from available recorded decisions; report unrecoverable loss if those records are absent |
 | A feature plan's approval no longer matches its spec | Remove invalid approval, re-plan and re-gate |
 | Approved plan missing/truncated | Rebuild the plan from the spec and require its gate again |
-| Shipped feature folder remains | Diagnose torn wrap; finish the prescribed wrap cleanup rather than replay tasks |
+| Shipped feature folder remains while deletion is enabled | Diagnose torn wrap; finish the prescribed wrap cleanup rather than replay tasks |
 | Index links fail or outputs lack rows | Repair index/file relationships and legacy index location |
 | Final docs cite private interview questions | Put the actual decision/rationale into the owning final file and remove private provenance |
 | Ignore/config policy drift | Run initializer or correct approved keys/tracking; personal keys do not belong in project settings |

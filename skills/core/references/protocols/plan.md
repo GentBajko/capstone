@@ -10,8 +10,10 @@ writing-plans discipline (bite-sized steps, complete code, exact
 paths, TDD throughout) with capstone's twist that context comes from
 the chapterized reference, not repo exploration.
 
-Prerequisite: the feature's interview frontmatter says `formalized`
-and `spec.md` is on
+Prerequisite: if the ledger already carries the feature's
+`implement/<id>` key, the feature is shipped whether its folder is
+retained or absent; say so and stop. Otherwise the feature's interview
+frontmatter says `formalized` and `spec.md` is on
 disk. Interview missing or not yet `formalized` → execute
 `protocols/groom.md` first (its Resume rules pick up mid-interview);
 `formalized` with `spec.md` missing is a crash `groom`'s Resume rule

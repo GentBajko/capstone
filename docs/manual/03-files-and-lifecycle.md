@@ -53,9 +53,10 @@ The machine schema requires `generated_date` on generated Markdown other than th
 | `uiux/02-system.md` | Tokens, components, Implementation constraints, Assets table; consumed by stack/build/review | Final reference |
 | `uiux/03-experience.md` | Navigation, feedback, recovery, input, accessibility; consumed by build/review | Final reference |
 | `uiux/screens/NN-screen.md` | Mode & job, Composition, States, Motion, Copy, Not in play | Final reference; numbering mirrors mockup screens |
-| `uiux/preview.html` | Self-contained first viewport/style tile for steering decisions | Local, ignored, regenerated; not the design authority |
+| `uiux/preview.html` | Self-contained token/style tile for steering decisions | Local, ignored, regenerated; not the design authority |
 | `uiux/assets/*.svg` | Source brand marks | Kept in Git; build moves them into the app |
-| `uiux/assets/*.{png,jpg,jpeg,webp}` and `uiux/assets/references/` | Raster exports and inspiration/reference material | Local and ignored |
+| `uiux/assets/references/logo.svg` and `page-mockup.html` | User-reviewable first-pass logo and flagship page mockup | Local and ignored; retained until later phases no longer need them |
+| `uiux/assets/*.{png,jpg,jpeg,webp}` | Raster exports and inspiration/reference material | Local and ignored |
 | `standards.md` | User-chosen binding coding rules; used in planning and review | No coverage globs; map never regenerates it from code |
 | `implementation.md` | Whole-product build plan and verification steps | Indexed instructional output retained by build |
 
@@ -69,9 +70,9 @@ Every logic scenario has these exact sections: Trigger & preconditions; Steps; B
 | --- | --- | --- |
 | `*-interview.md` | Questions, answers, open items, lifecycle frontmatter | The unfinished stage; ignored, never indexed |
 | `features/<date>-<slug>/feature-interview.md` | Feature lifecycle, approval checksum, execution choice, base commit | Groom/plan/implement resume; ignored |
-| `features/<id>/spec.md` | What and why, requirements, approach, behavior, reference impact, exclusions | Plan and implement; ignored, later absorbed and deleted |
-| `features/<id>/plan.md` | Constraints, file map, ordered tasks, checkboxes, coverage | Implement; ignored, later deleted |
-| `features/<id>/review-ledger.md` | Confirmed/refuted findings and dry-round state | Implement's review resume; ignored, later summarized and deleted |
+| `features/<id>/spec.md` | What and why, requirements, approach, behavior, reference impact, exclusions | Plan and implement; ignored, later absorbed; folder retention follows `delete_feature_folders` |
+| `features/<id>/plan.md` | Constraints, file map, ordered tasks, checkboxes, coverage | Implement; ignored; folder retention follows `delete_feature_folders` |
+| `features/<id>/review-ledger.md` | Confirmed/refuted findings and dry-round state | Implement's review resume; ignored; folder retention follows `delete_feature_folders` |
 | `review.md` | Opt-in backend/frontend findings with separate side stamps | Human review; ignored and regenerated per side |
 | `questionnaires/YYYY-MM-DD-recipient.md` | Questions for someone outside the interview | Recipient and owning stage; kept in Git after answers arrive |
 | `changelog.d/YYYY-MM-DD-stage-target.md` | One complete event entry, keyed to a stage and revision | All lifecycle checks; committed until folded on the default branch |
@@ -82,7 +83,7 @@ Every logic scenario has these exact sections: Trigger & preconditions; Steps; B
 
 The factual reference follows `docs_in_git`; interviews, feature files, previews, rasters, and review reports remain local regardless of that choice. Ledger, project configuration, and questionnaires are committed exceptions. A fresh clone can consume completed reference outputs and their ledger without the interviews. It cannot recover unfinished local Q&A, feature plans, or checked task state that were never copied there.
 
-Each writing stage records its ledger entry before its done marker. New entries are fragments; a later writing run on the default branch folds them. Past 200 folded entries, all but the newest 100 move into year files. Keys remain searchable in fragments and rotation files. A shipped feature's folder is deleted only after its wrap; its `implement/<id>` key then tells later runs it is done.
+Each writing stage records its ledger entry before its done marker. New entries are fragments; a later writing run on the default branch folds them. Past 200 folded entries, all but the newest 100 move into year files. Keys remain searchable in fragments and rotation files. A shipped feature's folder is retained by default or deleted when `delete_feature_folders` is `true`; its `implement/<id>` key tells later runs it is done in either case.
 
 ## Find the event that completed a stage
 

@@ -76,7 +76,7 @@ Wrap then:
 1. Refreshes the spec's affected reference chapters and writes already-confirmed interface far ends.
 2. Absorbs implemented behavior into `logic/`, changed mockup screens, and relevant UI design files; updates indexes and `absorbed_from: features/<id>@<date>`.
 3. Writes `implement/<id>@Q<n>` with the feature, alternatives, exclusions, tasks, diff paths, refreshed/absorbed files, and review results.
-4. Sets `implemented: true`, completes the repository's branch flow, and finally deletes the local feature folder.
+4. Sets `implemented: true`, completes the repository's branch flow, and applies `delete_feature_folders`: by default the feature folder remains ignored local history; when `true`, it is deleted.
 
 Source commits do not include the docs area. Refreshed reference files remain dirty or staged for the repository's normal documentation commit flow. The protocol separately asks before a push or PR; plan approval does not itself authorize publication. Check the documentation diff and ledger are included in the intended repository workflow before relying on another clone to have them.
 
@@ -84,6 +84,6 @@ Source commits do not include the docs area. Refreshed reference files remain di
 
 Run `/capstone:feature <id>` again in the same working directory. It reads state rather than restarting. A valid approved plan resumes execution; all tasks checked resumes review/wrap. Unchecked work whose verification already passes may be checked off; completed verified tasks are not blindly rerun. Confirm the code checkout matches the feature's branch context before trusting local checkboxes, because the ignored plan does not change when Git switches branches.
 
-The feature folder is ignored and not recoverable from a fresh clone unless separately preserved. Once the folder is gone, the `implement/<id>` ledger key is the done marker. A later request to change that shipped behavior creates a new feature and a new identifier; it does not reconstruct and reopen the deleted plan. A remaining folder with a completed ledger key is a torn wrap for `doctor`, not permission to build it again.
+The feature folder is ignored and not recoverable from a fresh clone unless separately preserved. `delete_feature_folders` defaults to `false`, so a completed folder normally remains local; when deletion is enabled, the `implement/<id>` ledger key is the only surviving done marker. A later request to change shipped behavior creates a new feature and a new identifier; it does not reconstruct and reopen the old plan. A retained folder with a completed ledger key is done, not permission to build it again.
 
 Sources: [feature router](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/feature.md), [groom](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/groom.md), [plan](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/plan.md), [implement](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/implement.md).

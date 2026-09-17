@@ -8,8 +8,8 @@ reference](../commands.md#doctor).
 `doctor` checks the docs area against itself and offers to fix what it
 finds: a done marker with no ledger entry, a ledger key whose outputs
 are missing, an index row pointing at a file that is not there, a plan
-approval voided by an edited spec, a feature folder left behind after
-its entry landed.
+approval voided by an edited spec, or a feature folder left behind
+after its entry landed while `delete_feature_folders` is enabled.
 
 Every repair `doctor` performs is a rule some other protocol already
 defines. It centralizes them; the owning protocol stays the source of
@@ -56,10 +56,11 @@ the conflict fragments exist to remove.
 
 **It says my ledger is untracked, loudly.** Deliberately.
 `changelog.md`, its rotation files and `changelog.d/` are always
-committed whatever `docs_in_git` says. `implement` deletes a feature's
-folder on the strength of its ledger entry, so an untracked ledger is
-one machine change away from losing why every shipped feature was
-built that way.
+committed whatever `docs_in_git` says. `implement` uses the ledger as
+the durable shipped-feature marker; when `delete_feature_folders` is
+enabled, it also relies on that entry before deleting the folder. An
+untracked ledger is one machine change away from losing why every
+shipped feature was built that way.
 
 **It wants to move `expertise` out of my project config.** Those two
 keys are personal. `expertise` and `teaching_mode` live in the global
