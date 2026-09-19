@@ -25,10 +25,12 @@ into a generic linter with prose.
 rewrites only its own section and leaves the other side's stamp
 untouched.
 
-Reach for `map check` instead when you want to know whether the docs
-are still true; that is a fact question and writes no judgment. Reach
-for `retro` when the thing you want improved is the agent's
+`review retro` is the third axis and the one argument that is not a
+side: reach for it when the thing you want improved is the agent's
 instructions rather than the code.
+
+Reach for `map check` instead when you want to know whether the docs
+are still true; that is a fact question and writes no judgment.
 
 A project with no visual surface skips the frontend side on a bare run
 and records the section as not applicable.
@@ -49,6 +51,35 @@ signed off), then against the vendored craft floor, then against the
 surface's mode. Highest confidence sits with the first bar, because
 you already decided that standard and the critique only holds the code
 to it. One claim gets one bar, its strongest.
+
+## `review retro`
+
+Not a stage. `review` judges the code; `retro` judges what the agent
+had to work with. It reads a finished session for evidence and walks
+seven candidates - reference navigation, checks a machine could run
+instead of a human, standards rules to add or sharpen, steering-file
+lines that belong elsewhere, repeated calls a recorded command would
+replace, rules that changed no behavior, and facts the agent needed
+and could not reach - each needing evidence from that session. A
+candidate with no evidence is reported clear rather than filled in.
+
+You approve findings one row at a time. Approved rules land in
+`standards.md` under the domain that owns them; anything outside the
+docs area comes back as text to paste, because no capstone command
+writes there.
+
+It lives under `review` because `review` is the opt-in judgment
+command and this is its third axis, and because a session ends under
+every command: a project that was mapped rather than designed never
+runs the pipeline at all. Nothing runs it on your behalf - `start`,
+`feature` and `implement` each name it when they finish, and stop.
+
+It writes `retro/<scope>@<stamp>` only when it actually changed
+`standards.md`. A run whose findings are all declined writes nothing.
+
+It is not a side, so it never rewrites `review.md` or touches either
+side's stamp. `review retro` and `review backend` share a command,
+not an output.
 
 ## Common questions
 

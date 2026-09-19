@@ -59,9 +59,9 @@ Open a repository with code and invoke:
 
 Then use `/capstone:map`, or ask the agent to use its Capstone map skill to generate the architecture reference. The exact command-selection UI depends on the harness. Namespaced examples in this manual follow Capstone's documented invocation convention. Gemini's `GEMINI.md` imports the dispatcher, which routes arguments to the same protocols.
 
-Arguments are positional words: `map check`, `map models`, `review be`, `stack refresh`. They are not CLI flags such as `--check`. A bare `capstone` request starts the greenfield pipeline. Use `map` explicitly for existing code.
+Arguments are positional words: `map check`, `map models`, `review be`, `start stack refresh`. They are not CLI flags such as `--check`. A bare `capstone` request starts the greenfield pipeline. Use `map` explicitly for existing code.
 
-For a bare `/capstone` shortcut in Claude Code, the README provides a custom command-file recipe. It is optional; the namespaced commands need no such alias. In `map architecture`, the topic wins: this refreshes `01-architecture.md`, whereas `/capstone:architecture` starts the design interview.
+For a bare `/capstone` shortcut in Claude Code, the README provides a custom command-file recipe. It is optional; the namespaced commands need no such alias. In `map architecture`, the topic wins: this refreshes `01-architecture.md`, whereas `/capstone:start architecture` starts the design interview.
 
 ## Bash and global settings
 
@@ -93,6 +93,8 @@ The two Claude commands update different things: the marketplace checkout, then 
 
 Skills CLI updates can leave retired skills on disk. After a release removes a command, compare `gh skill list` or `npx skills list` with the installed Capstone help and remove retired entries using that installer's normal removal flow. An update is not evidence that old skill files were deleted.
 
+This matters specifically when upgrading to 7.0.0, which retires eight skills: `mockup`, `logic`, `uiux`, `architecture`, `standards`, `stack`, `build` and `retro`. If they remain on disk after the update, the agent can still route to them, and a stale copy carries its own `core` expectations. Confirm they are gone; `/capstone:help` lists what 7.0.0 actually offers.
+
 `help` runs the bundled `help.sh`. Its no-model shortcut is specifically the Claude Code `UserPromptExpansion` hook; do not generalize that zero-token behavior to other harnesses. Help and the internal `core` help route do not create a reference or a changelog entry.
 
-Sources: [installation and update commands](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/README.md), [hooks](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/hooks/hooks.json), [initializer](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/scripts/init-config.sh), [OpenCode installation](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/.opencode/INSTALL.md).
+Sources: [installation and update commands](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/README.md), [hooks](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/hooks/hooks.json), [initializer](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/scripts/init-config.sh), [OpenCode installation](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/.opencode/INSTALL.md).

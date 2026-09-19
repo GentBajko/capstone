@@ -4,24 +4,44 @@ This appendix records practical details that are easy to miss in a normal walkth
 
 ## Version baseline and installing the documented behavior
 
-This manual targets **6.4.1**, tag `v6.4.1`, source commit `4210f6cab09dc5c3b742147d8714795b026e1cd9`. The documented changes and manual were merged into `main` on 9 September 2026 in [PR #19](https://github.com/GentBajko/capstone/pull/19). The earlier research check found the default branch at `82094d42c4bfa9d6ffdeb569e3b971394765e6fc` with a **6.4.0** manifest; that branch difference is now resolved. The 6.4.1 tag existed at that check, but a GitHub Release entry for it was not found. A tag and a GitHub Release are different publication artifacts.
+This manual targets **7.0.0**, source commit `a21d9401800b81692556fe434024777d61e43b55` on branch `capstone-7.0.0`. Two cautions about that baseline:
 
-Default-branch installations now include the documented 6.4.1 changes. Existing installations still need an update through their original installer. Check the version in the installed plugin manifest or the generated files' `capstone_version`; do not infer it from this manual or from the existence of a tag. To inspect this exact source version independently, a terminal command is:
+- **There is no `v7.0.0` tag yet.** The published tags are `v6.4.1`, `v6.5.0` and `v6.6.0`. A tag, a GitHub Release, and a merged default branch are three different publication artifacts, and none of them is implied by this manual.
+- **The commit is not on `main` yet.** Default-branch installations currently deliver 6.6.0. Until `capstone-7.0.0` merges and is tagged, an install from the default branch or from the marketplace will not have the command surface described here.
+
+Existing installations need an update through their original installer. Check the version in the installed plugin manifest or the generated files' `capstone_version`; do not infer it from this manual or from the existence of a tag.
+
+To inspect this exact source version independently once it is tagged:
 
 ```sh
-git clone --branch v6.4.1 https://github.com/GentBajko/capstone capstone-6.4.1
+git clone --branch v7.0.0 https://github.com/GentBajko/capstone capstone-7.0.0
 ```
 
-This clones source; it does not install the skills into every agent. Use your harness's supported installation mechanism for a selected checkout/version. The per-PR template explicitly clones the tag; the nightly model-review template installs from the marketplace without a version pin.
+This clones source; it does not install the skills into every agent. Use your harness's supported installation mechanism for a selected checkout/version. The per-PR template explicitly clones the tag, so that template fails until the tag exists; the nightly model-review template installs from the marketplace without a version pin.
 
-These two commits introduced the changes since the previously published 6.4.0 source:
+These three commits introduced the changes since the previously published 6.4.1 source:
 
-| Commit | User-visible changes |
+| Commit | Version | User-visible changes |
+| --- | --- | --- |
+| `bd2b7fa` | 6.5.0 | Makes completed feature-folder cleanup configurable through `delete_feature_folders` (default `false`, retaining folders as ignored local history). The `implement/<id>` ledger key, not the folder's presence, becomes the done marker |
+| `fb7ce6a` | 6.6.0 | Adds uiux review artifacts: a first-pass SVG logo and a self-contained HTML page mockup in `uiux/assets/references/`, presented for explicit approval before `architecture`, with accepted files listed in `02-system.md`'s Assets table |
+| `a21d940` | 7.0.0 | Reduces the command surface from seventeen to nine. The seven pipeline stages become `start <stage>` subcommands and the session review becomes `review retro`; the protocol behavior of each is unchanged |
+
+### 7.0.0 is a breaking change to invocation only
+
+`/capstone:mockup`, `:logic`, `:uiux`, `:architecture`, `:standards`, `:stack`, `:build` and `:retro` are no longer commands and no longer resolve. Replace them:
+
+| Before 7.0.0 | From 7.0.0 |
 | --- | --- |
-| `257b64f` | Adds retro and questionnaires, strengthens final-output/documentation guidance, moves full standards enforcement to the implementation reviewer while copying executor constraints into plans, and adds per-command documentation |
-| `4210f6c` | Requires a fresh explicit inline/subagents choice for every new/resumed start or feature run and standalone build/implement, covering prerequisite work through wrap |
+| `/capstone:mockup`, `:logic`, `:uiux`, `:architecture`, `:standards`, `:stack`, `:build` | `/capstone:start <stage>` |
+| `/capstone:stack refresh` | `/capstone:start stack refresh` |
+| `/capstone:retro [session]` | `/capstone:review retro [session]` |
 
-The default branch already included the 6.4.0 schema machinery, payload tables, UI preview/assets, inventory completion checks, and cross-stage readback work. Do not describe all 6.4 features as new in 6.4.1.
+No generated file, schema, ledger key, config key, or protocol behavior changed. A repository whose docs were produced by 6.x needs no migration; only the words you type change. A stage entered directly still runs exactly what the pipeline runs at that point and then stops, including its own execution-mode question and its own formalization gate.
+
+`retro` moved to `review` rather than `start` because its trigger is a finished session, which happens under every command. A repository that was mapped rather than designed never runs the pipeline at all, so under `start` the session review would have been unreachable in practice. It is an argument rather than a side: it writes `standards.md`, not `review.md`, and does not touch either review side's stamp.
+
+The earlier 6.4.x notes remain accurate for their versions. The default branch already included the 6.4.0 schema machinery, payload tables, UI preview/assets, inventory completion checks, and cross-stage readback work. Do not describe all 6.4 features as new in 6.4.1.
 
 ## Output authority and ownership traps
 
@@ -82,4 +102,4 @@ Old `generate` and `sync` commands became map in 4.x. Old CI looking for `SYNC C
 
 Build's completion marker means its walking skeleton runs, and its protocol does not specify the feature executor's two-dry-round diff loop. Feature `status: formalized` means only its spec is complete; `plan_approved` is another checkpoint, and `implemented` is written after documentation wrap. Read the marker appropriate to the stage rather than treating all “formalized” files as shipped software.
 
-Sources: [6.4.1 commit](https://github.com/GentBajko/capstone/commit/4210f6cab09dc5c3b742147d8714795b026e1cd9), [preceding feature commit](https://github.com/GentBajko/capstone/commit/257b64f4845c9a65f3dfc0c54a9f51076e29bc57), [compared 6.4.0 manifest](https://github.com/GentBajko/capstone/blob/82094d42c4bfa9d6ffdeb569e3b971394765e6fc/.claude-plugin/plugin.json), [checker implementation](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/scripts/map-check.sh), [initializer implementation](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/scripts/init-config.sh), [shared lifecycle](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/core.md), [interfaces source](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/topics.md), [build](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/build.md), [doctor](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/doctor.md).
+Sources: [7.0.0 commit](https://github.com/GentBajko/capstone/commit/a21d9401800b81692556fe434024777d61e43b55), [6.6.0 commit](https://github.com/GentBajko/capstone/commit/fb7ce6a), [6.5.0 commit](https://github.com/GentBajko/capstone/commit/bd2b7fa), [6.4.1 commit](https://github.com/GentBajko/capstone/commit/4210f6cab09dc5c3b742147d8714795b026e1cd9), [checker implementation](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/scripts/map-check.sh), [initializer implementation](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/scripts/init-config.sh), [shared lifecycle](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/core.md), [interfaces source](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/topics.md), [build](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/protocols/build.md), [doctor](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/protocols/doctor.md).

@@ -5,7 +5,7 @@ These four stages settle different questions. `uiux` decides appearance and inte
 ## uiux: appearance, interaction, and design assets
 
 ```text
-/capstone:uiux brand-guide.md
+/capstone:start uiux brand-guide.md
 ```
 
 The stage reads the mockup, logic, and any existing design output. Without a formalized mockup or existing frontend code, it points to mockup/start rather than inventing screens. Nonvisual mockup surfaces cause a recorded no-UI skip. Missing logic does not prevent styling the mockup's states, but their unsettled conditions remain visible gaps.
@@ -16,6 +16,8 @@ The durable outputs are `uiux/01-direction.md`, `02-system.md`, `03-experience.m
 
 Once direction and system decisions are settled, the stage writes `uiux/preview.html`: one self-contained first viewport plus a style tile, with no network requests or CDN. It uses system fonts and names the chosen fonts in a comment; it is not a faithful installed-font rendering. Correcting the design updates the interview and preview before approval. The Markdown design remains authoritative; the preview is ignored working state.
 
+Added in 6.6.0: before the gate, the stage also produces review artifacts for you to judge rather than only read. It writes a clearly marked first-pass SVG logo and a pure self-contained HTML page mockup into `uiux/assets/references/`, then presents them through whatever the harness supports — Claude Code artifacts, GPT Sites, or the local HTML file as the fallback. The stage does not continue to `architecture` until you explicitly approve; requested changes are recorded and the artifacts regenerated. Approval is explicit, so silence is not consent. Accepted brand files move to `uiux/assets/` and are listed row by row in `02-system.md`'s Assets table, with SVG sources committed and review/raster exports left ignored.
+
 The Assets table has `Asset`, `File`, `Source`, and `Status`. Source is `supplied`, `generated`, or `placeholder`; Status is `present` or `awaited`. An awaited row remains in the table. Build stops on it rather than quietly inventing a substitute. SVG sources stay in Git; preview/raster/reference material remains local. Build later moves SVGs to the application's public/static directory and updates the table paths.
 
 For an existing frontend with no mockup, uiux can document the incumbent design from tokens, components, routes, and source. It confirms the surface inventory, writes observed files with coverage globs, and does not invent a direction contract where the application has no coherent visual system. Map can invoke the same extraction for missing surfaces. Use review to judge drift from an already committed design.
@@ -23,7 +25,7 @@ For an existing frontend with no mockup, uiux can document the incumbent design 
 ## architecture: system boundaries and quality targets
 
 ```text
-/capstone:architecture operating-constraints.md
+/capstone:start architecture operating-constraints.md
 ```
 
 The architecture interview reuses mockup, logic, and existing standards decisions. It walks framing, irreversible structural choices, topic checklists, measurable quality attributes, applicable modules, and a final risk/deferred-decision sweep. The macro-structure question offers 2–3 candidates with tradeoffs. Defaults are explicit proposals; they are not silently accepted architecture.
@@ -37,7 +39,7 @@ After code appears, map replaces prescriptive chapters with observations while r
 ## standards: binding rules, distinct from observed conventions
 
 ```text
-/capstone:standards team-style-guide.md
+/capstone:start standards team-style-guide.md
 ```
 
 Standards can seed from a style guide or existing agent instructions, then asks what this project requires. It consults relevant existing documents lazily as each domain arises. A codebase habit is not automatically a desired rule: the interview can ask whether an observed practice is intentional.
@@ -51,8 +53,8 @@ A standards decision can override Capstone's vendored craft rules when it names 
 ## stack: researched choices for actual capabilities
 
 ```text
-/capstone:stack preferred-vendors.md
-/capstone:stack refresh
+/capstone:start stack preferred-vendors.md
+/capstone:start stack refresh
 ```
 
 Stack derives capabilities from the recorded system: services, communication channels, state stores, processes/configuration, logic that calls external systems, existing standards commitments, and UI choices. It presents that list with its document sources for additions or removals. A checklist can reveal a missing design decision; it does not automatically create a need for every common dependency.
@@ -69,4 +71,4 @@ Start reads the six completed pre-build stages and checks coverage, misplaced de
 
 Readback records `readback/all@<stamp>`, with the stamp derived from ordered latest stage ledger keys. Unchanged completed stages skip an already recorded pass; amended stage output requires another pass. This ensures build receives the current set of decisions, while still allowing explicitly open items to remain identifiable.
 
-Sources: [uiux](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/uiux.md), [architecture](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/architecture.md), [standards](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/standards.md), [standards inventory](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/standards-inventory.md), [stack](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/stack.md), [readback](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/start.md).
+Sources: [uiux](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/protocols/uiux.md), [architecture](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/protocols/architecture.md), [standards](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/protocols/standards.md), [standards inventory](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/standards-inventory.md), [stack](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/protocols/stack.md), [readback](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/protocols/start.md).

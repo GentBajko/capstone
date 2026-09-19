@@ -8,7 +8,7 @@ Use `feature` when an existing product needs one coherent change:
 
 The chain is `groom` → `plan` → `implement`. It reads the existing reference, asks the questions needed to specify the change, presents an implementation plan for approval, executes it, reviews the diff, and updates the affected documentation. It can bootstrap a missing reference through map, subject to the large-repository confirmation rule.
 
-Every new or resumed `feature` run in 6.4.1 first asks **inline or subagents**. There is no default. The choice covers research, mapping, planning, implementation, review, and wrap in that run. Inline prohibits subagent dispatch even above the map threshold. A later invocation asks again; a continuation of the same active run carries the answer forward. More agents can consume more of your harness allowance.
+Every new or resumed `feature` run in 7.0.0 first asks **inline or subagents**. There is no default. The choice covers research, mapping, planning, implementation, review, and wrap in that run. Inline prohibits subagent dispatch even above the map threshold. A later invocation asks again; a continuation of the same active run carries the answer forward. More agents can consume more of your harness allowance.
 
 ## Groom: agree what the feature does
 
@@ -57,7 +57,7 @@ Tasks are ordered by dependency, with backend work before frontend work that use
 
 Approval writes a ledger entry and records `plan_approved: true` plus `approved_spec`, a checksum of the current spec. Changing `spec.md` voids that approval: the stage removes the old approval keys, studies the changed spec, updates the plan, and asks again. A plan file existing on disk is not approval by itself.
 
-In 6.4.1, implementation reads copied constraints while writing code; its later reviewer reads the full `standards.md`. This makes the plan's Header important: it must carry every rule the executor needs up front.
+In 7.0.0, implementation reads copied constraints while writing code; its later reviewer reads the full `standards.md`. This makes the plan's Header important: it must carry every rule the executor needs up front.
 
 ## Implement: execute, review, and preserve the result
 
@@ -86,4 +86,4 @@ Run `/capstone:feature <id>` again in the same working directory. It reads state
 
 The feature folder is ignored and not recoverable from a fresh clone unless separately preserved. `delete_feature_folders` defaults to `false`, so a completed folder normally remains local; when deletion is enabled, the `implement/<id>` ledger key is the only surviving done marker. A later request to change shipped behavior creates a new feature and a new identifier; it does not reconstruct and reopen the old plan. A retained folder with a completed ledger key is done, not permission to build it again.
 
-Sources: [feature router](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/feature.md), [groom](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/groom.md), [plan](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/plan.md), [implement](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/implement.md).
+Sources: [feature router](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/protocols/feature.md), [groom](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/protocols/groom.md), [plan](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/protocols/plan.md), [implement](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/protocols/implement.md).

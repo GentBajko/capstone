@@ -13,7 +13,7 @@ If code exists but you have not already chosen mapping or started a pipeline, st
 ## Mockup: define the product and its surfaces
 
 ```text
-/capstone:mockup product-brief.md
+/capstone:start mockup product-brief.md
 ```
 
 An optional artifact seeds answers for confirmation. Otherwise the three seed questions ask what the product is and why it exists, who it serves and their current alternative, and what success means a year after launch. Later questions follow from the answers rather than a fixed questionnaire.
@@ -29,7 +29,7 @@ The README contains the final brief plus Screens, Journeys, and Scenarios for lo
 ## Logic: define the behavior precisely
 
 ```text
-/capstone:logic
+/capstone:start logic
 ```
 
 Logic takes the scenario inventory from the formalized mockup and confirms it in priority order. If there is no usable inventory, it asks for one. It finishes one scenario before the next, recording every answer immediately in `logic-interview.md`.
@@ -50,7 +50,7 @@ When map invokes extraction, it writes descriptive files without a per-scenario 
 
 ## Questions another person must answer
 
-When you cannot answer a material question, the 6.4.1 protocol can offer a questionnaire. It asks who can answer and whether there is a deadline or needed context, then writes `questionnaires/YYYY-MM-DD-recipient.md`. Questions already waiting on the same recipient can share a document.
+When you cannot answer a material question, the 7.0.0 protocol can offer a questionnaire. It asks who can answer and whether there is a deadline or needed context, then writes `questionnaires/YYYY-MM-DD-recipient.md`. Questions already waiting on the same recipient can share a document.
 
 The sections are Purpose, Context, How to answer, Questions, and Anything else?. This is a file for you to send, not an automatic message to another person. The owning stage records the item as open and can formalize with that gap visible. When answers arrive, resume the owning stage and update its final output. The questionnaire remains in Git as the record of the request.
 
@@ -58,4 +58,4 @@ The sections are Purpose, Context, How to answer, Questions, and Anything else?.
 
 Unfinished stages resume from local interview files. Completed stages are recognized from complete final outputs and matching ledger entries; a fresh clone does not need completed interview bodies to continue to a later stage. If a completed stage's output is lost and the local interview is also unavailable, Capstone must report the lost decision record rather than invent it. See [lifecycle](03-files-and-lifecycle.md) and [recovery](11-review-repair-and-retro.md).
 
-Sources: [start](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/start.md), [mockup](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/mockup.md), [logic](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/logic.md), [logic dimensions](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/logic-craft.md), [questionnaires](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/core.md#questionnaires-what-the-user-cannot-answer-alone).
+Sources: [start](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/protocols/start.md), [mockup](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/protocols/mockup.md), [logic](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/protocols/logic.md), [logic dimensions](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/logic-craft.md), [questionnaires](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/core.md#questionnaires-what-the-user-cannot-answer-alone).

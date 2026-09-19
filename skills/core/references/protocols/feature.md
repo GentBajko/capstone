@@ -69,3 +69,9 @@ an existing feature's slug.
    ("spec approved; planning next; say stop to pause"). Stopping is
    always safe: every stage persists its state, and the next
    `feature` run resumes exactly here.
+6. Once `implement` wraps, close the chain by naming `review retro`:
+   the session just finished is the evidence it reads. Name it, do not
+   run it - retro proposes edits to the user's own steering files and
+   starts when they ask. `retro` is never a `feature` argument: that
+   argument is a description or a slug, so `feature retro` would groom
+   a feature called "retro".
