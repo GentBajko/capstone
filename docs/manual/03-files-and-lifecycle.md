@@ -29,7 +29,7 @@ This is an illustrative shape, not a captured file:
 ---
 generated_at_commit: 0123456789ab
 generated_date: 2026-09-09
-capstone_version: 6.4.1
+capstone_version: 7.0.0
 content_hash: abcdef012345
 paths_covered:
   - ":(top)src/auth/**"
@@ -112,4 +112,4 @@ Ledger keys are internal durable identifiers, not commands. Search `changelog.md
 
 Generated sections may be rewritten. Manual prose edits are not generally preserved. The explicit protected exceptions are ledger history and previously confirmed `to`/`from` values on still-existing interface rows. Keep durable design decisions in their owning final files and let the relevant command record changes.
 
-Sources: [machine schema](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/schema.txt), [topic definitions](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/topics.md), [index and ignore rules](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/core-authoring.md), [ledger and lifecycle](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/core.md).
+Sources: [machine schema](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/schema.txt), [topic definitions](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/topics.md), [index and ignore rules](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/core-authoring.md), [ledger and lifecycle](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/core.md).

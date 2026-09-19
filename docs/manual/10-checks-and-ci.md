@@ -42,7 +42,7 @@ bash /absolute/path/to/capstone/skills/core/scripts/map-check.sh --headings
 bash /absolute/path/to/capstone/skills/core/scripts/map-check.sh --patterns
 ```
 
-`--schema` prints the resolved file and record count; the inspected 6.4.1 source contains 23 records. `--headings` prints each topic's ordered headings. `--patterns` prints pattern names and regular expressions. These flags do not run the full report.
+`--schema` prints the resolved file and record count; the inspected 7.0.0 source contains 23 records. `--headings` prints each topic's ordered headings. `--patterns` prints pattern names and regular expressions. These flags do not run the full report.
 
 The schema uses first-match file patterns. Extra headings and columns are allowed, but required headings must appear in order. A required section may honestly say no applicable content was found. Entity subtables under Fields and types require `Field`, `Type`, and `Required`; an empty entity section is not excused the way an inapplicable general section can be.
 
@@ -69,20 +69,20 @@ MAP REVIEW: <N> findings
 
 These are model protocol outputs rather than a shell process's independent semantic proof. The count covers parts 2–6. Disabled extraction passes report disabled, not missing; no frontend reports design coverage not applicable. Outside Git, the model side falls back to pointer drift.
 
-Both halves are read-only. They do not regenerate files, fold fragments, record ledger entries, or fix findings. Run map for stale observed material, stack refresh for outdated research, or doctor for documentation-state repair.
+Both halves are read-only. They do not regenerate files, fold fragments, record ledger entries, or fix findings. Run map for stale observed material, `start stack refresh` for outdated research, or doctor for documentation-state repair.
 
 ## Add the supplied GitHub Actions templates
 
-First generate and commit the reference. Then copy the source version's `templates/capstone-map-check.yml` to your repository's `.github/workflows/` directory through your normal review process. The 6.4.1 template:
+First generate and commit the reference. Then copy the source version's `templates/capstone-map-check.yml` to your repository's `.github/workflows/` directory through your normal review process. The 7.0.0 template:
 
 - Runs on pull requests with an Ubuntu runner.
 - Checks out full Git history.
-- Clones Capstone's `v6.4.1` tag into the runner temporary directory.
+- Clones Capstone's `v7.0.0` tag into the runner temporary directory.
 - Runs the Bash script for `docs/capstone` and fails unless the last `MAP CHECK:` line is exactly current.
 
 Adjust the docs-directory argument for custom paths or pass all workspace docs directories in the single script call. Keep the version pin deliberate: upgrading the checker can reveal documents written against older semantics even when their code did not change.
 
-For the model half, use `templates/capstone-map-review.yml` and provide the `ANTHROPIC_API_KEY` repository secret. That template runs at `03:17 UTC` daily and on manual dispatch. It installs Claude Code and the marketplace plugin, writes a headless global config, invokes `/capstone:map check`, and fails unless its last `MAP REVIEW:` line is clean. This template's plugin install is **not pinned to 6.4.1**; account for that when coordinating it with the pinned mechanical gate. The jobs deliberately consume different verdict lines.
+For the model half, use `templates/capstone-map-review.yml` and provide the `ANTHROPIC_API_KEY` repository secret. That template runs at `03:17 UTC` daily and on manual dispatch. It installs Claude Code and the marketplace plugin, writes a headless global config, invokes `/capstone:map check`, and fails unless its last `MAP REVIEW:` line is clean. This template's plugin install is **not pinned to 7.0.0**; account for that when coordinating it with the pinned mechanical gate. The jobs deliberately consume different verdict lines.
 
 For repositories connected to Quarry, run `quarry init` and `quarry check` alongside the freshness check on pull requests. Ensure the shared docs snapshot is sufficiently fresh; `quarry check --sync` requests a pull first. Capstone's template does not configure your Quarry registry or publish references for you.
 
@@ -92,4 +92,4 @@ The secret scan recognizes six patterns: AWS access keys, GitHub tokens in the s
 
 If the schema cannot be read, the script reports that headings/tables were not checked, applies its fallback checks, and can still print current. Missing semantic evidence, inaccurate coverage globs, and model mistakes are also outside a blanket guarantee. Read the report body as well as its last line.
 
-Sources: [actual checker](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/scripts/map-check.sh), [schema](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/schema.txt), [model-half protocol](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/protocols/map.md), [PR template](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/templates/capstone-map-check.yml), [nightly template](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/templates/capstone-map-review.yml).
+Sources: [actual checker](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/scripts/map-check.sh), [schema](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/schema.txt), [model-half protocol](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/protocols/map.md), [PR template](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/templates/capstone-map-check.yml), [nightly template](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/templates/capstone-map-review.yml).

@@ -2,9 +2,9 @@
 
 Capstone is a collection of coding-agent skills. It can document an existing repository, guide a new product through design and implementation, or take one feature through specification, planning, code, and documentation updates. The agent reads the source and writes the documents; Capstone is not a background indexing service.
 
-> **Command surface changed in 7.0.0.** Capstone now has nine commands. The pipeline stages are no longer commands of their own — each is reached as `start <stage>` (`/capstone:start mockup`, `/capstone:start stack refresh`) — and the session review is now `/capstone:review retro`. Every example below has been corrected to that syntax. Everything else in this manual still describes 6.4.1 and has not been re-verified against 7.0.0.
+This manual describes **7.0.0**, from source commit `a21d9401800b81692556fe434024777d61e43b55` on branch `capstone-7.0.0`. That branch is not yet merged to `main` and there is no `v7.0.0` tag: a default-branch or marketplace install currently delivers 6.6.0, whose command surface differs. A tag, a GitHub Release, and a merged default branch are separate artifacts, and this manual implies none of them. See [version details and less obvious behaviors](12-version-and-edge-cases.md).
 
-This manual describes **6.4.1**, from source commit `4210f6cab09dc5c3b742147d8714795b026e1cd9`. The documented changes and this manual were merged into `main` on 9 September 2026. The `v6.4.1` tag identifies the original source revision; a tag is separate from a GitHub Release entry. See [version details and less obvious behaviors](12-version-and-edge-cases.md).
+**Upgrading from 6.x?** 7.0.0 changes how commands are invoked and nothing else. The seven pipeline stages became `/capstone:start <stage>`, and the session review became `/capstone:review retro`. No generated file, config key, ledger key, or protocol behavior changed, so an existing repository needs no migration. The [version chapter](12-version-and-edge-cases.md#700-is-a-breaking-change-to-invocation-only) carries the full before/after table.
 
 Commands prefixed `/capstone:` are instructions to your coding agent, not shell executables. Bash, Git, installer, and `quarry` examples are terminal commands. Product names, repository names, feature identifiers, paths, and payloads in examples are illustrative; only explicitly labeled script output is literal.
 
@@ -57,4 +57,4 @@ Each stage runs exactly what the pipeline would have run at that point, then sto
 
 The source protocols define expected agent behavior. They do not make the model deterministic or guarantee that every source fact, implementation, or review is correct. Use the cited code and the supplied verification steps to assess results.
 
-Sources: [6.4.1 manifest](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/.claude-plugin/plugin.json), [dispatcher](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/references/dispatcher.md), [literal help implementation](https://github.com/GentBajko/capstone/blob/4210f6cab09dc5c3b742147d8714795b026e1cd9/skills/core/scripts/help.sh).
+Sources: [7.0.0 manifest](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/.claude-plugin/plugin.json), [dispatcher](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/dispatcher.md), [literal help implementation](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/scripts/help.sh).

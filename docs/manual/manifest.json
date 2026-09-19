@@ -1,9 +1,9 @@
 {
   "title": "Capstone",
-  "version": "6.4.1",
-  "commit": "4210f6cab09dc5c3b742147d8714795b026e1cd9",
+  "version": "7.0.0",
+  "commit": "a21d9401800b81692556fe434024777d61e43b55",
   "sourceRepository": "https://github.com/GentBajko/capstone",
-  "researchDate": "2026-09-09",
+  "researchDate": "2026-09-19",
   "chapters": [
     {
       "file": "README.md",
