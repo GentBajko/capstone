@@ -2,7 +2,7 @@
 
 Capstone is a collection of coding-agent skills. It can document an existing repository, guide a new product through design and implementation, or take one feature through specification, planning, code, and documentation updates. The agent reads the source and writes the documents; Capstone is not a background indexing service.
 
-This manual describes **7.0.0**, from source commit `a21d9401800b81692556fe434024777d61e43b55` on branch `capstone-7.0.0`. That branch is not yet merged to `main` and there is no `v7.0.0` tag: a default-branch or marketplace install currently delivers 6.6.0, whose command surface differs. A tag, a GitHub Release, and a merged default branch are separate artifacts, and this manual implies none of them. See [version details and less obvious behaviors](12-version-and-edge-cases.md).
+This manual describes **7.0.0**, from source commit `a21d9401800b81692556fe434024777d61e43b55`. The documented changes and this manual were merged into `main` on 19 September 2026. The `v7.0.0` tag identifies the released revision; a tag is separate from a GitHub Release entry, and this repository publishes tags without Release entries. See [version details and less obvious behaviors](12-version-and-edge-cases.md).
 
 **Upgrading from 6.x?** 7.0.0 changes how commands are invoked and nothing else. The seven pipeline stages became `/capstone:start <stage>`, and the session review became `/capstone:review retro`. No generated file, config key, ledger key, or protocol behavior changed, so an existing repository needs no migration. The [version chapter](12-version-and-edge-cases.md#700-is-a-breaking-change-to-invocation-only) carries the full before/after table.
 

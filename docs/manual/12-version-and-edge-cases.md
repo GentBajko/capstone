@@ -4,20 +4,19 @@ This appendix records practical details that are easy to miss in a normal walkth
 
 ## Version baseline and installing the documented behavior
 
-This manual targets **7.0.0**, source commit `a21d9401800b81692556fe434024777d61e43b55` on branch `capstone-7.0.0`. Two cautions about that baseline:
+This manual targets **7.0.0**, tag `v7.0.0`, source commit `a21d9401800b81692556fe434024777d61e43b55`. The documented changes and manual were merged into `main` on 19 September 2026 in [PR #22](https://github.com/GentBajko/capstone/pull/22), and `v7.0.0` was tagged from that merge.
 
-- **There is no `v7.0.0` tag yet.** The published tags are `v6.4.1`, `v6.5.0` and `v6.6.0`. A tag, a GitHub Release, and a merged default branch are three different publication artifacts, and none of them is implied by this manual.
-- **The commit is not on `main` yet.** Default-branch installations currently deliver 6.6.0. Until `capstone-7.0.0` merges and is tagged, an install from the default branch or from the marketplace will not have the command surface described here.
+Default-branch installations now include the documented 7.0.0 changes. Existing installations still need an update through their original installer, and 7.0.0 changes how commands are invoked, so an unupdated installation keeps the old seventeen-command surface. Check the version in the installed plugin manifest or the generated files' `capstone_version`; do not infer it from this manual or from the existence of a tag.
 
-Existing installations need an update through their original installer. Check the version in the installed plugin manifest or the generated files' `capstone_version`; do not infer it from this manual or from the existence of a tag.
+A GitHub Release entry for `v7.0.0` was not created. This repository publishes tags without Release entries, as it did for 6.4.1, 6.5.0 and 6.6.0. A tag and a GitHub Release are different publication artifacts.
 
-To inspect this exact source version independently once it is tagged:
+To inspect this exact source version independently:
 
 ```sh
 git clone --branch v7.0.0 https://github.com/GentBajko/capstone capstone-7.0.0
 ```
 
-This clones source; it does not install the skills into every agent. Use your harness's supported installation mechanism for a selected checkout/version. The per-PR template explicitly clones the tag, so that template fails until the tag exists; the nightly model-review template installs from the marketplace without a version pin.
+This clones source; it does not install the skills into every agent. Use your harness's supported installation mechanism for a selected checkout/version. The per-PR template explicitly clones the tag; the nightly model-review template installs from the marketplace without a version pin.
 
 These three commits introduced the changes since the previously published 6.4.1 source:
 
