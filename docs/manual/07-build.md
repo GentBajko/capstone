@@ -3,7 +3,7 @@
 `build` turns the completed product design into an implementation plan and then code:
 
 ```text
-/capstone:build
+/capstone:start build
 ```
 
 Use it for the whole-product design assembled by the greenfield stages. For one feature in an existing application, use [feature/implement](04-feature-workflow.md). `build` and `implement` are the two Capstone protocols allowed to write source code, each after its plan gate.

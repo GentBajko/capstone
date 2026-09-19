@@ -13,8 +13,8 @@ its plan gate.
 
 **Entry gate:** apply [Execution choice](../core.md#execution-choice)
 before prerequisite stages, research or resumed work. Inherit the
-current `start` run's explicit answer; a standalone invocation always
-asks and waits, including a resume. Record the chosen
+current `start` run's explicit answer; a stage entered directly as
+`start build` always asks and waits, including a resume. Record the chosen
 `execution: subagent | inline` in `build-interview.md`'s frontmatter
 as soon as the file exists; a saved value never skips the entry gate.
 

@@ -87,7 +87,7 @@ observations (hard rule 1; no per-scenario confirmation gate), the
 scenario list is confirmed with the user only when the run is
 interactive, no `logic-interview.md` is created (nothing was asked),
 and the invoking protocol's changelog entry records the files instead
-of per-scenario keys. A later standalone `logic` run confirms or
+of per-scenario keys. A later `start logic` run confirms or
 corrects those drafts and records the decisions as usual.
 
 ## Phase B - one scenario at a time, depth first

@@ -40,10 +40,35 @@ if [ "$(printf '%s\n' "$UNIQ" | grep -c '.')" -gt 1 ]; then
 fi
 
 # 3. protocol files <-> skill dirs, and every wrapper is loadable and wired
-#    (help has no protocol file by design)
+#    (help has no protocol file by design). A protocol is one of two
+#    things and the check has to know which: a command, which owns a
+#    skills/<n>/ wrapper and is advertised everywhere check 5 looks, or
+#    a stage, which owns no wrapper and is reached as `start <n>`. The
+#    stage list is named rather than derived, because deriving it from
+#    "has no wrapper" would make a deleted wrapper look like a design
+#    decision, and a stage that grows a wrapper back is a tenth command
+#    nobody decided to add.
+STAGES='mockup logic uiux architecture standards stack build retro'
+# retro is the one subcommand that is not a start stage: it hangs off
+# review instead, so its routing is asserted against review.md below.
+NONSTAGE_SUB='retro'
 for p in skills/core/references/protocols/*.md; do
   n=$(basename "$p" .md)
-  [ -d "skills/$n" ] || err "protocol $n.md has no skills/$n/ wrapper"
+  if printf '%s\n' $STAGES | grep -qx "$n"; then
+    [ -e "skills/$n" ] \
+      && err "subcommand $n has a skills/$n/ wrapper again (subcommands are not commands)"
+    if printf '%s\n' $NONSTAGE_SUB | grep -qx "$n"; then
+      sed -n '/^## Sides/,/^## Method/p' \
+        skills/core/references/protocols/review.md | grep -q "\`$n\`" \
+        || err "review.md Sides section does not route $n"
+    else
+      sed -n '/^## Routing/,/^## Procedure/p' \
+        skills/core/references/protocols/start.md | grep -q "\`$n\`" \
+        || err "start.md Routing table does not route stage $n"
+    fi
+  else
+    [ -d "skills/$n" ] || err "protocol $n.md has no skills/$n/ wrapper"
+  fi
 done
 for d in skills/*/; do
   n=$(basename "$d")
@@ -1927,31 +1952,53 @@ grep -q 'docs/commands/' docs/commands.md \
   || err "docs/commands.md does not name the docs/commands/ folder its pages live in"
 
 # 27. retro's wiring, named rather than derived. Checks 5, 5b and 5c
-#     iterate over whatever skills/ happens to hold, so deleting
-#     skills/retro/ makes all three pass again with the command gone
-#     from every surface. This names it, the way check 10b names the
-#     commands that must stay gone. The protocol's own load-bearing
+#     iterate over whatever skills/ happens to hold, so once retro
+#     stopped being a command those checks went quiet about it
+#     entirely. This names it, the way check 10b names the commands
+#     that must stay gone: retro is reachable, as `review retro`, and
+#     advertised on every surface a user reads, without being a
+#     command of its own. It hangs off `review` rather than `start`
+#     because a session ends under every command, and a `map`-only
+#     project never runs the pipeline at all - under `start` it would
+#     be unreachable in practice for the users it helps most. It is
+#     also not a side: it writes standards.md, not review.md. Nothing
+#     runs it on the user's behalf, so an unadvertised retro is an
+#     unreachable one.
+#     The protocol's own load-bearing
 #     parts are asserted here too: seven candidates, because a retro
 #     that walks five reports a clean environment it never looked at,
 #     and the placement rule, which is the one sentence that decides
 #     where an approved rule lands.
-[ -f skills/retro/SKILL.md ] || err "skills/retro/SKILL.md is missing"
 RETRO_MD=skills/core/references/protocols/retro.md
 [ -f "$RETRO_MD" ] || err "$RETRO_MD is missing"
-bash skills/core/scripts/help.sh | grep -Eq '^  retro( |$)' \
-  || err "help.sh has no retro command line"
-grep -q '/capstone:retro[` ]' README.md \
-  || err "README command table missing /capstone:retro"
-sed -n '/matches a capstone skill/,/invoke capstone:/p' README.md \
+bash skills/core/scripts/help.sh | grep -Eq '^    review retro( |$)' \
+  || err "help.sh has no 'review retro' subcommand line"
+grep -q '/capstone:review retro[` ]' README.md \
+  || err "README subcommand table missing /capstone:review retro"
+sed -n '/matches a capstone skill/,/argument intact/p' README.md \
   | grep -Eq '(^|[ (])retro[,)]' \
   || err "README routing snippet missing retro"
 grep -Eq '(^|[ (])retro[,)]' .opencode/INSTALL.md \
-  || err "INSTALL.md skill list missing retro"
+  || err "INSTALL.md stage list missing retro"
 sed -n '/The reserved subcommand words/,/each route to/p' \
   skills/core/references/dispatcher.md | grep -q '`retro`' \
   || err "dispatcher.md routing list missing retro"
-grep -q '^### `retro`' docs/commands.md \
-  || err "docs/commands.md has no retro section"
+grep -q '^### `review retro`' docs/commands.md \
+  || err "docs/commands.md has no 'review retro' section"
+# retro judges the session, not the code, so review must route it
+# without running its own Reads block, and nothing may run it on the
+# user's behalf: a command that ended by proposing edits to the user's
+# own AGENTS.md unasked would be writing outside the docs area.
+grep -q 'an argument, not a side' skills/core/references/protocols/review.md \
+  || err "review.md does not say retro is an argument rather than a side"
+for pr in start feature implement; do
+  grep -q 'review retro' "skills/core/references/protocols/$pr.md" \
+    || err "$pr.md close-out does not name review retro (a session ends there too)"
+done
+# feature resolves an unmatched argument into a NEW feature, so a
+# `retro` subcommand there would groom a feature called "retro".
+grep -q 'never a `feature` argument' skills/core/references/protocols/feature.md \
+  || err "feature.md does not record why retro cannot be a feature argument"
 if [ -f "$RETRO_MD" ]; then
   for s in 'Navigation' 'Automated checks' 'Standards rules' \
            'Steering-file bloat' 'Tool economy' 'No-ops' \

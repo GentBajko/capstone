@@ -256,3 +256,8 @@ Entered when Phase C goes dry.
    present with that key is expected when `delete_feature_folders` is
    false; when it is true, it is a torn wrap: finish the delete, never
    re-run the stage (`doctor` repairs this).
+
+   Close by naming `review retro`: this session is the evidence it
+   reads, and a shipped feature is the most common one worth reading.
+   Name it, do not run it - retro proposes edits to the user's own
+   steering files and starts when they ask.

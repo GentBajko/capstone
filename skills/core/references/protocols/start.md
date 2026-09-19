@@ -6,11 +6,13 @@ outputs, plus core.md's Stage ownership table and the five inventories
 step 7's coverage half walks (`logic-craft.md`, `uiux-inventory.md`,
 `interview.md`, `standards-inventory.md`, `protocols/stack.md` Phase A),
 once, for the readback pass (step 7); nothing else until a stage's own
-protocol runs.
+protocol runs. An argument routes straight to one protocol and reads
+none of the above.
 
 Entry point when the user says just "capstone" or asks to start or
-continue the pipeline. Runs the interview chain in order, resuming
-wherever it stopped:
+continue the pipeline, and the owner of every stage the pipeline runs:
+no stage is a command of its own, each is reached as `start <stage>`.
+Runs the interview chain in order, resuming wherever it stopped:
 
 1. `mockup` → `docs/capstone/mockup/` (+ `mockup-interview.md`)
 2. `logic` → `docs/capstone/logic/` (+ `logic-interview.md`)
@@ -25,6 +27,34 @@ wherever it stopped:
      No subcommand, no outputs of its own.
 7. `build` → `docs/capstone/implementation.md`, then working code
    (+ `build-interview.md`)
+
+## Routing
+
+An argument routes; it does not change what the pipeline is. Match the
+first argument against the stage words; the rest of the arguments are
+that stage's own (an artifact path for an interview stage, `refresh`
+for `stack`).
+
+| Argument | Runs |
+| --- | --- |
+| none | the pipeline below, from the first incomplete stage |
+| `mockup` `logic` `uiux` `architecture` `standards` `stack` `build` | `protocols/<stage>.md` exactly, that one stage alone |
+| `stack refresh` | `protocols/stack.md`, which reads `refresh` |
+| `retro` | nothing here - it is `review retro`, not a stage. Say so and route there |
+| anything else | the pipeline, treating the argument as a seed artifact if it names a readable file, and otherwise ignoring it |
+
+A directly entered stage is the same stage the pipeline runs, entered
+mid-chain: it applies [Execution
+choice](../core.md#execution-choice) itself (Procedure step 1), reads
+its own prerequisites, runs its own formalization gate, and writes its
+own changelog entry. It does not run the stage after it, and it does
+not run the readback pass, which belongs to the pipeline. Report what
+the stage left unfinished in one line when it ends, naming `start`
+with no argument as the way to continue the chain.
+
+Entering a stage whose prerequisites are missing is not an error to
+route around: say which stage owns the missing input and stop, rather
+than interviewing for it here.
 
 ## Procedure
 
@@ -180,4 +210,8 @@ wherever it stopped:
    `start` re-runs the pass.
 8. After `build`, close out: the project runs. Point at everything
    generated, and note that from now on plain `map` runs replace
-   prescriptive intent with observed fact as the code evolves.
+   prescriptive intent with observed fact as the code evolves, and
+   that `review retro` reads this session and proposes the instruction
+   edits it earned. Name it; do not run it. Retro proposes edits to
+   the user's own steering files one approved row at a time, so it
+   starts when the user asks, not as the pipeline's last act.

@@ -61,7 +61,7 @@
   <a href="#the-greenfield-pipeline">Pipeline</a> ·
   <a href="#the-feature-chain">Feature chain</a> ·
   <a href="#what-review-is">Review</a> ·
-  <a href="#what-retro-is">Retro</a> ·
+  <a href="#what-review-retro-is">Retro</a> ·
   <a href="#not-technical-still-yours">Not technical?</a>
 </p>
 
@@ -173,19 +173,23 @@ instead of sending you off to run something else.
 | `/capstone:map check` | Read-only trust report in two halves: a bash script (staleness, ledger fragments, schema: stamps, `known_as`, headings, edge sites, payload sections, model references, secret shapes; the CI gate, no API key) and the model's review (pointer drift, absorption, re-vetting, coverage). Writes nothing |
 | `/capstone:doctor` | Diagnose and repair the docs area: torn writes, index drift, voided approvals, absorption gaps |
 | `/capstone:review [be\|fe]` | The opt-in judgment → `review.md`. No argument does both sides; `backend` takes architecture, `frontend` grades the UI against your own design docs |
-| `/capstone:retro [session]` | Read a finished session for evidence, then propose edits to `standards.md` and your `AGENTS.md`/`CLAUDE.md`, one approved row at a time |
+| `/capstone:review retro [session]` | The third judgment axis, and not a side: read a finished session for evidence, then propose edits to `standards.md` and your `AGENTS.md`/`CLAUDE.md`, one approved row at a time. Writes no `review.md` |
 
 **Greenfield pipeline** - `/capstone:start` runs these in order
 
-| Command | What it does |
+There are nine commands. A stage is not one of them: it is reached as
+`start <stage>` when you want to enter the chain in the middle, and
+runs exactly what the pipeline would have run there.
+
+| Subcommand | What it does |
 | --- | --- |
-| `/capstone:mockup` | Product discovery → one file per screen |
-| `/capstone:logic` | Business logic, scenario by scenario |
-| `/capstone:uiux` | How the UI looks and the UX behaves |
-| `/capstone:architecture` | The big design interview → prescriptive chapters |
-| `/capstone:standards` | How code should be written here |
-| `/capstone:stack` | Research libraries and services per capability; you pick |
-| `/capstone:build` | Implementation plan, your approval, then working code |
+| `/capstone:start mockup` | Product discovery → one file per screen |
+| `/capstone:start logic` | Business logic, scenario by scenario |
+| `/capstone:start uiux` | How the UI looks and the UX behaves |
+| `/capstone:start architecture` | The big design interview → prescriptive chapters |
+| `/capstone:start standards` | How code should be written here |
+| `/capstone:start stack` | Research libraries and services per capability; you pick. `refresh` re-vets the recorded picks |
+| `/capstone:start build` | Implementation plan, your approval, then working code |
 
 **Feature chain** - `/capstone:feature` runs these in order
 
@@ -269,7 +273,7 @@ a CLAUDE.md.
 
 **stack, then build**. `stack` researches real options per
 capability, licenses and prices included; you pick, and
-`stack refresh` re-vets the picks months later. The capability list
+`start stack refresh` re-vets the picks months later. The capability list
 comes from your own chapters rather than a stock list, and every
 capability reaches you as options, writing it yourselves among them,
 with the ladder recommending rather than deciding for you. `build` writes an
@@ -328,10 +332,16 @@ outranks the craft baseline: **your recorded decisions beat generic
 best practice.** Gitignored by default - it is judgment, not
 reference.
 
-## What `retro` is
+## What `review retro` is
 
 `review` judges the code. `retro` judges what the agent had to work
-with. Run it after a session and it reads that session for evidence,
+with — the third axis of the same command, and the only one that is
+not a side: it writes `standards.md` rather than `review.md`, and
+nothing runs it on your behalf. It sits under `review` because a
+session ends under every command, not just the pipeline; a project
+that was mapped rather than designed never runs `start` at all. Run
+`/capstone:review retro` after a session and it reads that session for
+evidence,
 then walks seven candidates: reference navigation, checks a machine
 could run instead of a human, standards rules to add or sharpen,
 steering-file lines that belong somewhere else, repeated calls a
@@ -486,10 +496,12 @@ argument-hint: [command] [args...]
 ---
 
 No arguments: invoke the capstone:start skill. If the first argument
-matches a capstone skill (map, doctor, review, retro,
-mockup, logic, uiux, architecture, standards,
-stack, build, groom, plan, implement, feature, start, help),
-invoke capstone:<that skill> with the remaining arguments.
+matches a capstone skill (map, doctor, review,
+groom, plan, implement, feature, start, help),
+invoke capstone:<that skill> with the remaining arguments. The stage
+words (mockup, logic, uiux, architecture, standards,
+stack, build, retro) are not skills: they are start's subcommands,
+so route them to capstone:start with the argument intact.
 
 ARGUMENTS: $ARGUMENTS
 ```

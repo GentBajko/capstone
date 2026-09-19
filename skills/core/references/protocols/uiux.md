@@ -123,7 +123,7 @@ language that hold across surfaces. Where it cannot, the file records
 that the incumbent has no consistent visual system, with the
 divergences as evidence, and no contract blocks are invented.
 
-A later standalone `uiux` run confirms or corrects those drafts and
+A later `start uiux` run confirms or corrects those drafts and
 records the decisions as usual: that is what turns an extracted
 description into the committed design the rest of the pipeline reads.
 

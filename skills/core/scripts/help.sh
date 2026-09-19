@@ -4,12 +4,26 @@
 cat <<'EOF'
 capstone - codebase architecture reference generator
 
-Usage: /capstone:<command>
+Usage: /capstone:<command> [subcommand]
+
+Nine commands. Everything else is a subcommand: the seven pipeline
+stages, reached as "start <stage>" when you want to enter mid-chain,
+and the session review, reached as "review retro".
 
   start                Run the greenfield pipeline stage by stage:
                        mockup -> logic -> uiux -> architecture -> standards -> stack -> build
                        (resumes at the first incomplete stage; also
                         triggers on a bare "capstone" prompt)
+    start mockup       Product discovery: seed + adaptive interview -> traceable markdown mockup
+    start logic        Business-logic interview, scenario by scenario -> docs/capstone/logic/
+    start uiux         How the UI looks and the UX behaves, from the mockup + logic
+                       -> docs/capstone/uiux/
+    start architecture Greenfield: exhaustive architecture interview -> prescriptive reference
+    start standards    Coding-standards interview -> normative standards.md
+    start stack        Research libraries/services per capability, you pick -> 05-dependencies.md
+    start stack refresh
+                       Re-vet the recorded picks: maintenance, license, pricing deltas
+    start build        Implementation plan (backend then frontend), gate, then working code
 
   map                  Build the reference docs, or refresh what drifted: no
                        reference yet builds one, an existing one gets only its
@@ -29,18 +43,11 @@ Usage: /capstone:<command>
                        drift, voided approvals, absorption gaps
   review [be|fe]       Opt-in judgment -> review.md; no arg does both sides,
                        backend (architecture) and frontend (UI vs your design docs)
-  retro [session]      Read a finished session for evidence, then propose edits
-                       to standards.md and your AGENTS.md/CLAUDE.md, one
-                       approved row at a time; never touches code
-  mockup               Product discovery: seed + adaptive interview -> traceable markdown mockup
-  logic                Business-logic interview, scenario by scenario -> docs/capstone/logic/
-  uiux                 How the UI looks and the UX behaves, from the mockup + logic
-                       -> docs/capstone/uiux/
-  architecture         Greenfield: exhaustive architecture interview -> prescriptive reference
-  standards            Coding-standards interview -> normative standards.md
-  stack                Research libraries/services per capability, you pick -> 05-dependencies.md
-  stack refresh        Re-vet the recorded picks: maintenance, license, pricing deltas
-  build                Implementation plan (backend then frontend), gate, then working code
+    review retro [session]
+                       The third judgment axis, and not a side: read a finished
+                       session for evidence, then propose edits to standards.md and
+                       your AGENTS.md/CLAUDE.md, one approved row at a time. Writes
+                       no review.md and never touches code
 
   groom <feature>      Feature interview against the existing docs -> features/<date>-<slug>/spec.md
   plan <feature>       Task-by-task TDD plan from a groomed spec; gated on your approval
@@ -53,8 +60,9 @@ Usage: /capstone:<command>
 start and feature always ask inline or subagents on each new or resumed
 run, before stage work. Inline avoids extra agent usage; subagents can
 consume your allowance faster. No default: the run waits for your answer.
-The choice covers every stage, review and reference refresh. Standalone
-build and implement ask too; pipeline handoffs inherit the current choice.
+The choice covers every stage, review and reference refresh. A stage
+entered directly as "start <stage>" asks too; pipeline handoffs inherit
+the current choice.
 
 Output: everything lands in docs/capstone/ - 00-index.md, the numbered
 topic chapters, and the logic/ scenario map. Chapters carry the commit
@@ -67,7 +75,7 @@ CI gate: skills/core/scripts/map-check.sh [docs_dir] runs the script
 half alone, no API key, checking every page against the output schema
 in skills/core/references/schema.txt; templates/ carries both workflows.
 
-Interview commands accept an optional artifact argument (a PRD, notes,
+Interview stages accept an optional artifact argument (a PRD, notes,
 screenshots) that pre-fills answers for your confirmation.
 
 Config: capstone.json in the agent's global folder (~/.claude; created

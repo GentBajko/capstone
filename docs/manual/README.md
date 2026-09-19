@@ -2,6 +2,8 @@
 
 Capstone is a collection of coding-agent skills. It can document an existing repository, guide a new product through design and implementation, or take one feature through specification, planning, code, and documentation updates. The agent reads the source and writes the documents; Capstone is not a background indexing service.
 
+> **Command surface changed in 7.0.0.** Capstone now has nine commands. The pipeline stages are no longer commands of their own — each is reached as `start <stage>` (`/capstone:start mockup`, `/capstone:start stack refresh`) — and the session review is now `/capstone:review retro`. Every example below has been corrected to that syntax. Everything else in this manual still describes 6.4.1 and has not been re-verified against 7.0.0.
+
 This manual describes **6.4.1**, from source commit `4210f6cab09dc5c3b742147d8714795b026e1cd9`. The documented changes and this manual were merged into `main` on 9 September 2026. The `v6.4.1` tag identifies the original source revision; a tag is separate from a GitHub Release entry. See [version details and less obvious behaviors](12-version-and-edge-cases.md).
 
 Commands prefixed `/capstone:` are instructions to your coding agent, not shell executables. Bash, Git, installer, and `quarry` examples are terminal commands. Product names, repository names, feature identifiers, paths, and payloads in examples are illustrative; only explicitly labeled script output is literal.
@@ -22,25 +24,34 @@ Commands prefixed `/capstone:` are instructions to your coding agent, not shell 
 
 ## Every user command
 
+Nine commands.
+
 | Command | Practical example | Result |
 | --- | --- | --- |
 | `map` | `/capstone:map` | Existing-code reference; refreshes on later runs |
 | `doctor` | `/capstone:doctor fix` | Consistency report; approved repairs |
 | `review` | `/capstone:review frontend` | Findings in `review.md` |
-| `retro` | `/capstone:retro` | Evidence-backed instruction proposals; approved standards edits |
+| `review retro` | `/capstone:review retro` | Evidence-backed instruction proposals; approved standards edits |
 | `start` | `/capstone:start` | New-product chain, resuming its first incomplete stage |
-| `mockup` | `/capstone:mockup product-brief.md` | Product brief and screen or surface descriptions |
-| `logic` | `/capstone:logic` | Scenario-by-scenario rules |
-| `uiux` | `/capstone:uiux brand-guide.md` | Visual direction, system, experience, screens |
-| `architecture` | `/capstone:architecture constraints.md` | Prescriptive architecture reference |
-| `standards` | `/capstone:standards team-style-guide.md` | Binding coding rules |
-| `stack` | `/capstone:stack refresh` | Researched dependency decisions or re-vetting |
-| `build` | `/capstone:build` | Whole-product implementation plan, then code after approval |
 | `feature` | `/capstone:feature add CSV export` | `groom` → `plan` → `implement` |
 | `groom` | `/capstone:groom add CSV export` | Feature specification |
 | `plan` | `/capstone:plan 2026-09-09-csv-export` | Task plan with verification and an approval gate |
 | `implement` | `/capstone:implement 2026-09-09-csv-export` | Executes an approved feature plan |
 | `help` | `/capstone:help` | Installed command usage |
+
+## Every `start` subcommand
+
+Each stage runs exactly what the pipeline would have run at that point, then stops.
+
+| Stage | Practical example | Result |
+| --- | --- | --- |
+| `mockup` | `/capstone:start mockup product-brief.md` | Product brief and screen or surface descriptions |
+| `logic` | `/capstone:start logic` | Scenario-by-scenario rules |
+| `uiux` | `/capstone:start uiux brand-guide.md` | Visual direction, system, experience, screens |
+| `architecture` | `/capstone:start architecture constraints.md` | Prescriptive architecture reference |
+| `standards` | `/capstone:start standards team-style-guide.md` | Binding coding rules |
+| `stack` | `/capstone:start stack refresh` | Researched dependency decisions or re-vetting |
+| `build` | `/capstone:start build` | Whole-product implementation plan, then code after approval |
 
 `core` is an installed support skill containing shared rules, schemas, and scripts. Install it with the other skills; it is not another workflow stage. A direct invocation of `core` displays help.
 

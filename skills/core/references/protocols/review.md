@@ -22,6 +22,17 @@ Bare `review` runs **both** sides, backend first. An argument runs one:
 - `frontend` (also `fe`): UI judgment against the project's own
   design docs.
 
+**`retro` is an argument, not a side.** `review retro [session]`
+routes to `protocols/retro.md` and this protocol does not run: it
+reads a finished session rather than the code, writes `standards.md`
+and paste-text rather than `review.md`, and touches no side's stamp.
+It lives here because `review` is the opt-in judgment command and
+retro is its third axis - backend judges the architecture, frontend
+judges the UI, retro judges what the agent had to work with - and
+because a session ends under every command, not just the pipeline.
+Route it before reading anything this protocol's **Reads** block
+names.
+
 A one-sided run **rewrites only its own section** of `review.md` and
 leaves the other side's section and stamp untouched. A project with no
 frontend (the mockup records no visual surface, or there is no

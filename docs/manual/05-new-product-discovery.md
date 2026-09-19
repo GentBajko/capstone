@@ -13,7 +13,7 @@ If code exists but you have not already chosen mapping or started a pipeline, st
 ## Mockup: define the product and its surfaces
 
 ```text
-/capstone:mockup product-brief.md
+/capstone:start mockup product-brief.md
 ```
 
 An optional artifact seeds answers for confirmation. Otherwise the three seed questions ask what the product is and why it exists, who it serves and their current alternative, and what success means a year after launch. Later questions follow from the answers rather than a fixed questionnaire.
@@ -29,7 +29,7 @@ The README contains the final brief plus Screens, Journeys, and Scenarios for lo
 ## Logic: define the behavior precisely
 
 ```text
-/capstone:logic
+/capstone:start logic
 ```
 
 Logic takes the scenario inventory from the formalized mockup and confirms it in priority order. If there is no usable inventory, it asks for one. It finishes one scenario before the next, recording every answer immediately in `logic-interview.md`.

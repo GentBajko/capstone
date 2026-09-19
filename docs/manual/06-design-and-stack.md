@@ -5,7 +5,7 @@ These four stages settle different questions. `uiux` decides appearance and inte
 ## uiux: appearance, interaction, and design assets
 
 ```text
-/capstone:uiux brand-guide.md
+/capstone:start uiux brand-guide.md
 ```
 
 The stage reads the mockup, logic, and any existing design output. Without a formalized mockup or existing frontend code, it points to mockup/start rather than inventing screens. Nonvisual mockup surfaces cause a recorded no-UI skip. Missing logic does not prevent styling the mockup's states, but their unsettled conditions remain visible gaps.
@@ -23,7 +23,7 @@ For an existing frontend with no mockup, uiux can document the incumbent design 
 ## architecture: system boundaries and quality targets
 
 ```text
-/capstone:architecture operating-constraints.md
+/capstone:start architecture operating-constraints.md
 ```
 
 The architecture interview reuses mockup, logic, and existing standards decisions. It walks framing, irreversible structural choices, topic checklists, measurable quality attributes, applicable modules, and a final risk/deferred-decision sweep. The macro-structure question offers 2–3 candidates with tradeoffs. Defaults are explicit proposals; they are not silently accepted architecture.
@@ -37,7 +37,7 @@ After code appears, map replaces prescriptive chapters with observations while r
 ## standards: binding rules, distinct from observed conventions
 
 ```text
-/capstone:standards team-style-guide.md
+/capstone:start standards team-style-guide.md
 ```
 
 Standards can seed from a style guide or existing agent instructions, then asks what this project requires. It consults relevant existing documents lazily as each domain arises. A codebase habit is not automatically a desired rule: the interview can ask whether an observed practice is intentional.
@@ -51,8 +51,8 @@ A standards decision can override Capstone's vendored craft rules when it names 
 ## stack: researched choices for actual capabilities
 
 ```text
-/capstone:stack preferred-vendors.md
-/capstone:stack refresh
+/capstone:start stack preferred-vendors.md
+/capstone:start stack refresh
 ```
 
 Stack derives capabilities from the recorded system: services, communication channels, state stores, processes/configuration, logic that calls external systems, existing standards commitments, and UI choices. It presents that list with its document sources for additions or removals. A checklist can reveal a missing design decision; it does not automatically create a need for every common dependency.

@@ -51,8 +51,8 @@ Doctor does not silently bootstrap a missing reference. That absence is a findin
 ## retro: improve the environment from a real session
 
 ```text
-/capstone:retro
-/capstone:retro <session-name>
+/capstone:review retro
+/capstone:review retro <session-name>
 ```
 
 The optional session name is resolved by your harness; it is not a Capstone-global transcript ID format. If the harness cannot read a past session, the command says so and uses the current one.

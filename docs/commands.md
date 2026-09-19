@@ -15,7 +15,7 @@ argument-by-argument reference.
 
 1. [Invocation](#invocation)
 2. [Three entry points](#three-entry-points)
-3. [Reference commands](#reference-commands) — [`map`](#map) · [`doctor`](#doctor) · [`review`](#review) · [`retro`](#retro)
+3. [Reference commands](#reference-commands) — [`map`](#map) · [`doctor`](#doctor) · [`review`](#review) · [`review retro`](#review-retro)
 4. [The greenfield pipeline](#the-greenfield-pipeline) — [`start`](#start)
 5. [The feature chain](#the-feature-chain) — [`feature`](#feature-description)
 6. [`help`](#help) and [`core`](#core)
@@ -35,7 +35,13 @@ A bare `capstone` with no argument runs `start`. To get a bare
 agents" section.
 
 Arguments are positional words, not flags: `map check`,
-`review backend`, `stack refresh`, `groom add CSV export`.
+`review backend`, `start stack refresh`, `groom add CSV export`.
+
+There are nine commands: `map`, `doctor`, `review`, `groom`, `plan`,
+`implement`, `feature`, `start`, `help`. The pipeline stages are not
+among them - each is `start <stage>` - because a stage run outside its
+chain is the exception, and a flat list of seventeen hides which five
+you actually reach for.
 
 ## Three entry points
 
@@ -43,8 +49,9 @@ Diagrammed end to end in [flows.md](flows.md): what each one does, in
 what order, where it stops for you, and what it leaves on disk.
 
 
-Everything else is a stage one of these runs, individually invocable
-when you want to enter mid-chain.
+Everything else is a stage one of these runs, reached as that
+command's second word when you want to enter mid-chain: `start uiux`,
+`start stack refresh`. There are nine commands and no more.
 
 | Situation | Command |
 | --- | --- |
@@ -210,9 +217,18 @@ section. **Gitignored by default:** it is judgment, not reference.
 
 **Ledger key** `review/<side>@<stamp>`.
 
-### `retro`
+### `review retro`
 
-[Page: when to reach for it, and how to tell it worked](commands/retro.md)
+[Page: when to reach for it, and how to tell it worked](commands/review.md#review-retro)
+
+`review`'s third judgment axis, and the only one that is **not a
+side**: it reads a finished session rather than the code, writes
+`standards.md` rather than `review.md`, and touches neither side's
+stamp. It sits under `review` because a session ends under every
+command - a project that was mapped rather than designed never runs
+the pipeline, and retro is exactly as useful there. Nothing runs it on
+your behalf; `start`, `feature` and `implement` name it when they
+finish.
 
 Reads a finished session for evidence, then proposes edits to the
 files the agent works from. `review` judges the code; `retro` judges
@@ -281,20 +297,21 @@ again.
 mockup → logic → uiux → architecture → standards → stack → build
 ```
 
-Each stage below is individually invocable. Every one is a resumable
-interview: answers are written to disk before the next question, so a
+Each stage below is reachable on its own as `start <stage>`, which
+runs exactly what the pipeline would have run there and then stops.
+Every one is a resumable interview: answers are written to disk before the next question, so a
 dead session preserves recorded design answers. The execution choice
 is asked again when starting a new run to resume the pipeline.
 
 | Stage | Produces | State file |
 | --- | --- | --- |
-| [`mockup`](commands/mockup.md) | `mockup/` - one file per screen: wireframe, elements, and a state inventory; `README.md` indexes the screens, the journeys, and the scenario list `logic` works from | `mockup-interview.md` |
-| [`logic`](commands/logic.md) | `logic/` - one file per scenario: triggers, exact rules, branches, unhappy paths, invariants, and the dimensions ruled out | `logic-interview.md` |
-| [`uiux`](commands/uiux.md) | `uiux/01-direction.md`, `02-system.md` (tokens, the `## Assets` manifest), `03-experience.md`, `screens/`, approved brand SVGs in `uiux/assets/`, review artifacts in `uiux/assets/references/`, and `preview.html` | `uiux-interview.md` |
-| [`architecture`](commands/architecture.md) | The numbered chapters, marked `mode: prescriptive` (`09-interfaces.md` too when the design declares cross-repo edges) | `architecture-interview.md` |
-| [`standards`](commands/standards.md) | `standards.md` | `standards-interview.md` |
-| [`stack`](commands/stack.md) | `05-dependencies.md` | `stack-interview.md` |
-| [`build`](commands/build.md) | `implementation.md`, then source code | `build-interview.md` |
+| `mockup` | `mockup/` - one file per screen: wireframe, elements, and a state inventory; `README.md` indexes the screens, the journeys, and the scenario list `logic` works from | `mockup-interview.md` |
+| `logic` | `logic/` - one file per scenario: triggers, exact rules, branches, unhappy paths, invariants, and the dimensions ruled out | `logic-interview.md` |
+| `uiux` | `uiux/01-direction.md`, `02-system.md` (tokens, the `## Assets` manifest), `03-experience.md`, `screens/`, approved brand SVGs in `uiux/assets/`, review artifacts in `uiux/assets/references/`, and `preview.html` | `uiux-interview.md` |
+| `architecture` | The numbered chapters, marked `mode: prescriptive` (`09-interfaces.md` too when the design declares cross-repo edges) | `architecture-interview.md` |
+| `standards` | `standards.md` | `standards-interview.md` |
+| `stack` | `05-dependencies.md` | `stack-interview.md` |
+| `build` | `implementation.md`, then source code | `build-interview.md` |
 
 **Stage notes**
 
@@ -378,9 +395,9 @@ is asked again when starting a new run to resume the pipeline.
   stamp and skip.
 - **`build`** requires a formalized `stack`. It writes an
   implementation plan, **stops for your approval**, then writes code -
-  in the execution mode chosen for this run. A standalone `build`
+  in the execution mode chosen for this run. `start build` entered directly
   asks inline or subagents before research or prerequisites, including
-  resumes; entry through `start` inherits its answer. Ledger keys
+  resumes; entry through the pipeline inherits its answer. Ledger keys
   `build/plan@Q<n>` and `build/code@Q<n>`.
 
 `build` and `implement` are the **only two commands allowed to write

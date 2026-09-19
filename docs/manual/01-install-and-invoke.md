@@ -61,7 +61,7 @@ Then use `/capstone:map`, or ask the agent to use its Capstone map skill to gene
 
 Arguments are positional words: `map check`, `map models`, `review be`, `stack refresh`. They are not CLI flags such as `--check`. A bare `capstone` request starts the greenfield pipeline. Use `map` explicitly for existing code.
 
-For a bare `/capstone` shortcut in Claude Code, the README provides a custom command-file recipe. It is optional; the namespaced commands need no such alias. In `map architecture`, the topic wins: this refreshes `01-architecture.md`, whereas `/capstone:architecture` starts the design interview.
+For a bare `/capstone` shortcut in Claude Code, the README provides a custom command-file recipe. It is optional; the namespaced commands need no such alias. In `map architecture`, the topic wins: this refreshes `01-architecture.md`, whereas `/capstone:start architecture` starts the design interview.
 
 ## Bash and global settings
 
