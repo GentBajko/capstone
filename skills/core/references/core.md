@@ -214,19 +214,24 @@ is conversation only; the generated docs stay dense per style.md. When
 
 ## Structured questions
 
-When the current harness exposes a structured question tool (for
-example, Claude Code's `AskUserQuestion`), use it for every question
-asked of the user. Encode enumerable answers as selectable options and
-keep the tool's native `Other`/free-text path available so the user can
-click an answer or type a different one. If the tool does not provide
-that path, include an `Other` option that accepts text. Use one
-question per tool call, record the returned selection or text exactly
-as the answer, and then persist it before asking the next question.
-This applies to confirmations, approvals, mode choices, digests, and
-interview questions; it does not change any protocol's gates or its
-`non_interactive` behavior. On a harness without a structured question
-tool, ask the same one question in normal conversation with the same
-options and `Other` instruction.
+When the harness exposes a structured question tool (Claude Code's
+`AskUserQuestion`), every question to the user goes through it, and
+the tool carries only the question and its answers: a one-sentence
+question, the enumerable answers as options with a one-line
+description each, and the tool's native `Other`/free-text path (add
+an `Other` option when the tool lacks one). Everything else - a
+research digest, a comparison, the artifact-seeding digest, the
+options' pros, cons and pricing - is written in the chat message
+immediately before the call, in markdown, where lists and tables
+render; the question then refers to it ("Which identity provider?
+Comparison above."). One decision per question: one capability, one
+confirmation, one digest. Several small related picks may share a
+call, one question each, when the tool allows it. Record the returned
+selection or text exactly as the answer and persist it before the
+next question. This changes no protocol's gates or `non_interactive`
+behavior. Without such a tool, ask the same one-sentence question in
+conversation, after the same markdown message, with the same options
+and `Other` instruction.
 
 If `expertise` is null or missing and the task is interactive (any
 interview, `review`), ask ONE
