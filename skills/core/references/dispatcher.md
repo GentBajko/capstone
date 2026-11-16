@@ -8,12 +8,12 @@ protocol files.
 1. Read `core.md` (same directory) first: hard rules, voice, and
    user config. Then `core-authoring.md`, unless the route below lands
    on `start` or `feature`, which route rather than write.
-2. Route on the first argument. Nine command words are the whole
-   surface: `map`, `doctor`, `review`, `groom`, `plan`, `implement`,
-   `feature`, `start`, `help`. Every other protocol is a stage one of
-   them runs, reached as that command's second word.
+2. Route on the first argument. Ten command words are the whole
+   surface: `map`, `edges`, `doctor`, `review`, `groom`, `plan`,
+   `implement`, `feature`, `start`, `help`. Every other protocol is a
+   stage one of them runs, reached as that command's second word.
    The reserved subcommand words - the commands
-   `map`, `doctor`, `review`,
+   `map`, `edges`, `doctor`, `review`,
    `groom`, `plan`, `implement`, `feature`, `start`, under
    `start` the stage words `mockup`,
    `logic`, `uiux`, `architecture`, `standards`, `stack`, `build`,

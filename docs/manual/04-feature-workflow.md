@@ -24,7 +24,7 @@ The interview establishes purpose, users, measurable success, candidate approach
 
 If the request hides several independent features, grooming splits the work and specifies one at a time. A ticket, PRD, or notes file can seed the interview; the agent presents the extracted answers for confirmation. Each new answer is written before the next question.
 
-At the specification gate, the stage presents its summary and waits for approval. It then writes:
+The stage then writes the spec as a draft and stops at the specification gate: it presents the design summary with the spec's path and waits for you to check it. Approve it, or reply with changes; a change is recorded, the spec is rewritten, and the gate is asked again. Nothing is planned from a spec you have not approved. The working files are:
 
 ```text
 docs/capstone/features/2026-09-09-csv-export/
@@ -34,7 +34,7 @@ docs/capstone/features/2026-09-09-csv-export/
 
 The actual identifier uses the date grooming began and a derived kebab-case slug. `spec.md` contains What & why, numbered Requirements, Approach, Behavior, Reference impact, and Out of scope. Reference impact names both code-reference chapters and scenario/screen files that must absorb the shipped behavior. Confirmed cross-repository names are recorded there for implement's later wrap.
 
-Groom adds `groom/<id>@Q<n>` to the ledger and sets the interview's `status: formalized`. **Formalized here means the spec exists, not that code exists.** A standalone groom stops; the feature chain proceeds to plan.
+On your approval, groom adds `groom/<id>@Q<n>` to the ledger and sets the interview's `status: formalized`. **Formalized here means you approved the spec, not that code exists.** A standalone groom stops; the feature chain proceeds to plan.
 
 ## Plan: approve concrete work and verification
 

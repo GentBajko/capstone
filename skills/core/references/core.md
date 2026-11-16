@@ -18,7 +18,10 @@ idempotent initializer from the `core` skill's `scripts/` directory
 (`init-config.sh --global` via bash) on the first session after
 install. When the file is missing anyway (an agent without hook
 support), run that initializer yourself: `init-config.sh --global`
-via bash, which on Windows means Git Bash. If bash is unavailable,
+via bash, which on Windows means Git Bash. The initializer and checker
+resolve `CAPSTONE_GLOBAL_DIR`, then Codex's `CODEX_HOME` or runtime
+markers (defaulting to `~/.codex`), Gemini home variables,
+`CLAUDE_CONFIG_DIR`, and finally `~/.claude`. If bash is unavailable,
 write this template yourself:
 
 ```json
@@ -26,6 +29,7 @@ write this template yourself:
   // Comments are allowed in this file; capstone reads around them.
   "expertise": null,                  // null = ask once | 1 vibe | 2 explorer | 3 builder | 4 engineer | 5 architect; conversation only, never the docs
   "teaching_mode": false,             // true = narrate each step and the concept behind it, at any expertise level
+  "batch_questions": "auto",          // "auto" = an interview's independent questions share one dialog when the harness can show several | "off" = always one question per turn
   "docs_dir": "docs/capstone",        // where generated docs land; relative path inside the repo
   "index_file": "docs/capstone/00-index.md", // chapter zero of the docs area; relative path inside the repo
   "subagent_threshold": 150,          // source-file count where map fans out to subagents and unrequested full builds ask first
@@ -113,6 +117,15 @@ report. A question with no default - an approval gate (`plan`'s,
 main, an interview question - is never answered by inventing consent: the run says what it is
 blocked on and stops. It changes how prompts resolve, never what gets
 written.
+
+`batch_questions` (`"auto" | "off"`, default `"auto"`): whether an
+interview's independent questions may share one dialog, per Shared
+dialogs below. `auto` means only where that section allows it and the
+harness has a question tool that takes several; `off` means one
+question per turn everywhere. `off` in either config file wins: a
+project may ask for one question per turn, and none turns sharing on
+for a user who turned it off. It changes how many questions arrive
+at once, never which are asked or what is recorded.
 
 `extract` (list, default `["logic", "uiux"]`): which of `map`'s
 extraction passes run. `["logic"]` skips the uiux surface extraction
@@ -214,28 +227,155 @@ is conversation only; the generated docs stay dense per style.md. When
 
 ## Structured questions
 
-When the harness exposes a structured question tool (Claude Code's
-`AskUserQuestion`), every question to the user goes through it, and
-the tool carries only the question and its answers: a one-sentence
-question, the enumerable answers as options with a one-line
-description each, and the tool's native `Other`/free-text path (add
-an `Other` option when the tool lacks one). Everything else - a
-research digest, a comparison, the artifact-seeding digest, the
-options' pros, cons and pricing - is written in the chat message
-immediately before the call, in markdown, where lists and tables
-render; the question then refers to it ("Which identity provider?
-Comparison above."). One decision per question: one capability, one
-confirmation, one digest. Several small related picks may share a
-call, one question each, when the tool allows it. Record the returned
-selection or text exactly as the answer and persist it before the
-next question. This changes no protocol's gates or `non_interactive`
-behavior. Without such a tool, ask the same one-sentence question in
-conversation, after the same markdown message, with the same options
-and `Other` instruction.
+**A question is answerable from what the user can see when it is
+asked.** A structured question tool (Claude Code's `AskUserQuestion`)
+opens a dialog that can cover the conversation, and text composed
+while reasoning is never sent at all, so a question that points at
+"the comparison above" or "items 1-7" can be pointing at nothing.
+What the user has to read before answering decides how it is asked:
+
+- **Dialog question**: the dialog alone is enough to answer. Use the
+  structured question tool: one sentence naming what is being decided,
+  the enumerable answers as options, each with a one-line description
+  of what choosing it does, and the tool's native
+  `Other`/free-text path (add an `Other` option when the tool lacks
+  one). The question never refers to the conversation: no "above",
+  no "as summarized", no item numbers from a list that is not in the
+  dialog. A file or page it asks about is named by path or link.
+  The options are the whole choice, not examples of it: yes or no,
+  or one of a known few. Where the true answer could lie outside
+  them, the question is open-ended. A question or option never
+  states as given a fact the user has not given (a time window, a
+  figure, a date): ask for it instead. Interview questions of that
+  kind, mode choices, the execution choice and yes/no confirmations
+  are dialog questions.
+- **Message question**: the user has to read something first - a
+  gate's summary, a digest, a comparison of options with their pros,
+  cons and pricing, a drafted scenario, a findings table - or the
+  question is open-ended, its answers only guessable (which problem,
+  what number, whose name), or there are more answers than the tool
+  can list. A number is asked for, not picked from ranges: a guessed
+  option invites a wrong pick over a typed truth. Finish the writes
+  the step needs
+  (the interview entry, `status: awaiting-formalization`), then
+  write that content as the chat message, in markdown where lists and
+  tables render, naming by path any file under approval (`plan.md`).
+  Close the message with the one-sentence question and the answers it
+  takes ("Formalize, or tell me what to change"), and
+  **the turn ends on it**: no structured question tool, no further
+  tool call, nothing after the question. The user's next message is
+  the answer. Every formalization gate, plan gate and digest is a
+  message question.
+
+"Present" in a protocol means written into the conversation, where
+the user reads it. A summary that exists only in reasoning or in a
+file has not been presented, and an approval of it approves nothing.
+
+**A gate passes only on an explicit approval of what was presented.**
+A reply that adds, changes or questions something is an amendment,
+however it is worded ("looks good, and also...", "before you build,
+add..."): apply it, present the result, and end the turn on the
+question again. A gate never asks for approval of content still to
+change ("approve the plan with your answers folded in"), and never
+shares its turn with other questions: settle those first, then
+present what they produced.
+
+One decision per question: one capability, one confirmation, one
+digest. Record the returned selection or text exactly as the answer
+and persist it before anything else is asked. A picked option is
+the gist of an answer: where the decision needs a detail the option
+did not carry (which vendor, which countries, how many), ask for it
+before moving on. This changes no protocol's gates or
+`non_interactive` behavior. Without a structured question tool, a
+dialog question is asked in conversation instead, one per turn: the
+same one sentence, the same options, the same `Other` instruction.
+
+**A dialog nobody answered settled nothing.** A question the dialog
+returned no answer for is still open: every one of them when the
+user dismissed, cancelled or skipped it or the harness closed it
+after a wait, the unanswered ones when it came back partly answered.
+When the user typed a reply in place of the choices, that reply
+answers only a question it plainly names; the rest are open, and
+what the user said is acted on first. Never record a default, the
+first option or a guess as an answer. A dialog that came back
+without a word from the user is not reopened at once, since it could
+close the same way: ask its first open question in the chat, as a
+message question the turn ends on, and resume dialogs once the user
+has replied.
+
+### Shared dialogs
+
+Several questions may go out in one dialog, each still one decision,
+where all of them were written before any was answered. That holds
+in four places and nowhere else: in `architecture`, within one
+subsection of `interview.md` §0, §2 or §4; in `standards`, among
+what a domain's sweep leaves to ask; in `uiux`, among what an
+inventory pass leaves; in `logic`, among what a scenario's sweep
+leaves. A question derived from the last answer is never shared:
+every question of `mockup` and `groom`, the generation rules of
+`logic` and `uiux`, and every follow-up.
+
+**When.** The session lists a structured question tool whose input
+takes several questions (Claude Code's and Kimi's `AskUserQuestion`,
+Gemini CLI's `ask_user`, OpenCode's `question`, Codex's
+`request_user_input`, Cursor's ask-question tool), `batch_questions`
+is `auto`, `teaching_mode` is off and `expertise` is 3 or higher:
+in teaching mode and below level 3 each question carries its own
+explanation. Go by the tools this session lists, never by the
+harness's name: Codex lists its tool in one mode and not in another.
+Otherwise every question has a turn to itself. A user who asks for
+one question at a time has set the key: write
+`"batch_questions": "off"` to the global config file, say so in one
+line, and stop sharing.
+
+**Which.** A question may share a dialog only when all four hold:
+
+- it is a dialog question, its options the whole choice: no gate,
+  no digest, nothing the user has to read first, and nothing
+  open-ended dressed in sample options;
+- it would be asked, in the same words and with the same options,
+  whatever the others in the dialog are answered: none of their
+  answers could settle it, change it or make it moot;
+- no answer to it is expensive to undo once built on (a one-way
+  door): such a decision is asked alone, with its alternatives;
+- it belongs to the same subsection, domain, pass or scenario as the
+  others.
+
+As many as pass, up to the limit in the tool's own schema: read it
+there, since it differs by harness and version. A question that
+fails waits for a turn of its own. None is recast as a choice,
+reworded, merged or pulled in from another section to fill a
+dialog, and none refers to another question in it.
+
+**After it returns**, before anything else is asked:
+
+1. Record each answer as its own `### Q<n>` entry, in the order
+   asked, exactly as returned.
+2. Check each answer against the others in the dialog. One that
+   changed what another question should have asked voids that other
+   answer: its entry keeps the question and the answer as given and
+   carries the line `void: ask again` in place of a decision. Two
+   answers that void each other are both void. One that already
+   settled another question leaves that question's answer standing
+   only where the two agree.
+3. Ask what the answers call for, one per turn, each as a dialog or
+   a message question by the test above: every voided question
+   again, as it should have read; which of two answers that
+   disagree stands; the follow-up a surprising answer spawns; the
+   number behind an adjective and the measure behind a number; the
+   detail a picked option left out; the text behind an `Other` the
+   tool could not carry; the confirmation, with what it rules out,
+   of an answer that turned out expensive to undo; a pushback.
+
+Then the next dialog, with none of step 3's questions in it. A
+voided entry is an open question: a resumed interview asks it again
+unless a later entry already did. Answers that arrive in the chat
+instead of a dialog are recorded and checked the same way.
 
 If `expertise` is null or missing and the task is interactive (any
 interview, `review`), ask ONE
-question ("How technical should I be with you?" with the five levels),
+question ("How technical should I be with you?" with the five levels,
+none merged or dropped to fit a dialog's option limit),
 write the answer into the global config file (creating it with all
 keys if needed), and never ask again. Non-interactive runs behave as
 level 3 without asking and leave `expertise` null.
@@ -259,14 +399,19 @@ level 3 without asking and leave `expertise` null.
    section; manual edits are not preserved. Two named exceptions.
    `changelog.md` is append-only; re-runs add entries and never
    rewrite, reorder, or drop them. And the `to` and `from` values in
-   `09-interfaces.md`'s `edges:` block belong to the person or the
-   confirmation that wrote them: **no run writes or edits one**. A
-   consumer's code holds an address, a producer's code holds nothing
-   about its callers, so those values answer a question no read of
-   this repo can, and a run that re-derived them would overwrite an
-   answer with a guess. `map` writes the rest of each row - `kind`,
-   `name`, `site`, `schema` - and merges by `(direction, kind, name)`
-   per `topics.md`'s interfaces section.
+   `09-interfaces.md`'s `edges:` block belong to whoever answered
+   them: **no run edits one, and no run derives one from a single
+   repo**. A consumer's code holds an address, a producer's code
+   holds nothing about its callers, so those values answer a question
+   no read of this repo can, and a run that re-derived them would
+   overwrite an answer with a guess. A person's answer is written as
+   given, by hand or by the run that asked for it (Edge confirmation,
+   below). `edges` is the one run that derives one, because it reads
+   every repo of a folder at once: it fills a consumer's empty `from`
+   and nothing else (`protocols/edges.md`).
+   `map` writes the rest of each row - `kind`, `name`, `site`,
+   `schema` - and merges by `(direction, kind, name)` per
+   `topics.md`'s interfaces section.
 4. Follow `style.md` (same directory) for every sentence you write,
    and `core-authoring.md` for landing it: what is never committed,
    what gets indexed, and how a stage seeds and delegates.
@@ -306,8 +451,12 @@ this same choice gate before any prerequisite work or execution,
 including a resume that has only review or wrap left. When reached
 from `feature` or `start`, it inherits that run's answer instead.
 
-The executor records the choice in its interview frontmatter when
-that file exists. That value records the last choice; it never
+The executor - `build` under `start`, `implement` under `feature` -
+records the choice as `execution: subagent | inline` in the
+frontmatter of `build-interview.md` or the feature's
+`feature-interview.md`, when that file exists. No interview stage
+writes the key: `start` and `feature` hold the answer for the run and
+hand it to each stage. That value records the last choice; it never
 authorizes a new run. Progress, interview answers and plan approvals
 still resume under their own rules. If the user changes mode during
 the run, apply the new explicit choice to remaining work; do not
@@ -371,15 +520,17 @@ unreachable: a refresh that cannot diff from `generated_at_commit`
 recomputes this hash instead, and an unchanged hash means current,
 so the run degrades to a per-file check rather than a full rebuild.
 
-`capstone_version` is this plugin's own version, read once per run
-from its manifest (`.claude-plugin/plugin.json` at the plugin root,
-two levels above the running skill's directory; every harness
-manifest carries the same value). It records **which capstone wrote
-the file**, which template drift cannot: drift detects a section that
-went missing, never a section whose meaning changed under it, and
-never a rename. A later release migrates an output by reading this
-key, not by guessing from shape. Unreadable manifest → omit the key
-rather than inventing one; a wrong version is worse than none.
+`capstone_version` is this installation's writer identity, read once per
+run. A plugin installation reads the shared version from its manifests.
+An `npx skills add` installation reads `skills/core/VERSION` when present,
+then the `core` entry in the neighboring `.skill-lock.json`; its
+`skillFolderHash` is the exact opaque fallback when no semantic version is
+recorded. It records **which capstone wrote the file**, which template
+drift cannot: drift detects a section that went missing, never a section
+whose meaning changed under it, and never a rename. A later release
+migrates an output by reading this key, not by guessing from shape.
+Unreadable installation metadata → omit the key rather than inventing one;
+an opaque hash is compared for equality, never as a numeric version.
 
 ## Missing reference: build it, don't refuse
 
@@ -404,10 +555,11 @@ Five bounds on it:
   frontmatter used only to resume an unfinished stage. `uiux`
   without a mockup still points at `mockup`; `build` without a
   formalized stack still runs `stack`.
-- **`map` and `doctor` are exempt.** `map` is what the rule
+- **`map`, `doctor` and `edges` are exempt.** `map` is what the rule
   delegates to; `doctor` diagnoses the docs area, so a
   missing index is a finding it reports, never a thing it silently
-  builds.
+  builds; `edges` reads a folder of repos, and an unmapped one is a
+  line in its report, never a build in every clone.
 - **Interview prerequisites are untouched.** This rule fires only on
   a missing index, never to skip a gate or invent a decision the user
   has not made.
@@ -428,7 +580,10 @@ Five bounds on it:
 repo's declarations on `(kind, name)`. One repo on the other side
 gives one edge; no repo at all leaves the row a publication.
 **Several repos on one contract is the case a person has to settle**,
-and this section is that ask.
+and this section is that ask. Where every repo of the system is
+cloned into one folder, `edges` settles the consumer side from the
+code first (`protocols/edges.md`), and the ask covers what it left
+open.
 
 The trigger is narrow. When config `cross_repo` is `auto` and the
 `quarry` CLI is on PATH, run `quarry docs index --json` once and read
@@ -442,7 +597,8 @@ CLI, or an empty `ambiguous` list, nothing is asked and the run
 continues.
 
 The ask is **one digest**, whatever the row count, in the shape
-core-authoring.md's Artifact seeding uses: a numbered list, one line
+core-authoring.md's Artifact seeding uses, and a message question per
+Structured questions above: a numbered list, one line
 per row, each naming its direction, `kind`, `name`, `site`, and the
 candidate repos quarry reported, in the order quarry reported them.
 The user answers per row with a repo name, several names for a
@@ -497,7 +653,7 @@ recorded decisions rather than routing to a stage that would.
 
 **Entries land as fragments, one file each, folded on sight.** A run
 never inserts into `changelog.md` directly: it writes its entry as
-its own file, `<docs_dir>/changelog.d/<YYYY-MM-DD>-<stage>-<target>.md`
+its own file, `<docs_dir>/changelog.d/<YYYY-MM-DD>-<stage>-<target>-<rev>.md`
 (the key, slugged, as the filename), holding the complete entry and
 nothing else. Distinct filenames are the whole point: the old rule
 inserted every entry at the same offset directly below the
@@ -547,12 +703,21 @@ later run hunting one key, never read start to finish.
 `02-models.md`; `all` for a run covering the whole
 project). `<rev>` is the highest interview question number incorporated
 when the output was formalized (`Q7`) for a stage with an interview
-file, otherwise the run's stamp. The revision belongs in the key only;
+file, otherwise the run's stamp (`edges` reads a folder of repos and
+uses the moment the run began, per its protocol). The revision belongs
+in the key only;
 the output never cites the interview or its question numbers.
 
 Before writing a fragment, search the ledger (all of it, per the rule
-above) for the key: if it is already there, this is a resumed run and
-the entry stands; never write a second. A
+above) for the key: if it is already there and records everything
+this run wrote, this is a resumed run and the entry stands; never
+write a second. If this run wrote something that entry does not
+record - a refresh at a commit already recorded, a re-plan after a
+voided approval, a later coding session - it is a new event at the
+same revision: append `.2`, `.3` and so on to `<rev>`
+(`map/all@3ebe6f657223.2`) and write its own entry. The first entry
+is never edited, and a rule that looks for a stage's key matches
+every suffix of it. A
 done marker found with no matching key is a torn write: append the
 missing entry from the recorded decisions, never re-run the stage.
 Writes to `*-interview.md`, `features/*/review-ledger.md` and
@@ -580,11 +745,15 @@ drops a recorded event.
 
 **Rotation:** the folded file is read whole by `doctor` and
 `map check`, so it cannot grow without bound. Past **200 entries**,
-the next fold (or `doctor`) moves all but the newest 100 into
-`changelog-<YYYY>.md` beside it, the year the moved entries' dates
-fall in (same entry format, same newest-first order, its own
-Companion docs row, never rewritten afterwards). **Keys move with
-their bodies**: a rollup file is still greppable, and every rule that
+the next fold (or `doctor`) moves all but the newest 100 out of it,
+each entry into the `changelog-<YYYY>.md` beside it for the year its
+own date falls in (same entry format, same newest-first order, one
+Companion docs row per file). A year's file that an earlier rotation
+made is added to, never replaced: the moved entries are newer than
+everything in it, so they go directly below its frontmatter, and
+nothing already there is rewritten, reordered, or dropped.
+**Keys move with their bodies**: a rollup file is still greppable,
+and every rule that
 resolves a key already reads the rotation files, so nothing is left
 behind in `changelog.md` - no stripped headings, no `## Archived`
 stub section. A repo carrying a `changelog-archive-<YYYY>.md` and an
@@ -628,7 +797,8 @@ one summary gate, so it never uses `awaiting-formalization`; it stays
 `interviewing` and keeps a scenario checklist in its frontmatter
 (`scenarios: [{name, status: pending|written|dropped}]`), moving
 straight to `formalized` once every listed scenario is `written` or
-`dropped` and the index row exists. The pipeline runner
+`dropped`, the index rows exist and its `logic/all@Q<n>` entry is on
+disk. The pipeline runner
 (`protocols/start.md`) keys stage completion on these rules.
 
 ## Stage ownership: which stage settles what
@@ -673,7 +843,12 @@ states it a second time in its own words.
 the commercial model for everyone; architecture's framing questions are
 pre-filled from the formalized mockup by design; `logic` and
 `uiux` in extraction mode record observed fact from code rather than
-decisions.
+decisions; the architecture interview's conventions and dependency
+answers land in the prescriptive chapters as provisional, marked
+"provisional: `standards` owns this" or
+"provisional: `stack` owns this", and `standards` and `stack` treat a
+provisional entry as a proposal to confirm, never as settled, and
+rewrite it when they formalize.
 
 `start`'s readback pass (`protocols/start.md` step 7) is where anything
 misfiled anyway gets moved to its owner.
@@ -691,7 +866,8 @@ twice.
    outputs (cite the owning file);
 - it contradicts a craft file the stage answers to (`code-craft.md`'s
   ladder or TDD cycle, `arch-craft.md`, `uiux-craft.md`), which for
-  the ladder is the case core.md's precedence rule calls an override;
+  the ladder is the case code-craft.md's Precedence rule calls an
+  override;
 - it contradicts an earlier answer in this same interview;
 - it cannot meet a number the user already gave (the stated load,
   budget, deadline, or compliance constraint);
@@ -765,6 +941,15 @@ would otherwise record a fabricated decision. One offer per question
 and never repeated: the user may decline and leave the item open,
 which is recorded as an open question exactly as it is today.
 
+Each stalled question gets its own offer, and the two exchanges
+follow an accepted offer rather than counting against it. An
+exchange the user has already answered is skipped: "ask X" has named
+the person. When that person already has a file from this interview
+that has not come back answered, the new question is appended to its
+Questions section: no second file is written, and the second
+exchange is not asked again, because the file already carries its
+date and context.
+
 The output is `<docs_dir>/questionnaires/<YYYY-MM-DD>-<slug>.md`, the
 slug naming the recipient rather than the question, so several
 stalled questions from one interview batch into one document. Its
@@ -801,7 +986,12 @@ the questionnaire file stays on disk as the record of what was asked.
 
 `questionnaires/` is committed, like the ledger and `capstone.json`
 (core-authoring.md's Local-only outputs), and the folder gets a
-Companion docs row.
+Companion docs row. The row is added when the first file is written,
+in a minimal index when none exists yet (core-authoring.md's Index
+maintenance). A questionnaire gets no changelog entry of its own,
+since no done marker is set when it is written: the next entry its
+stage writes carries one bullet per questionnaire file, naming what
+is still awaited.
 
 Vocabulary follows `expertise` in the two exchanges, like any
 interview turn. The document itself is pitched at its recipient

@@ -29,7 +29,7 @@ This is an illustrative shape, not a captured file:
 ---
 generated_at_commit: 0123456789ab
 generated_date: 2026-09-09
-capstone_version: 7.0.0
+capstone_version: 7.0.1
 content_hash: abcdef012345
 paths_covered:
   - ":(top)src/auth/**"
@@ -37,7 +37,7 @@ paths_covered:
 ---
 ```
 
-`generated_at_commit` and `content_hash` are 12-character Git values. The date is when the file was generated; `capstone_version` identifies the writer's template generation. `paths_covered` is the set of source paths used for refresh, anchored at the repository root. If the manifest cannot be read, the writer omits the version rather than inventing one. Outside Git, commit/hash requirements are waived. Prescriptive design uses `mode: prescriptive`; interview outputs without coverage globs have different freshness rules.
+`generated_at_commit` and `content_hash` are 12-character Git values. The date is when the file was generated; `capstone_version` identifies the writer's template generation. Plugin installs read it from a manifest; skills-cli installs read the core version file or lock metadata, falling back to the exact skill-folder hash. `paths_covered` is the set of source paths used for refresh, anchored at the repository root. If all installation metadata cannot be read, the writer omits the version rather than inventing one. Outside Git, commit/hash requirements are waived. Prescriptive design uses `mode: prescriptive`; interview outputs without coverage globs have different freshness rules.
 
 The machine schema requires `generated_date` on generated Markdown other than the index. Git-specific keys are waived for prescriptive and non-Git outputs; scenario/UI records waive coverage keys when they have no `paths_covered`. The checker handles an absent or older version in its freshness pass, not as a duplicate schema finding.
 
@@ -74,8 +74,9 @@ Every logic scenario has these exact sections: Trigger & preconditions; Steps; B
 | `features/<id>/plan.md` | Constraints, file map, ordered tasks, checkboxes, coverage | Implement; ignored; folder retention follows `delete_feature_folders` |
 | `features/<id>/review-ledger.md` | Confirmed/refuted findings and dry-round state | Implement's review resume; ignored; folder retention follows `delete_feature_folders` |
 | `review.md` | Opt-in backend/frontend findings with separate side stamps | Human review; ignored and regenerated per side |
+| `review/` | Screenshots a frontend review captured | Human review; ignored |
 | `questionnaires/YYYY-MM-DD-recipient.md` | Questions for someone outside the interview | Recipient and owning stage; kept in Git after answers arrive |
-| `changelog.d/YYYY-MM-DD-stage-target.md` | One complete event entry, keyed to a stage and revision | All lifecycle checks; committed until folded on the default branch |
+| `changelog.d/YYYY-MM-DD-stage-target-rev.md` | One complete event entry, keyed to a stage and revision | All lifecycle checks; committed until folded on the default branch |
 | `changelog.md` | Folded decision/event ledger, newest first | Resume, check, doctor, later features; always committed |
 | `changelog-YYYY.md` | Rotated older entries with keys intact | Same ledger readers; always committed |
 | `capstone.json` at the fixed project path | Shared settings, pipeline fork, workspace state | Every command; always committed, never indexed |
@@ -94,18 +95,19 @@ Ledger keys are internal durable identifiers, not commands. Search `changelog.md
 | Map write | `map/<topic-or-all>@<stamp>` |
 | Doctor repair | `doctor/<scope>@<stamp>` |
 | Codebase review | `review/<backend-or-frontend-or-all>@<stamp>`; repeat events at one stamp receive a suffix |
-| Retro standards edit | `retro/<all-or-domain>@<stamp>` |
+| Retro proposals, approved or declined | `retro/all@<stamp>` |
 | Mockup formalization | `mockup/all@Q<n>` |
 | Logic scenario written or deliberately dropped | `logic/<NN-scenario>@Q<n>` |
+| Logic stage complete | `logic/all@Q<n>` |
 | UI interview formalization | `uiux/all@Q<n>` |
 | Standalone observed UI extraction | `uiux/all@<stamp>` |
-| No visual UI | `uiux/skipped@<stamp>` |
+| No visual UI | `uiux/skipped@Q<n>` |
 | Architecture formalization | `architecture/all@Q<n>` |
 | Standards formalization | `standards/all@Q<n>` |
 | Initial stack selection | `stack/all@Q<n>` |
-| Stack re-vetting | `stack/refresh@Q<n>` |
+| Stack re-vetting | `stack/refresh@<stamp>` |
 | Cross-stage readback | `readback/all@<stamp>`; corrections also get their owning stage's entries |
-| Whole-product plan approval / code completion | `build/plan@Q<n>` / `build/code@Q<n>` |
+| Whole-product plan approval / code completion | `build/plan@<stamp>` / `build/code@<stamp>`, the latter once every build-order step is checked |
 | Feature spec / plan / completed wrap | `groom/<id>@Q<n>` / `plan/<id>@Q<n>` / `implement/<id>@Q<n>` |
 
 `start` and `feature` normally route rather than create an event of their own; their writing stages record the work. Readback is start's named exception. `help`, `core`'s help route, and `map check` write no event. A no-op map or report-only doctor/retro also has no repair/write entry.

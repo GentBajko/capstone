@@ -63,10 +63,17 @@ replace, rules that changed no behavior, and facts the agent needed
 and could not reach - each needing evidence from that session. A
 candidate with no evidence is reported clear rather than filled in.
 
-You approve findings one row at a time. Approved rules land in
-`standards.md` under the domain that owns them; anything outside the
-docs area comes back as text to paste, because no capstone command
-writes there.
+You answer every row in one reply, approving, skipping or amending
+each by number; an amended row comes back to you as amended and is
+written only once you approve it as shown. Approved rules land in
+`standards.md` under the domain that owns them. Retro never creates
+that file: without one, the rule comes back as text, with
+`/capstone:start standards` named as the command that creates it.
+Anything outside the docs area comes back as text to paste, because
+no capstone command writes there, and a fix that belongs in a
+generated chapter is named as the command that regenerates it
+(`/capstone:map <topic>`) rather than a line to paste that the next
+refresh would erase.
 
 It lives under `review` because `review` is the opt-in judgment
 command and this is its third axis, and because a session ends under
@@ -74,8 +81,11 @@ every command: a project that was mapped rather than designed never
 runs the pipeline at all. Nothing runs it on your behalf - `start`,
 `feature` and `implement` each name it when they finish, and stop.
 
-It writes `retro/<scope>@<stamp>` only when it actually changed
-`standards.md`. A run whose findings are all declined writes nothing.
+It writes `retro/all@<stamp>` whenever it proposed anything, approved
+or not, listing the rules it changed and the rows you declined; the
+next retro reads that entry and raises a declined row again only on
+new evidence. A run whose candidates all came back clear writes
+nothing.
 
 It is not a side, so it never rewrites `review.md` or touches either
 side's stamp. `review retro` and `review backend` share a command,
@@ -85,7 +95,8 @@ not an output.
 
 **Why isn't `review.md` in git?** It is gitignored by default. It is
 judgment, and a regenerable one; the factual reference is what gets
-committed.
+committed. The screenshots a live-browser run saves under
+`docs/capstone/review/` are ignored the same way.
 
 **I have `be-review.md` and `fe-review.md` from an older version.**
 They are superseded. The two commands merged into one two-sided

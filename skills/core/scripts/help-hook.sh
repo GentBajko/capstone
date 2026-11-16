@@ -4,7 +4,9 @@
 # below is a second guard so a broad matcher can never hijack other commands.
 # Verified payload fields: hook_event_name, expansion_type, command_name,
 # command_args, command_source, prompt.
-# JSON encoding below is complete for any text: backslashes, quotes, CR.
+# JSON encoding below covers any text: backslashes and quotes are
+# escaped, tabs become \t, newlines \n, and CR and the other control
+# characters (which help.sh never prints) are dropped.
 # Terminal CLI only: blocked-prompt reasons render in the terminal but are
 # swallowed by GUI surfaces (VS Code extension et al.; claude-code#15344),
 # where blocking would eat the command and print nothing. Allowlist the one
@@ -13,7 +15,8 @@
 if [ "${CLAUDE_CODE_ENTRYPOINT:-}" != "cli" ]; then exit 0; fi
 INPUT="$(cat)"
 if printf '%s' "$INPUT" | grep -q '"command_name":"capstone:help"'; then
-  HELP="$(bash "$(dirname "$0")/help.sh" | sed 's/\\/\\\\/g; s/"/\\"/g' | tr -d '\r' | awk '{printf "%s\\n", $0}')"
+  HELP="$(bash "$(dirname "$0")/help.sh" | sed 's/\\/\\\\/g; s/"/\\"/g' \
+    | tr -d '\000-\010\013-\037' | awk '{ gsub(/\t/, "\\t"); printf "%s\\n", $0 }')"
   # Fenced so markdown-rendering surfaces (VS Code extension chat) keep the
   # column alignment; terminals just show the fence lines. Empty HELP means
   # help.sh broke; pass through so the model path answers instead.

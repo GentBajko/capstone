@@ -6,16 +6,20 @@
 #   1. migrates a legacy docs/design tree to docs/capstone
 #   2. creates <docs_dir>/.gitignore if absent; drops the stale
 #      changelog.md and capstone.json rules from an existing one, one
-#      report line each (both may fire in one run)
-# The global folder is ~/.claude, or $CLAUDE_CONFIG_DIR when the agent
-# sets it ($CAPSTONE_GLOBAL_DIR overrides both, for non-Claude agents).
+#      report line each (both may fire in one run), and appends the
+#      local-only rules later releases added when they are missing
+# The global folder is selected from the explicit override, the detected
+# host, its host-specific config variable, and finally ~/.claude. Codex
+# exports CODEX_HOME in normal CLI sessions; CODEX_VERSION or
+# CODEX_THREAD_ID cover hosts that expose only their runtime marker.
+# CAPSTONE_GLOBAL_DIR remains the escape hatch for unusual harnesses.
 # The per-project docs/capstone/capstone.json is never created here:
 # it is the project's shared config, committed whatever docs_in_git
 # says, and written by protocols only when a project-scoped key gets
 # recorded (see core.md). The .gitignore goes in the docs area, which
 # the docs_dir argument may relocate.
-# Never overwrites an existing config; only the stale-rule removal
-# above touches an existing ignore file.
+# Never overwrites an existing config; only step 2's stale-rule
+# removal and missing-rule append touch an existing ignore file.
 # Usage: init-config.sh [--global] [docs_dir]
 set -eu
 GLOBAL_ONLY=0
@@ -25,7 +29,23 @@ LEGACY="docs/design"
 TARGET="docs/capstone"
 
 # 0. the global config
-GLOBAL_DIR="${CAPSTONE_GLOBAL_DIR:-${CLAUDE_CONFIG_DIR:-$HOME/.claude}}"
+global_dir() {
+  if [ -n "${CAPSTONE_GLOBAL_DIR:-}" ]; then
+    printf '%s\n' "$CAPSTONE_GLOBAL_DIR"
+  elif [ -n "${CODEX_HOME:-}" ] || [ -n "${CODEX_VERSION:-}" ] \
+       || [ -n "${CODEX_THREAD_ID:-}" ]; then
+    printf '%s\n' "${CODEX_HOME:-${HOME:-/nonexistent}/.codex}"
+  elif [ -n "${GEMINI_CLI_HOME:-}" ]; then
+    printf '%s\n' "$GEMINI_CLI_HOME"
+  elif [ -n "${GEMINI_HOME:-}" ]; then
+    printf '%s\n' "$GEMINI_HOME"
+  elif [ -n "${CLAUDE_CONFIG_DIR:-}" ]; then
+    printf '%s\n' "$CLAUDE_CONFIG_DIR"
+  else
+    printf '%s\n' "${HOME:-/nonexistent}/.claude"
+  fi
+}
+GLOBAL_DIR=$(global_dir)
 GLOBAL_FILE="$GLOBAL_DIR/capstone.json"
 if [ ! -f "$GLOBAL_FILE" ]; then
   mkdir -p "$GLOBAL_DIR"
@@ -34,6 +54,7 @@ if [ ! -f "$GLOBAL_FILE" ]; then
   // Comments are allowed in this file; capstone reads around them.
   "expertise": null,                  // null = ask once | 1 vibe | 2 explorer | 3 builder | 4 engineer | 5 architect; conversation only, never the docs
   "teaching_mode": false,             // true = narrate each step and the concept behind it, at any expertise level
+  "batch_questions": "auto",          // "auto" = an interview's independent questions share one dialog when the harness can show several | "off" = always one question per turn
   "docs_dir": "docs/capstone",        // where generated docs land; relative path inside the repo
   "index_file": "docs/capstone/00-index.md", // chapter zero of the docs area; relative path inside the repo
   "subagent_threshold": 150,          // source-file count where map fans out to subagents and unrequested full builds ask first
@@ -60,7 +81,14 @@ rewrite() {
 
 # 1. Retroactive migration. Only when the new tree does not exist yet;
 #    if both are present this is not a stale layout and nothing is merged.
-if [ -d "$LEGACY" ] && [ ! -d "$TARGET" ]; then
+#    And only when the old tree is capstone's own: docs/design is a name
+#    teams give their hand-written design docs, and moving and rewriting
+#    those would break the rule that no human-authored doc is touched.
+#    A capstone tree carries the frontmatter stamps on its pages.
+if [ -d "$LEGACY" ] && [ ! -d "$TARGET" ] \
+   && ! grep -rlE '^(generated_at_commit|generated_date|capstone_version):' "$LEGACY" 2>/dev/null | grep -q .; then
+  echo "note: $LEGACY is not a capstone docs area (no stamped page); left alone"
+elif [ -d "$LEGACY" ] && [ ! -d "$TARGET" ]; then
   mkdir -p "$(dirname "$TARGET")"
   if [ -n "$(git ls-files "$LEGACY" 2>/dev/null | head -1)" ]; then
     git mv "$LEGACY" "$TARGET" 2>/dev/null || mv "$LEGACY" "$TARGET"
@@ -118,7 +146,10 @@ if [ -f "$OLD_IDX" ] && [ ! -f "$NEW_IDX" ] \
   # (no \b): "DESIGN.md" is specific enough to replace unanchored.
   sed -e "s|($DOCS_DIR/|(|g" -e "s|\[$DOCS_DIR/|[|g" -e "s|\](\./|](|g" \
     "$NEW_IDX" > "$NEW_IDX.capstone-tmp" && mv "$NEW_IDX.capstone-tmp" "$NEW_IDX"
-  find "$DOCS_DIR" -type f -name '*.md' -exec sh -c '
+  # The ledger is append-only (core.md hard rule 3): an old entry that
+  # names an old file stays as it was written.
+  find "$DOCS_DIR" -type f -name '*.md' ! -name 'changelog*.md' \
+    ! -path '*/changelog.d/*' -exec sh -c '
     for f do
       sed -e "s|/DESIGN\.md|/00-index.md|g" -e "s|DESIGN\.md|00-index.md|g" \
         "$f" > "$f.capstone-tmp" && mv "$f.capstone-tmp" "$f"
@@ -159,9 +190,17 @@ if [ -d "$DOCS_DIR/uiux" ] || [ -f "$DOCS_DIR/uiux-interview.md" ] \
   # substitution runs first: code-prefs-interview.md does not contain
   # the string code-prefs.md, but keeping the specific rule ahead of the
   # general one is how this stays true if either name ever changes.
-  find "$DOCS_DIR" -type f -name '*.md' -exec sh -c '
+  # The ledger is append-only (core.md hard rule 3): an old entry that
+  # names an old file stays as it was written. design/ is repointed in
+  # every form a link takes: under the default path, under a custom
+  # docs_dir (D), and relative, as step 1b leaves the index's rows.
+  D="$DOCS_DIR" find "$DOCS_DIR" -type f -name '*.md' ! -name 'changelog*.md' \
+    ! -path '*/changelog.d/*' -exec sh -c '
     for f do
       sed -e "s|docs/capstone/design/|docs/capstone/uiux/|g" \
+          -e "s|$D/design/|$D/uiux/|g" \
+          -e "s|](design/|](uiux/|g" -e "s|](\.\./design/|](../uiux/|g" \
+          -e "s|\[design/|[uiux/|g" -e "s|\`design/|\`uiux/|g" \
           -e "s|design-interview\.md|uiux-interview.md|g" \
           -e "s|code-prefs-interview\.md|standards-interview.md|g" \
           -e "s|code-prefs\.md|standards.md|g" \
@@ -174,8 +213,9 @@ mkdir -p "$DOCS_DIR"
 IGNORE="$DOCS_DIR/.gitignore"
 if [ -f "$IGNORE" ]; then
   migrated=0
-  # Older versions ignored changelog.md. It is part of the reference
-  # now (follows docs_in_git), so drop the stale rule. sed, not
+  # Older versions ignored changelog.md. The ledger is always
+  # committed now, whatever docs_in_git says (core.md), so drop the
+  # stale rule. sed, not
   # grep -v: grep exits 1 when nothing survives, which set -e would
   # turn into a crash on a one-line ignore file.
   if grep -q '^changelog\.md$' "$IGNORE"; then
@@ -205,13 +245,14 @@ if [ -f "$IGNORE" ]; then
     migrated=1
   fi
   # 6.4 added the uiux stage's preview and its raster brand assets;
-  # later releases also retain review artifacts in the references dir.
+  # later releases also retain review artifacts in the references dir,
+  # and review's screenshots in review/.
   # Appended rather than rewritten, so a hand-edited ignore file keeps
   # its own rules; each rule is added only when it is absent, so a
   # second run adds nothing. uiux/assets/*.svg is never added: the mark
   # is committed, for the reason the template's header gives.
   added=""
-  for rule in uiux/preview.html 'uiux/assets/*.png' 'uiux/assets/*.jpg' \
+  for rule in review/ uiux/preview.html 'uiux/assets/*.png' 'uiux/assets/*.jpg' \
               'uiux/assets/*.jpeg' 'uiux/assets/*.webp' uiux/assets/references/; do
     if ! grep -qxF "$rule" "$IGNORE"; then
       added="$added$rule
@@ -221,10 +262,10 @@ if [ -f "$IGNORE" ]; then
   if [ -n "$added" ]; then
     { cat "$IGNORE"
       echo
-      echo "# The uiux preview, review artifacts and raster brand assets; the SVG sources are committed"
+      echo "# Review screenshots, the uiux preview and raster brand assets; the SVG sources are committed"
       printf '%s' "$added"; } > "$IGNORE.capstone-tmp" \
       && mv "$IGNORE.capstone-tmp" "$IGNORE"
-    echo "ignored: the uiux preview and raster assets in $IGNORE"
+    echo "ignored: $(printf '%s' "$added" | tr '\n' ' ')in $IGNORE"
     migrated=1
   fi
   [ "$migrated" -eq 1 ] || echo "exists: $IGNORE"
@@ -252,15 +293,17 @@ features/
 # Interview transcripts for every other stage
 *-interview.md
 
-# Opinionated and personal outputs
+# Opinionated and personal outputs, and review's screenshots
 review.md
+review/
 
 # Superseded by review.md; listed so older repos stay ignored
 be-review.md
 fe-review.md
 
 # The uiux stage's rendered preview: a picture of 02-system.md, not a
-# deliverable, and hard rule 4 says the outputs are markdown
+# deliverable, and core-authoring.md's Index maintenance says the
+# outputs are markdown
 uiux/preview.html
 
 # Review artifacts, raster brand assets and reference material. The
@@ -281,13 +324,21 @@ fi
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   for d in "$DOCS_DIR" "$TARGET"; do
     [ -d "$d" ] || continue
-    n=$(git ls-files -i -c --exclude-standard -- "$d" 2>/dev/null | grep -c . || true)
+    # The ledger, the project config and the questionnaires are always
+    # committed (core.md), whatever an ignore rule elsewhere says: a
+    # root .gitignore that lists the whole docs area must not untrack
+    # them.
+    keep='(^|/)(changelog(-[0-9][0-9][0-9][0-9])?\.md|capstone\.json)$|(^|/)(changelog\.d|questionnaires)/'
+    list=$(git -c core.quotePath=false ls-files -i -c --exclude-standard -- "$d" 2>/dev/null \
+      | grep -Ev "$keep" || true)
+    n=$(printf '%s\n' "$list" | grep -c . || true)
     if [ "${n:-0}" -gt 0 ]; then
       # -f: a migrated file can have staged content differing from both
       # the worktree and HEAD, which plain rm --cached refuses. --cached
       # keeps the working file either way.
-      git ls-files -z -i -c --exclude-standard -- "$d" \
-        | xargs -0 git rm --cached --force --quiet --
+      printf '%s\n' "$list" | while IFS= read -r f; do
+        if [ -n "$f" ]; then git rm --cached --force --quiet -- "$f"; fi
+      done
       echo "untracked $n file(s) under $d now covered by .gitignore (kept on disk)"
     fi
   done

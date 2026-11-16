@@ -14,7 +14,10 @@ To run only the mechanical half from your project root, using an installed/sourc
 bash /absolute/path/to/capstone/skills/core/scripts/map-check.sh docs/capstone
 ```
 
-The full Capstone tree matters: the script reads the neighboring `references/schema.txt` and the plugin manifest. Copying only the script omits the schema/version information it expects.
+The full Capstone tree matters: the script reads the neighboring
+`references/schema.txt` and the installation identity (a plugin manifest,
+`skills/core/VERSION`, or the skills-cli lockfile). Copying only the script
+omits the schema/version information it expects.
 
 ## Mechanical report
 

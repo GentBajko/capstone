@@ -31,9 +31,10 @@ and keys stay as they are and are matched like any other id; only
 new features get the date form.
 Output: `spec.md` beside it; the `features/` folder is one Companion
 docs row. Later stages add their own keys to the same frontmatter
-(`plan_approved`, `approved_spec`, `base_commit`, `implemented`);
-`status: formalized` here means the spec is on disk, not that the
-feature is built.
+(`plan_approved`, `approved_spec`, `branch`, `base_commit`,
+`implemented`);
+`status: formalized` here means the user approved the spec on disk,
+not that the feature is built.
 
 **Resume:** before anything else, match the request against existing
 `docs/capstone/features/*/` ids and spec titles **and against the
@@ -55,15 +56,20 @@ restated.
 A match on a folder still present continues as before: read its
 `feature-interview.md` and continue: `interviewing` resumes the
 interview after re-running Phase A's staleness pass (never re-ask an
-answered `§Q`), `awaiting-formalization` re-presents the gate,
+answered `§Q`), `awaiting-formalization` re-presents the gate over
+the draft `spec.md`, rewritten from the recorded `§Q` decisions first
+(an amendment may have been recorded and never reached the draft),
 `formalized` points at `plan`, unless the request changes the
 feature itself: then reopen from `spec.md`, set `status: interviewing`,
 and interview only the change (new `§Q` entries may name prior working
 entries internally, but the rewritten spec may not),
-re-gate, and rewrite `spec.md`; the changed spec voids any recorded
+rewrite `spec.md`, and re-gate; the changed spec voids any recorded
 plan approval via `plan`'s checksum rule. `formalized` with
 `spec.md` missing or partial is a crash: regenerate the spec from the
-recorded `§Q` decisions, without re-interviewing.
+recorded `§Q` decisions, without re-interviewing, then set
+`status: awaiting-formalization` and gate it again. The regenerated
+wording is not the text that was approved, and `plan`'s checksum
+voids any approval made against the lost one.
 
 ## Phase A - study
 
@@ -136,19 +142,18 @@ I have to invent?"** The next question is whatever tops that list.
   chain run. Groom one; list the rest in the interview file.
 - Settle purpose, users, and success criteria before mechanics.
 - For the shape decision, present 2-3 approaches with trade-offs and a
-  recommendation, never one. Record the rejected alternatives and
-  why.
+  recommendation, never one, as a message question so the comparison
+  is on screen when the user picks. Record the rejected alternatives
+  and why.
 - Walk the unhappy paths like `logic` does: per step: fails, invalid,
   happens twice, happens late, concurrent, cancelled midway.
 - A feature that contradicts a recorded decision in the reference is a
   question, not a silent override: show the chapter's decision, ask
   which governs.
 
-## Phase C - the gate, then the spec
+## Phase C - the spec, then the gate
 
-Present the design as a short summary (what it does, chosen approach,
-edge-case posture, what's out of scope) and set
-`status: awaiting-formalization`. On approval write `spec.md`:
+Write `spec.md` as a draft, from the recorded decisions:
 
 - **What & why**: the feature in one paragraph; success criteria.
 - **Requirements**: numbered, with each confirmed decision and any
@@ -167,17 +172,34 @@ edge-case posture, what's out of scope) and set
   and `from` are the one thing the `map` refresh will not derive.
 - **Out of scope**: non-goals, recorded as decisions.
 
-Self-review before handing the file over (fix inline, don't re-gate):
-no placeholders ("TBD", "handle errors appropriately"), no section
-contradicting another, no requirement readable two ways, scoped to a
-single plan. Then write the changelog entry per core.md's ledger: key
+Self-review before presenting it (fix inline): no placeholders
+("TBD", "handle errors appropriately"), no section contradicting
+another, no requirement readable two ways, scoped to a single plan.
+
+Then set `status: awaiting-formalization` and ask the user to check
+the spec itself. The gate is a message question per core.md's
+Structured questions: the design as a short summary (what it does,
+chosen approach, edge-case posture, what's out of scope) and
+`spec.md`'s path are the chat message, its last line asks the user to
+approve the spec or change it, and the turn ends there, in a
+standalone run and inside the `feature` chain alike. Only an explicit
+approval passes it. A reply that adds or changes something is an
+amendment, however it is worded ("before you plan, add..."): record
+it as a new `§Q` entry, rewrite the spec, and present the gate again.
+An amendment that leaves something to invent goes back to the
+interview first: set `status: interviewing`, ask per Phase B, then
+return here.
+Nothing is planned from a spec the user has not approved.
+
+On approval write the changelog entry per core.md's ledger: key
 `groom/<id>@Q<n>`, `<n>` the highest `§Q` in
 `feature-interview.md`; record the chosen approach with the rejected
 alternatives and the out-of-scope rulings. Add or refresh the
-`features/` Companion docs row, set `status: formalized` (only now,
-outputs on disk), and hand the
-user the `spec.md` path to review: a standalone run stops here; an
-`feature` chain run announces the stage and continues.
+`features/` Companion docs row and set `status: formalized` (only
+now: the spec approved, outputs on disk). A standalone run stops
+here; a run another protocol started - the `feature` chain, or `plan`
+or `implement` meeting its prerequisite - announces the stage and
+returns to that protocol.
 
 **Consumer:** `plan` turns the spec into a task-by-task implementation
 plan; suggest it as the next step.

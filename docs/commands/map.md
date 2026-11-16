@@ -13,7 +13,9 @@ pointer.
 It rewrites only the files whose covered paths moved. Each chapter
 records the globs it covers and a
 content hash of the tree under them, so a run after a one-file change
-regenerates one chapter and leaves the other eight alone. That is also
+regenerates one chapter and leaves the other eight alone. A repo-wide
+chapter's globs exclude the docs area, so writing the reference never
+marks it stale. That is also
 why there is one verb instead of two: no index on disk means build,
 an index on disk means refresh.
 
@@ -84,8 +86,9 @@ build asks first, and the work fans out to subagents.
 
 ## It's working if
 
-Every generated file carries `generated_at_commit`, `generated_date`,
-`capstone_version`, `content_hash` and `paths_covered` in its
-frontmatter, `00-index.md` has a row for each of them, and
+Every chapter, and every `logic/` and `uiux/` file extraction wrote,
+carries `generated_at_commit`, `generated_date`, `capstone_version`,
+`content_hash` and `paths_covered` in its frontmatter, `00-index.md`
+(which carries no stamps itself) has a row for each of them, and
 `map check` ends `MAP CHECK: current`. Run the script directly to
 confirm: `bash skills/core/scripts/map-check.sh docs/capstone`.

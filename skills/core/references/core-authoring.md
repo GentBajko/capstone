@@ -11,11 +11,13 @@ Some outputs are personal working state and are **never committed**,
 whatever `docs_in_git` says: `features/` (the whole feature chain:
 interviews, specs, plans, review ledgers), every `*-interview.md`,
 and `review.md` (plus the legacy `be-review.md` and
-`fe-review.md` older versions wrote). Two more join them from the
+`fe-review.md` older versions wrote) with `review/`, the folder of
+screenshots `review` saves as evidence (no index row: they are the
+report's attachments, not outputs). Two more join them from the
 `uiux` stage: `uiux/preview.html`, the rendered picture of
-`02-system.md` that Phase D' writes for the user to steer by (hard
-rule 4 says the outputs are markdown, and a picture of a decision is
-not the decision), and the raster brand assets under `uiux/assets/` -
+`02-system.md` that Phase D' writes for the user to steer by (Index
+maintenance below says the outputs are markdown, and a picture of a
+decision is not the decision), and the raster brand assets under `uiux/assets/` -
 `*.png`, `*.jpg`, `*.jpeg`, `*.webp`, and the whole
 `uiux/assets/references/` folder of screenshots and mood boards, which
 are exports and reference material rather than sources.
@@ -41,7 +43,9 @@ initializer's per-project run writes `<docs_dir>/.gitignore` listing
 exactly the local-only set, and deletes the `changelog.md` and
 `capstone.json` lines older versions wrote; whenever you write into
 `<docs_dir>` and that file is absent,
-create it: the same idempotent initializer without the global flag
+create it (`edges` aside: it writes into other repos' docs areas and
+leaves their housekeeping to `map` and `doctor`): the same idempotent
+initializer without the global flag
 (`init-config.sh [docs_dir]`, via bash on every platform) does
 that, the legacy migration below, and the retroactive untracking. The
 `.gitignore` itself is committed, so the rules travel with the repo.
@@ -83,7 +87,12 @@ it first; pre-fill every question it answers as `§Q` entries marked
 `source: artifact`, quoting the artifact's own words; present ONE
 digest ("the PRD answers Q1-Q9; confirm or correct") whose
 confirmation turns them into decisions; then interview only what
-remains. One-way doors (irreversible decisions per `interview.md`'s
+remains. The digest is a message question per core.md's Structured
+questions: every pre-filled answer is listed in the chat with its
+number and the artifact's words, the message closes by asking the
+user to confirm or correct by number, and the turn ends there. A
+question that asks whether "items 1-7" stand, about a list the user
+was never shown, has confirmed nothing. One-way doors (irreversible decisions per `interview.md`'s
 conduct rules) are never taken from an artifact silently: each is
 re-confirmed individually.
 

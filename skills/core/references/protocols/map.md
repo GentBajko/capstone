@@ -26,9 +26,9 @@ audience is future AI sessions; they read these docs instead of
 re-exploring the repository.
 
 **One verb, because the branch is readable off disk, not off intent.**
-No stamped index → build it. Stamped index → rewrite only what
-drifted. The user should never have to know which of those they
-needed. The two things that are *not* inferable stay explicit words:
+No index → build it. An index → rewrite only what drifted. The user
+should never have to know which of those they needed. The two things
+that are *not* inferable stay explicit words:
 `rebuild` (rewrite a current reference anyway) and `check` (report,
 write nothing).
 
@@ -40,13 +40,19 @@ refresh.
 ## Phase 0 - mode select
 
 0. Per core.md: read the config first. `docs_dir` and `index_file`
-   must be relative paths inside the repository.
+   must be relative paths inside the repository. With config
+   `workspaces` set, branches 2-5 are taken per workspace, each
+   against its own docs area and index, and a workspace name as the
+   argument targets that workspace alone (Workspaces, below).
 1. `check` → the read-only trust report at the end of this file.
    Writes nothing, not even a changelog entry.
 2. A single topic argument → run Phase 1 recon, then Phases 2-4 for
    that topic only, regardless of staleness; it always regenerates
    that chapter, and Phase 3's extractions (steps 4-5) do not run.
-   Confirm before overwriting a chapter that is current.
+   Confirm before overwriting a chapter that is current. With no
+   `<index_file>` on disk a topic argument is a full build (branch
+   4): one chapter is not a reference, and the Refresh would never
+   write the rest.
 3. `rebuild` → full build (Phases 1-4), overwriting what exists.
    Confirm once first: it rewrites every chapter, and a plain `map`
    would have refreshed only what drifted. In this mode Phase 3's
@@ -62,7 +68,9 @@ refresh.
    what drifted. The index itself carries no stamps (Phase 3 step 7),
    so its presence is the whole test - the stamps the Refresh reads
    live in the topic files. An index with no stamped topic file beside
-   it is a torn build, not a reference: say so and full-build.
+   it is a torn build, not a reference: say so and full-build. The
+   root index-of-indexes of a project with `workspaces` set is exempt:
+   it has no topic files beside it by design (Workspaces, below).
    Never silently rewrite a current reference; a user who wants
    everything redone says `rebuild`.
 
@@ -94,7 +102,7 @@ Do this in the main session with cheap reads only:
    full build.
 9. If that count is ~0 and no entry points or manifests were found,
    stop here. There is nothing to describe yet; write nothing and
-   point the user at `start` (or `architecture` directly), the
+   point the user at `start` (or `start architecture` directly), the
    greenfield path.
 
 ## Phase 2 - deep-dive
@@ -130,9 +138,10 @@ each row is this run's to write (`../topics.md`'s interfaces
 section).
 
 1. **Read the existing chapter first**, if there is one, and keep its
-   `edges:` block: every row's `to` and `from` is an answer a person
-   or a confirmation gave, and **no run writes or edits one** (core.md
-   hard rule 3).
+   `edges:` block: every row's `to` and `from` is an answer - a
+   person's, a confirmation's, or an `edges` run's - and **no run
+   edits one**. `map` derives none: the one thing it writes there is
+   the answer step 5's ask is given (core.md hard rule 3).
 2. **Derive this run's rows from the code**: `kind`, `name`, `site`
    as a repo-relative path with no line number, and `schema` naming
    the `### <Entity>` section `02-models.md` holds for that payload,
@@ -185,7 +194,7 @@ section).
 ---
 generated_at_commit: <12-char sha of HEAD>   # omit outside git
 generated_date: <YYYY-MM-DD>
-capstone_version: <this plugin's manifest version>  # omit if unreadable
+capstone_version: <this installation's version or skill hash>  # omit if unreadable
 content_hash: <12 chars>   # omit outside git; see core.md's stamps rule
 paths_covered:
   - "<glob>"
@@ -217,8 +226,15 @@ paths_covered:
    Some topics (architecture, conventions) are legitimately
    repo-wide. Anchor every glob at the repository root with the
    `:(top)` magic pathspec (e.g. `:(top)src/api/**`) so staleness
-   checks work from any cwd. `09-interfaces.md`'s globs also cover
-   the deploy sources its `known_as` was read from, so a renamed
+   checks work from any cwd. A glob list that could match the docs
+   area (a repo-wide `:(top)**`, or a glob over a parent of
+   `<docs_dir>`) carries one more entry excluding it,
+   `":(top,exclude)<docs_dir>/**"`: without it this run's own docs
+   writes, and every later docs commit, mark the chapter stale
+   forever. git honours the exclusion in `git diff`, `git status` and
+   `git ls-files` alike, so the staleness test and the `content_hash`
+   recipe take the list as written. `09-interfaces.md`'s globs also
+   cover the deploy sources its `known_as` was read from, so a renamed
    service marks the chapter stale.
 3. Ensure the global config and the docs area's `.gitignore` exist by
    running the platform-appropriate initializer from the `core`
@@ -265,15 +281,18 @@ paths_covered:
    which regenerates the extraction-mode ones. A committed design the
    `uiux` interview produced is never overwritten, in any mode.
 6. Write the changelog entry per core.md's Changelog ledger (a
-   `changelog.d/` fragment), key `map/<topic|all>@<the run's stamp>`;
-   one bullet per chapter and logic scenario written **this run**
-   (every one, never only those you judge materially changed; that
-   judgment is the escape hatch), the topics recorded absent with
-   their reasons, and whether the index was created or refreshed.
+   `changelog.d/` fragment), key `map/<topic|all>@<the run's stamp>`,
+   suffixed `.2`, `.3` when the ledger already holds that key and its
+   entry does not record what this run wrote (core.md's ledger rule;
+   the fragment is named `<YYYY-MM-DD>-map-<target>-<rev>.md` after
+   the suffixed key); one bullet per chapter and logic scenario
+   written **this run** (every one, never only those you judge
+   materially changed; that judgment is the escape hatch), the topics
+   recorded absent with their reasons, and whether the index was created or refreshed.
    Nothing written (Phase 1 step 9's empty-repo stop) → no entry.
    This run writes the docs area, so it also **folds** any waiting
-   `changelog.d/` fragments into `changelog.md` per that ledger rule
-   (its own entry included).
+   `changelog.d/` fragments into `changelog.md` per that ledger rule:
+   on the default branch only, its own entry included.
 7. Write `<index_file>` **last**, so the index reflects what was
    actually written. It is chapter zero of the docs area
    (`docs/capstone/00-index.md` by default), and it carries no stamps:
@@ -289,9 +308,10 @@ paths_covered:
      (the monorepo split mechanic below, applied to a subfolder
      instead of the root); a repo with no scenarios yet records
      `logic` absent here with its reason instead.
-   - If companion docs exist (`review.md`, `changelog.md`,
-     `standards.md`, `implementation.md`, `mockup/`,
-     `uiux/`, `features/`), a `| File | What it is |` table below
+   - If companion docs exist (`review.md`, `changelog.md` and its
+     `changelog-<YYYY>.md` rotation files, `standards.md`,
+     `implementation.md`, `mockup/`, `uiux/`, `features/`,
+     `questionnaires/`), a `| File | What it is |` table below
      the topic table; the factual reference and the
      opinionated/instructional outputs stay visibly distinct.
      Interview Q&A files are never indexed, and the index never lists
@@ -316,9 +336,13 @@ paths_covered:
    included, both always committed per core.md). If those generated files are
    untracked and not covered by `.gitignore`: honor the `docs_in_git`
    config key when set (`commit` or `ignore`); when it is `ask` or
-   unset, ask the user whether to commit them or add
-   `<docs_dir>/` to `.gitignore`; never decide unilaterally. On
-   later runs, respect whichever choice is in place.
+   unset, ask the user whether to commit them or ignore them; never
+   decide unilaterally. Ignoring adds the reference's own paths to
+   `.gitignore` (`<index_file>`, the topic chapters, and
+   `<docs_dir>`'s `logic/`, `mockup/`, `uiux/` and `standards.md`),
+   never `<docs_dir>/` as a whole: that would also ignore the ledger,
+   `capstone.json` and `questionnaires/`, which are always committed.
+   On later runs, respect whichever choice is in place.
 
 ## Refresh - rewrite only what drifted
 
@@ -341,14 +365,18 @@ Then, for each stamped file with `paths_covered`:
 
 1. Read `generated_at_commit`, `capstone_version`, `content_hash`,
    and `paths_covered` from its frontmatter.
-2. If the frontmatter has `mode: prescriptive` and any tracked source
-   now exists, the file is **stale by definition**: the planned globs
-   may not match where code actually landed. Re-run its Phase 2
+2. If the frontmatter has `mode: prescriptive` and tracked source now
+   exists under its globs (`git ls-files -- <globs>` lists a file),
+   the file is **stale by definition**: code has landed where the plan
+   put it. Re-run its Phase 2
    deep-dive, rewrite it descriptively, drop
    `mode: prescriptive` and the banner, and record
    designed-vs-implemented divergences from the existing chapter as
    facts ("designed as X; implemented as Y (`file:line`)"), preserving
-   the design rationale inline. When regenerating
+   the design rationale inline. With nothing tracked under its globs
+   the file is current, the same test `check` runs; when the repo
+   does have tracked source elsewhere, the run report names the file:
+   planned paths the code did not follow. When regenerating
    `05-dependencies.md` by ANY path (refresh, rebuild, or a topic
    argument), carry forward every final-chapter pick not yet present in
    the manifests as a fact ("picked but not yet installed"); the
@@ -368,22 +396,27 @@ Then, for each stamped file with `paths_covered`:
    expanded the globs; treat it as absent. Only a file with neither a
    reachable stamp nor a `content_hash` (written by an older
    capstone) is stale-by-unknowable and regenerates. `check`'s script
-   half (`scripts/map-check.sh`) runs this same test and prints the
-   verdict per file; its part 1 rows are that test's output.
+   half (`scripts/map-check.sh`) runs this same test, and step 2's,
+   and prints the verdict per file; its part 1 rows are their output.
 4. **No changes** → skip; leave the file and its stamp untouched.
    **Changes** → regenerate it through Phases 2-3; a stale
    extraction-mode `logic/` or `uiux/` file regenerates per its own
    protocol's extraction mode instead. Template drift overrides the
    skip: a chapter missing a required section that `../topics.md` now
    defines (the template changed after the chapter was stamped) is
-   stale regardless of `git diff`; regenerate it against the current
-   template. So does a **version gap**: a `capstone_version` older
+   stale regardless of `git diff`, and so is a glob list that could
+   match the docs area without a `":(top,exclude)<docs_dir>/**"` entry
+   (Phase 3 step 2); regenerate either against the current template.
+   So does a **version gap**: a `capstone_version` older
    than the running plugin's marks a file written by an earlier
    template generation. Drift catches a section that went missing; it
    cannot catch one whose meaning moved under it, or a rename, which
    is what the version stamp is for. Re-read such a file against the
    current `../topics.md` and regenerate when they disagree in shape
-   or meaning (not merely in wording). A file carrying no
+   or meaning (not merely in wording). When they agree, write the
+   running version into the file's `capstone_version` and change
+   nothing else: the gap is closed, and `check` stops reporting a
+   page that has nothing wrong with it. A file carrying no
    `capstone_version` predates the stamp: same treatment.
 5. Re-run the **Applicable** test from `../topics.md` for every topic
    the index lists as absent; write any newly applicable topic at
@@ -418,13 +451,18 @@ Then, for each stamped file with `paths_covered`:
 8. If any file was rewritten or created in this run, write the
    changelog entry per core.md's ledger (a `changelog.d/` fragment),
    key `map/<scope>@<the run's stamp>` (`<scope>` = the topic name
-   for a single file, `all` otherwise); record the files regenerated
-   or created and each one's trigger (covered paths changed,
-   `mode: prescriptive` with code now present, template drift,
+   for a single file, `all` otherwise), suffixed `.2`, `.3` when the
+   ledger already holds that key and its entry does not record what
+   this run wrote (core.md's ledger rule; the fragment is named
+   `<YYYY-MM-DD>-map-<scope>-<rev>.md` after the suffixed key, so a
+   second refresh at one commit records itself); record the files
+   regenerated or created and each one's trigger (covered paths
+   changed, `mode: prescriptive` with code now under its globs,
+   template drift,
    version gap, newly applicable topic, logic or design coverage
    gap), the divergences recorded, and the files skipped as current.
    A writing run also folds waiting `changelog.d/` fragments per the
-   ledger rule. A run where every file was current writes nothing
+   ledger rule, on the default branch only. A run where every file was current writes nothing
    and folds nothing.
 9. Always re-verify the index's module map and rows.
 10. Fall back to a full build (Phases 1-4) only when there is no git
@@ -434,8 +472,8 @@ Then, for each stamped file with `paths_covered`:
    back, say so before doing it: the user asked to refresh and is
    getting a rewrite.
 
-Config `workspaces` set → run the refresh per workspace (an argument
-targets one) and re-verify the root index-of-indexes' workspace table.
+Config `workspaces` set → the refresh runs for each workspace that
+has an index, as the Workspaces section below says.
 
 ## check - the read-only trust report
 
@@ -468,13 +506,15 @@ own:
    first 12 chars, and comparing, with the legacy empty-input hash
    `e69de29bb2d1` read as absent); `stamp unreachable` (no reachable
    stamp and no `content_hash`); `written by an older capstone`
-   (`capstone_version` absent or below the plugin's, read from the
-   plugin's own manifest); or `prescriptive, pending first
+   (`capstone_version` absent or below the running installation's
+   identity, read from its manifest, version file or skills lockfile;
+   opaque skill hashes compare for equality); or `prescriptive, pending first
    observation` (`mode: prescriptive` while tracked source exists
-   under its globs; with no tracked source yet the file is `current`
-   by definition). Outside git every verdict is `unknowable (not a
-   git repo)` and counts for nothing. A docs area without its index
-   is one finding, `no index at <path>`, and gets no rows.
+   under its globs; with no tracked source under them the file is
+   `current`, the Refresh's step 2 test). Outside git every verdict
+   is `unknowable (not a git repo)` and counts for nothing. A docs
+   area without its index is one finding, `no index at <path>`, and
+   gets no rows.
 - Part 7, unfolded fragments: every file in `changelog.d/` with
    its key and the repair (any writing run folds them; so does
    `doctor`). Informational only: fragments are the designed state on a branch,
@@ -489,7 +529,12 @@ own:
    `../topics.md` and to the protocols that write `logic/`, `mockup/`
    and `uiux/`. Every file the index reaches is checked against its
    record, so a scenario file, a screen chapter and a questionnaire
-   are held to their section lists the way a chapter is. A schema that cannot be read
+   are held to their section lists the way a chapter is. A page whose
+   part 1 row already counts its version gap is not held to its
+   headings and tables until its stage rewrites it; a page whose row
+   counts nothing (no globs, or outside git) is, so an older
+   interview-derived page with a section missing is still reported.
+   A schema that cannot be read
    costs the headings and the tables and nothing else: the run prints
    `schema: <path> unreadable; headings and tables not checked`, holds
    every page to `generated_date`, and reaches the same verdict line
@@ -598,7 +643,7 @@ reword, recompute, or repeat it.
    picks against the manifests and lockfile (picked but absent,
    installed but unrecorded, version below the recorded floor) and
    flag any pick whose recorded research date is more than 6 months
-   old as "re-vet suggested (`stack refresh`)".
+   old as "re-vet suggested (`start stack refresh`)".
 5. **Logic coverage**: the Refresh step 6 inventory, read-only:
    entry points no `logic/` scenario claims. Report "logic/ missing
    N scenarios", naming the unclaimed entry points (repair: `map`,
@@ -625,11 +670,16 @@ never the script's; never omit or reword either.
 
 ## Workspaces
 
-When config `workspaces` is set, run Phases 1-4 once per workspace
-with `<path>/docs/capstone/` as its docs area (a workspace name as
-argument targets just that one), then write the root `<index_file>`
+When config `workspaces` is set, a plain `map` covers every
+workspace, with `<path>/docs/capstone/` as its docs area and Phase 0
+taken for each on its own: a workspace whose docs area has an index
+is refreshed (Refresh, above), and one with none gets a full build
+(Phases 1-4). A workspace name as the argument targets just that
+one. Then write, or on a refresh re-verify, the root `<index_file>`
 as an index-of-indexes: project one-liner, a workspace table (name ·
-path · index link · newest stamp), and cross-cutting notes. When
+path · index link · newest stamp), and cross-cutting notes. It has
+no topic files beside it by design, so Phase 0's torn-build test
+never applies to it. When
 Phase 1 recon detects workspace manifests (`pnpm-workspace.yaml`,
 `go.work`, a Cargo, uv, or poetry workspace) and `workspaces` is
 unset, offer to record them in the project config (per core.md,

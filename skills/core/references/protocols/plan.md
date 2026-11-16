@@ -17,7 +17,7 @@ frontmatter says `formalized` and `spec.md` is on
 disk. Interview missing or not yet `formalized` → execute
 `protocols/groom.md` first (its Resume rules pick up mid-interview);
 `formalized` with `spec.md` missing is a crash `groom`'s Resume rule
-regenerates.
+regenerates and gates again.
 
 State: the feature's
 `docs/capstone/features/<id>/feature-interview.md`
@@ -35,7 +35,14 @@ first, before touching `plan.md`, then re-run Phase A's study and
 Phase B's review passes against the changed spec, update the plan,
 and re-gate. If `plan.md` exists unapproved (or ends mid-sentence, a
 crash artifact), finish it via Phase B's review passes, re-reading
-Phase A's sources as needed, then re-present the gate.
+Phase A's sources as needed, then re-present the gate. `plan_approved`
+with `plan.md` missing or truncated is a crash too: delete
+`plan_approved` and `approved_spec` first, rebuild the plan through
+Phase B, and re-gate. A rebuilt plan is not the one that was approved.
+A re-plan after `implement` executed tasks keeps every checked task
+as it is (its commit stands) and plans the difference as new tasks,
+including a new task that changes or removes what a finished task
+built; it never unchecks a box and never rewrites a finished task.
 
 ## Phase A - study
 
@@ -144,10 +151,21 @@ executor sees only the plan.
 
 Present the summary: file map, task list, the Coverage table's totals
 (N requirements and N behavior rules, all mapped), what Task 1
-proves. The user approves before any code is written. On approval,
+proves. The gate is a message question per core.md's Structured
+questions: the summary and `plan.md`'s path are the chat message, its
+last line asks the user to approve the plan or change it, and the turn
+ends there. The user approves before any code is written. Only an
+explicit approval passes, and it covers the plan as presented: a reply
+that changes a task is an amendment, so update `plan.md` and present
+the gate again (core.md's Structured questions). A task changed after
+approval is a new plan: delete `plan_approved` and `approved_spec`,
+then gate it again. On approval,
 first write the changelog entry per core.md's ledger, key
-`plan/<id>@Q<n>` from the same highest `§Q`; record the file
-map, the task count and titles, and the global constraints pinned.
+`plan/<id>@Q<n>` from the same highest `§Q`; a re-plan at the same
+`Q<n>` wrote something that key does not record, so it appends `.2`,
+`.3` to `<rev>` per core.md's ledger rule and records itself. Record
+the file map, the task count and titles, and the global constraints
+pinned.
 Then record `plan_approved: true` and `approved_spec: <checksum of
 spec.md>` (`git hash-object spec.md`; any stable checksum outside
 git) in the interview frontmatter; `implement` and the chain verify

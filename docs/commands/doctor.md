@@ -21,8 +21,9 @@ rule is reported as one rather than tidied away.
 
 `/capstone:doctor` after a session that died mid-write, after a merge
 that touched the docs area from two branches, or when a command
-complains that state disagrees with disk. `doctor fix` pre-approves
-the documented crash rules and still asks about everything else.
+complains that state disagrees with disk. `doctor fix` applies the
+repairs that only restore a state a crash rule already defines, then
+still asks about everything else.
 
 Reach for `map check` instead when the question is whether the
 reference is still true about the code. `doctor` is about the docs
@@ -32,9 +33,15 @@ which both run.
 
 ## What a finding looks like
 
-Findings are grouped into two piles. Auto-repairable means a
-documented crash rule covers it exactly, so `fix` may apply it without
-asking again. Needs-confirmation means a person has to rule.
+Findings are grouped into two piles. Pre-approvable means the repair
+restores a state a crash rule already defines and chooses nothing:
+the catch-up ledger entry for a done marker with none, removing a
+voided plan approval's keys, finishing a torn wrap's delete, running
+the initializer, and folding `changelog.d/` fragments. With `fix`
+those are applied before the table appears and marked applied in it.
+Needs-confirmation is everything else - regenerating outputs, a `map`
+refresh, absorption, extraction, ledger rotation - and a person has
+to rule.
 
 Each row names the check, the finding, the owning rule, and the
 proposed repair. Some findings are reported unrecoverable rather than
@@ -44,9 +51,9 @@ final output missing content that only an unavailable interview held.
 
 ## Common questions
 
-**Does `doctor fix` apply everything it found?** No. It pre-approves
-the documented crash rules only. Anything that needs a decision still
-stops and asks.
+**Does `doctor fix` apply everything it found?** No. It applies the
+five pre-approvable repairs only. Anything else still stops and asks,
+and the run ends on that question.
 
 **It reported unfolded `changelog.d/` fragments on my feature
 branch.** That is the designed state, not a fault. Fragments fold only

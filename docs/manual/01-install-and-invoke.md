@@ -79,7 +79,11 @@ Replace the installation path. For direct script use outside Claude, select the 
 CAPSTONE_GLOBAL_DIR="$HOME/.codex" bash /absolute/path/to/capstone/skills/core/scripts/init-config.sh --global
 ```
 
-The script resolves `CAPSTONE_GLOBAL_DIR`, then `CLAUDE_CONFIG_DIR`, then `$HOME/.claude`. It does not infer `.codex` or `.gemini` from the current agent. Use the same environment when running check scripts that should read that configuration. See [configuration](08-configuration.md).
+The script resolves `CAPSTONE_GLOBAL_DIR`, then the detected host
+(`CODEX_HOME` or Codex runtime markers, Gemini home variables), then
+`CLAUDE_CONFIG_DIR`, then `$HOME/.claude`. Use the same environment when
+running check scripts that should read that configuration. See
+[configuration](08-configuration.md).
 
 ## Update an installation
 
@@ -92,6 +96,8 @@ The script resolves `CAPSTONE_GLOBAL_DIR`, then `CLAUDE_CONFIG_DIR`, then `$HOME
 The two Claude commands update different things: the marketplace checkout, then the installed plugin. The README also documents enabling marketplace auto-update from Claude Code's plugin UI. It does not provide a version-specific update command for every other harness.
 
 Skills CLI updates can leave retired skills on disk. After a release removes a command, compare `gh skill list` or `npx skills list` with the installed Capstone help and remove retired entries using that installer's normal removal flow. An update is not evidence that old skill files were deleted.
+
+Both skills CLIs also check only the skills already installed, so an update does not install a command that a release adds. 7.1.0 adds `edges`: run the original install command again and select it.
 
 This matters specifically when upgrading to 7.0.0, which retires eight skills: `mockup`, `logic`, `uiux`, `architecture`, `standards`, `stack`, `build` and `retro`. If they remain on disk after the update, the agent can still route to them, and a stale copy carries its own `core` expectations. Confirm they are gone; `/capstone:help` lists what 7.0.0 actually offers.
 

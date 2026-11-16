@@ -5,13 +5,13 @@ Topics are written as numbered chapters in this reading order:
 `04-data-flow.md`, `05-dependencies.md`, `06-testing.md`,
 `07-operations.md`, `08-glossary.md`, `09-interfaces.md`. The headings below use the
 logical topic names; the chapter number is a filename prefix only.
-`logic/`'s per-scenario files join the same topic index (core.md's
-Index maintenance rule) under the `logic` topic name, one row per
+`logic/`'s per-scenario files join the same topic index
+(core-authoring.md's Index maintenance rule) under the `logic` topic name, one row per
 scenario file; their required sections live in `protocols/logic.md`
 (Phase B), not here, since they're generated scenario-by-scenario
 rather than by a single deep-dive per chapter.
 
-Every topic file uses the frontmatter defined in SKILL.md Phase 3 and the
+Every topic file uses the frontmatter defined in `protocols/map.md` Phase 3 and the
 exact headings shown here. A deep-dive (inline or subagent) must return
 content for every required section; write "None found" plus where you
 looked rather than omitting a section.
@@ -228,8 +228,10 @@ base URL and a path, so the far end of an edge cannot be derived by
 reading one repo. Quarry derives it instead, by joining two repos'
 declarations on `(kind, name)`, and a person answers only where that
 join is ambiguous or empty (core.md's Edge confirmation). A `to` or
-`from` already in the block came from a person or from that ask, and
-no run edits it.
+`from` already in the block came from a person, from that ask, or
+from an `edges` run over a folder that held both repos
+(`protocols/edges.md`, which fills a consumer's empty `from` and
+nothing else), and no run edits it.
 
 ```yaml
 known_as: [ingest.internal]

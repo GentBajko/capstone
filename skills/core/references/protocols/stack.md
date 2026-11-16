@@ -17,6 +17,8 @@ argument (a preferred-vendor list, an infra doc) seeds it per
 core-authoring.md's Artifact seeding rule). Output:
 `05-dependencies.md` written or updated (`mode: prescriptive` while no
 code exists) with the chosen stack.
+Prerequisite: a formalized `architecture`. Without one, name
+`architecture` as the stage that owns the missing chapters and stop.
 
 ## Phase A - derive the capability list
 
@@ -36,13 +38,20 @@ documents already record, one row per thing they name:
 - every commitment `uiux/02-system.md` records - design system and
   component kit, faces, icon family - carried in as **decided**.
   Research within them; never silently re-open them;
-- every capability `standards.md` already pins, likewise carried in as
-  decided rather than re-asked;
+- every library preference `standards.md` records, carried in as a
+  constraint on that capability's pick ("must be X-compatible"), never
+  as a decided pick;
+- every pick `05-dependencies.md` marks
+  "provisional: `stack` owns this", carried in as a proposal to
+  compare in Phase B, never as settled;
 - anything the architecture interview left open.
 
 Present the derived list with **its source per row**
 (`04-data-flow.md` State → session store) and let the user add or
-strike rows. A design that names something unusual - a license server,
+strike rows, as a message question per core.md's Structured questions.
+A struck row is recorded, with the user's reason, for Phase C to write
+into `05-dependencies.md` as "not needed", so no later pass derives it
+again. A design that names something unusual - a license server,
 a hardware key, a court-filing gateway - reaches the list because a
 document named it, rather than because the model thought of it.
 
@@ -93,8 +102,11 @@ Seed the ledger with the confirmed list.
    dependency already picked - goes first and is named as the
    recommendation with its rung; the researched alternatives are still
    shown, with what they buy over it. Expertise governs the form
-   (level 1: recommend and confirm in plain words; level 5: the
-   comparison table). The user picks.
+   (level 1: recommend in plain words, still showing each option's
+   price and the alternatives; level 5: the comparison table). At
+   every level the comparison is a message question, never a yes/no
+   dialog: it is the chat message, and the user picks by replying
+   to it.
 4. **Record the pick** as a `§Q` decision, together with the rung that
    ranked the options and whether the pick followed it; flip the
    ledger box.
@@ -102,17 +114,29 @@ Seed the ledger with the confirmed list.
 ## Phase C - gate and output
 
 Set `status: awaiting-formalization`; present the summary table
-(capability → decision → one-line why). On formalization, write or
+(capability → decision → one-line why) as a message question per
+core.md's Structured questions: the table is the chat message, its
+last line asks the user to formalize or amend, and the turn ends
+there. On formalization, write or
 update `05-dependencies.md` as the complete capability matrix: every
-pick with version floor, license and pricing notes; every
+pick with version floor, license and pricing notes, and
+`researched: <date>`, the date its research ran; every
 no-dependency decision with the ladder rung that recommended it and the
-options the user turned down for it; and every open or deferred
-capability with its trigger. Write each decision's
-rationale inline; append the changelog entry
+options the user turned down for it; every struck capability as
+"not needed" with the reason; and every open or deferred
+capability with its trigger. Every provisional entry is rewritten to
+the decision, its marker dropped. The matrix is complete when the
+`stack/all` key exists and every capability row in
+`05-dependencies.md` has a pick, a no-dependency decision, a
+"not needed" ruling, or an open or deferred marker. Write each
+decision's rationale inline; append the changelog entry
 per core.md's ledger: key `stack/all@Q<n>`; record the capability
 → pick table with version floors, licenses and pricing, what each pick
 replaced in the architecture stage's draft, and the capabilities still
-open. Update the index; then set `status: formalized`. On a repo with no
+open. Update the index; then set `status: formalized`. Outputs on
+disk, the `stack/all` key present and
+`status: awaiting-formalization` is a finished stage whose marker was
+not written: set `status: formalized`, never re-gate. On a repo with no
 code the chapter carries `mode: prescriptive`; on a repo that already
 has code, write the picks into the existing descriptive chapter as
 decision facts ("picked but not yet installed") without flipping its
@@ -124,10 +148,14 @@ caught up.
 
 `stack refresh` re-researches only the picks `05-dependencies.md`
 already records (maintenance activity, license changes, pricing,
-newer majors), presents the deltas (unchanged picks in one line
-each), and records re-confirmations or changes as new `§Q` entries,
-updating the chapter rows touched with the decision and rationale
-inline. Changelog key `stack/refresh@Q<n>`.
+newer majors) and presents the deltas (unchanged picks in one line
+each) as a message question per core.md's Structured questions; the
+turn that presents them swaps nothing. A re-confirmed pick gets its
+`researched: <date>` updated; a pick the user changes goes back
+through Phase B's comparison for that capability. Each outcome is a
+new `§Q` entry, and the chapter rows touched carry the decision and
+rationale inline. Changelog key `stack/refresh@<stamp>` with the
+run's commit stamp as `<rev>`.
 It never re-opens the capability list or the uiux stage's
 commitments; a changed pick flows into `05-dependencies.md` like any
 formalization. `map check`'s dependency section is what suggests it.

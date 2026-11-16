@@ -90,6 +90,12 @@ quarry docs section record-store "file-ingest (v2)"
 
 `ingest-api` and `record-store` are illustrative names; substitute registered repos or workspace targets. Query results normally reflect the last-synced reference, not a live read of every source repository.
 
+## Fill far ends from a folder of clones
+
+When every repository of a system is cloned into one folder and each has been mapped, run `/capstone:edges` from that folder. For each consumed contract with no `from`, it reads the calling code at the row's `site`, follows the address through environment variables and deployment configuration across the clones, and writes the name of the repository that answers to it. Where the code holds no address, as with a queue or a topic, it writes the only repository in the folder that produces the contract.
+
+It writes only an empty `from`. It never writes a producer's `to`, never writes `unknown`, never changes an existing answer, and leaves a row empty when the evidence gives several candidates or none. Each repository it changes gets a ledger entry naming the evidence for every row, and nothing is committed. Review and commit each repository's `09-interfaces.md` yourself; Quarry sees the result after the usual `quarry update`.
+
 ## When Capstone consults Quarry
 
 | Stage | Condition and use |

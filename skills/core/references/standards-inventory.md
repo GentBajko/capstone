@@ -38,15 +38,18 @@ sits through.
 1. **Generate.** For each item in the domain you are on, write the
    question it raises *for this project*. Many raise none.
 2. **Eliminate.** Delete every question already settled by an earlier
-   answer, by `../code-craft.md`, or by the conventions chapter. Record
+   answer, by `../code-craft.md`, or by the conventions chapter (an
+   entry marked "provisional: `standards` owns this" settles nothing:
+   confirm it as a question). Record
    the settled value with its source rather than re-asking it.
 3. **Batch the empties.** Items that do not apply go into **one**
    confirmation, not one question each: "no HTTP surface, no browser
    UI, nothing runs on a schedule - so no API conventions, no
    accessibility target, no performance budget for a page. Right?" A
    correction turns a batched empty back into a real question.
-4. **Ask what remains**, one per turn, per `standards.md`'s Phase B
-   conduct.
+4. **Ask what remains**, per `standards.md`'s Phase B conduct: one
+   per turn, or sharing a dialog where core.md's Shared dialogs
+   allows.
 5. **Record.** Answers land in the `standards.md` section each item
    names. Items ruled out are recorded per §5.
 
@@ -163,14 +166,16 @@ one for what a few lines can do - accept, or change which rung?"
 reinventing, as accepted or as the named amendment.
 
 **S8 Preferred picks per capability.** HTTP client, validation, ORM or
-query builder, testing, state, CLI parsing, dates, serialization: which
-library the project already stands behind, so `stack` researches within
-the choice rather than reopening it.
+query builder, testing, state, CLI parsing, dates, serialization: the
+library preferences the project already holds, recorded as constraints
+on the pick ("must be X-compatible"), so `stack` researches within them;
+the pick itself is `stack`'s.
 *Probe:* "for each capability the design already needs, is there a
-library you will use whatever the research says?"
-*Default:* none. *Lands in:* Libraries vs reinventing, as the pinned
-picks; the versions and pricing land in `05-dependencies.md` at the
-`stack` stage.
+library or ecosystem the pick must work with whatever the research
+says?"
+*Default:* none. *Lands in:* Libraries vs reinventing, as constraints
+on the pick; the pick, its version and pricing land in
+`05-dependencies.md` at the `stack` stage.
 
 **S9 The vetting bar.** What a candidate must clear: last release,
 maintainer count, open-issue behavior, license list, transitive weight,
@@ -804,8 +809,9 @@ Agent rules, as the mirror location and the precedence rule.
 
 ## 5. The completeness gate
 
-The interview is finished when **every item is answered, cited, or
-recorded inapplicable** - not when nothing more comes to mind.
+The interview is finished when **every item is answered, cited,
+recorded inapplicable, or awaited** - not when nothing more comes to
+mind.
 
 - **Answered**: the decision is in `standards.md`, under the domain the
   item names.
@@ -818,6 +824,10 @@ recorded inapplicable** - not when nothing more comes to mind.
   style.md, absent things are facts: a later reader can tell "no API
   here" from "nobody asked about the API", and `review` will not
   re-raise it.
+- **Awaited**: a questionnaire is out for it (core.md's
+  Questionnaires). It counts as settled for now, so the gate is
+  reachable, and is listed under `## Not in play` as awaited, naming
+  the recipient and the date sent.
 
 An item the user declines to settle is **not** inapplicable: it is an
 open question, recorded as one in the interview file and named in

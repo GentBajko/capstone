@@ -15,7 +15,7 @@ argument-by-argument reference.
 
 1. [Invocation](#invocation)
 2. [Three entry points](#three-entry-points)
-3. [Reference commands](#reference-commands) — [`map`](#map) · [`doctor`](#doctor) · [`review`](#review) · [`review retro`](#review-retro)
+3. [Reference commands](#reference-commands) — [`map`](#map) · [`edges`](#edges) · [`doctor`](#doctor) · [`review`](#review) · [`review retro`](#review-retro)
 4. [The greenfield pipeline](#the-greenfield-pipeline) — [`start`](#start)
 5. [The feature chain](#the-feature-chain) — [`feature`](#feature-description)
 6. [`help`](#help) and [`core`](#core)
@@ -37,10 +37,10 @@ agents" section.
 Arguments are positional words, not flags: `map check`,
 `review backend`, `start stack refresh`, `groom add CSV export`.
 
-There are nine commands: `map`, `doctor`, `review`, `groom`, `plan`,
-`implement`, `feature`, `start`, `help`. The pipeline stages are not
+There are ten commands: `map`, `edges`, `doctor`, `review`, `groom`,
+`plan`, `implement`, `feature`, `start`, `help`. The pipeline stages are not
 among them - each is `start <stage>` - because a stage run outside its
-chain is the exception, and a flat list of seventeen hides which five
+chain is the exception, and a flat list of eighteen hides which five
 you actually reach for.
 
 ## Three entry points
@@ -51,7 +51,7 @@ what order, where it stops for you, and what it leaves on disk.
 
 Everything else is a stage one of these runs, reached as that
 command's second word when you want to enter mid-chain: `start uiux`,
-`start stack refresh`. There are nine commands and no more.
+`start stack refresh`. There are ten commands and no more.
 
 | Situation | Command |
 | --- | --- |
@@ -73,10 +73,11 @@ means refresh only what drifted.
 
 | Argument | Behavior |
 | --- | --- |
-| *(none)* | No stamped index → full build. Stamped index → refresh what drifted. |
+| *(none)* | No index → full build. An index → refresh what drifted. With `workspaces` set, each workspace on its own. |
 | `check` | Read-only trust report. Writes nothing, not even a ledger entry. |
 | `rebuild` | Force a full rewrite of a reference that looks current. |
 | `<topic>` | Rebuild one chapter: `architecture`, `models`, `conventions`, `data-flow`, `dependencies`, `testing`, `operations`, `glossary`, `interfaces`. |
+| `<workspace>` | With `workspaces` set, map that one workspace: refresh it, or build it when it has no index. |
 
 **Writes** `docs/capstone/00-index.md`, the numbered chapters
 (`09-interfaces.md`, the cross-repo produces/consumes tables with one
@@ -84,9 +85,13 @@ means refresh only what drifted.
 another repo; the `interfaces` config key can turn it off), `logic/`
 (business-logic scenarios) and `uiux/` (surface chapters); the
 `extract` config key can skip either extraction pass.
-Every file carries `generated_at_commit`, `generated_date`,
-`capstone_version`, `content_hash` and `paths_covered` in
-frontmatter; those globs are what a later refresh diffs against, and
+Every chapter, and every `logic/` and `uiux/` file extraction wrote,
+carries `generated_at_commit`, `generated_date`, `capstone_version`
+(when the installation's identity is readable),
+`content_hash` and `paths_covered` in frontmatter; the index carries
+no stamps. Those globs are what a later refresh diffs against (a
+repo-wide list also excludes the docs area, so writing the reference
+never marks it stale), and
 the content hash is the stamp that survives squash and rebase merges,
 so an unreachable commit degrades to a per-file check instead of a
 full rebuild.
@@ -171,6 +176,45 @@ MAP REVIEW: <N> findings
 
 **Ledger key** `map/<topic|all>@<stamp>`.
 
+### `edges`
+
+[Page: when to reach for it, and how to tell it worked](commands/edges.md)
+
+Fills the consumer side of cross-repo edges. Run from a folder that
+holds several mapped repos, it reads each one's `09-interfaces.md`
+and, for every consumes row with no `from`, the code at the row's
+`site` and the config that feeds it, then writes the name of the repo
+that answers. It asks nothing.
+
+| Argument | Behavior |
+| --- | --- |
+| *(none)* | The current folder: every immediate subfolder that is a git work tree. A single repo with `workspaces` configured is read as its workspaces. |
+| `<folder>` | That folder instead. |
+
+**What decides a row**: the address the code calls, followed through
+env vars and deploy config across the clones and matched against each
+repo's name and `known_as`; failing an address, the only repo in the
+folder that produces the contract. Exactly one candidate is written;
+several or none leave the cell empty and the row in the report. A
+clone that was never mapped counts as a candidate when its files name
+the contract, so an unseen producer keeps the row open.
+
+**What it never does**: write a producer's `to` (quarry builds a
+producer's edges from the consumers that name it, and a written `to`
+would hide every consumer the folder does not hold), write `unknown`,
+change a `from` that is already there, touch a stamp, run `map` in an
+unmapped clone, or commit. A filled `from` the evidence disagrees
+with is reported.
+
+**The report** lists the rows written with their evidence, the rows
+left open and why, the answered rows that disagree, calls no row
+covers (`run map interfaces there`), the clones skipped, and the
+files changed.
+
+**Ledger key** `edges/09-interfaces.md@<rev>` in each repo written,
+where `<rev>` is the moment the run began, so a later run that fills
+more rows records itself under a key of its own.
+
 ### `doctor`
 
 [Page: when to reach for it, and how to tell it worked](commands/doctor.md)
@@ -182,14 +226,14 @@ already defines.
 | Argument | Behavior |
 | --- | --- |
 | *(none)* | Report findings, ask before applying anything. |
-| `fix` | Pre-approves the documented crash rules; anything else still asks. |
+| `fix` | Applies first the repairs that only restore a state a crash rule defines (catch-up ledger entry, stale approval keys removed, torn wrap's delete finished, initializer run, fragments folded); anything else still asks. |
 
 **Checks**: torn writes (a done marker with no ledger entry, or a
 ledger key whose outputs are missing), approval integrity (voided plan
 approvals, truncated plans), torn wraps (a feature folder left behind
 after its entry landed while deletion is enabled), index ↔ disk drift,
-housekeeping (missing `.gitignore` or config keys, an untracked
-ledger), absorption drift, logic coverage, ledger size, schema
+housekeeping (a missing `.gitignore` or a stale rule in it, an
+untracked ledger), absorption drift, logic coverage, ledger size, schema
 (`map-check.sh`'s part 8: missing frontmatter keys, `known_as`
 included, or required headings, a Produces or Consumes row on
 `09-interfaces.md` with no `### <Name>` payload section, untracked
@@ -214,8 +258,11 @@ The one command allowed opinions, and only when you ask for them.
 **Writes** `docs/capstone/review.md` - one file, one section per side,
 each with its own stamp. A one-sided run rewrites only its own
 section. **Gitignored by default:** it is judgment, not reference.
+Screenshots from a live-browser run go to `docs/capstone/review/`,
+gitignored too.
 
-**Ledger key** `review/<side>@<stamp>`.
+**Ledger key** `review/<side>@<stamp>`, `<stamp>` being the commit
+in the side's stamp line.
 
 ### `review retro`
 
@@ -240,7 +287,7 @@ it.
 | *(none)* | Read the session in progress. |
 | `<session>` | Read the session the harness resolves that name to. A harness that cannot open a past session says so and runs on the current one. |
 
-**Reads** `standards.md`, `03-conventions.md`, the project's
+**Reads** the index, `standards.md`, `03-conventions.md`, the project's
 `AGENTS.md` and `CLAUDE.md` where either exists, the ledger, and the
 session.
 
@@ -257,9 +304,14 @@ candidate with no evidence behind it is reported clear, never filled
 in.
 
 **Writes** one findings table - candidate, category, evidence,
-proposed edit, owning file - ordered by severity, approved row by row.
-Approved rules land in `docs/capstone/standards.md` under the domain
-that owns them. Everything else comes back as text to place by hand:
+proposed edit, owning file - ordered by severity, answered row by row
+in one reply; an amended row is shown again and written only once
+approved as shown. Approved rules land in
+`docs/capstone/standards.md` under the domain that owns them; retro
+never creates that file, and without it names
+`/capstone:start standards` instead. A fix to a generated chapter is
+named as the `/capstone:map <topic>` run that regenerates it.
+Everything else comes back as text to place by hand:
 `AGENTS.md`, linter configs, workflows and test files sit outside the
 docs area, and no capstone command writes there.
 
@@ -268,9 +320,10 @@ the reviewer rather than the implementer, and says so: the
 implementing agent holds the plan, the diff and the standards at once,
 while the reviewer starts fresh on a diff.
 
-**Ledger key** `retro/<scope>@<stamp>` - only when `standards.md` was
-actually changed. A run whose findings are all declined writes
-nothing.
+**Ledger key** `retro/all@<stamp>` - whenever the table proposed
+anything, approved or not; it lists the declined rows, which the next
+retro does not raise again without new evidence. A run whose
+candidates all came back clear writes nothing.
 
 ---
 
@@ -332,7 +385,11 @@ is asked again when starting a new run to resume the pipeline.
   The dimensions generate the questions rather than being asked as
   questions: what does not apply is confirmed in one batch, not
   sixteen turns. Without the sweep, a rule nobody thought to ask about
-  reads exactly like a rule that does not exist.
+  reads exactly like a rule that does not exist. It requires a
+  formalized `mockup`. Ledger keys `logic/<NN>-<scenario>@Q<n>`, one
+  per scenario, and `logic/all@Q<n>` once every scenario is written or
+  dropped; that wrap also replaces each `rule: logic` marker it
+  settled in the mockup's screen files with the rule and a pointer.
 - **`uiux`** requires a formalized `mockup`. It sweeps the product
   against `uiux-inventory.md`'s twenty-seven system items and every
   screen against its eleven screen items, and finishes when each one
@@ -340,17 +397,20 @@ is asked again when starting a new run to resume the pipeline.
   the owning file's `## Not in play` section - the same completion test
   `logic` gets from its dimensions. Before the gate it writes
   `uiux/preview.html`, one self-contained page rendering the committed
-  tokens as a style tile, and asks the user to review a first-pass SVG
-  logo and a pure HTML page mockup from
+  tokens as a style tile, and asks the user to review the logo (the
+  supplied SVG, or a first-pass one when the asset question asked for
+  it) and a pure HTML page mockup from
   `uiux/assets/references/` before continuing to `architecture`. Claude
   Code uses artifacts, GPT uses Sites, and other harnesses use the local
   HTML file. Requested changes are recorded and regenerated until the
   user explicitly approves. The accepted brand files go in
   `uiux/assets/` and are listed row by row in `02-system.md`'s
   `## Assets` table, with the SVGs committed and the review/raster
-  exports ignored. On a repo that already has
-  a frontend it runs in **extraction mode** instead: it documents the
-  design that exists rather than interviewing for one.
+  exports ignored. With no mockup but existing frontend code it runs
+  in **extraction mode** instead: it documents the design that exists
+  rather than interviewing for one. Where `map` already extracted
+  `uiux/` drafts, it confirms them through the interview instead of
+  extracting again.
 - **`standards`** sweeps the seventeen domains in
   `standards-inventory.md`: the nine it always walked plus security,
   logging and privacy, API conventions, accessibility, performance
@@ -360,7 +420,7 @@ is asked again when starting a new run to resume the pipeline.
   an earlier answer or by the craft file and never asked. It finishes
   when every item is answered, cited to `code-craft.md` as accepted
   unchanged, or recorded in `standards.md`'s closing `## Not in play`
-  with its reason.
+  with its reason or as awaiting a questionnaire answer.
 - **`stack`** derives the capability list from your own documents
   rather than from a stock list: every External services row, every
   Communication channel, every store and queue in the data-flow
@@ -373,7 +433,7 @@ is asked again when starting a new run to resume the pipeline.
   code and in what the project then maintains. The `code-craft.md`
   ladder recommends and names its rung; you pick. `stack refresh`
   re-vets recorded picks later. Ledger keys `stack/all@Q<n>` and
-  `stack/refresh@Q<n>`.
+  `stack/refresh@<stamp>`.
 - **Between `stack` and `build`** the pipeline reads all six stages'
   final outputs in three halves. First it **names what nobody asked**:
   every item of a stage's own inventory - `logic`'s dimensions, the
@@ -393,12 +453,18 @@ is asked again when starting a new run to resume the pipeline.
   interview bodies are not read or amended. Ledger key
   `readback/all@<stamp>`; unchanged outputs produce the same stable
   stamp and skip.
-- **`build`** requires a formalized `stack`. It writes an
+- **`build`** follows a formalized `stack` with a complete capability
+  matrix and a readback of the current outputs: `start build` entered
+  directly runs `stack` first when it is not formalized, and the
+  readback first when no `readback/all@<stamp>` matches. It writes an
   implementation plan, **stops for your approval**, then writes code -
   in the execution mode chosen for this run. `start build` entered directly
   asks inline or subagents before research or prerequisites, including
-  resumes; entry through the pipeline inherits its answer. Ledger keys
-  `build/plan@Q<n>` and `build/code@Q<n>`.
+  resumes; entry through the pipeline inherits its answer. Each
+  build-order step is a checkbox checked when its verification passes.
+  Ledger keys `build/plan@<stamp>` and `build/code@<stamp>`, the latter
+  once every step is checked: that is when `build` is done, and the
+  walking skeleton running is a milestone.
 
 `build` and `implement` are the **only two commands allowed to write
 source code**, and only after their plan gates.
@@ -433,7 +499,7 @@ groom → plan → implement
 | [`plan <feature>`](commands/plan.md) | `features/<date>-<slug>/plan.md` | **Plan approval, before any code** |
 | [`implement <feature>`](commands/implement.md) | Source code, then reference updates | - |
 
-**`groom`** requires a stamped index; without one it builds the
+**`groom`** requires an index; without one it builds the
 reference first rather than refusing. It interviews a spec out of you
 *against* the existing docs, so every requirement traces to a
 recorded decision.
@@ -450,8 +516,8 @@ then **reviews the diff recursively until two consecutive rounds find
 nothing new**. It then refreshes the affected chapters, absorbs the
 spec into `logic/`, `mockup/` and `uiux/`, writes its ledger entry,
 and, by default, retains the feature folder as ignored local history.
-Set `delete_feature_folders: true` to delete it after the ledger entry
-and done marker are written.
+Set `delete_feature_folders: true` to delete it once the ledger entry
+is committed and the branch is finished.
 
 > The whole `features/` tree is gitignored working state. Once
 > `implement` finishes, its `implement/<id>` ledger key is the durable
@@ -469,8 +535,9 @@ parallel feature branches can't mint the same one.
 
 [Page: when to reach for it, and how to tell it worked](commands/help.md)
 
-Prints the usage block. In Claude Code a hook answers it before the
-model is invoked, so it costs zero tokens.
+Prints the usage block. In the Claude Code terminal CLI a hook answers
+it before the model is invoked, so it costs zero tokens; elsewhere the
+model runs the same script.
 
 ## `core`
 
@@ -506,6 +573,7 @@ docs/capstone/
 ├── standards.md           how code should be written here
 ├── implementation.md      build's plan
 ├── review.md              opinionated findings          (gitignored)
+├── review/                screenshots a frontend review took (gitignored)
 ├── *-interview.md         interview transcripts         (gitignored)
 ├── features/              specs, plans, review ledgers   (gitignored)
 └── capstone.json          the project's settings and state - committed
@@ -516,15 +584,24 @@ moves, so a custom location stays discoverable.
 
 ## Shared mechanics
 
-**Config.** `~/.claude/capstone.json`, created on first session by a
-hook. `expertise` (1–5) calibrates the conversation only, never the
+**Config.** `capstone.json` in the host's global config directory,
+created on first session by a hook or initializer. `expertise` (1–5) calibrates the conversation only, never the
 docs. `teaching_mode` narrates what is happening and why.
 `delete_feature_folders` defaults to `false`, retaining completed
 feature folders as ignored local history; set it to `true` to delete
 them after implement's wrap.
 When the harness provides a structured question tool, Capstone uses it
-for interactive questions so options are clickable and `Other` accepts
-typed text; otherwise it asks the same question in normal conversation.
+for questions with a known set of answers, so options are clickable
+and `Other` accepts typed text; otherwise it asks the same question in
+normal conversation. An open-ended question, and anything you have to
+read before answering - a gate's summary, a digest, a comparison of
+options - is never put behind a dialog: it is written in the chat with
+the question as its last line, and the run waits for your reply. A
+dialog left unanswered records nothing.
+`batch_questions` (`auto` by default) lets the `architecture`,
+`standards`, `uiux` and `logic` interviews send a section's
+independent questions in one dialog where the tool takes several;
+`off` keeps one question per turn.
 `docs_in_git` governs whether the reference is committed. The ledger
 (`changelog.md` and `changelog.d/`), `capstone.json` and
 `questionnaires/` ignore it and are always committed: the ledger

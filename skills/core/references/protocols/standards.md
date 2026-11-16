@@ -47,7 +47,9 @@ present:
 - The conventions topic (`docs/capstone/03-conventions.md`): ask
   preference questions as confirmations of observed reality ("the code
   currently uses exceptions everywhere: preference or accident?")
-  rather than from scratch.
+  rather than from scratch. An entry marked
+  "provisional: `standards` owns this" is the architecture interview's
+  proposal: confirm it as a question, never copy it as settled.
 - The architecture reference (index + `01-architecture.md`,
   `05-dependencies.md`): the chosen stack scopes the library questions;
   ask about the libraries the project actually faces, not generic ones.
@@ -60,9 +62,11 @@ needs it.
 
 ## Phase B - the interview
 
-One question per turn; offer concrete options when enumerable; adaptive
-follow-ups until each answer is concrete; record the normalized decision
-immediately.
+One decision per question; offer concrete options when enumerable;
+adaptive follow-ups until each answer is concrete; record the
+normalized decision immediately. What a domain's sweep leaves to ask
+may share a dialog per core.md's Shared dialogs; a follow-up never
+does.
 
 `../standards-inventory.md` holds the seventeen domains and the items
 inside them. Each item carries the probe that turns it into a question,
@@ -75,11 +79,14 @@ at the start:
 
 - Deduce what an earlier answer, `../code-craft.md`, or
   `03-conventions.md` already settles, and record the value with its
-  source instead of asking.
+  source instead of asking. A provisional entry settles nothing; it
+  is asked as a confirmation.
 - Batch every inapplicable item in the domain into **one**
   confirmation, not one question each. A correction turns a batched
   empty back into a real question.
-- Ask what remains, one item per turn.
+- Ask what remains, one item per question: the independent ones
+  together where core.md's Shared dialogs allows, one per turn
+  otherwise.
 
 Order the domains by what this project makes urgent - a payments
 service earns Security and API conventions before Accessibility - and
@@ -94,8 +101,9 @@ cannot answer earns a questionnaire per core.md's Questionnaires
 section, and its ledger box stays unchecked with the recipient named
 on the line (`- [ ] Logging and privacy - retention window, sent to
 the data team 2026-09-07`). An item awaiting an answer is neither
-answered nor ruled out, so Phase D writes it into `## Not in play` as
-open with its recipient, and a later run picks it up from there.
+answered nor ruled out; it counts as settled for now, so the gate
+stays reachable, Phase D writes it into `## Not in play` as awaited
+with its recipient, and a later run picks it up from there.
 
 **Overriding the craft file.** `../code-craft.md` governs everything
 these domains leave open, and this file outranks it - but only by a
@@ -110,11 +118,14 @@ saying so, is not an override: the ladder still stands.
 
 The interview is finished when `../standards-inventory.md`'s §5 gate is
 satisfied: every item answered, cited to `../code-craft.md` as accepted
-unchanged, or recorded inapplicable with its reason. Not when nothing
-more comes to mind. When the gate is met (or the user stops), set
-`status: awaiting-formalization`, present the decision summary by
-domain, and ask the user to formalize. Do not write the output until
-they do.
+unchanged, recorded inapplicable with its reason, or awaiting a
+questionnaire answer. Not when nothing more comes to mind. A user who
+stops pauses the stage with `status: interviewing`. When the gate is
+met, set `status: awaiting-formalization`, present the decision
+summary by domain, and ask the user to formalize. The gate is a
+message question per core.md's Structured questions: the summary is
+the chat message, its last line asks the user to formalize or amend,
+and the turn ends there. Do not write the output until they do.
 
 ## Phase D - the output
 
@@ -138,13 +149,21 @@ attached to it.
 
 Then append the changelog entry per core.md's ledger: key
 `standards/all@Q<n>` from the interview's highest `### Q<n>`; record
-the rules decided per domain and the domains the user ruled out. Update
+the rules decided per domain and the domains the user ruled out. Rewrite
+each entry in `03-conventions.md` marked
+"provisional: `standards` owns this" to the rule decided here, dropping
+the marker. Update
 the index per core.md, set `status: formalized`
 in the interview file (only now that the output is on disk, per
 core.md's Interview lifecycle), and suggest (never do unasked)
-seeding the project's `AGENTS.md`/`CLAUDE.md` from it.
+seeding the project's `AGENTS.md`/`CLAUDE.md` from it. Outputs on
+disk, the `standards/all` key present and
+`status: awaiting-formalization` is a finished stage whose marker was
+not written: set `status: formalized`, never re-gate.
 
-**Consumers:** the `architecture` interview pre-fills its conventions answers
-from this file and never re-asks; `review`'s backend side gains a
+**Consumers:** an `architecture` interview that starts while this file
+already exists (a re-run, or `architecture` entered after `standards`;
+never in pipeline order) reads its conventions answers from it and
+never re-asks; `review`'s backend side gains a
 standards-divergence dimension when this file exists (the conventions
 chapter measured against these rules).

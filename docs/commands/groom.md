@@ -24,7 +24,7 @@ feature. It is the first stage of the feature chain.
 Reach for `feature` instead when you want the whole chain in one run:
 `feature` chains `groom → plan → implement` and resumes at whichever
 stage is unfinished, while `groom` stops at the spec. Reach for
-`mockup` when the product itself is not defined yet, since `groom`
+`start mockup` when the product itself is not defined yet, since `groom`
 grooms one change to something that already exists.
 
 ## Prerequisites
@@ -53,6 +53,11 @@ builds it rather than sending you off to run something else.
 **It never asked me about the database.** Because `02-models.md`
 already answers it. Anything the docs settle is read, not asked.
 
+**It wrote the spec and stopped.** That is the spec gate. Read
+`spec.md`, then approve it or say what to change; a change rewrites
+the spec and asks again. Nothing is planned from a spec you have not
+approved, in `groom` and inside `feature` alike.
+
 **Which repository name does it send to quarry?** The origin's last
 segment, unless `workspaces` is configured, in which case it is the
 workspace whose path contains the files the feature touches. That
@@ -65,7 +70,8 @@ surviving record, which is why the ledger is always committed.
 ## It's working if
 
 `docs/capstone/features/<date>-<slug>/spec.md` exists, every
-requirement in it cites the chapter, scenario or screen it rests on,
+requirement in it states the decision it rests on, its Reference
+impact names the chapters, scenarios and screens it will change,
 the out-of-scope rulings are written down rather than implied, and the
 ledger carries a `groom/<id>@Q<n>` entry naming the chosen approach
 and the alternatives rejected.

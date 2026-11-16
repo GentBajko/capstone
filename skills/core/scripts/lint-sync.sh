@@ -38,6 +38,11 @@ UNIQ=$(printf '%s' "$VERSIONS" | grep '.' | sort -u)
 if [ "$(printf '%s\n' "$UNIQ" | grep -c '.')" -gt 1 ]; then
   err "version mismatch across manifests: $(printf '%s' "$UNIQ" | tr '\n' ' ')"
 fi
+CORE_VERSION=$(sed -n '1p' skills/core/VERSION 2>/dev/null | sed 's/[[:space:]]*$//')
+MANIFEST_VERSION=$(printf '%s\n' "$UNIQ" | grep '.' | head -1)
+[ -n "$CORE_VERSION" ] || err "skills/core/VERSION is missing or empty"
+[ "$CORE_VERSION" = "$MANIFEST_VERSION" ] \
+  || err "skills/core/VERSION does not match the manifest version"
 
 # 3. protocol files <-> skill dirs, and every wrapper is loadable and wired
 #    (help has no protocol file by design). A protocol is one of two
@@ -100,6 +105,13 @@ grep -q 'core-authoring\.md' skills/core/references/core.md \
   || err "core.md does not point at core-authoring.md"
 grep -q 'core-authoring\.md' skills/core/references/dispatcher.md \
   || err "dispatcher.md does not load core-authoring.md"
+# the routers skip core-authoring.md, but every stage they hand off to
+# writes outputs under its rules, and since 7.0.0 a stage is reachable
+# only through them: the hand-off is where the file gets read
+for n in start feature; do
+  grep -q 'read `\.\./core-authoring\.md`' "skills/core/references/protocols/$n.md" \
+    || err "protocol $n.md hands off to a stage without loading core-authoring.md"
+done
 # contributor-only material must not sit in the runtime path
 grep -q '^Maintenance: each subcommand' skills/core/references/core.md \
   && err "core.md still carries the contributor Maintenance block (belongs in CONTRIBUTING.md)"
@@ -151,13 +163,44 @@ done
 for d in skills/*/; do
   n=$(basename "$d")
   case "$n" in core) continue;; esac
-  grep -q "\`$n\`\|\`$n " docs/commands.md \
+  grep -q -e "\`$n\`" -e "\`$n " docs/commands.md \
     || err "docs/commands.md does not document $n"
 done
 grep -q 'MAP CHECK: current' docs/commands.md \
   || err "docs/commands.md does not show the MAP CHECK verdict line"
 grep -q 'MAP REVIEW: clean' docs/commands.md \
   || err "docs/commands.md does not show the MAP REVIEW verdict line"
+
+# 5d. the command count is spelled out on seven surfaces. Check 5
+#     catches a command missing from a list; it cannot see a sentence
+#     that still counts the suite as it was before the command landed.
+NCMD=0
+for d in skills/*/; do
+  [ "$(basename "$d")" = core ] || NCMD=$((NCMD + 1))
+done
+case "$NCMD" in
+  9) NWORD=nine ;; 10) NWORD=ten ;; 11) NWORD=eleven ;; 12) NWORD=twelve ;;
+  *) NWORD='' ;;
+esac
+if [ -z "$NWORD" ]; then
+  err "the suite has $NCMD commands and check 5d has no word for that count"
+else
+  for f in skills/core/scripts/help.sh README.md docs/commands.md \
+           docs/commands/start.md docs/manual/README.md \
+           skills/core/references/dispatcher.md .opencode/INSTALL.md; do
+    # flattened first, so re-wrapping a sentence cannot turn the gate red
+    CNT_FLAT=$(tr '\n' ' ' < "$f" | tr -s ' ')
+    printf '%s' "$CNT_FLAT" \
+      | grep -Eqi "(^|[^a-z])$NWORD (commands|command words|capstone skills)" \
+      || err "$f does not count the suite's $NCMD commands as $NWORD"
+    for w in nine ten eleven twelve; do
+      [ "$w" = "$NWORD" ] && continue
+      printf '%s' "$CNT_FLAT" \
+        | grep -Eqi "(^|[^a-z])$w (commands|command words|capstone skills)" \
+        && err "$f still counts $w commands; the suite has $NWORD"
+    done
+  done
+fi
 
 # 5b. the dispatcher's reserved-word list carries every routable
 #     subcommand (on Gemini, skills/core/references/dispatcher.md is the only entry point)
@@ -189,7 +232,8 @@ grep -q 'init-config.sh --global' hooks/hooks.json || err "hooks.json SessionSta
 #    core.md and README
 for f in skills/core/scripts/init-config.sh \
          skills/core/references/core.md README.md; do
-  for k in expertise teaching_mode docs_dir index_file subagent_threshold \
+  for k in expertise teaching_mode batch_questions docs_dir index_file \
+           subagent_threshold \
            docs_in_git language non_interactive delete_feature_folders \
            extract interfaces interfaces_frontmatter cross_repo redact; do
     grep -q "\"$k\"" "$f" || err "$f config template missing key $k"
@@ -368,7 +412,7 @@ hit=$(grep -Eo "^\*\*($DEAD_NAMES)\*\*" README.md | head -1)
 #     only as good as its sites)
 for n in groom plan implement mockup logic uiux architecture \
          standards stack build review retro \
-         map doctor; do
+         map doctor edges; do
   grep -q 'changelog entry' "skills/core/references/protocols/$n.md" \
     || err "protocol $n.md has no changelog-entry step"
 done
@@ -413,7 +457,7 @@ done
 #     and both initializers must carry the unignore migration for it.
 #     capstone.json left this list in 6.3 and is asserted absent by
 #     check 19, with its own migration.
-for r in 'features/' '\*-interview.md' 'review.md' 'be-review.md' 'fe-review.md'; do
+for r in 'features/' '\*-interview.md' 'review.md' 'review/' 'be-review.md' 'fe-review.md'; do
   for f in skills/core/scripts/init-config.sh; do
     grep -q "^$r$" "$f" || err "$f ignore template missing rule $r"
   done
@@ -470,7 +514,7 @@ for s in backend frontend; do
     skills/core/references/protocols/review.md \
     || err "review.md has no $s method-source section"
 done
-grep -q 'docs/capstone/review\.md' skills/core/references/protocols/review.md \
+grep -q '<docs_dir>/review\.md' skills/core/references/protocols/review.md \
   || err "review.md does not name its output file"
 grep -q 'rewrites only its own section' skills/core/references/protocols/review.md \
   || err "review.md does not state that a one-sided run preserves the other side"
@@ -632,14 +676,68 @@ grep -q '^## Pushback' skills/core/references/core.md \
 grep -q 'never more than' skills/core/references/core.md \
   || err "core.md's Pushback rule lost its two-round cap"
 
-# 12k. interactive questions use the harness's structured controls when
-# available, while retaining a text fallback for harnesses without them.
+# 12j2. a question is answerable from what the user can see when it is
+#       asked. Short ones use the harness's structured controls, with a
+#       text fallback for harnesses without them. A dialog can cover
+#       the conversation and reasoning is never sent, so a question
+#       pointing at "the comparison above" confirms nothing: a gate's
+#       summary or a digest is the chat message itself, and the turn
+#       ends on its question. core.md defines the two channels; every
+#       gate and digest names the message question at its point of use,
+#       because a long run has compacted core.md away by the time it
+#       reaches its gate.
 grep -q 'structured question tool' skills/core/references/core.md \
   || err "core.md has no structured-question-tool rule"
 grep -q 'Other.*free-text' skills/core/references/core.md \
   || err "core.md structured-question rule has no typed Other path"
+grep -q 'never refers to the conversation' skills/core/references/core.md \
+  || err "core.md lets a dialog question point at the conversation"
+grep -q 'the turn ends on it' skills/core/references/core.md \
+  || err "core.md's message question no longer ends the turn"
+grep -q 'Comparison above' skills/core/references/core.md \
+  && err "core.md teaches a question that points at text the user may not see"
+# a dialog can come back with nothing: dismissed, skipped, closed by
+# the harness after a wait, or answered with a typed reply instead of
+# a choice. Recording a default for it fabricates a decision.
+QCORE=$(tr '\n' ' ' < skills/core/references/core.md | tr -s ' ')
+printf '%s' "$QCORE" | grep -q 'A dialog nobody answered settled nothing' \
+  || err "core.md lets an unanswered dialog be recorded as an answer"
+printf '%s' "$QCORE" | grep -q 'Never record a default, the first option or a guess' \
+  || err "core.md lets a default stand in for the user's answer"
+printf '%s' "$QCORE" | grep -q 'answers only a question it plainly names' \
+  || err "core.md lets a typed reply answer questions it does not name"
+printf '%s' "$QCORE" | grep -q 'ask its first open question in the chat' \
+  || err "core.md reopens a dialog nobody answered"
+printf '%s' "$QCORE" | grep -q 'never states as given a fact the user has not given' \
+  || err "core.md lets a question or option assert a fact the user never gave"
+printf '%s' "$QCORE" | grep -q 'A number is asked for, not picked from ranges' \
+  || err "core.md lets a number be picked from guessed ranges"
+printf '%s' "$QCORE" | grep -q 'A picked option is the gist of an answer' \
+  || err "core.md records a picked option without the detail the decision needs"
+# options are the whole choice: a dialog built on sample answers to an
+# open question invites a wrong pick over a typed truth
+printf '%s' "$QCORE" | grep -q 'The options are the whole choice, not examples of it' \
+  || err "core.md lets a dialog offer sample options for an open question"
+printf '%s' "$QCORE" | grep -q 'question is open-ended, its answers only guessable' \
+  || err "core.md sends an open-ended question to a dialog"
+for n in groom plan build architecture mockup stack standards logic uiux \
+         start doctor retro; do
+  grep -q 'message question' "skills/core/references/protocols/$n.md" \
+    || err "protocol $n.md presents its gate or digest without naming the message question"
+done
+grep -q 'message question' skills/core/references/core-authoring.md \
+  || err "core-authoring.md's artifact digest is not a message question"
+# the spec gate is on the written spec: groom drafts spec.md, then
+# asks. Approving a summary and writing the spec afterwards let the
+# feature chain plan from a spec nobody had checked.
+grep -q 'approve the spec or change it' skills/core/references/protocols/groom.md \
+  || err "groom.md's gate does not ask the user to approve the written spec"
+grep -q 'On approval write `spec.md`' skills/core/references/protocols/groom.md \
+  && err "groom.md writes spec.md after its gate, so nobody checks the spec"
+grep -q 'never planning from an unapproved spec' skills/core/references/protocols/feature.md \
+  || err "feature.md can plan from a spec the user has not approved"
 
-# 12l. interviews are local working state. Final outputs must survive a
+# 12j3. interviews are local working state. Final outputs must survive a
 #      fresh clone, so authoring instructions cannot make them cite an
 #      interview file or question number.
 grep -q 'Final outputs never name or cite interview files' \
@@ -661,6 +759,228 @@ for f in README.md docs/*.md skills/core/references/*.md \
 done
 grep -q 'Pushback rule' skills/core/references/interview.md \
   || err "interview.md conduct rules do not point at core.md's Pushback rule"
+
+# 12j4. a gate passes on an explicit approval of what was shown, and
+#       nothing else. Two real runs went wrong here: an amendment read
+#       as approval of a spec, and a plan approved "with your answers
+#       folded in" and then changed. Review found the rest: a rebuilt
+#       plan run under the approval of the one it replaced, a plan run
+#       while its spec was back in the interview, a feature folder
+#       deleted before its ledger entry was committed or before the
+#       wrap had finished.
+tr '\n' ' ' < skills/core/references/core.md | tr -s ' ' \
+  | grep -q 'A gate passes only on an explicit approval of what was presented' \
+  || err "core.md does not say a gate needs an explicit approval of what was presented"
+for n in plan build; do
+  tr '\n' ' ' < "skills/core/references/protocols/$n.md" | tr -s ' ' \
+    | grep -q 'Only an explicit approval passes' \
+    || err "protocol $n.md lets a reply that changes the plan pass its gate"
+done
+tr '\n' ' ' < skills/core/references/protocols/plan.md | tr -s ' ' \
+  | grep -q 'A rebuilt plan is not the one that was approved' \
+  || err "plan.md rebuilds a lost plan under its old approval"
+tr '\n' ' ' < skills/core/references/protocols/implement.md | tr -s ' ' \
+  | grep -q '`status: formalized` and `plan_approved: true`' \
+  || err "implement.md runs a plan while its spec is back in the interview"
+tr '\n' ' ' < skills/core/references/protocols/implement.md | tr -s ' ' \
+  | grep -q "3's entry is committed" \
+  || err "implement.md deletes a feature folder before its ledger entry is committed"
+tr '\n' ' ' < skills/core/references/protocols/doctor.md | tr -s ' ' \
+  | grep -q 'The same folder without `implemented: true` is an unfinished wrap' \
+  || err "doctor.md check 2b deletes the folder of an unfinished wrap"
+# and the initializer moves a docs/design folder only when it is
+# capstone's own legacy tree, never a team's hand-written design docs
+grep -q 'is not a capstone docs area' skills/core/scripts/init-config.sh \
+  || err "init-config.sh migrates a docs/design folder without checking it is capstone's"
+
+# 12j5. the rules a command-by-command review added. Each one closes a
+#       way a run could end wrong while every file still read as
+#       complete: a second run at one revision leaving no ledger entry,
+#       build counted done at its walking skeleton, logic with no stage
+#       key for start to test, a paused interview sent to its gate, a
+#       stack pick with no research date, a repo-wide glob that marks a
+#       chapter stale whenever the docs themselves are committed.
+flat1() { tr '\n' ' ' < "$1" | tr -s ' '; }
+flat1 skills/core/references/core.md \
+  | grep -q 'append `\.2`, `\.3` and so on to `<rev>`' \
+  || err "core.md lets a second run at one revision go unrecorded"
+flat1 skills/core/references/protocols/build.md \
+  | grep -q 'When every box is checked, append the changelog entry' \
+  || err "build.md marks build done before every build-order step is checked"
+flat1 skills/core/references/protocols/build.md \
+  | grep -q 'continue from the first unchecked' \
+  || err "build.md resumes without a per-step progress record"
+flat1 skills/core/references/protocols/start.md \
+  | grep -q '`build` is done only when every build-order step' \
+  || err "start.md counts build done at its walking skeleton"
+flat1 skills/core/references/protocols/logic.md \
+  | grep -q 'key `logic/all@Q<n>`' \
+  || err "logic.md writes no stage key, so start cannot tell when logic is done"
+flat1 skills/core/references/protocols/uiux.md \
+  | grep -q 'Stopping never jumps to the gate' \
+  || err "uiux.md sends a paused interview to its gate"
+flat1 skills/core/references/protocols/stack.md \
+  | grep -q 'researched: <date>' \
+  || err "stack.md records no research date for map check's six-month rule"
+grep -qF ':(top,exclude)<docs_dir>/**' skills/core/references/protocols/map.md \
+  || err "map.md lets a repo-wide glob cover the docs area"
+
+# 12j6. several questions in one dialog. An interview that asks its
+#       independent questions together is faster, and worse the moment
+#       a question written before the answer it depends on is recorded
+#       as a decision. core.md owns the rule and its bounds; the four
+#       interviews whose questions exist before any is answered point
+#       at it, the ones that derive each question from the last answer
+#       never do, and a dialog nobody answered records nothing.
+CORE_FLAT=$(flat1 skills/core/references/core.md)
+core_has() { printf '%s' "$CORE_FLAT" | grep -q "$1"; }
+core_has '### Shared dialogs' \
+  || err "core.md has no Shared dialogs rule"
+core_has 'in four places and nowhere else' \
+  || err "core.md lets shared dialogs spread beyond the four interviews that name them"
+core_has 'where all of them were written before any was answered' \
+  || err "core.md shares a dialog among questions derived from each other's answers"
+core_has 'in the same words and with the same options, whatever the others in the dialog are answered' \
+  || err "core.md lets dependent questions share a dialog"
+core_has 'could settle it, change it or make it moot' \
+  || err "core.md shares a question another answer in the dialog could settle"
+core_has 'expensive to undo once built on (a one-way door)' \
+  || err "core.md lets a one-way door share a dialog"
+core_has 'voids that other answer' \
+  || err "core.md keeps an answer whose question another answer changed"
+core_has '`void: ask again`' \
+  || err "core.md gives a voided answer no marker a resumed interview can read"
+core_has 'A voided entry is an open question' \
+  || err "core.md lets a resumed interview treat a voided answer as answered"
+core_has 'only where the two agree' \
+  || err "core.md records an answer that disagrees with what another answer settled"
+core_has 'the measure behind a number' \
+  || err "core.md lets a number picked from a dialog go without its measure"
+core_has 'the detail a picked option left out' \
+  || err "core.md lets a shared dialog's answers go without their detail"
+core_has 'None is recast as a choice' \
+  || err "core.md lets an open question be recast as a choice to fill a dialog"
+core_has 'an answer that turned out expensive to undo' \
+  || err "core.md leaves a one-way door found in an answer unconfirmed"
+core_has '`expertise` is 3 or higher' \
+  || err "core.md shares dialogs below expertise 3, where each question is explained"
+core_has '`off` in either config file wins' \
+  || err "core.md lets a project config turn shared dialogs on for a user who turned them off"
+core_has 'Ask what the answers call for, one per turn' \
+  || err "core.md lets follow-ups and pushback ride in the next shared dialog"
+core_has 'Go by the tools this session lists, never by the harness' \
+  || err "core.md decides shared dialogs by harness name, not by the tool listed"
+core_has 'up to the limit in the tool.s own schema' \
+  || err "core.md hardcodes a question limit for shared dialogs"
+core_has '`teaching_mode` is off' \
+  || err "core.md shares dialogs under teaching_mode"
+core_has 'A user who asks for one question at a time has set the key' \
+  || err "core.md forgets a user's request for one question at a time"
+flat1 skills/core/references/protocols/architecture.md \
+  | grep -q 'all of §1, §3, §5 and §6' \
+  || err "architecture.md shares a dialog in its shape, quality or wrap-up sections"
+flat1 skills/core/references/protocols/architecture.md \
+  | grep -q 'one subsection of `../interview.md` §0, §2 or §4' \
+  || err "architecture.md does not name the sections whose questions may share a dialog"
+flat1 skills/core/references/protocols/logic.md \
+  | grep -q "the generation rule's own questions never do" \
+  || err "logic.md shares a dialog among its generation rule's questions"
+flat1 skills/core/references/protocols/logic.md \
+  | grep -q 'shares a dialog with none of them' \
+  || err "logic.md asks D16 before the answers it checks exist"
+flat1 skills/core/references/protocols/logic.md \
+  | grep -q "One question per turn, the sweep's leftovers aside" \
+  || err "logic.md's cadence contradicts its sweep"
+flat1 skills/core/references/protocols/uiux.md \
+  | grep -q 'A question either generation rule produced never does' \
+  || err "uiux.md shares a dialog among its generation rules' questions"
+flat1 skills/core/references/protocols/standards.md \
+  | grep -q 'a follow-up never does' \
+  || err "standards.md lets a follow-up share a dialog"
+flat1 skills/core/references/interview.md \
+  | grep -q '`groom` never does' \
+  || err "interview.md's conduct rules let groom share a dialog"
+grep -q 'It asked several questions in one dialog' docs/commands/start.md \
+  || err "docs/commands/start.md does not explain shared dialogs"
+for f in protocols/architecture.md protocols/standards.md protocols/uiux.md \
+         protocols/logic.md interview.md standards-inventory.md \
+         uiux-inventory.md logic-craft.md; do
+  flat1 "skills/core/references/$f" | grep -q "core.md's Shared dialogs" \
+    || err "$f does not send its questions through core.md's Shared dialogs"
+done
+for n in mockup groom stack; do
+  grep -qi 'shared dialog\|share a dialog' "skills/core/references/protocols/$n.md" \
+    && err "protocol $n.md shares a dialog though its next question depends on the last answer"
+done
+grep -q 'One per turn, each derived from prior answers' \
+  skills/core/references/protocols/mockup.md \
+  || err "mockup.md no longer asks one question per turn"
+grep -q '^One question per turn' skills/core/references/protocols/groom.md \
+  || err "groom.md no longer asks one question per turn"
+flat1 skills/core/references/interview.md \
+  | grep -q 'a turn to itself, never a shared dialog' \
+  || err "interview.md lets a one-way door into a shared dialog"
+for f in docs/manual/08-configuration.md docs/commands.md \
+         skills/core/scripts/help.sh; do
+  grep -q 'batch_questions' "$f" || err "$f does not document batch_questions"
+done
+BQ_INIT=$(grep '"batch_questions"' skills/core/scripts/init-config.sh | head -1)
+BQ_CORE=$(grep '"batch_questions"' skills/core/references/core.md | head -1)
+[ -n "$BQ_INIT" ] && [ "$BQ_INIT" = "$BQ_CORE" ] \
+  || err "batch_questions template line differs between init-config.sh and core.md"
+
+# 12j7. five places where the architecture interview's own text
+#       disagreed with itself or fell silent, and every run that met
+#       one resolved it its own way. The executor is named, so no
+#       design stage invents a frontmatter key; the Frontend module has
+#       one place in the walk; the ledger is seeded with the sub-items
+#       a resume and a shared dialog both work in, and they are
+#       interview.md's own headings; a questionnaire has a rule for its
+#       ledger line and for a second stalled question.
+core_has 'The executor - `build` under `start`, `implement` under `feature` -' \
+  || err "core.md does not name the stages that record the execution choice"
+core_has 'No interview stage writes the key' \
+  || err "core.md lets a design stage record the execution choice in its interview"
+INT_FLAT=$(flat1 skills/core/references/interview.md)
+ARCH_FLAT=$(flat1 skills/core/references/protocols/architecture.md)
+printf '%s' "$INT_FLAT" \
+  | grep -q 'walk it here, before closing this checklist, and not again when §4 is reached' \
+  || err "interview.md does not place the Frontend module in the → architecture.md checklist"
+printf '%s' "$INT_FLAT" | grep -q 'is already done when §4 is reached' \
+  || err "interview.md's §4 walks the Frontend module a second time"
+printf '%s' "$ARCH_FLAT" | grep -q 'is skipped when §4 is reached' \
+  || err "architecture.md's question order contradicts interview.md on the Frontend module"
+printf '%s' "$ARCH_FLAT" | grep -q 'the parent with its last sub-item' \
+  || err "architecture.md does not say when a split section's own box flips"
+printf '%s' "$ARCH_FLAT" | grep -q '§0 and §2 start split' \
+  || err "architecture.md seeds a ledger a resumed run cannot place itself in"
+ARCH_SUB=$(awk '
+  { sub(/\r$/, "") }
+  /^## Open questions$/ { inp = 1; next }
+  inp && /^```/ { exit }
+  inp && /^  - \[ \] / { sub(/^  - \[ \] /, ""); print }' \
+  skills/core/references/protocols/architecture.md \
+  | sed 's/^\(0\.[0-9][0-9]*\) .*/\1/' | tr '\n' '|')
+INT_SUB=$(awk '
+  { sub(/\r$/, "") }
+  /^### 0\.[0-9]+ / { print $2 }
+  /^### → / { sub(/^### /, ""); print }' \
+  skills/core/references/interview.md | tr '\n' '|')
+[ -n "$ARCH_SUB" ] && [ "$ARCH_SUB" = "$INT_SUB" ] \
+  || err "architecture.md's seeded sub-items are not interview.md's §0 subsections and §2 checklists
+architecture.md: $ARCH_SUB
+interview.md:    $INT_SUB"
+core_has 'Each stalled question gets its own offer' \
+  || err "core.md does not say whether a second stalled question earns an offer"
+core_has 'the new question is appended to its Questions section' \
+  || err "core.md writes a second questionnaire for a recipient who already has one"
+core_has 'A questionnaire gets no changelog entry of its own' \
+  || err "core.md leaves a questionnaire's ledger entry undecided"
+core_has 'the next entry its stage writes carries one bullet per questionnaire file' \
+  || err "core.md lets a questionnaire go unrecorded in its stage's entry"
+flat1 README.md \
+  | grep -q 'a dead session loses only the question, or the one dialog of questions, in flight' \
+  || err "README.md says a dead session loses nothing"
 
 # 12k. README's jump-to nav must resolve. GitHub renders a dead anchor
 #      without complaint, so a renamed section breaks navigation
@@ -825,6 +1145,36 @@ mc_gloss() { # dir stamp hash version [extra frontmatter line]
   printf -- '---\ngenerated_at_commit: %s\ngenerated_date: 2026-01-01\ncapstone_version: %s\ncontent_hash: %s\npaths_covered:\n  - ":(top)src/**"\n%s---\n# g\n\n## Concepts\n\nnone\n' \
     "$2" "$4" "$3" "${5:-}" > "$1/08-glossary.md"
 }
+
+# An npx skills add install has no plugin root or plugin manifest. Its core
+# script lives under .agents/skills/core beside a lockfile at .agents, so the
+# checker must get its writer identity from that layout instead.
+INIT_OUT=""; INIT_RC=0
+INIT_OUT=$(HOME="$T/init-home" CODEX_VERSION=fixture \
+  CAPSTONE_GLOBAL_DIR= bash "$PWD/skills/core/scripts/init-config.sh" --global 2>&1) \
+  || INIT_RC=$?
+[ "$INIT_RC" -eq 0 ] || err "init-config.sh Codex host detection exited $INIT_RC: $INIT_OUT"
+[ -f "$T/init-home/.codex/capstone.json" ] \
+  || err "init-config.sh Codex host detection did not use the Codex default"
+[ ! -e "$T/init-home/.claude/capstone.json" ] \
+  || err "init-config.sh Codex host detection fell back to ~/.claude"
+
+NPX_ROOT="$T/agents"
+NPX_BIN="$NPX_ROOT/skills/core/scripts/map-check.sh"
+NPX_HASH=0123456789abcdef0123456789abcdef01234567
+mkdir -p "$NPX_ROOT/skills/core/scripts" "$NPX_ROOT/skills/core/references" "$G/npx/docs"
+cp "$MCABS" "$NPX_BIN"
+cp "$PWD/skills/core/references/schema.txt" "$NPX_ROOT/skills/core/references/schema.txt"
+printf '{\n  "version": 3,\n  "skills": {\n    "core": {\n      "source": "GentBajko/capstone",\n      "skillFolderHash": "%s"\n    }\n  }\n}\n' "$NPX_HASH" > "$NPX_ROOT/.skill-lock.json"
+[ ! -e "$NPX_ROOT/.claude-plugin/plugin.json" ] \
+  || err "npx skills fixture unexpectedly has a plugin manifest"
+MC_BIN="$NPX_BIN"
+mc_index "$G/npx/docs"
+mc_gloss "$G/npx/docs" ffffffffffff 000000000000 "$NPX_HASH"
+mc_run 'npx skills layout without plugin manifest' 0 'MAP CHECK: current' "$G/npx" docs
+mc_row "^plugin version: $NPX_HASH$" 'npx skills layout without plugin manifest'
+MC_BIN="$MCABS"
+
 mc_index "$G/ok/docs"
 printf -- '---\ngenerated_date: 2026-01-01\n---\n# g\n\n## Concepts\n\nnone\n' > "$G/ok/docs/08-glossary.md"
 # the ledger is skipped entirely, secrets included; an unfolded fragment
@@ -937,6 +1287,39 @@ if command -v git >/dev/null 2>&1; then
   [ "$(printf '%s\n' "$MC_OUT" | grep -c '^# map check:')" -eq 2 ] || err "map-check.sh two docs dirs: not two sections"
   [ "$(printf '%s\n' "$MC_OUT" | grep -c '^MAP CHECK:')" -eq 1 ] || err "map-check.sh two docs dirs: not exactly one verdict line"
   rm "$S/src/new.rs"; rm -r "$S/docs/two"
+  # a repo-wide chapter (map.md Phase 3 step 2): `:(top)**` plus the
+  # docs-area exclusion stays current after a docs-only commit and with
+  # an untracked file in the docs area, by stamp and by content_hash.
+  # The inline list form proves the comma inside `:(top,exclude)` is
+  # not read as a separator. Without the exclusion the same commit
+  # marks the chapter stale.
+  mc_wide() { # dir stamp hash globs
+    printf -- '---\ngenerated_at_commit: %s\ngenerated_date: 2026-01-01\ncapstone_version: %s\ncontent_hash: %s\npaths_covered: [%s]\n---\n# g\n\n## Concepts\n\nnone\n' \
+      "$2" "$MANIFEST_V" "$3" "$4" > "$1/08-glossary.md"
+  }
+  MC_WIDE='":(top)**", ":(top,exclude)docs/capstone/**"'
+  SHA2=$(git -C "$S" rev-parse --short=12 HEAD)
+  H2=$(git -C "$S" ls-files -s --full-name -- ':(top)**' ':(top,exclude)docs/capstone/**' | git hash-object --stdin | cut -c1-12)
+  mc_wide "$S/docs/capstone" "$SHA2" "$H2" "$MC_WIDE"
+  git -C "$S" add docs; git -C "$S" $GC commit -qm 'docs only'
+  mkdir -p "$S/docs/capstone/changelog.d"
+  printf 'key: map/all@%s\n' "$SHA2" > "$S/docs/capstone/changelog.d/2026-01-02-map-all-$SHA2.md"
+  mc_run 'repo-wide chapter after a docs-only commit' 0 'MAP CHECK: current' "$S"
+  mc_row "| docs/capstone/08-glossary.md | $SHA2 | $MANIFEST_V | 0 | current |" 'repo-wide chapter after a docs-only commit'
+  mc_wide "$S/docs/capstone" ffffffffffff "$H2" "$MC_WIDE"
+  mc_run 'repo-wide chapter, hash fallback' 0 'MAP CHECK: current' "$S"
+  mc_wide "$S/docs/capstone" "$SHA2" "$H2" '":(top)**"'
+  mc_run 'repo-wide chapter without the exclusion' 1 'MAP CHECK: stale (1 findings)' "$S"
+  rm -r "$S/docs/capstone/changelog.d"
+  mc_gloss "$S/docs/capstone" "$SHA" "$H" "$MANIFEST_V"
+  # the project config sits at docs/capstone/capstone.json whatever
+  # docs_dir says (core.md), so a custom docs area's index_file is read
+  # from there, not from a capstone.json inside that area
+  mkdir -p "$S/docs/ref"; mc_index "$S/docs/ref"; mc_gloss "$S/docs/ref" "$SHA" "$H" "$MANIFEST_V"
+  mv "$S/docs/ref/00-index.md" "$S/docs/ref/INDEX.md"
+  printf '{ "docs_dir": "docs/ref", "index_file": "docs/ref/INDEX.md" }\n' > "$S/docs/capstone/capstone.json"
+  mc_run 'custom docs_dir, project config at its fixed path' 0 'MAP CHECK: current' "$S" docs/ref
+  rm "$S/docs/capstone/capstone.json"; rm -r "$S/docs/ref"
   # Site cells: tracked, an escaped pipe in an earlier cell, a link cell
   # with a :from-to range, a fenced decoy. Every row carries its
   # `### <Name>` payload section, one of them by the version-suffix form
@@ -1153,6 +1536,14 @@ mode: prescriptive' "$S/docs/capstone/09-interfaces.md" > "$S/x" && mv "$S/x" "$
     && mv "$S/x" "$S/docs/capstone/logic/01-scenario.md"
   mc_run 'logic scenario missing a section' 1 'MAP CHECK: stale (1 findings)' "$S"
   mc_row '| docs/capstone/logic/01-scenario.md | - | ## Invariants | - | - |' 'logic scenario missing a section'
+  # the same page written by an older capstone, with no globs (an
+  # interview's output): its part 1 row is informational and counts
+  # nothing, so part 8 still reports the missing section
+  awk 'NR == 2 { print "capstone_version: 5.2.1" } { print }' "$S/docs/capstone/logic/01-scenario.md" > "$S/x" \
+    && mv "$S/x" "$S/docs/capstone/logic/01-scenario.md"
+  mc_run 'older page with no globs missing a section' 1 'MAP CHECK: stale (1 findings)' "$S"
+  mc_row '| docs/capstone/logic/01-scenario.md | - | ## Invariants | - | - |' 'older page with no globs missing a section'
+  mc_row '| written by an older capstone (informational) |' 'older page with no globs missing a section'
   rm -r "$S/docs/capstone/logic"
   # a questionnaire (core.md's Questionnaires section). It is committed
   # rather than local working state, so the gate holds it to its five
@@ -1406,8 +1797,9 @@ $DOC_PATTERNS"
 #     schema - quarry joins the two halves on (kind, name), and a
 #     person answers only what that join leaves ambiguous. Three
 #     things have to agree or an answer gets overwritten by a guess:
-#     the rule that no run writes to/from, the section that governs
-#     the ask, and the vocabulary every writer and reader uses.
+#     the rule that no run edits a far end and no run reading one repo
+#     writes one, the section that governs the ask, and the vocabulary
+#     every writer and reader uses.
 grep -q '^## Edge confirmation' skills/core/references/core.md \
   || err "core.md has no Edge confirmation section"
 for n in map groom architecture; do
@@ -1430,12 +1822,51 @@ done
 # so re-wrapping a paragraph cannot turn the gate red
 for f in skills/core/references/core.md \
          skills/core/references/protocols/map.md; do
-  tr '\n' ' ' < "$f" | tr -s ' ' | grep -q 'no run writes or edits one' \
-    || err "$(basename "$f") lost the rule that no run writes to/from"
+  tr '\n' ' ' < "$f" | tr -s ' ' | grep -q 'no run edits one' \
+    || err "$(basename "$f") lost the rule that no run edits a far end"
 done
 tr '\n' ' ' < skills/core/references/topics.md | tr -s ' ' \
   | grep -q 'It never writes `to` or `from`' \
   || err "topics.md interfaces section does not say map never writes to/from"
+# edges (7.1.0) is the one run that writes a far end unasked, and it
+# may because it reads both ends of the edge. What keeps an inferred
+# name from doing damage is a short list of things it never does, and
+# a protocol that lost one would still read as complete: a written
+# `to` hides every consumer the folder does not hold, an edited cell
+# overwrites an answer, a second candidate turns a fact into a guess,
+# `unknown` is a person's ruling, and a `map` in every unmapped clone
+# is a bill nobody agreed to.
+EDG=skills/core/references/protocols/edges.md
+EDG_FLAT=$(tr '\n' ' ' < "$EDG" 2>/dev/null | tr -s ' ')
+for s in "never a producer's \`to\`" 'Empty cells only' \
+         'One candidate, or nothing' 'Never `unknown`' \
+         '`edges` never runs `map`' 'It asks nothing' \
+         'date -u +%Y%m%dT%H%M%SZ' 'Record, then write' \
+         'An unread clone may produce it unseen' \
+         "the consumer's own unit aside" \
+         'No source file, no stamp, no commit'; do
+  printf '%s' "$EDG_FLAT" | grep -qF -- "$s" \
+    || err "edges.md lost one of its bounds: $s"
+done
+grep -q 'key: edges/09-interfaces.md@<rev>' "$EDG" \
+  || err "edges.md does not spell its ledger key"
+tr '\n' ' ' < skills/core/references/core.md | tr -s ' ' \
+  | grep -q 'fills a consumer.s empty `from` and nothing else (`protocols/edges.md`)' \
+  || err "core.md hard rule 3 does not name edges as the run that writes a far end"
+grep -q '`map`, `doctor` and `edges` are exempt' skills/core/references/core.md \
+  || err "core.md's Missing reference rule does not exempt edges (it would map every clone)"
+grep -q 'protocols/edges.md' skills/core/references/topics.md \
+  || err "topics.md does not say an edges run may have written a far end"
+# map still writes a far end in one case, the answer its own ask is
+# given, and a step 1 that said it writes none would drop that answer
+tr '\n' ' ' < skills/core/references/protocols/map.md | tr -s ' ' \
+  | grep -q '`map` derives none' \
+  || err "map.md step 1 no longer separates deriving a far end from writing an answer"
+# the ledger records what edges wrote, not what must stay written: a
+# person may correct the cell and map drops it with the row
+tr '\n' ' ' < skills/core/references/protocols/doctor.md | tr -s ' ' \
+  | grep -q 'An `edges/\*` key is never this finding either' \
+  || err "doctor.md check 1 could restore a far end from an edges ledger entry"
 for f in skills/core/references/core.md \
          skills/core/references/protocols/map.md; do
   grep -q 'quarry docs index --json' "$f" \

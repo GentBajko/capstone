@@ -52,9 +52,10 @@ seed it once with the angle areas (purpose, business plan, journeys,
 behaviors), then maintain it with appends and checkbox toggles, never
 whole-file rewrites; a question the generation rule's stop hands to
 `logic` is logged here as an open thread marked `for: logic`, never
-answered). Append each entry before asking the next
+answered, and carried into the README's Scenarios table at Phase E).
+Append each entry before asking the next
 question. Resume = read the file, never re-ask. An artifact argument
-(a PRD, notes, screenshots) seeds the interview per core.md's
+(a PRD, notes, screenshots) seeds the interview per core-authoring.md's
 Artifact seeding rule.
 
 ## Phase B - the seeds (the only predetermined questions)
@@ -112,15 +113,19 @@ Set `status: awaiting-formalization`; present the summary organized as
 purpose / business plan / journeys / behaviors, plus what is still
 vague and, separately, the open threads marked `for: logic` - named so
 the user can see what the next stage will settle rather than mistaking
-it for something forgotten. The user formalizes or amends; do not
-generate until they do.
+it for something forgotten. The gate is a message question per
+core.md's Structured questions: the summary is the chat message, its
+last line asks the user to formalize or amend, and the turn ends
+there. The user formalizes or amends; do not generate until they do.
 
 ## Phase E - the mockup
 
 On formalization, write `docs/capstone/mockup/` as **chapterized
 markdown, no HTML anywhere**. One file per screen the scenarios imply,
 numbered in journey order (`01-<screen>.md`, `02-<screen>.md`, …), each
-with frontmatter naming the scenario(s) it serves, and these sections:
+with frontmatter naming the scenario(s) it serves - the logic
+scenarios, by their rows in the README's Scenarios table, not the
+journeys - and these sections:
 
 - `## Layout`: an ASCII wireframe in a fenced code block plus a short
   element tree (what contains what).
@@ -145,13 +150,15 @@ an invented trigger reads as settled fact to every stage downstream. A
 section is never filled to look complete: `rule: logic` is the honest
 entry, an invented threshold is a defect.
 
-The folder's **only index is `README.md`**. It starts with the final
+Inside the folder, the **only index is `README.md`**; the project
+index carries the folder as one row (below). It starts with the final
 product brief: purpose, audience, positioning, success measures,
 interaction surfaces, commercial model, constraints, non-goals,
 confirmed rationale, and every open question or deferral needed by a
 later stage. It then carries three tables:
 
-- **Screens** → the journeys served → the scenarios implemented.
+- **Screens** → the journeys served → the Scenarios-table rows it
+  surfaces.
 - **Journeys**: each journey as its path through the screens
   (`01 → 02 → 05`). Mockup's own unit, and what `uiux` and `build`
   order their work by.
@@ -168,7 +175,10 @@ later stage. It then carries three tables:
   line between stages. An unclaimed marker means the inventory is not
   finished; a marker two rows both claim to decide means the cut is
   wrong, so name the owner rather than merging two behaviors that are
-  genuinely distinct.
+  genuinely distinct. Every open thread the interview marked
+  `for: logic` is carried here too, in the row of the behavior that
+  settles it, or as a row of its own when none does; a thread no row
+  carries means the inventory is not finished either.
 
 All "assumed" items are collected in the README too, for the user to
 review. Only after every screen file and the README are on disk,
@@ -177,18 +187,21 @@ append the changelog entry per core.md's ledger: key
 `mockup-interview.md`; record the screens written with the journeys
 they serve, the purpose and business-model decisions, the scenario
 inventory handed to `logic`, and the vagueness the gate left open.
-Then set `status: formalized` in the interview file (per core.md's
-Interview lifecycle).
+Then add or refresh the Companion docs row for `mockup/` in
+`<index_file>`, creating a minimal index when none exists, per
+core-authoring.md's Index maintenance, and only then set
+`status: formalized` in the interview file (per core.md's Interview
+lifecycle).
 
 **Handoff:** (when running inside the `start` pipeline, it continues
-automatically) the natural next step is the `logic` skill: it takes
+automatically) the natural next step is `start logic`: it takes
 the README's Scenarios table and settles each behavior's rules, one by
 one, including every question this stage logged `for: logic`; `uiux`
 then turns the screens into a committed frontend design, before any
-architecture. Both stages outrank this one on anything they settle: a
-`rule: logic` state is filled in by `logic`, and this folder is
-regenerated rather than defended when the two disagree. `architecture` (run after these) reads
-regenerated rather than defended when the two disagree. `architecture`
+architecture. Both stages outrank this one on anything they settle:
+`logic`'s wrap replaces each `rule: logic` marker it settled with the
+rule in one line and a pointer to its scenario file, and this folder
+is regenerated rather than defended when the two disagree. `architecture`
 (run after these) reads the formalized mockup and never re-asks what it
 answers: its framing section (§0 of `../interview.md`) is largely
 pre-filled by these final files.

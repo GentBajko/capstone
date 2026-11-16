@@ -1,7 +1,8 @@
 # build - implementation research, then working code
 
-**Reads:** config → `build-interview.md` (resume) → the index and
-chapters → `logic/`, `mockup/`, `uiux/`, `standards.md` (Phase A
+**Reads:** config → `build-interview.md` (resume) → the ledger's
+`stack/all`, `readback/all` and `architecture/all` keys → the index
+and chapters → `logic/`, `mockup/`, `uiux/`, `standards.md` (Phase A
 only, to copy its constraints into the plan),
 `../code-craft.md` → the stack chapter → the existing
 `implementation.md` (resume).
@@ -16,25 +17,34 @@ before prerequisite stages, research or resumed work. Inherit the
 current `start` run's explicit answer; a stage entered directly as
 `start build` always asks and waits, including a resume. Record the chosen
 `execution: subagent | inline` in `build-interview.md`'s frontmatter
-as soon as the file exists; a saved value never skips the entry gate.
+(Phase A creates the file); a saved value never skips the entry gate.
 
-State: `docs/capstone/build-interview.md` (standard lifecycle per
-core.md; `formalized` here means the walking-skeleton slice runs).
+State: `docs/capstone/build-interview.md`, created when Phase A starts
+with `status: interviewing` and the recorded `execution` (standard
+lifecycle per core.md; `formalized` here means every build-order step
+is checked). `build` asks no interview questions, so the file holds no
+`### Q<n>` and its ledger keys carry the run's commit stamp as `<rev>`.
 Plan output: `docs/capstone/implementation.md` (companion, indexed).
-Prerequisite: if `05-dependencies.md` does not contain the complete
-formalized capability matrix and its `stack/all@...` changelog key is
-absent, execute `protocols/stack.md` first; an architecture-stage draft
-alone is not enough.
+Prerequisites: execute `protocols/stack.md` first when the `stack/all`
+key is absent or the capability matrix is incomplete, either one
+alone; an architecture-stage draft alone is not enough. The capability
+matrix is complete when the `stack/all` key exists and every
+capability row in `05-dependencies.md` has a pick, a no-dependency
+decision, a "not needed" ruling, or an open or deferred marker. A
+directly entered `start build` then runs the readback pass
+(`protocols/start.md` step 7) first when no `readback/all@<stamp>` key
+matches the current outputs.
 
 **Resume:** if `implementation.md` exists and the interview records
 plan approval (`plan_approved: true` in its frontmatter, set at the
-gate), skip straight to Phase C and continue from the last step whose
-verification passes; never re-present an approved plan, never restart
-finished steps.
+gate), skip straight to Phase C and continue from the first unchecked
+build-order step; never re-present an approved plan, never restart a
+checked step.
 
 ## Phase A - implementation research
 
-Read everything: the index and chapters, `docs/capstone/logic/`,
+Create `build-interview.md` if it does not exist (State above). Read
+everything: the index and chapters, `docs/capstone/logic/`,
 `docs/capstone/mockup/`, `docs/capstone/uiux/`,
 `docs/capstone/standards.md`, and the stack chapter. Research (web
 search when available) how the chosen pieces actually connect:
@@ -53,12 +63,15 @@ official quickstarts for anything unfamiliar. Then write
   commented only where `../code-craft.md`'s Comments section earns it.
 - How components connect (interfaces, calls, events), each traceable
   to the architecture chapters that decided it.
-- Build order: the walking-skeleton slice first (recorded in the
-  architecture chapters), then backend capabilities in logic-scenario
-  priority order, then frontend screens in mockup order, each
+- Build order: the walking-skeleton slice first (read from the
+  architecture chapters where they record it, otherwise from the
+  `architecture/all@...` ledger entry), then backend capabilities in
+  the order of `mockup/README.md`'s Scenarios table, then frontend
+  screens in mockup order, each
   implementing its `uiux/screens/` chapter and
   `uiux/02-system.md`'s Implementation constraints, which carry
-  `../uiux-craft.md` §8's build-time checklist.
+  `../uiux-craft.md` §8's build-time checklist. Each step is a
+  `- [ ]` checkbox line, checked in Phase C.
 - Per step: how to verify it works before moving on.
 - **Coverage**, the closing section: a table mapping every `logic/`
   scenario, every `mockup/` and `uiux/screens/` screen, and every
@@ -99,10 +112,17 @@ gap, not a judgment call.
 
 Set `status: awaiting-formalization`; present the plan summary
 (layout, build order, the first slice, and the Coverage table's
-totals: N scenarios, N screens, N components, all mapped). The user
-approves before any code is written. On approval, append the
-changelog entry per core.md's ledger, key `build/plan@Q<n>` from
-`build-interview.md`'s highest `### Q<n>`; record the approved module
+totals: N scenarios, N screens, N components, all mapped). The gate
+is a message question per core.md's Structured questions: the summary
+and `implementation.md`'s path are the chat message, its last line
+asks the user to approve the plan or change it, and the turn ends
+there. The user approves before any code is written. Only an explicit
+approval passes, and it covers the plan as presented: a reply that
+changes a step is an amendment, so update `implementation.md` and
+present the gate again (core.md's Structured questions). On approval,
+append the
+changelog entry per core.md's ledger, key `build/plan@<stamp>` with
+the run's commit stamp as `<rev>`; record the approved module
 layout, the build order starting with the walking-skeleton slice, and
 the per-step verification method. Then record `plan_approved: true`
 in the interview frontmatter; Phase C's coding sessions resume
@@ -118,14 +138,19 @@ never `standards.md`: Phase A already copied that file's constraints
 into the plan's Global constraints section, and a session that
 scaffolds, wires and debugs has no budget for seventeen domains
 beside the work. Follow the copied constraints; when one of them is
-wrong, fix `implementation.md` and say so, rather than reading around
-it.
+wrong, stop and say so rather than reading around it: the user rules,
+`implementation.md` is corrected, and a change to a step or a
+constraint they approved goes back through Phase B's gate before
+coding continues.
 
 Then execute `implementation.md` directly: its build-order steps in
 order, the walking-skeleton slice first, backend before the frontend
 that calls it, verifying each step as the plan specifies before
 starting the next. Commits follow `../code-craft.md`'s Git section,
-one per step.
+one per step. A step's checkbox in `implementation.md` is checked when
+its verification passes, one step at a time, never in a batch. The
+walking-skeleton slice is the first milestone: report it when it
+runs, and record nothing as done for it.
 
 **Subagent mode** works exactly as `implement.md`'s Phase B describes
 it: one subagent per build-order step, dispatched fresh and never in
@@ -157,17 +182,20 @@ run and before the first screen is built:
    the file rather than at where it used to live.
 3. Rasterize from those SVG sources at that point: the favicon at the
    sizes the framework's head expects, the app icon per platform
-   target, and `og.png`. The rasters are generated output and are
-   ignored per core-authoring.md's Local-only outputs; the SVGs stay
-   the source of record.
+   target, and `og.png`. The rasters are generated output in the
+   app's own tree: whether they are committed follows the app's
+   conventions, since core-authoring.md's Local-only outputs covers
+   only the copies under `uiux/assets/`. The SVGs stay the source of
+   record.
 
 Either way, code lands in the repository's source tree (never under
-the docs area). Append the changelog entry per core.md's ledger, key
-`build/code@Q<n>`, same `<n>`; record which build-order steps are
-complete, the source paths created, the dependencies installed, and
-the divergences from `implementation.md`. Then set
-`status: formalized` only when the walking-skeleton slice actually
-runs.
+the docs area). A coding session that ends with steps unchecked writes
+no `build/code` entry; the next session resumes at the first unchecked
+step. When every box is checked, append the changelog entry per
+core.md's ledger, key `build/code@<stamp>` with the run's commit stamp
+as `<rev>`; record the build-order steps, the source paths created,
+the dependencies installed, and the divergences from
+`implementation.md`. Then set `status: formalized`.
 
 ## After
 

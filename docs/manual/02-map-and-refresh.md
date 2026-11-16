@@ -6,7 +6,7 @@ Run this inside a repository that already has code:
 /capstone:map
 ```
 
-The agent reads manifests, lint and typing configuration, project instructions, directories, and entry points. It builds a module map, studies each applicable topic, and writes a reference under `docs/capstone/` by default. An empty repository with no source, entry points, or manifests has nothing to describe: the run stops without writing a map and points to `start` or `architecture`.
+The agent reads manifests, lint and typing configuration, project instructions, directories, and entry points. It builds a module map, studies each applicable topic, and writes a reference under `docs/capstone/` by default. An empty repository with no source, entry points, or manifests has nothing to describe: the run stops without writing a map and points to `start` or `start architecture`.
 
 The smallest useful follow-up is a question grounded in the new index:
 
@@ -44,11 +44,11 @@ Each observed chapter records source coverage globs, a generation commit, a cont
 
 If a squash or rebase makes the commit unreachable, it compares the stored hash with current Git index entries and also checks whether the working tree is dirty. This avoids making every lost commit stamp trigger a whole-repository rewrite. The hash is not a summary of prose and not a semantic comparison of code: it is derived from Git's tracked entries under the covered globs.
 
-Source drift is not the only trigger. Refresh also checks missing required sections, older or absent `capstone_version`, newly applicable topics, missing scenario or surface coverage, and final documents improperly referring readers to private interview files. A file can therefore need refresh even when its covered source did not change. Conversely, a change outside a chapter's declared coverage does not automatically make that chapter stale; accurate globs matter.
+Source drift is not the only trigger. Refresh also checks missing required sections, older or absent `capstone_version`, newly applicable topics, missing scenario or surface coverage, and final documents improperly referring readers to private interview files. A file can therefore need refresh even when its covered source did not change. Conversely, a change outside a chapter's declared coverage does not automatically make that chapter stale; accurate globs matter. A repo-wide chapter's globs carry an entry excluding the docs area, `":(top,exclude)docs/capstone/**"` for the default, so map's own writes and later docs commits never mark it stale; a repo-wide list without that entry is refreshed as template drift.
 
-Prescriptive architecture becomes observed documentation when tracked source exists. Map records design-versus-implementation differences and keeps the design rationale. In the dependencies chapter, a researched choice not yet installed remains recorded as **picked but not yet installed**; refresh does not erase it simply because the manifest lacks it.
+Prescriptive architecture becomes observed documentation when tracked source exists under the chapter's covered globs, the same test `map check` runs. A prescriptive chapter whose globs match nothing while the repository has tracked source elsewhere stays current and is named in the run report as planned paths the code did not follow. Map records design-versus-implementation differences and keeps the design rationale. In the dependencies chapter, a researched choice not yet installed remains recorded as **picked but not yet installed**; refresh does not erase it simply because the manifest lacks it.
 
-When every file is current, map leaves the files and stamps unchanged and does not fold pending changelog fragments. A writing run adds a `map/<scope>@<stamp>` ledger entry and folds fragments only on the default branch. Without Git, there is no commit-based freshness calculation: map warns that it is doing a full build on subsequent runs too.
+When every file is current, map leaves the files and stamps unchanged and does not fold pending changelog fragments. A writing run adds a `map/<scope>@<stamp>` ledger entry (suffixed `.2`, `.3` when an earlier run's entry already holds that key and does not record what this one wrote) and folds fragments only on the default branch. Without Git, there is no commit-based freshness calculation: map warns that it is doing a full build on subsequent runs too.
 
 ## Size, extraction, and existing decisions
 

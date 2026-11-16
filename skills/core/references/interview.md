@@ -8,13 +8,18 @@ from recorded decisions.
 
 ## Conduct rules
 
-- One question per turn; offer concrete options when enumerable.
+- One decision per question; offer concrete options when enumerable.
+  One question per turn, with one exception: a protocol that says so
+  lets a subsection's independent questions share a dialog (core.md's
+  Shared dialogs). `architecture` does for §0, §2 and §4; `groom`
+  never does.
 - Quantify everything: "fast", "secure", "scalable" are banned answers:
   push for a number, a percentile, and how it would be measured. A
   quality target without a measure is recorded as a wish, not a decision.
 - Classify each decision as a **one-way door** (irreversible: gets
-  rigor, alternatives, and explicit confirmation) or **two-way door**
-  (reversible: decide fast, record, move on).
+  rigor, alternatives, explicit confirmation, and a turn to itself,
+  never a shared dialog) or **two-way door** (reversible: decide
+  fast, record, move on).
 - For the macro-structure decision, present **2-3 candidates** with
   trade-offs, never one.
 - Offer defaults explicitly (boring technology, monolith-first, buy for
@@ -131,8 +136,8 @@ from recorded decisions.
   `schema` on that row of `09-interfaces.md` is what points at them.
 - Composition: how dependencies are wired (DI style, composition roots).
 - Frontend (products with a UI): the §4 Frontend/clients module fills
-  this chapter's Frontend section; walk it before closing this
-  checklist.
+  this chapter's Frontend section; walk it here, before closing this
+  checklist, and not again when §4 is reached.
 
 ### → models.md
 - Core entities and their relationships; aggregate/invariant boundaries.
@@ -158,6 +163,9 @@ from recorded decisions.
 - Backup strategy incl. restore-testing cadence.
 
 ### → conventions.md
+Answers here are recorded as provisional, marked
+"provisional: `standards` owns this"; `standards` confirms and
+rewrites them.
 - Paradigm: OO / functional / procedural mix; where each.
 - Typing level: strictness config, escape-hatch policy, structural
   (protocols/interfaces) vs nominal; enums over strings?
@@ -181,6 +189,8 @@ from recorded decisions.
 - Background jobs: queue, scheduling, retry, poison-message handling.
 
 ### → dependencies.md
+Picks here are recorded as provisional, marked
+"provisional: `stack` owns this"; `stack` confirms and rewrites them.
 - Full stack picks with version floors; per pick: maturity, license,
   hiring pool, exit cost.
 - External services (DB, cache, broker, IdP, payments, email, storage,
@@ -257,12 +267,14 @@ reliability, autonomy vs standardization.
   model), and skipping this module is a recorded decision, never a
   default: rendering model (SPA/MPA/SSR/SSG/islands) per page class;
   client-side routing; client entry points and bundles; state
-  management split (server-state vs UI state); design system; the
+  management split (server-state vs UI state); the design system
+  `uiux` already picked, cited and never re-asked; the
   API-client seam to the backend (hand-rolled fetch layer, generated
   client, BFF); mobile approach; offline/conflict strategy;
   bundle/Web-Vitals budgets; client versioning and forced-upgrade
   policy. These answers fill architecture.md's Frontend section and
-  data-flow's client state.
+  data-flow's client state, so this module is walked with §2's
+  → architecture.md checklist and is already done when §4 is reached.
 - **Multi-tenant SaaS**: tenant lifecycle (onboard/migrate/offboard/
   export); noisy-neighbor controls and per-tenant quotas; entitlements
   and plan-gated flags; usage metering and billing integration;

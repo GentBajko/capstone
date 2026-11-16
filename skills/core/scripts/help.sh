@@ -6,7 +6,7 @@ capstone - codebase architecture reference generator
 
 Usage: /capstone:<command> [subcommand]
 
-Nine commands. Everything else is a subcommand: the seven pipeline
+Ten commands. Everything else is a subcommand: the seven pipeline
 stages, reached as "start <stage>" when you want to enter mid-chain,
 and the session review, reached as "review retro".
 
@@ -39,8 +39,13 @@ and the session review, reached as "review retro".
                        sections, model references, secret shapes ->
                        "MAP CHECK:") and the model's review (pointer drift,
                        absorption, re-vetting, coverage -> "MAP REVIEW:")
-  doctor               Verify and repair the docs area: torn writes, index
-                       drift, voided approvals, absorption gaps
+  edges [folder]       From the folder that holds several mapped repos: fill
+                       each consumer's empty "from" in 09-interfaces.md out
+                       of the code and the sibling clones. Asks nothing,
+                       never writes a producer's "to", changes no answer
+  doctor [fix]         Verify and repair the docs area: torn writes, index
+                       drift, voided approvals, absorption gaps; "fix"
+                       pre-approves the documented crash repairs
   review [be|fe]       Opt-in judgment -> review.md; no arg does both sides,
                        backend (architecture) and frontend (UI vs your design docs)
     review retro [session]
@@ -78,10 +83,12 @@ in skills/core/references/schema.txt; templates/ carries both workflows.
 Interview stages accept an optional artifact argument (a PRD, notes,
 screenshots) that pre-fills answers for your confirmation.
 
-Config: capstone.json in the agent's global folder (~/.claude; created
-at install): expertise 1-5 (vibe coder ... architect; how technical
+Config: capstone.json in the agent's global folder (host-aware; ~/.claude
+for Claude Code and ~/.codex for Codex, created at install): expertise 1-5 (vibe coder ... architect; how technical
 conversations are, asked once then saved), teaching_mode (true =
-narrate and teach while working), docs_dir, index_file,
+narrate and teach while working), batch_questions (auto = an
+interview's independent questions arrive together in one dialog, off =
+always one per turn), docs_dir, index_file,
 subagent_threshold, docs_in_git, language, redact (env-var name
 patterns whose values the docs never quote), cross_repo (auto = map,
 groom, plan and architecture consult quarry when it is on PATH).
@@ -95,5 +102,6 @@ Cross-repo edges: 09-interfaces.md's frontmatter edges block is the
 record. map writes kind, name, site and schema from the code and never
 to/from - no repo holds another repo's name - quarry fills those by
 joining the two halves on (kind, name), and you are asked only where
-that join finds several candidates.
+that join finds several candidates. With every repo cloned into one
+folder, edges fills each consumer's empty from out of the code.
 EOF

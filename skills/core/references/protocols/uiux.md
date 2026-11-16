@@ -48,7 +48,11 @@ needs them.
 Conversation cadence: one question per turn, expertise-calibrated per
 core.md (level 1 hears "calm or bold?", never "what
 DESIGN_VARIANCE?"). Every decision is appended to the interview file
-before the next question.
+before the next question. One exception: the items a pass of the
+inventory's sweep finds still open at Phase C's exit test, which no
+generation rule has asked about, may share a dialog per core.md's
+Shared dialogs. A question either generation rule produced never
+does.
 
 ## Phase A - setup / resume
 
@@ -71,20 +75,25 @@ Prerequisite: either `docs/capstone/mockup/` is formalized and on disk
 (greenfield: the screens are this
 stage's unit of work), or the repo has frontend code (brownfield:
 Extraction mode below). Neither → say so, point at `mockup` (or
-`start`), and stop.
+`start`), and stop. With no mockup but `uiux/` drafts `map` extracted
+(no interview file, no `uiux/` changelog key), extraction does not run
+again: the interview phases below run with those drafts as pre-filled
+answers to confirm or correct, per core-authoring.md's Artifact
+seeding, the drafts' surfaces standing in for the mockup's screens.
 
 If `mockup/README.md` records no visual surface
-(`cli`/`api`/`none` only), there is nothing to design: write
-`uiux-interview.md` with `status: formalized` and `skipped: no-ui`
-in its frontmatter, append the changelog entry (key
-`uiux/skipped@<stamp>`, recording the surfaces that made it moot)
-and hand back; inside `start` the pipeline continues.
+(`cli`/`api`/`none` only), there is nothing to design: append the
+changelog entry first (key `uiux/skipped@Q<n>`, `<n>` the highest
+`### Q<n>` in the interview file, 0 when there is none, recording the
+surfaces that made it moot), then write `uiux-interview.md` with
+`status: formalized` and `skipped: no-ui` in its frontmatter, and
+hand back; inside `start` the pipeline continues.
 `docs/capstone/logic/` is read when present; absent or partial,
 proceed and record in the interview file that unhappy-path styling
 leans on the mockup's `## States` sections only - which are an
 inventory, so a state the mockup marked `rule: logic` has no trigger
-yet: style it and record that its condition is unsettled, never invent
-one to fill the gap.
+yet: style it and record its condition as an open thread `for: logic`,
+never invent one to fill the gap.
 
 ## Extraction mode (brownfield)
 
@@ -124,8 +133,10 @@ that the incumbent has no consistent visual system, with the
 divergences as evidence, and no contract blocks are invented.
 
 A later `start uiux` run confirms or corrects those drafts and
-records the decisions as usual: that is what turns an extracted
-description into the committed design the rest of the pipeline reads.
+records the decisions as usual, through the interview phases with the
+drafts as pre-filled answers (Phase A), never a second extraction:
+that is what turns an extracted description into the committed design
+the rest of the pipeline reads.
 
 ## Phase B - the design read (the seeds)
 
@@ -146,7 +157,8 @@ Derive before asking; never re-ask what the docs answer:
 The seeds (the only predetermined questions):
 
 1. Present the read, the mode map, and the dials for confirmation or
-   correction.
+   correction, as a message question per core.md's Structured
+   questions.
 2. "What brand material already exists and is binding: name, logo,
    colors, fonts, references you want honored?"
 2b. The asset question, asked here and never skipped: "Will you supply
@@ -195,31 +207,41 @@ produces a good-looking product nobody can operate.
   Navigation model and how the user knows where they are. Feedback:
   what is optimistic, what waits, and what the wait looks like past
   roughly a second. Destructive actions: confirm, undo, or both, per
-  the posture seed. Error recovery: what the product does with the
-  user's work when a step fails, and whether it retries silently.
+  the posture seed. Error recovery: how a failed step reaches the
+  user and how they get back to their work. Whether a step is
+  retried, and what becomes of partly done work, is the logic
+  scenario's (D10, D11): cited, never decided here.
   Progressive disclosure: what is visible by default versus behind a
   step. Input burden: what is remembered, defaulted, or asked again.
   Keyboard, pointer, and touch expectations, and the accessibility
   floor (`logic`'s rules say what must be true; this says what the
   user is put through to satisfy them). Each answer is a rule
-  `screens/` then applies rather than re-decides.
+  `screens/` then applies rather than re-decides. This stage never
+  records a `rule: logic` trigger or a retry or failure behaviour: it
+  cites the logic scenario, and where `logic` has not settled it,
+  records an open thread `for: logic` instead of deciding.
 - **Screens**: for each mockup screen, resolve what the wireframe
   underdetermines: composition and focal moment, the styled meaning
   of every state (the mockup's `## States` inventory crossed with the
   logic scenarios' unhappy paths, which is where a `rule: logic` state
-  gets its trigger), motion moments, copy register - the mockup's
+  cites its trigger, or gets an open thread `for: logic` when no
+  scenario settles it), motion moments, copy register - the mockup's
   labels are working copy this stage ratifies or replaces. Ask only
   where the docs and the committed world don't already decide it.
 
-Drill until concrete. The user may stop at any time; jump to Phase D
-and record remaining vagueness honestly.
+Drill until concrete. The user may stop at any time: that pauses the
+stage with `status: interviewing`, and the next run resumes here.
+Stopping never jumps to the gate.
 
 **The exit test.** The two generation rules above still order the
 questions; `../uiux-inventory.md` decides when there are none left.
 Phase C is over when every one of its §3 system items and, per screen,
 every one of its §4 screen items is answered, cited to an earlier
 answer, or recorded inapplicable with its reason - not when nothing
-further comes to mind. Sweep per that file's §2: generate, eliminate
+further comes to mind. An item the user declined, or one sent out as
+a questionnaire, counts as settled for now: it stays open in the
+outputs, and formalization is not blocked by it (core.md's
+Questionnaires section). Sweep per that file's §2: generate, eliminate
 what the mockup and the earlier answers already settle, and put the
 items that do not apply into **one** confirmation rather than one
 question each. A correction inside that batch turns an empty back into
@@ -227,12 +249,16 @@ a real question. Close each ledger box as its item lands.
 
 ## Phase D' - review artifacts
 
-Run once the direction is committed, the §3 system items are answered,
-and the screen sweep is complete, before the gate. Skip it when any of
-those is still open; say so in one line rather than presenting a design
-that is half decided.
+Run once the direction is committed, every §3 system item is
+answered, declined, or sent out as a questionnaire, and the screen
+sweep is complete on the same terms, before the gate. Skip it when any
+of those is still unsettled; say so in one line rather than presenting
+a design that is half decided.
 
-First ask the user, using core.md's structured question tool when the
+First read the recorded seed 2b answer: it already picks the path (a
+supplied SVG, a first-pass mark, or assets still to come), so take it
+and do not ask again. Only when no 2b answer is recorded, ask the
+user, using core.md's structured question tool when the
 harness provides it: "Should I make a first-pass logo in SVG and a
 page mockup for you to review now?" Offer selectable answers such as
 `Make both (Recommended)`, `Use the supplied SVG and make the mockup`,
@@ -241,8 +267,10 @@ and `I will provide the assets first`, while keeping the native
 options. Do not create a logo until the user has chosen a path that
 allows it. If the user supplies the SVG, copy that exact file into the
 reference folder for the review; do not redraw it. If the user chooses
-to provide the assets first and no SVG is present, record the row as
-`awaited` and stop; do not invent a logo or continue to the next phase.
+to provide the assets first and no SVG is present, record the logo
+rows `awaited`, make no logo, and continue: the page mockup sets the
+name in type where the mark will go, and the review and the gate run
+as usual. Only `build` stops on an `awaited` row.
 
 Write the canonical working copies here:
 
@@ -269,7 +297,8 @@ Present the artifacts according to the current harness:
 - **Other harnesses:** write and hand back the pure HTML path; the
   page must work from the reference folder with the SVG beside it.
 
-Then ask for review with the structured question tool when available:
+Then ask for review with the structured question tool when available,
+naming in the question the artifact link or file paths under review:
 `Approve and continue (Recommended)`, `Request visual changes`, or
 `Replace the logo`, plus its native `Other`/free-text path. The user can
 type suggestions in that response. Do not enter Phase D or hand off to
@@ -278,11 +307,11 @@ is appended as a new `### Q<n>` entry before regenerating both affected
 files; present the revised artifacts and ask again. An approval is not
 inferred from silence, a file existing, or a Site/artifact closing.
 
-After explicit approval, promote the accepted SVG from the reference
-folder to the final `uiux/assets/<file>.svg` path named by `02-system.md`'s
-`## Assets` table and mark that row `present`. Keep
-`uiux/assets/references/` intact and ignored through later phases; do
-not clean it up at formalization. A later phase or the user may remove
+After explicit approval, promote the accepted SVG, when there is one,
+from the reference folder to the final `uiux/assets/<file>.svg` path
+named by `02-system.md`'s `## Assets` table and mark that row
+`present`. Keep `uiux/assets/references/` intact and ignored through
+later phases; do not clean it up at formalization. A later phase or the user may remove
 it only after it no longer helps review or implementation. The HTML
 mockup is review material, never the design authority: the chapterized
 UIUX outputs remain authoritative.
@@ -298,8 +327,11 @@ Only after the review-artifact approval, set `status:
 awaiting-formalization`; present the summary: the read
 and mode map, the committed direction (world, the flagship surface's
 first viewport, signature interaction), dials, tokens, the per-screen
-notes, and what is still vague. The user formalizes or amends; do not
-write the final design docs until they do.
+notes, and what is still vague. The gate is a message question per
+core.md's Structured questions: the summary is the chat message, its
+last line asks the user to formalize or amend, and the turn ends
+there. The user formalizes or amends; do not write the final design
+docs until they do.
 
 ## Phase E - the design docs
 
@@ -333,7 +365,9 @@ marked "assumed" inline):
   reduced-motion behavior); the component-library / design-system
   pick with its reasoning; `## Implementation constraints`:
   uiux-craft §8's build-time checklist copied in, plus any
-  project-specific additions; and last, `## Assets`.
+  project-specific additions; then `## Assets`; and, where a system
+  item was ruled inapplicable, a closing `## Not in play`
+  (uiux-inventory.md §5).
   `## Assets` is a table, columns
   `Asset | File | Source | Status`, one row per file the brand needs:
   logo mark, logo wordmark, logo mono, logo on dark, favicon source,
@@ -348,8 +382,9 @@ marked "assumed" inline):
   screens apply rather than re-decide: navigation model and
   orientation; feedback thresholds (what is optimistic, what waits,
   what a wait longer than ~1s shows); destructive-action policy
-  (confirm, undo, or both); error recovery and what happens to the
-  user's work; progressive-disclosure defaults; input burden (what is
+  (confirm, undo, or both); error recovery as the user meets it, the
+  retry and failure behaviour cited from `logic`; progressive-disclosure
+  defaults; input burden (what is
   remembered, defaulted, never re-asked); keyboard, pointer, and touch
   expectations; the accessibility floor. `build` reads this beside
   `02-system.md`; `review`'s frontend
