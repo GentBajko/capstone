@@ -2,7 +2,12 @@
 
 Capstone reads a personal global configuration and an optional shared project configuration. Both allow `//` line comments, so the default file is JSON with comments rather than strict JSON for an arbitrary parser. Missing keys use the defaults below.
 
-The global configuration belongs to the user. The Claude hook writes `~/.claude/capstone.json`, or the directory selected by environment. The initializer and checker resolve **`CAPSTONE_GLOBAL_DIR` → `CLAUDE_CONFIG_DIR` → `$HOME/.claude`**. Set the first explicitly for direct script use with another agent.
+The global configuration belongs to the user. The initializer writes
+`capstone.json` in the detected host directory, or the directory selected
+by environment. The initializer and checker resolve **`CAPSTONE_GLOBAL_DIR`
+→ Codex host markers / `CODEX_HOME` → Gemini home variables →
+`CLAUDE_CONFIG_DIR` → `$HOME/.claude`**. Set the first explicitly for an
+unusual harness.
 
 The shared project file is always **`docs/capstone/capstone.json`**, even when generated output moves elsewhere. It is optional, created when there is project state/settings to record, and committed. Project values override global values except `expertise` and `teaching_mode`, which are personal and ignored if placed in the project file.
 
@@ -12,6 +17,7 @@ The shared project file is always **`docs/capstone/capstone.json`**, even when g
 | --- | --- | --- |
 | `expertise` | `null` | Ask once in an interactive task; levels 1–5 change conversational vocabulary/detail, not document rigor; null behaves as level 3 until answered |
 | `teaching_mode` | `false` | Narrate meaningful steps and concepts while working; personal/global only |
+| `batch_questions` | `"auto"` | `"auto"` lets an interview's independent questions arrive together in one dialog when the harness's question tool takes several; `"off"` keeps one question per turn everywhere |
 | `docs_dir` | `"docs/capstone"` | Generated docs directory, relative and inside the repository |
 | `index_file` | `"docs/capstone/00-index.md"` | Index path, relative and inside the repository |
 | `subagent_threshold` | `150` | Source-file count above which standalone map uses topic subagents if available and an unrequested initial map asks first |
@@ -29,12 +35,70 @@ The shared project file is always **`docs/capstone/capstone.json`**, even when g
 
 Expertise levels are 1: plain-language guidance, 2: explanations with introduced terminology, 3: normal technical vocabulary and recommended options, 4: terse engineering discussion with explicit numbers, 5: compact architectural tradeoffs. Teaching mode is independent of expertise.
 
-When the current harness exposes a structured question tool, interactive
-questions use it with clickable options and a typed `Other` path. A
-harness without that capability receives the same one-question prompt
-in normal conversation. The answer is persisted before the next
-question; this changes presentation, not the protocol's gates or
-non-interactive behavior.
+When the current harness exposes a structured question tool, questions
+with a known set of answers use it, with clickable options and a typed
+`Other` path. A harness without that capability receives the same
+one-question prompt in normal conversation. An open-ended question
+(a number, a name, a description), and anything you have to read
+before answering - a gate's summary, a digest, a comparison of
+options - is never put behind a dialog: it is written in the chat
+with the question as its last line, and the run waits for your
+reply. The answer is persisted before the next question; this
+changes presentation, not the protocol's gates or non-interactive
+behavior. A dialog you dismiss or skip, or one the
+harness closes after a wait, records nothing; a typed reply in place
+of the choices answers only the questions it plainly names. Whatever
+is still open is asked again in the chat.
+
+### Several questions in one dialog
+
+With `batch_questions` at `"auto"`, four interviews send independent
+questions together when the harness's question tool accepts several:
+`architecture` (one subsection of its framing, topic and conditional
+checklists at a time), `standards` (one domain), `uiux` (what its
+inventory leaves open) and `logic` (what a scenario's
+sixteen-dimension sweep leaves open). Those are the places where the
+questions are written before any of them is answered, so asking them
+together changes nothing about what is asked.
+
+| Harness | Tool | Questions per dialog |
+| --- | --- | --- |
+| Claude Code | `AskUserQuestion` | up to 4 |
+| Kimi CLI | `AskUserQuestion` | up to 4 |
+| Gemini CLI | `ask_user` | up to 4 |
+| OpenCode | `question` | several |
+| Codex | `request_user_input` | several, in the modes that list the tool (Plan mode by default) |
+| Cursor | its ask-question tool | several; options only, so a typed answer is asked for in the chat |
+
+Capstone reads the limit from the tool in the session, not from this
+table. A harness or mode without such a tool gets one question per
+turn, as before.
+
+What never shares a dialog:
+
+- a question whose wording, options or relevance depends on another
+  answer in the same dialog;
+- an irreversible decision (a one-way door), which keeps its
+  alternatives and its explicit confirmation;
+- a gate, a digest, a comparison you have to read, or an open-ended
+  question;
+- a follow-up or a pushback, which come one per turn after the dialog
+  and before the next one;
+- `architecture`'s shape decisions, quality attributes and closing
+  red-flag questions;
+- any question in `mockup` or `groom`, where each question is derived
+  from your last answer.
+
+Every answer is still recorded as its own interview entry. If an
+answer turns out to change what another question in the same dialog
+should have asked, that other answer is marked void in the interview
+file and the question is asked again by itself.
+
+Teaching mode and expertise levels 1 and 2 keep one question per
+turn, because each question there comes with its own explanation. To
+switch batching off, set `"batch_questions": "off"`, or ask for one
+question at a time during a run, which writes that setting for you.
+`"off"` in either the global or the project file wins.
 
 ## Useful project examples
 

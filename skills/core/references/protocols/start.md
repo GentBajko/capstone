@@ -7,7 +7,8 @@ step 7's coverage half walks (`logic-craft.md`, `uiux-inventory.md`,
 `interview.md`, `standards-inventory.md`, `protocols/stack.md` Phase A),
 once, for the readback pass (step 7); nothing else until a stage's own
 protocol runs. An argument routes straight to one protocol and reads
-none of the above.
+none of the above, except `start build` when it runs the readback
+pass first (Routing).
 
 Entry point when the user says just "capstone" or asks to start or
 continue the pipeline, and the owner of every stage the pipeline runs:
@@ -46,6 +47,7 @@ for `stack`).
 A directly entered stage is the same stage the pipeline runs, entered
 mid-chain: it applies [Execution
 choice](../core.md#execution-choice) itself (Procedure step 1), reads
+`../core-authoring.md` (Procedure step 5) and
 its own prerequisites, runs its own formalization gate, and writes its
 own changelog entry. It does not run the stage after it, and it does
 not run the readback pass, which belongs to the pipeline. Report what
@@ -55,6 +57,12 @@ with no argument as the way to continue the chain.
 Entering a stage whose prerequisites are missing is not an error to
 route around: say which stage owns the missing input and stop, rather
 than interviewing for it here.
+
+`start build` is the one exception to both rules. Entered directly, it
+first runs `stack` when the stack output is not formalized, then the
+readback pass (Procedure step 7) when no `readback/all@<stamp>` key
+matches the current outputs, and only then `build.md`: code is never
+written from outputs the readback has not read.
 
 ## Procedure
 
@@ -68,23 +76,42 @@ than interviewing for it here.
    per core.md's Interview lifecycle:
    - **not started**: no interview file, no complete final outputs, and
      no matching stage changelog key.
+   - **mapped drafts**: `logic/` or `uiux/` files `map` extracted,
+     with no interview file and no changelog key under that stage.
+     Not started, for the pipeline: the stage runs, and treats those
+     files as drafts to confirm or correct, never as decisions.
    - **in progress**: status `interviewing` or
      `awaiting-formalization` (for the latter, resume by re-presenting
      the stage's formalization gate, never generating without the
      user's approval; exception: `build` with `plan_approved: true`
      resumes coding per its Resume rules instead of re-gating), or
-     `logic` with pending scenarios in its checklist.
+     `logic` with pending scenarios in its checklist. On a clone with
+     no `logic-interview.md` and no `logic/all` key, `logic` with
+     scenario keys is in progress too: resume by reading the mockup
+     README's Scenarios table against the `logic/` files present (a
+     file present is written), never re-asking a written scenario.
     - **done**: complete final outputs and the matching stage changelog
        key are present. Local interview frontmatter saying `formalized`
        confirms the same state when it exists but is not required on a
        fresh clone;
      `formalized` with no key is repairable: append the missing entry
-     from the recorded decisions, without re-interviewing.
+     from the recorded decisions, without re-interviewing. Status
+     `awaiting-formalization` with complete outputs and the stage key
+     is done as well: the run stopped between its entry and the
+     marker, so set `status: formalized` and do not re-gate. `logic`'s
+     stage key is `logic/all@Q<n>`, which its wrap writes; its
+     per-scenario keys alone are not done. `build` is done only when
+     every build-order step in `implementation.md` is checked and the
+     `build/code` key exists; the walking skeleton running is a
+     milestone, not done. A
+     `uiux/skipped@Q<n>` key is done with no outputs: the product
+     has no visual surface, so nothing is missing.
     - **outputs missing**: status `formalized` or a stage changelog key
        exists, but outputs are missing or partial. Regenerate from the
        interview only when that local working record still exists;
-       otherwise report the loss as unrecoverable and never invent the
-       missing decisions.
+       otherwise never invent the missing decisions: stop, tell the
+       user the loss is unrecoverable and the stage has to be
+       interviewed again, and re-run it only when they say so.
 3. Hold the pipeline as progress tasks per core.md's Progress tasks
    rule, one per stage plus one for the readback pass (step 7), so the
    user sees where they are; the running stage's protocol adds its own
@@ -102,11 +129,19 @@ than interviewing for it here.
      core.md, creating `docs/capstone/capstone.json` holding just
      that key if absent).
    - On a `map` answer: execute `protocols/map.md` now and
-     end the pipeline run.
+     end the pipeline run. The same holds for the answer already on
+     record: with `pipeline: false`, or a descriptive index and no
+     stage started, this is `map`'s project, so run `map` and end
+     here instead of opening a greenfield interview on a mapped repo.
 5. Run the first non-done stage by executing its protocol file
    (`mockup.md`, `logic.md`, `uiux.md`, `architecture.md`,
    `standards.md`, `stack.md`, `build.md`) exactly, including its
-   own formalization gate. Do not blend stages. `build.md` runs only
+   own formalization gate. Do not blend stages. Before the first
+   stage protocol or the readback pass, whichever comes first,
+   read `../core-authoring.md`: the
+   wrapper left it out because routing needs none of it, and every
+   stage and the readback land their outputs under its rules (artifact
+   seeding, the index row, the local-only ignore list). `build.md` runs only
    after step 7's readback pass. A cross-repo edge the design
    declares is confirmed inside `architecture` per core.md's Edge
    confirmation; `start` carries its execution choice into the stage.
@@ -126,7 +161,11 @@ than interviewing for it here.
    `build.md`.
    `<stamp>` is a stable hash of the ordered latest changelog keys for
    the six stage outputs, so unchanged outputs skip and any amended
-   stage runs the pass again.
+   stage runs the pass again. Compute it once, before the pass edits
+   anything, and record that value in `readback/all@<stamp>`; the
+   `<stage>/readback@<stamp>` entries the pass itself writes are left
+   out of the latest keys it hashes, so a later run computes the same
+   stamp and does not re-run the pass.
    Read the final `mockup/`, `logic/`, `uiux/`, architecture chapters,
    `standards.md`, and `05-dependencies.md`, then run the three halves
    in order: coverage first, because a decision nobody made is cheaper
@@ -146,6 +185,9 @@ than interviewing for it here.
    | standards | `standards-inventory.md` §3's domains and §4's items | `standards.md` and its `## Not in play` |
    | stack | the capability list `stack.md` Phase A derives | `05-dependencies.md` |
 
+   A ledger carrying a `uiux/skipped@Q<n>` key exempts `uiux`: the
+   pass skips every uiux row of this table and reads no `uiux/` files.
+
    An item is covered when an output records a decision for it, or
    records it inapplicable with a reason. An item another stage's
    output settles and this one cites is covered as well. Everything
@@ -155,7 +197,10 @@ than interviewing for it here.
    digest rather than a debate** like misplacement: a numbered list,
    each line naming the stage, the item, and the final file the answer
    would land in ("3. standards, S65 idempotency → `standards.md`, API
-   conventions"). The user answers, skips, or rules one out. Every
+   conventions"). It is a message question per core.md's Structured
+   questions: the numbered list is the chat message, its last line
+   asks for the answers, and the turn ends there. The user answers,
+   skips, or rules one out. Every
    answer is written into the owning final file with its
    rationale, that file's stamp refreshed, and the owning stage's
    changelog entry appended; an item ruled out is written as an
@@ -178,7 +223,8 @@ than interviewing for it here.
    Nothing is being re-decided here, only re-filed, so this half is
    **one digest rather than a debate**: list every move as a line
    ("the wind-down threshold: `01-architecture.md` →
-   `logic/03-wind-down.md`"), and the user confirms the set, corrects
+   `logic/03-wind-down.md`") in the chat, as a message question like
+   the coverage digest, and the user confirms the set, corrects
    a destination, or strikes a move. On confirmation, write the
    decision and its rationale into the owner's final file, remove it
    from the non-owner, and replace any needed mention there with a

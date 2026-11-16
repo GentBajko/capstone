@@ -43,8 +43,9 @@ refreshes. It is carried between stages, with no automatic default.
 The stage approvals remain separate. `groom` stops for
 spec approval. `plan` stops for plan approval, recorded with a
 checksum of the spec, and no code is written before it. `implement`
-runs to completion after that, reviewing its own diff until two
-consecutive rounds find nothing new.
+then asks where the commits should land, stops when a step fails or
+reads two ways, reviews its own diff until two consecutive rounds find
+nothing new, and asks again before any push or pull request.
 
 ## Common questions
 

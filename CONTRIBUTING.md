@@ -7,7 +7,9 @@ wrapper skill at `skills/<name>/`; update both when the surface
 changes, plus the core skill's `scripts/help.sh` and
 `docs/commands.md`. Check 5c fails when a command is missing from
 the reference: a command doc that silently omits a command is worse
-than none, because it reads as complete.
+than none, because it reads as complete. The suite's command count is
+spelled out on seven surfaces ("ten commands"), and check 5d fails
+the one that still counts the suite as it was.
 
 A new command also owes a page at `docs/commands/<name>.md`, which
 check 26 requires along with its four fixed headings in order

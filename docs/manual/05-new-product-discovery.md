@@ -22,7 +22,7 @@ Mockup records purpose, audience, commercial model, journeys, screens or other i
 
 At the gate, review the summary and unresolved items. After formalization it writes `mockup/README.md` and `mockup/NN-screen.md`. Each screen has Layout, Elements, and States. The layout is an ASCII wireframe plus containment structure, not a screenshot or HTML prototype. Elements identify actions and destinations; States inventory what appears and name triggers without inventing their thresholds. `rule: logic` marks a trigger or behavior that still needs the logic stage.
 
-The README contains the final brief plus Screens, Journeys, and Scenarios for logic tables. Every `rule: logic` marker must have one owning scenario. Screen assumptions are marked inline and in `assumed:` frontmatter and collected in the README; they must not look like confirmed choices.
+The README contains the final brief plus Screens, Journeys, and Scenarios for logic tables. Every `rule: logic` marker must have one owning scenario, and every question logged `for: logic` is carried by a row of that table. The README is the folder's own index; the project index lists `mockup/` as one row. Screen assumptions are marked inline and in `assumed:` frontmatter and collected in the README; they must not look like confirmed choices.
 
 `surfaces` records any combination of `web`, `mobile`, `cli`, `api`, and `none`. For API/CLI products, the numbered “screens” describe commands, endpoints, or message flows using interaction transcripts. A product with only nonvisual surfaces skips the UI design stage with `skipped: no-ui`; the rest of the pipeline continues.
 
@@ -32,7 +32,7 @@ The README contains the final brief plus Screens, Journeys, and Scenarios for lo
 /capstone:start logic
 ```
 
-Logic takes the scenario inventory from the formalized mockup and confirms it in priority order. If there is no usable inventory, it asks for one. It finishes one scenario before the next, recording every answer immediately in `logic-interview.md`.
+Logic takes the scenario inventory from the formalized mockup and confirms it in priority order. A mockup that is not yet formalized stops it with a pointer back to mockup; a formalized one that predates the Scenarios table makes it ask for the list instead. It finishes one scenario before the next, recording every answer immediately in `logic-interview.md`.
 
 For an invitation feature, a scenario might cover who may invite, which addresses are accepted, when invitations expire, what a repeated invitation does, and what happens when the invitation is accepted concurrently with revocation. Those are sample concerns; your recorded answers determine the rules.
 
@@ -40,7 +40,7 @@ Each scenario is checked against 16 dimensions: authority; eligibility/precondit
 
 The scenario file contains Trigger & preconditions, Steps, Branches, Unhappy paths, State transitions, Invariants, Outcomes & side effects, and Dimensions not in play. A ruled-out dimension has a reason. An unanswered dimension remains open; it is not recategorized as irrelevant to satisfy a completion checklist.
 
-The user confirms each scenario, which is written immediately to `logic/NN-scenario.md` with its own ledger entry. The interview remains `interviewing` until all scenarios are `written` or `dropped`; it does not use the overall `awaiting-formalization` state. A deliberate drop has a recorded reason and ledger key. Stopping halfway retains the written scenarios and the pending list.
+The user confirms each scenario, which is written immediately to `logic/NN-scenario.md` with its own ledger entry and index row. The interview remains `interviewing` until all scenarios are `written` or `dropped`; it does not use the overall `awaiting-formalization` state. A deliberate drop has a recorded reason and ledger key. When the last scenario is written or dropped, the wrap replaces each `rule: logic` marker it settled in the mockup's screen files with the rule and a pointer to its scenario, then records the stage as a whole under `logic/all`. Stopping halfway retains the written scenarios and the pending list; on a fresh clone without the interview file, the scenario files present show which are written.
 
 ## Existing code and extraction
 
@@ -56,6 +56,6 @@ The sections are Purpose, Context, How to answer, Questions, and Anything else?.
 
 ## What survives a restart
 
-Unfinished stages resume from local interview files. Completed stages are recognized from complete final outputs and matching ledger entries; a fresh clone does not need completed interview bodies to continue to a later stage. If a completed stage's output is lost and the local interview is also unavailable, Capstone must report the lost decision record rather than invent it. See [lifecycle](03-files-and-lifecycle.md) and [recovery](11-review-repair-and-retro.md).
+Unfinished stages resume from local interview files. Completed stages are recognized from complete final outputs and matching ledger entries; a fresh clone does not need completed interview bodies to continue to a later stage. If a completed stage's output is lost and the local interview is also unavailable, Capstone must report the lost decision record rather than invent it, and stops: the stage is interviewed again only when you say so. `logic/` or `uiux/` files that map extracted do not count as a started stage; the stage runs and treats them as drafts for you to confirm or correct. See [lifecycle](03-files-and-lifecycle.md) and [recovery](11-review-repair-and-retro.md).
 
 Sources: [start](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/protocols/start.md), [mockup](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/protocols/mockup.md), [logic](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/protocols/logic.md), [logic dimensions](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/logic-craft.md), [questionnaires](https://github.com/GentBajko/capstone/blob/a21d9401800b81692556fe434024777d61e43b55/skills/core/references/core.md#questionnaires-what-the-user-cannot-answer-alone).

@@ -2,7 +2,7 @@
 
 Capstone is a collection of coding-agent skills. It can document an existing repository, guide a new product through design and implementation, or take one feature through specification, planning, code, and documentation updates. The agent reads the source and writes the documents; Capstone is not a background indexing service.
 
-This manual describes **7.0.0**, from source commit `a21d9401800b81692556fe434024777d61e43b55`. The documented changes and this manual were merged into `main` on 19 September 2026. The `v7.0.0` tag identifies the released revision; a tag is separate from a GitHub Release entry, and this repository publishes tags without Release entries. See [version details and less obvious behaviors](12-version-and-edge-cases.md).
+This manual describes **7.0.1**, a patch release over the 7.0.0 source commit `a21d9401800b81692556fe434024777d61e43b55`. The 7.0.0 command-surface changes remain the baseline; 7.0.1 adds skills-CLI installation identity and host-aware configuration detection. See [version details and less obvious behaviors](12-version-and-edge-cases.md).
 
 **Upgrading from 6.x?** 7.0.0 changes how commands are invoked and nothing else. The seven pipeline stages became `/capstone:start <stage>`, and the session review became `/capstone:review retro`. No generated file, config key, ledger key, or protocol behavior changed, so an existing repository needs no migration. The [version chapter](12-version-and-edge-cases.md#700-is-a-breaking-change-to-invocation-only) carries the full before/after table.
 
@@ -24,11 +24,12 @@ Commands prefixed `/capstone:` are instructions to your coding agent, not shell 
 
 ## Every user command
 
-Nine commands.
+Ten commands.
 
 | Command | Practical example | Result |
 | --- | --- | --- |
 | `map` | `/capstone:map` | Existing-code reference; refreshes on later runs |
+| `edges` | `/capstone:edges` | Consumers' missing far ends filled across a folder of mapped repos |
 | `doctor` | `/capstone:doctor fix` | Consistency report; approved repairs |
 | `review` | `/capstone:review frontend` | Findings in `review.md` |
 | `review retro` | `/capstone:review retro` | Evidence-backed instruction proposals; approved standards edits |

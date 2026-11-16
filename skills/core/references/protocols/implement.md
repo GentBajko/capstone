@@ -23,28 +23,38 @@ as `groom`'s Resume rule does): no folder but an
 files, or an unfolded `changelog.d/` fragment), or a folder with
 `implemented: true` and that matching key → the feature is done; say
 so, point at the changelog entry, and stop. If the folder remains and
-`delete_feature_folders` is true, finish its deletion first; when the
+`delete_feature_folders` is true, finish its deletion first, under
+Phase D step 6's committed-ledger rule; when the
 setting is false, retaining it is expected. `implemented: true` without
 the matching key is a torn write for `doctor`; do not re-run or delete
-it. Otherwise require `plan_approved: true` in the
-feature's `feature-interview.md`, with `approved_spec` still matching
-a checksum of the current `spec.md`. No approval → execute
+it. Otherwise require the feature's `feature-interview.md` to say
+`status: formalized` and `plan_approved: true`, with `approved_spec`
+still matching a checksum of the current `spec.md`. A feature back in
+its interview (`interviewing`, `awaiting-formalization`) goes to
+`protocols/groom.md` first, whatever its approval keys say: that plan
+was approved for a spec now being changed. No approval → execute
 `protocols/plan.md` first (which chains `groom` when there is no
 spec); a checksum mismatch is a voided approval: likewise `plan`.
-`plan_approved` with `plan.md` missing or truncated is a crash:
-re-run `plan`'s Phase B from the spec, then re-gate.
+`plan_approved` with `plan.md` missing or truncated is a crash
+`plan`'s Resume rule owns: it voids the approval, rebuilds the plan
+and gates it again. No code is written from a plan the user has not
+approved as it now reads.
 
 **Resume:** `features/` is gitignored (core-authoring.md's Local-only
 outputs), so
-the feature's progress lives in the working tree and is never
-branch-scoped: read `plan.md`'s boxes directly, whatever is checked
-out, and there is no docs copy to merge forward. The code those boxes
-describe IS branch-scoped, so confirm the checked-out branch is the one
-`base_commit` names before trusting a checked box; on a mismatch, say so
-and check the branch out rather than re-running its tasks.
+the feature's progress lives in the working tree (the worktree's,
+once Phase A moved the folder there) and is never branch-scoped:
+read `plan.md`'s boxes directly, whatever is checked out, and there is no docs copy to merge forward. The code those boxes
+describe IS branch-scoped, so confirm the checked-out branch is the
+recorded `branch` before trusting a checked box; on a mismatch, say so
+and check the branch out rather than re-running its tasks. A resumed
+run keeps the recorded `branch` and `base_commit`: Phase A's branch
+offer is made once, and a second `base_commit` would drop the finished
+tasks out of the review.
 Walk the boxes in order: check off any unchecked step whose
 verification already passes, continue executing from the first one
-that doesn't. Never redo checked steps. Every box checked but
+that doesn't. Never redo checked steps; a re-plan never unchecks
+one either (plan.md's Resume). Every box checked but
 `implemented` absent → only Phases C-D remain; `review-ledger.md`
 says where (mid-loop resumes the loop, a recorded dry verdict skips
 to the wrap).
@@ -53,10 +63,15 @@ to the wrap).
 
 Never write to main/master without the user's explicit consent: offer
 a feature branch (or worktree) first, named per `../code-craft.md`'s
-Git section (`<type>/<slug>`, the slug the feature's own). Record
-`base_commit` in the feature-interview frontmatter: the branch
-point, or HEAD before Task 1 on a consented main run; Phase C reviews
-the diff from it. Read
+Git section (`<type>/<slug>`, the slug the feature's own). A new
+worktree holds no `features/` (it is gitignored), so when the user
+picks one, move `features/<id>/` into the worktree's docs area first
+and work from the worktree from then on: the boxes, `review-ledger.md`,
+the absorption and the ledger fragment land where the code does. Tell
+the user the original checkout no longer holds the feature. Record
+`branch` and `base_commit` in the feature-interview frontmatter: the
+branch the tasks land on, and its branch point, or HEAD before Task 1
+on a consented main run; Phase C reviews the diff from it. Read
 `plan.md`, `spec.md`, `../code-craft.md` (the
 TDD + YAGNI discipline the code follows; the plan's global
 constraints win on conflict), and the operations chapter the plan's verification steps
@@ -64,6 +79,8 @@ rely on (`07-operations.md`'s Processes and Developer workflow
 sections carry the verified commands). Review the plan critically:
 a contradiction between tasks, or between plan and spec, goes to the
 user before Task 1, batched, not one interrupt per discovery mid-run.
+An answer that changes a task changes the plan: `plan`'s gate runs
+again before Task 1 (its Phase C).
 
 ## Phase B - execute
 
@@ -206,10 +223,12 @@ Entered when Phase C goes dry.
    `implement/<id>@Q<n>`, the same highest `§Q` (this stage adds
    none, so the key is stable across a resumed review loop). The
    entry stays a fragment here: folding is main-only per the ledger
-   rule, and this run is normally on a feature branch. The fragment
-   merges as its own file - that is the point - and the next writing
-   run on main folds it. On a consented main run, fold per the
-   ledger rule, this entry included.
+   rule, and this run is normally on a feature branch. This run never
+   commits the docs area (Phase B), so the fragment reaches the
+   branch only once the docs area is committed, which the user or the
+   repo's own flow does; from there it merges as its own file, and
+   the next writing run on main folds it. On a consented main run,
+   fold per the ledger rule, this entry included.
    **Step 6 may delete the feature folder, so write this entry to be
    read without the spec beside it when `delete_feature_folders` is
    enabled.**
@@ -241,9 +260,14 @@ Entered when Phase C goes dry.
    to finish, just the repo's push conventions). Ask before opening a
    PR or pushing; neither is implied by the plan's approval.
 6. Apply `delete_feature_folders` (default `false`) last, after step
-   3's entry is on disk and the branch is finished. When it is `true`,
-   delete `features/<id>/`: the spec is absorbed into `logic/`,
+   3's entry is committed and the branch is finished. When it is
+   `true`, delete `features/<id>/`: the spec is absorbed into `logic/`,
    `mockup/`, and `uiux/`, and the ledger's counts are in the entry.
+   That entry is the only record deletion leaves, and this run never
+   commits the docs area (Phase B), so check `git status` first: while
+   the fragment, or the `changelog.md` it was folded into, is
+   untracked or modified, keep the folder, say the ledger has to be
+   committed first, and let the next run finish the delete.
    When it is `false`, retain `features/<id>/` as ignored local history
    and report that it was preserved. In either mode the
    `implement/<id>` ledger key is the done marker, and a retained folder

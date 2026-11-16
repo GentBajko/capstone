@@ -37,7 +37,8 @@ Run it yourself; it is not an interrogation the user sits through.
    confirmation, not one question each: "no money moves here, nothing
    is notified, one actor throughout - right?" A correction turns a
    batched empty back into a real question.
-4. **Ask what remains**, one per turn, per `logic`'s Phase B conduct.
+4. **Ask what remains**, per `logic`'s Phase B conduct: one per turn,
+   or sharing a dialog where core.md's Shared dialogs allows.
 5. **Record.** Applicable answers land in the scenario file's normal
    sections (§3 names which). Dimensions ruled inapplicable are
    recorded per §4.

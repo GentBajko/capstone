@@ -56,8 +56,8 @@ flowchart TD
   CHK --> NIL[("nothing written<br/>not even a changelog entry")]
 ```
 
-**How drift is detected.** Every generated file carries frontmatter
-stamps: the commit it was derived at, the capstone version that wrote
+**How drift is detected.** Every chapter carries frontmatter
+stamps (the index carries none): the commit it was derived at, the capstone version that wrote
 it, and `paths_covered` - the globs its claims come from. The refresh
 runs `git diff` between that stamp and the **working tree** over exactly
 those globs, so uncommitted work counts. Only what moved gets rewritten.
@@ -175,9 +175,11 @@ committed, so its knowledge has to move before the folder goes: the
 chapters the spec named are refreshed against what was actually built,
 then the spec is **absorbed** - behavior into `logic/`, changed screens
 into `mockup/`, restyled chapters into `uiux/`, each stamped
-`absorbed_from`. Only then is the changelog entry written and the folder
-deleted. That entry is all that survives it, which is why it has to be
-readable with no spec beside it.
+`absorbed_from`. Only then is the changelog entry written. By default
+the folder stays as ignored local history; with
+`delete_feature_folders: true` it is deleted, and the entry is then all
+that survives it, which is why it has to be readable with no spec
+beside it.
 
 ---
 

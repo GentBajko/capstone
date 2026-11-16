@@ -26,9 +26,9 @@ know which command to pick.
 ## Common questions
 
 **It answered instantly and my usage did not move.** That is the hook
-doing its job. The zero-token path is Claude Code only; on other
-harnesses the model runs the script and echoes it, which costs a
-little.
+doing its job. The zero-token path is the Claude Code terminal CLI
+only; in its desktop and IDE surfaces, and on other harnesses, the
+model runs the script and echoes it, which costs a little.
 
 **Can I get a bare `/capstone` instead of `/capstone:help`?** Yes, by
 dropping a small command file into `~/.claude/commands/capstone.md`
@@ -37,8 +37,8 @@ that routes the first argument to the matching skill. The README's
 
 ## It's working if
 
-The usage block comes back listing every installed command, including
-the ones added by the release you are on. A command missing from that
-list is missing from your install rather than from the plugin, which
-matters because updates are additive and never delete a retired skill
-for you.
+The usage block comes back listing every command of the release the
+`core` skill was installed from. The list is fixed text, so it says
+what that release ships, not which skills are present on disk: a
+command it names that your agent cannot find is missing from your
+install, and updates never delete a retired skill for you.

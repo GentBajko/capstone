@@ -58,9 +58,10 @@ through.
    no screen is ever permission-denied, and you ship light only -
    right?" A correction turns a batched empty back into a real
    question.
-4. **Ask what remains**, one per turn per `uiux.md` Phase C's conduct,
-   in the order the generation rules pick rather than this file's
-   numbering.
+4. **Ask what remains** per `uiux.md` Phase C's conduct, in the order
+   the generation rules pick rather than this file's numbering: one
+   per turn, or sharing a dialog where core.md's Shared dialogs
+   allows.
 5. **Record.** Answers land where the item says. Items ruled
    inapplicable are recorded per §5.
 
@@ -257,8 +258,9 @@ dialog - how long it stays, who dismisses it, and whether it names a
 recovery.
 *Probe:* "the save failed. Where does that sentence appear, how does
 it leave, and what does it tell the user to do next?"
-*Lands in:* `02-system.md`; what happens to the user's work is
-`03-experience.md`'s error-recovery rule.
+*Lands in:* `02-system.md`; how the user gets back to their work is
+`03-experience.md`'s error-recovery rule, and what is retried or kept
+is the logic scenario's.
 
 **S24 Form field anatomy.** Label position, help text, required
 marking, placeholder policy, error-text position, and the field's own
@@ -324,8 +326,9 @@ escapes the grid on purpose?"
 screen's mockup file lists, crossed with every unhappy path the logic
 scenarios touching it produce, the two reconciled rather than
 concatenated where both describe one state. Each gets its styled
-treatment. A mockup state marked `rule: logic` gets its trigger here,
-or the trigger is recorded unsettled rather than invented.
+treatment. A mockup state marked `rule: logic` cites its trigger from
+the logic scenario that settles it; where none does, the trigger is an
+open thread `for: logic`, never invented or decided here.
 *Probe:* "walk the mockup's states and the scenario's failures
 together. Which two are one state under different names, and which
 failure has no state at all?"
@@ -421,5 +424,7 @@ asked, the user still formalizes before any file is written.
 **Extraction mode does not run this sweep.** Documenting an incumbent
 design records what the code has, and uiux-craft §9 is the method
 there: an item the code never decided is an observation ("no disabled
-state is implemented"), not a question. The later standalone `uiux`
-run that confirms those drafts runs the sweep in full.
+state is implemented"), not a question. The later `start uiux`
+run that confirms those drafts does not extract again: it runs the
+interview phases with the drafts as pre-filled answers, and the sweep
+in full.

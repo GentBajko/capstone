@@ -49,9 +49,12 @@ re-ask it.
 A question here will regularly reach a decision this stage does not
 own - a business rule, a screen's behavior, a library pick. Per
 core.md's Stage ownership table, record it where it belongs: an
-unsettled business rule goes into the owning final `logic/` scenario
-as an open question rather than being answered in this interview, and
-a rule `logic/` already settled is cited, never restated. What this
+unsettled business rule is recorded as an open thread `for: logic` in
+`architecture-interview.md` and named at the gate, never answered here,
+and this stage never edits `logic/`; a rule `logic/` already settled
+is cited, never restated. Conventions and dependency answers are
+`standards`' and `stack`'s to settle: Phase D records them as
+provisional (core.md's Stage ownership, Declared crossings). What this
 stage settles is how the system is built, not what it decides at
 runtime.
 
@@ -68,11 +71,11 @@ If it exists and is unfinished, read it and resume; never re-ask an
 answered question. If it is formalized, read the final architecture
 chapters instead; open the interview body only to repair a proven
 omission in them.
-An artifact argument (an RFC, an ADR set, notes) seeds the interview
-per core-authoring.md's Artifact seeding rule.
-If not, create it, **seeding `## Open questions` once** as a
-section-granularity checkbox ledger (about 20 lines, one box per
-`../interview.md` section, not per question):
+If it does not exist, create it, **seeding `## Open questions` once**
+as a
+section-granularity checkbox ledger (about 20 lines: one box per
+`../interview.md` section, §0's subsections and §2's checklists each
+their own, never one per question):
 
 ```markdown
 ---
@@ -88,21 +91,51 @@ status: interviewing   # see core.md "Interview lifecycle"
 
 ## Open questions
 - [ ] §0 Framing
+  - [ ] 0.1 Business & product
+  - [ ] 0.2 Users & load
+  - [ ] 0.3 Constraints
+  - [ ] 0.4 Team & organization
+  - [ ] 0.5 Operations & risk posture
 - [ ] §1 Shape decisions
 - [ ] §2 Topic checklists
+  - [ ] → architecture.md
+  - [ ] → models.md
+  - [ ] → conventions.md
+  - [ ] → data-flow.md
+  - [ ] → dependencies.md
+  - [ ] → testing.md
+  - [ ] → operations.md
+  - [ ] → glossary.md
 - [ ] §3 Quality attributes
 - [ ] §4 Conditional modules
 - [ ] §5-6 Wrap-up + red-flag screen
-(split a section into sub-items only when partially done)
+(§0 and §2 start split; split any other section into sub-items only
+when partially done)
 ```
+
+§0 and §2 start split because their sub-items are the unit a resumed
+run and a shared dialog both work in. A file an earlier version
+seeded flat is resumed as found: split its section in progress and
+leave the rest.
+
+The file is created whether or not an artifact argument is given. An
+artifact (an RFC, an ADR set, notes) then seeds the new file per
+core-authoring.md's Artifact seeding rule.
 
 ## Phase B - the interview loop
 
-- **One question per turn.** Offer concrete options when the choice
-  space is enumerable; open-ended otherwise. Ask follow-ups spawned by
-  answers before moving to the next area.
-- **Record immediately.** After each answer, append an entry before
-  asking the next question; the file must survive a dead session:
+- **One decision per question.** Offer concrete options when the
+  choice space is enumerable; open-ended otherwise. The independent
+  picks of one subsection of `../interview.md` §0, §2 or §4 may share
+  a dialog per core.md's Shared dialogs. Every other question has a
+  turn to itself: an open-ended one, a follow-up, and all of §1, §3,
+  §5 and §6, where an answer is a one-way door, owes a response
+  measure, or reopens a recorded decision. Ask follow-ups spawned by
+  answers before the next dialog, and before moving to the next
+  area.
+- **Record immediately.** After each answer, and after every answer
+  of a shared dialog, append its entry before asking anything
+  further; the file must survive a dead session:
 
   ```markdown
   ### Q<n> - <topic>/<section> (<date>)
@@ -136,23 +169,30 @@ status: interviewing   # see core.md "Interview lifecycle"
   for macro-structure), then the topic-mapped checklists (§2), quality
   attributes with response measures (§3), the conditional modules that
   apply (§4), and the wrap-up sweep + red-flag screen (§5-6) before the
-  gate.
+  gate. One module is out of order by design: §4's Frontend/clients
+  module is walked with §2's → architecture.md checklist, as that
+  checklist says, and is skipped when §4 is reached.
 - **Maintain the ledger with appends and toggles, never whole-file
-  rewrites.** Per turn: append the new `### Q<n>` entry (end-anchored
+  rewrites.** Per turn: append the new `### Q<n>` entries (end-anchored
   edit or shell append), and flip one `- [ ]` to `- [x]` when a section
-  completes. On a harness without partial-file edits, rewrite only when
-  a box flips, not every turn. The interview ends when every box is
-  checked after a full topics × sections sweep.
+  or sub-item completes, the parent with its last sub-item. §4 gains
+  its first sub-item, already ticked, when the Frontend/clients module
+  is walked during §2. On a harness without partial-file edits, rewrite
+  only when a box flips, not every turn. The interview ends when every
+  box is checked after a full topics × sections sweep.
 
 ## Phase C - formalization gate
 
 When every box is checked, set `status: awaiting-formalization`, present
 the complete decision summary organized by topic (including the agreed
 walking-skeleton slice, the deferred-decisions list with their triggers,
-the risk/assumption log, and any red-flag screen hits the user accepted)
-and ask the user to formalize it. Amendments update the interview file
-and re-run the sweep. Do not generate anything until the user explicitly
-formalizes.
+the risk/assumption log, any red-flag screen hits the user accepted,
+and every open thread `for: logic`) and ask the user to formalize it.
+The gate is a message question per core.md's Structured questions:
+the summary is the chat message, its last line asks the user to
+formalize or amend, and the turn ends there. Amendments update the
+interview file and re-run the sweep. Do not generate anything until
+the user explicitly formalizes.
 
 ## Phase D - generation
 
@@ -166,6 +206,11 @@ these differences:
 - Decisions and their rationale are written directly into the owning
   chapter. Citations point only at other final outputs and planned
   paths from the decided layout, since no code exists.
+- Conventions answers land in `03-conventions.md` and dependency
+  picks in `05-dependencies.md` as provisional, each marked in the
+  text: "provisional: `standards` owns this" and
+  "provisional: `stack` owns this". Those stages confirm and rewrite
+  them.
 - `paths_covered` uses the planned layout's globs.
 - A banner on each file: "Prescriptive design intent; code does not
   exist yet."
@@ -189,13 +234,16 @@ Append the changelog entry per core.md's ledger: key
 `architecture-interview.md`; record the chapters written and that they
 carry `mode: prescriptive`, the one-way-door choices with the
 alternatives rejected, the walking-skeleton slice, the deferred
-decisions with their triggers, and the topics recorded not-applicable
-with their reasons. A later `map` refresh of these chapters is a
-`map` run and records itself under a `map/` changelog key, never as
-an architecture entry.
+decisions with their triggers, the open threads `for: logic`, and the
+topics recorded not-applicable with their reasons. A later `map`
+refresh of these chapters is a `map` run and records itself under a
+`map/` changelog key, never as an architecture entry.
 
 Only after every output is on disk, set `status: formalized` (per
-core.md's Interview lifecycle, never before generation).
+core.md's Interview lifecycle, never before generation). Outputs on
+disk, the `architecture/all` key present and
+`status: awaiting-formalization` is a finished stage whose marker was
+not written: set `status: formalized`, never re-gate.
 
 **Lifecycle:** once code exists, `map`'s refresh protocol
 treats every `mode: prescriptive` file as stale by definition: it

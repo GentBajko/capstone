@@ -22,22 +22,40 @@ The review loop runs until two consecutive rounds find nothing new.
 One clean round is not enough, because the round that fixes a finding
 is the round most likely to introduce the next one. Only after that
 does the wrap happen, and the wrap applies `delete_feature_folders`:
-the default retains the folder, while `true` deletes it after the
-ledger entry and done marker are written.
+the default retains the folder, while `true` deletes it only once the
+ledger entry is committed and the branch is finished.
 
 ## When to reach for it
 
 `/capstone:implement <feature>` when the feature's plan is approved.
 
 Reach for `feature` instead to run `groom → plan → implement` in one
-pass; reach for `build` when the project itself does not exist yet, as
+pass; reach for `start build` when the project itself does not exist yet, as
 that is the greenfield code stage rather than the per-feature one.
 
 ## Prerequisites
 
-`plan_approved: true` in the feature interview's frontmatter. Without
-it `implement` stops, writes its changelog entry, and says why: the
-gate is what makes the code traceable to a spec you signed off.
+`status: formalized` and `plan_approved: true` in the feature
+interview's frontmatter, with `approved_spec` still matching the
+current `spec.md`. Without them `implement` writes no code: a feature
+back in its interview goes to `groom` first, and a missing or voided
+approval runs `plan` first (which runs `groom` when there is no spec)
+and stops at the plan gate, because the gate is what makes the code
+traceable to a spec you signed off. A plan lost or cut off after
+approval is rebuilt and gated again.
+
+## Branches and worktrees
+
+`implement` never writes to main without your consent; it offers a
+feature branch or a worktree first. `features/` is gitignored, so a
+new worktree starts without the feature: choosing one moves
+`features/<date>-<slug>/` into it, and the run works from the
+worktree from then on. The original checkout no longer holds the
+feature.
+
+`implement` never commits the docs area. Its ledger fragment reaches
+your branch only when you, or your repo's own flow, commit the docs
+area.
 
 ## The wrap and feature-folder retention
 
@@ -53,8 +71,10 @@ reused.
 
 **What happens to my feature folder?** `delete_feature_folders` is
 `false` by default, so the completed folder remains as ignored local
-history. Set it to `true` to delete it after the ledger entry and done
-marker are on disk. A retained folder is complete and is not re-run.
+history. Set it to `true` to delete it once the ledger entry is
+committed and the branch is finished; while the entry is uncommitted
+the folder stays, and the next run finishes the delete. A retained
+folder is complete and is not re-run.
 
 **How many review rounds will it do?** As many as it takes for two
 consecutive rounds to find nothing new. Each round's findings are

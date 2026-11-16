@@ -29,12 +29,32 @@ set -u
 
 PLUGIN_ROOT="$(cd "$(dirname "$0")/../../.." 2>/dev/null && pwd -P)"
 SCRIPT_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd -P)"
+SKILL_DIR="$(cd "$SCRIPT_DIR/.." 2>/dev/null && pwd -P)"
+SKILL_NAME="$(basename "$SKILL_DIR")"
 # /nonexistent when HOME is unset (a bare container, a cron job): under
 # set -u a bare $HOME would abort the run before the verdict line.
-GLOBAL_DIR="${CAPSTONE_GLOBAL_DIR:-${CLAUDE_CONFIG_DIR:-${HOME:-/nonexistent}/.claude}}"
+global_dir() {
+  if [ -n "${CAPSTONE_GLOBAL_DIR:-}" ]; then
+    printf '%s\n' "$CAPSTONE_GLOBAL_DIR"
+  elif [ -n "${CODEX_HOME:-}" ] || [ -n "${CODEX_VERSION:-}" ] \
+       || [ -n "${CODEX_THREAD_ID:-}" ]; then
+    printf '%s\n' "${CODEX_HOME:-${HOME:-/nonexistent}/.codex}"
+  elif [ -n "${GEMINI_CLI_HOME:-}" ]; then
+    printf '%s\n' "$GEMINI_CLI_HOME"
+  elif [ -n "${GEMINI_HOME:-}" ]; then
+    printf '%s\n' "$GEMINI_HOME"
+  elif [ -n "${CLAUDE_CONFIG_DIR:-}" ]; then
+    printf '%s\n' "$CLAUDE_CONFIG_DIR"
+  else
+    printf '%s\n' "${HOME:-/nonexistent}/.claude"
+  fi
+}
+GLOBAL_DIR=$(global_dir)
 
 TOPICS='architecture models conventions data-flow dependencies testing operations glossary interfaces'
 
+# The installation root above may be a plugin root or the skills CLI's
+# .agents root; its sibling metadata is resolved by plugin_version below.
 # references/schema.txt is the definition of every output shape this
 # pass checks: which frontmatter keys a file owes, which `## ` headings
 # it carries and in which order, and which columns its tables need. It
@@ -187,12 +207,56 @@ print_patterns() {
 }
 
 plugin_version() {
-  [ -f "$PLUGIN_ROOT/.claude-plugin/plugin.json" ] || return 0
-  sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' \
-    "$PLUGIN_ROOT/.claude-plugin/plugin.json" | head -1
+  local f v lock_block
+  for f in .claude-plugin/plugin.json .codex-plugin/plugin.json \
+           .cursor-plugin/plugin.json .kimi-plugin/plugin.json; do
+    [ -f "$PLUGIN_ROOT/$f" ] || continue
+    v=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' \
+      "$PLUGIN_ROOT/$f" | head -1)
+    [ -n "$v" ] && { printf '%s\n' "$v"; return 0; }
+  done
+
+  # The skills CLI copies each skill folder, so a version file inside core
+  # survives even though the plugin root and its manifests do not.
+  for f in "$SKILL_DIR/VERSION" "$SKILL_DIR/version" \
+           "$PLUGIN_ROOT/VERSION" "$PLUGIN_ROOT/version"; do
+    [ -f "$f" ] || continue
+    v=$(sed -n '1p' "$f" | sed 's/[[:space:]]*$//')
+    [ -n "$v" ] && { printf '%s\n' "$v"; return 0; }
+  done
+
+  # Current skills-cli lockfiles carry an exact folder identity, and newer
+  # lockfile versions may also carry a semantic version. Limit the lookup
+  # to this skill's object so the lockfile schema version is never used as
+  # Capstone's version.
+  if [ -f "$PLUGIN_ROOT/.skill-lock.json" ]; then
+    lock_block=$(sed -n "/^[[:space:]]*\"$SKILL_NAME\"[[:space:]]*:/,/^[[:space:]]*}[,]*[[:space:]]*$/p" \
+      "$PLUGIN_ROOT/.skill-lock.json")
+    v=$(printf '%s\n' "$lock_block" \
+      | sed -n -e 's/^[[:space:]]*"capstone_version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' \
+              -e 's/^[[:space:]]*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' \
+      | head -1)
+    [ -n "$v" ] && { printf '%s\n' "$v"; return 0; }
+    v=$(printf '%s\n' "$lock_block" \
+      | sed -n 's/^[[:space:]]*"skillFolderHash"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' \
+      | head -1)
+    [ -n "$v" ] && { printf '%s\n' "$v"; return 0; }
+  fi
 }
 
-# version_lt a b: true when a < b on the first three numeric components
+# version_is_release v: true for the dotted numeric release values that can
+# be compared semantically. Skills-cli hashes are deliberately opaque.
+version_is_release() {
+  printf '%s\n' "$1" | awk -F. '
+    NF < 1 || NF > 3 { exit 1 }
+    { for (i = 1; i <= NF; i++)
+        if ($i == "" || $i !~ /^[0-9]+$/ || length($i) > 9) exit 1 }
+    { exit 0 }
+  '
+}
+
+# version_lt a b: true when release a < release b on the first three
+# numeric components
 version_lt() {
   local a b i x y
   a=$(printf '%s' "$1" | tr -cd '0-9.')
@@ -206,6 +270,17 @@ version_lt() {
     [ "$x" -gt "$y" ] && return 1
   done
   return 1
+}
+
+# version_gap old current: true when old is older than current. For an
+# opaque identity such as skillFolderHash, equality is the only meaningful
+# comparison; this avoids treating a hash as a numeric release.
+version_gap() {
+  if version_is_release "$1" && version_is_release "$2"; then
+    version_lt "$1" "$2"
+  else
+    [ "$1" != "$2" ]
+  fi
 }
 
 # absolute, symlink-resolved path; a missing leaf keeps its basename
@@ -242,17 +317,29 @@ fm_value() {
   printf '%s\n' "$v"
 }
 
-# paths_covered entries, one per line, block form and inline list form
+# paths_covered entries, one per line, block form and inline list form.
+# Each entry reaches git exactly as written, magic and all: map.md
+# Phase 3 step 2 pairs a repo-wide glob with
+# `":(top,exclude)<docs_dir>/**"`, so the inline form splits on commas
+# outside quotes only, or that entry would be cut in two.
 fm_globs() {
   printf '%s\n' "$1" | awk -v q="'" '
+    function emit(g) {
+      gsub(/^[ \t]+|[ \t]+$/, "", g)
+      gsub("^[\"" q "]|[\"" q "]$", "", g)
+      if (g != "") print g
+    }
     /^paths_covered:[[:space:]]*\[/ {
-      s = $0; sub(/^paths_covered:[[:space:]]*\[/, "", s); sub(/\].*$/, "", s)
-      n = split(s, a, ",")
-      for (i = 1; i <= n; i++) {
-        g = a[i]; gsub(/^[ \t]+|[ \t]+$/, "", g)
-        gsub("^[\"" q "]|[\"" q "]$", "", g)
-        if (g != "") print g
+      s = $0; sub(/^paths_covered:[[:space:]]*\[/, "", s); sub(/\][ \t]*(#.*)?$/, "", s)
+      g = ""; inq = ""
+      for (i = 1; i <= length(s); i++) {
+        c = substr(s, i, 1)
+        if (inq != "") { if (c == inq) inq = "" }
+        else if (c == "\"" || c == q) inq = c
+        else if (c == ",") { emit(g); g = ""; continue }
+        g = g c
       }
+      emit(g)
       next
     }
     /^paths_covered:/ { inlist = 1; next }
@@ -788,7 +875,7 @@ check_part1() {
     # question this page can answer. Which capstone wrote it still is,
     # and for a page no refresh path regenerates that is the only signal
     # there will ever be.
-    if [ -n "$PLUGIN_VERSION" ] && version_lt "$ver" "$PLUGIN_VERSION"; then
+    if [ -n "$PLUGIN_VERSION" ] && { [ -z "$ver" ] || version_gap "$ver" "$PLUGIN_VERSION"; }; then
       verdict="written by an older capstone"
     else
       verdict=current
@@ -815,7 +902,7 @@ check_part1() {
     if [ -z "$verdict" ]; then
       if [ -n "$fallback" ]; then
         verdict="$fallback"
-      elif [ -z "$ver" ] || { [ -n "$PLUGIN_VERSION" ] && version_lt "$ver" "$PLUGIN_VERSION"; }; then
+      elif [ -z "$ver" ] || { [ -n "$PLUGIN_VERSION" ] && version_gap "$ver" "$PLUGIN_VERSION"; }; then
         verdict="written by an older capstone"
       else
         verdict=current
@@ -854,11 +941,14 @@ check_part8() {
   base=$(basename "$f")
   # A page written by an older capstone is measured against a template it
   # never saw, so its every heading would be reported at once. Part 1
-  # names that page and its repair already; the section list is checked
-  # again once the owning stage has rewritten it.
+  # names that page and counts it already; the section list is checked
+  # again once the owning stage has rewritten it. A page with no globs,
+  # or any page outside git, is not excused: its part 1 row counts
+  # nothing, so this pass is the only place a missing section on it is
+  # reported.
   older=0
   fmver=$(fm_value "$fm" capstone_version)
-  if [ -n "$fmver" ] && [ -n "$PLUGIN_VERSION" ] && version_lt "$fmver" "$PLUGIN_VERSION"; then
+  if [ -n "$globs" ] && [ "$IN_GIT" -eq 1 ] && [ -n "$fmver" ] && [ -n "$PLUGIN_VERSION" ] && version_gap "$fmver" "$PLUGIN_VERSION"; then
     older=1
   fi
   if [ "$only_secrets" -eq 0 ]; then
@@ -1055,9 +1145,11 @@ check_part7() {
   echo "unfolded fragments: $n (informational; any writing run folds them, so does doctor)"
 }
 
-# resolve_index docs_abs: the project's <docs_dir>/capstone.json
-# index_file, then the global one, otherwise <docs_dir>/00-index.md.
-# The project file sits inside the docs area it configures, so its
+# resolve_index docs_abs: the project config's index_file, then the
+# global one, otherwise <docs_dir>/00-index.md. The project config's
+# path is fixed at docs/capstone/capstone.json under the repo root
+# whatever docs_dir says (core.md: docs_dir relocates outputs, never
+# the config), so a custom docs area is still found through it. Its
 # candidate is honoured anywhere under this docs dir - a nested
 # `index/00-index.md` is a legal layout, and a candidate that names no
 # file is reported as `no index at <path>` rather than swapped for a
@@ -1068,7 +1160,7 @@ check_part7() {
 resolve_index() {
   local d="$1" scope cfg v cand
   for scope in project global; do
-    if [ "$scope" = project ]; then cfg="$d/capstone.json"
+    if [ "$scope" = project ]; then cfg="$BASE/docs/capstone/capstone.json"
     else cfg="$GLOBAL_DIR/capstone.json"; fi
     [ -f "$cfg" ] || continue
     v=$(sed -n 's/.*"index_file"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$cfg" | head -1)

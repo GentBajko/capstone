@@ -13,7 +13,8 @@ It reads which stages already finished off disk and resumes at the
 first incomplete one, preserving the design answers you have already
 given. Every answer is written to the stage's interview file
 before the next question is asked, which is why a dead session costs
-you the question in flight and nothing behind it.
+you the question, or the one dialog of questions, in flight and
+nothing behind it.
 
 Every new or resumed run first asks **inline or subagents** and waits
 for your answer. Inline avoids extra agent usage; subagents use fresh
@@ -30,7 +31,7 @@ yet and you want the whole thing designed before any code is written.
 `/capstone:start <stage>` when you want one stage and not the chain.
 The stage words are `mockup`, `logic`, `uiux`, `architecture`,
 `standards`, `stack` and `build`. None of them is a command of its
-own: capstone has nine commands, and running a stage outside its chain
+own: capstone has ten commands, and running a stage outside its chain
 is the exception rather than the entry point, which is what the second
 word says. (`retro` is not among them - it is
 [`review retro`](review.md#review-retro), because a session ends under
@@ -68,7 +69,8 @@ then stops: it reads its own prerequisites, runs its own formalization
 gate, writes its own changelog entry, and does not run the stage after
 it or the readback pass. Entering a stage whose prerequisite is
 missing gets you the name of the stage that owns the missing input,
-not an interview for it. Interview stages take an optional artifact
+not an interview for it. `start build` is the one exception to both,
+below. Interview stages take an optional artifact
 argument - a PRD, notes, screenshots - and pre-fill every answer that
 artifact settles, for you to confirm rather than to trust silently.
 
@@ -90,14 +92,19 @@ a developer could implement it without inventing a rule. Every
 scenario is swept against sixteen rule dimensions and is finished only
 when each is answered, cited to an earlier scenario, or recorded
 inapplicable with its reason - which is what catches the rules with no
-natural question behind them.
+natural question behind them. It needs a formalized `mockup`. When
+every scenario is written or dropped it records the stage as a whole,
+and replaces each `rule: logic` marker it settled in the mockup's
+screen files with the rule and a pointer to its scenario.
 
 **`start uiux`** needs a formalized `mockup`. Visual direction, the
-design system and tokens, then per-screen composition and states. On a
-repo that already has a frontend it runs in extraction mode instead,
-documenting the design that exists. Before its gate it writes
-`uiux/preview.html` and asks you to approve a first-pass logo and page
-mockup.
+design system and tokens, then per-screen composition and states. With
+no mockup but existing frontend code it runs in extraction mode
+instead, documenting the design that exists; drafts `map` already
+extracted are confirmed through the interview rather than extracted
+again. Before its gate it writes `uiux/preview.html` and asks you to
+approve the logo (yours, or a first-pass one if you asked for it) and
+a page mockup.
 
 **`start architecture`** is the big design interview, done only when
 every section of the future docs is answerable from your recorded
@@ -118,9 +125,14 @@ yourselves priced in code and maintenance. You pick.
 **`start stack refresh`** re-vets the recorded picks later:
 maintenance, license and pricing deltas.
 
-**`start build`** needs a formalized `stack`. It writes
-`implementation.md`, stops for your approval, then writes code. With
-`implement`, one of the only two commands allowed to write source.
+**`start build`** needs a formalized `stack` and a readback of the
+current outputs. Entered directly, it does not stop on either: it runs
+`stack` first when the stack is not formalized, and the readback first
+when none matches the current outputs. It writes `implementation.md`,
+stops for your approval, then writes code, and is done only when every
+build-order step is checked; the walking skeleton running is a
+milestone. With `implement`, one of the only two commands allowed to
+write source.
 
 ## Common questions
 
@@ -137,6 +149,18 @@ the same way entered mid-chain; `start` only sequences them. There is
 no `/capstone:mockup` - a bare stage word is not a command, and the
 harness routes it here.
 
+**It asked several questions in one dialog.** In `architecture`,
+`standards`, `uiux` and `logic`, questions that do not depend on each
+other arrive together when your harness's question tool takes several.
+A follow-up, a pushback, an irreversible decision, an open-ended
+question and anything you have to read first still come one at a
+time, and `mockup` always does. Each answer is recorded separately.
+Set `batch_questions` to `off`, or ask for one question at a time, to
+go back to one per turn.
+
+**I closed a dialog without answering.** Nothing was recorded. The
+question is asked again in the chat, and the run waits for you.
+
 **Does `start` write a ledger entry?** Only for the readback pass,
 which changes recorded decisions. Routing to a stage writes nothing;
 the stage records itself.
@@ -146,6 +170,7 @@ the stage records itself.
 Every stage's interview file reads `status: formalized` and its
 outputs are on disk beside it, `docs/capstone/` holds `mockup/`,
 `logic/`, `uiux/`, the numbered chapters, `standards.md` and
-`05-dependencies.md`, and the ledger carries one entry per stage plus
-a `readback/all@<stamp>` entry. The pipeline then stops at `build`'s
+`05-dependencies.md`, and the ledger carries a stage entry for each
+stage (`logic` adds one per scenario before its `logic/all` entry)
+plus a `readback/all@<stamp>` entry. The pipeline then stops at `build`'s
 plan gate rather than writing code on its own.

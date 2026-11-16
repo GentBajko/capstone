@@ -1,19 +1,23 @@
 # retro - turn a finished session into edits to the agent's environment
 
-**Reads:** config → `<docs_dir>/standards.md` → `<docs_dir>/03-conventions.md`
+**Reads:** config → `<index_file>` → `<docs_dir>/standards.md` →
+`<docs_dir>/03-conventions.md`
 → the project's `AGENTS.md` and `CLAUDE.md` where either is present →
 the ledger (`<docs_dir>/changelog.md`, its rotation files, and
-`changelog.d/` fragments) → the session the user names, defaulting to
-the one running now.
+`changelog.d/` fragments; the latest `retro` entry's declined rows
+among them) → the session the user names, defaulting to the one
+running now.
 
 Read-only diagnosis first, then edits the user approves, the same
 posture `doctor` takes. The subject is the environment the agent
 worked in: the steering files it read, the standards it was bound by,
 the checks a machine runs for it, and the docs it had to reach
 through. It never changes code and never rewrites a chapter; `map`
-owns the reference and `implement` owns the source. It is not
-core.md's judgment exception either. `review` still holds every
-opinion about the codebase, and retro holds none about it.
+owns the reference and `implement` owns the source. It runs under
+`review`, so it is core.md hard rule 1's named exception: it ranks
+candidates and recommends edits to the environment because the user
+invoked it. Its judgment stops at that environment: `review`'s sides
+hold every opinion about the codebase, and retro holds none about it.
 
 **Attribution.** Adapted, condensed and modified, from
 mattpocock/skills (MIT, © Matt Pocock,
@@ -30,9 +34,11 @@ twice, a path the run searched for and did not find, a command re-run
 because nothing recorded it. Open the named session's transcript when
 the harness can reach one. A harness that cannot open a past session
 says so in one line and the run continues against the session in
-progress. Never infer an event the transcript does not hold, and never
-carry a finding forward from an earlier retro: a candidate with no
-evidence in this session is not reported at all.
+progress. Never infer an event the transcript does not hold: a
+candidate with no evidence in this session is not reported at all.
+A row the latest `retro` ledger entry records as declined is not
+raised again unless this session holds new evidence for it, which
+the row then names.
 
 ## Candidates
 
@@ -44,9 +50,12 @@ line, never filled with a plausible suggestion.
    reached late: three chapters opened to answer one question, a glob
    over the source tree for a path `01-architecture.md` names, a file
    opened that no index row points at. Applies when the fact existed
-   and was found slowly. Proposed edit: an index row, or a pointer
-   line in the chapter a reader opens first. A fact that was absent
-   rather than buried is candidate 7, never this one.
+   and was found slowly. Proposed edit: the command that makes the
+   fix durable, never a line pasted into a generated chapter, which
+   the next `map` refresh erases: a file with no index row is
+   `doctor`'s check 3, and a chapter that buries the fact is
+   regenerated from the code by `/capstone:map <topic>`. A fact that
+   was absent rather than buried is candidate 7, never this one.
 2. **Automated checks.** A defect a machine can detect that a human
    caught instead: a review round naming an unhandled failure path, a
    user correcting an import the layering forbids, a missing test the
@@ -75,8 +84,11 @@ line, never filled with a plausible suggestion.
    would replace: the same shell pipeline run three times or more, a
    whole-tree search to find one path, a build re-run because no run
    command was written down. Applies when the call is deterministic
-   and worth naming. Proposed edit: the verified command into
-   `07-operations.md`, or a script plus the line that names it.
+   and worth naming. Proposed edit: a script plus the line that names
+   it, and `/capstone:map operations`, which regenerates
+   `07-operations.md` from the code so the command lands there
+   durably; never a line pasted into that generated chapter, which
+   the next `map` refresh erases.
 6. **No-ops.** A steering instruction that changed no behavior: one
    the run had occasion to apply and would have satisfied without it,
    or one worded too vaguely to act on. Applies only where the
@@ -90,7 +102,7 @@ line, never filled with a plausible suggestion.
    contract with no row in `09-interfaces.md`. Applies when the
    missing fact belongs in a capstone output. Proposed edit: the
    chapter or scenario file that should hold it, and the command that
-   writes it (`map <topic>`, `logic`, `groom`).
+   writes it (`map <topic>`, `start logic`, `groom`).
 
 ## Where a rule belongs
 
@@ -119,26 +131,40 @@ number.
 `file:line` it happened over. `Proposed edit` is the text to write,
 not a description of it. `Owning file` is where that text lands.
 
-Ask for each row: approve, skip, or amend. Nothing is applied before
-its own row is approved, and the answers are taken row by row rather
-than as one batch.
+Ask for each row: approve, skip, or amend. The table is a
+message question per core.md's Structured questions: it is the chat
+message, its last line asks for a verdict on each row by number, and
+the turn ends there. The user answers in one reply, row by row: a
+verdict per row number, never one verdict for the batch. Nothing is
+applied before its own row is approved. An amended row is not yet
+approved: apply the approved rows, then present each amended row
+again, marked amended, as the next message question, and apply it
+only once it is approved as shown. The text written is the approved
+text, verbatim.
 
 **Applying.** An approved edit to `<docs_dir>/standards.md` is written
 into the domain `../standards-inventory.md` §3 names for it, under
 that `## <Domain>` heading, in the imperative voice the file already
 uses; a rule removed leaves one line in `## Not in play` carrying the
-reason. Everything else is proposed as text and never written.
+reason. Retro never creates `standards.md`: with no such file, an
+approved rule that belongs there is printed for the user like the
+rest, naming `/capstone:start standards` as the command that creates
+the file. Everything else is proposed as text and never written, and
+a fix that is a command (`/capstone:map <topic>`, `doctor`,
+`start logic`, `groom`) is named for the user to run, never run by
+retro.
 `AGENTS.md`, `CLAUDE.md`, linter configs, CI workflows and test files
 sit outside the docs area core.md hard rule 2 confines this run to,
 and retro owns no file there: print the exact text and the file and
 section it goes in, and stop. No index row is added, since
 `standards.md` already carries one.
 
-Then append the changelog entry per core.md's ledger, and only when
-`standards.md` was actually changed: key `retro/<scope>@<stamp>`,
-`<scope>` being `all` for a retro covering a whole session or the
-domain name when one domain was touched. Bullets: each rule added,
-removed or sharpened with the domain it landed in, and each candidate
-the user declined with the reason they gave, since the next retro will
-raise it again otherwise. A run that proposes and is declined writes
-nothing, sets no marker, and says so in one line.
+Then append the changelog entry per core.md's ledger whenever the
+table proposed anything, approved or not: key `retro/<scope>@<stamp>`
+with `<scope>` always `all` (`retro/all@<stamp>`), since a retro
+reads a whole session. Bullets: each rule added, removed or sharpened
+with the domain it landed in, and each declined row with its
+candidate, its proposed edit in one line, and the reason the user
+gave; the next retro reads them (The session is the evidence, above).
+A run whose candidates all came back clear proposed nothing: it
+writes nothing, sets no marker, and says so in one line.

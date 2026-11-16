@@ -52,7 +52,13 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          out=$(claude -p "/capstone:map check" 2>&1) || true
+          # -p denies every tool call that would need an approval, and the
+          # check runs map-check.sh and git. Allow the read tools, the
+          # script and the read-only git commands it uses, and nothing
+          # that writes: the review has to run, and stay a review.
+          out=$(claude -p "/capstone:map check" \
+            --allowedTools "Read,Grep,Glob,Bash(bash *),Bash(git diff *),Bash(git ls-files *),Bash(git log *),Bash(git status *),Bash(git rev-parse *),Bash(git hash-object *),Bash(git show *),Bash(git grep *),Bash(git cat-file *)" \
+            2>&1) || true
           printf '%s\n' "$out"
           line=$(printf '%s\n' "$out" | grep -E '^MAP REVIEW: ' | tail -1)
           if [ -z "$line" ]; then echo "no MAP REVIEW verdict found"; exit 1; fi

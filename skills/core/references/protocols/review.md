@@ -5,7 +5,7 @@ per-side stamps, before overwriting either side). Then per side.
 **Backend:** every current topic chapter (after the refresh) →
 `standards.md`, `../code-craft.md`, `../arch-craft.md` (the method
 and its rulings) → source spot-checks where evidence
-needs exact lines. **Frontend:** `docs/capstone/uiux/` (the
+needs exact lines. **Frontend:** `<docs_dir>/uiux/` (the
 committed bar) → `mockup/` and `logic/` (what each screen must do) →
 `../uiux-craft.md` (§7-8) → the frontend source via the chapters →
 `07-operations.md` (the verified run commands) and the live app when
@@ -61,7 +61,8 @@ have change what this command can *do*, never how it judges:
 
 - **A live browser**: run the app per `07-operations.md`'s verified
   command and screenshot each surface in every shipped theme at
-  desktop and mobile widths. Absent, judge from source and say so.
+  desktop and mobile widths, saving the screenshots under
+  `<docs_dir>/review/`. Absent, judge from source and say so.
 - **A security-review command or skill**: run it and fold its findings
   into the backend section with their evidence, ranked alongside the
   rest. Absent, spot-check the security dimension directly against the
@@ -74,18 +75,23 @@ supply evidence the ranking then treats like any other.
 
 ## Procedure
 
-1. **Ensure the ground is solid**, per side.
+1. **Ensure the ground is solid**, per side. Either side, no index
+   at all → core.md's Missing reference rule builds one before this
+   run continues (once per run, however many sides run).
    Backend: the reference must be current (run the refresh path first
-   if stale; no index at all → core.md's Missing reference rule builds
-   one before this run continues): judgments must rest on verified
-   facts. Frontend: without `docs/capstone/uiux/`, say so (findings
+   if stale): judgments must rest on verified
+   facts. Frontend: without `<docs_dir>/uiux/`, say so (findings
    then rest on the craft floor alone) and suggest `uiux`'s
    extraction mode first, so there is an incumbent standard to hold
    the code to. Never block on it.
 2. **Preserve the evidence you are about to overwrite.** Before
    rewriting a side's section, read that side's stamp: if no changelog
    entry carries it, append the catch-up entry first; the rewrite
-   destroys the only other evidence the earlier run happened.
+   destroys the only other evidence the earlier run happened. The
+   stamp is the `<commit>` in the side's
+   `_Reviewed <date> at <commit>_` line, and the search accepts the
+   side's own key or a `review/all@<stamp>` key at that commit, since
+   a bare run records both sides under one entry.
 3. **Backend side**: review across these dimensions, drawing evidence
    from the topic files and spot-checking source: boundary integrity
    (violations of the project's own layering), dead or unwired code,
@@ -105,33 +111,36 @@ supply evidence the ranking then treats like any other.
    dependencies chapter's own recorded floors and research dates),
    craft divergence (unearned abstractions, unclimbed ladder rungs,
    and comments that narrate rather than explain, per
-   `../code-craft.md`), and, when `docs/capstone/standards.md`
+   `../code-craft.md`), and, when `<docs_dir>/standards.md`
    exists, divergence between the user's stated preferences and the
    observed conventions.
 4. **Frontend side**: inventory the surfaces from `uiux/screens/`
    (or the mockup, or the route table when neither exists). When
    `07-operations.md` carries a verified run command and the harness
    can drive a browser, run the app and screenshot the key screens in
-   each shipped theme at desktop and mobile widths; otherwise judge
-   from source, saying so. Judge every surface through the three bars
-   (Grading, below), drawing evidence from source (`file:line`) and
-   screenshots.
-5. **Write `docs/capstone/review.md`** in the shape below.
+   each shipped theme at desktop and mobile widths, saved under
+   `<docs_dir>/review/`; otherwise judge from source, saying so.
+   Judge every surface through the three bars (Grading, below),
+   drawing evidence from source (`file:line`) and screenshots.
+5. **Write `<docs_dir>/review.md`** in the shape below.
 6. **Append the changelog entry** per core.md's ledger: key
    `review/<side>@<stamp>`, `<side>` being `backend`, `frontend`, or
-   `all` for a bare run covering both (`#2`, `#3` … for further
-   reviews at the same stamp, each a real event). Facts about the run
+   `all` for a bare run covering both, `<stamp>` the commit its stamp
+   lines carry (`.2`, `.3` … appended for further reviews at the same
+   stamp, each a real event, per that rule). Facts about the run
    only: the sections written or replaced, their stamps, the finding
    count per severity band per side, the backend dimensions exercised,
    the frontend surfaces exercised, and whether the run had a live
    browser. The opinions stay in `review.md`.
 7. Never edit code. List `review.md` only under the index's Companion
    docs table, never in the topic index. It is local-only
-   (core-authoring.md's ignore list), so it is never committed.
+   (core-authoring.md's ignore list), so it is never committed, and
+   so is the `review/` screenshot folder beside it, which gets no
+   index row.
 
 ## The output: one file, two sections
 
-`docs/capstone/review.md`, frontmatter stamps, then the banner line
+`<docs_dir>/review.md`, frontmatter stamps, then the banner line
 "Opinion: generated judgment, not part of the factual reference."
 
 **Each side carries its own stamp line**, directly under its heading,
@@ -166,10 +175,10 @@ each other without scrolling. A one-sided run refreshes only its own
 line there.
 
 Every finding, either side: the claim, evidence (`file:line`, plus a
-screenshot reference where one exists), why it matters, and a
+screenshot's path under `review/` where one exists), why it matters, and a
 suggested direction in one sentence, no implementation plans. Close
 the file by noting that any accepted finding can enter the feature
-chain (`implementation <finding>`) to become a gated, traceable
+chain (`feature <finding>`) to become a gated, traceable
 change.
 
 **Legacy files:** older versions wrote `be-review.md` and

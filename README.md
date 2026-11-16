@@ -120,7 +120,10 @@ Marketplaces → capstone-marketplace → Enable auto-update.
 > a removed command lingers on disk and keeps being offered to your
 > agent. After any release that drops commands, compare
 > `gh skill list` or `npx skills list` against the command tables
-> below and remove whatever is no longer there.
+> below and remove whatever is no longer there. Nor do they install a
+> command a release adds: both check only the skills already on disk.
+> After a release that adds one (7.1.0 added `edges`), run the install
+> command again and select it.
 
 ---
 
@@ -171,13 +174,14 @@ instead of sending you off to run something else.
 | --- | --- |
 | `/capstone:map` | Build the reference, or refresh only what drifted. `rebuild` forces a full rewrite; a topic name targets one chapter |
 | `/capstone:map check` | Read-only trust report in two halves: a bash script (staleness, ledger fragments, schema: stamps, `known_as`, headings, edge sites, payload sections, model references, secret shapes; the CI gate, no API key) and the model's review (pointer drift, absorption, re-vetting, coverage). Writes nothing |
+| `/capstone:edges [folder]` | Run from the folder that holds several mapped repos: fills each consumer's empty `from` in `09-interfaces.md` out of the code and the sibling clones, with the evidence in each repo's ledger. Asks nothing and never writes a producer's `to` |
 | `/capstone:doctor` | Diagnose and repair the docs area: torn writes, index drift, voided approvals, absorption gaps |
 | `/capstone:review [be\|fe]` | The opt-in judgment → `review.md`. No argument does both sides; `backend` takes architecture, `frontend` grades the UI against your own design docs |
 | `/capstone:review retro [session]` | The third judgment axis, and not a side: read a finished session for evidence, then propose edits to `standards.md` and your `AGENTS.md`/`CLAUDE.md`, one approved row at a time. Writes no `review.md` |
 
 **Greenfield pipeline** - `/capstone:start` runs these in order
 
-There are nine commands. A stage is not one of them: it is reached as
+There are ten commands. A stage is not one of them: it is reached as
 `start <stage>` when you want to enter the chain in the middle, and
 runs exactly what the pipeline would have run there.
 
@@ -199,8 +203,9 @@ runs exactly what the pipeline would have run there.
 | `/capstone:plan <feature>` | Task-by-task TDD plan; you approve before any code |
 | `/capstone:implement <feature>` | Execute the plan, review until dry, absorb back into the docs |
 
-Plus `/capstone:help` for usage - in Claude Code a hook answers it
-before the model is invoked, so it costs zero tokens.
+Plus `/capstone:help` for usage - in the Claude Code terminal CLI a
+hook answers it before the model is invoked, so it costs zero tokens;
+elsewhere the model runs the same script.
 
 Not a command: `docs/capstone/changelog.md`, the ledger every writing
 command records itself in before it sets its done marker. New entries
@@ -220,7 +225,8 @@ mockup → logic → uiux → architecture → standards → stack → build
 
 Type `capstone` and it runs the stages in order, resuming wherever you
 stopped. Every answer is written to disk before the next question, so
-a dead session loses nothing. Each interview takes an optional
+a dead session loses only the question, or the one dialog of
+questions, in flight. Each interview takes an optional
 artifact (a PRD, screenshots) and pre-fills what it answers. On
 existing codebases, `logic` and `uiux` run in reverse: they draft
 from the observed code and you confirm.
@@ -371,15 +377,17 @@ terse questions and trade-off tables.
 <details>
 <summary>Settings</summary>
 
-Installing creates `~/.claude/capstone.json` (the first session after
-install runs the plugin's SessionStart hook): one config for the
-user, shared by every project.
+Installing creates `capstone.json` in the host's global config directory
+(`~/.claude` for Claude Code, `~/.codex` for Codex; the first session
+after install runs the initializer): one config for the user, shared by
+every project. `CAPSTONE_GLOBAL_DIR` remains an explicit override.
 
 ```jsonc
 {
   // Comments ship in the created file too; capstone reads around them.
   "expertise": null,                  // null = ask once | 1-5, vibe -> architect
   "teaching_mode": false,             // narrate each step and the concept behind it
+  "batch_questions": "auto",          // "auto" | "off" - an interview's independent questions share one dialog
   "docs_dir": "docs/capstone",        // where generated docs land
   "index_file": "docs/capstone/00-index.md", // chapter zero of the docs area
   "subagent_threshold": 150,          // where map fans out to subagents
@@ -399,6 +407,7 @@ user, shared by every project.
 | --- | --- |
 | `expertise` | 1–5, asked once and saved. Calibrates the conversation only, never the docs |
 | `teaching_mode` | Narrate and teach while working, at any expertise level |
+| `batch_questions` | `auto` or `off`: whether an interview's independent questions arrive together in one dialog, on a harness whose question tool takes several. `off` keeps one question per turn everywhere |
 | `docs_dir` | Where generated docs live. Relocates outputs only - the project config's own path never moves |
 | `index_file` | Chapter zero of the docs area |
 | `subagent_threshold` | Source-file count above which `map` fans out subagents, and above which an unrequested full build asks first |
@@ -413,9 +422,26 @@ user, shared by every project.
 | `redact` | Env-var name patterns (`*` at either end) whose values `map` writes as `<redacted>` and never quotes; case-insensitive |
 
 When the harness exposes a structured question tool, Capstone uses it
-for interactive questions so options are clickable and `Other` accepts
-typed text. Harnesses without that capability receive the same
-one-question prompt in normal conversation.
+for questions with a known set of answers, so options are clickable
+and `Other` accepts typed text. Harnesses without that capability
+receive the same one-question prompt in normal conversation. An
+open-ended question, and anything you have to read before answering -
+a gate's summary, a digest, a comparison of options - is never put
+behind a dialog: it is written in the chat with the question as its
+last line, and the run waits for your reply. A dialog you dismiss or
+leave unanswered records nothing: the question is asked again in the
+chat.
+
+Where that tool takes several questions at once, the `architecture`,
+`standards`, `uiux` and `logic` interviews send a section's
+independent questions together, up to the tool's limit (four on
+Claude Code, Gemini CLI and Kimi). Only questions written before any
+of them was answered travel together. A follow-up, a pushback, an
+irreversible decision and anything open-ended still get a turn each,
+and `mockup` and `groom` always ask one at a time, because each of
+their questions comes from your last answer. So does every interview
+in teaching mode or at expertise 1 and 2. Set `batch_questions` to
+`off`, or just ask for one question at a time, to stop it.
 
 Interviews, `features/`, `review.md`, `uiux/preview.html`, the review
 artifacts under `uiux/assets/references/` and the raster exports under
@@ -496,12 +522,13 @@ argument-hint: [command] [args...]
 ---
 
 No arguments: invoke the capstone:start skill. If the first argument
-matches a capstone skill (map, doctor, review,
+matches a capstone skill (map, edges, doctor, review,
 groom, plan, implement, feature, start, help),
 invoke capstone:<that skill> with the remaining arguments. The stage
 words (mockup, logic, uiux, architecture, standards,
-stack, build, retro) are not skills: they are start's subcommands,
-so route them to capstone:start with the argument intact.
+stack, build) are not skills: they are start's subcommands, so route
+them to capstone:start, and the session review (retro) to
+capstone:review, with the argument intact.
 
 ARGUMENTS: $ARGUMENTS
 ```
@@ -525,16 +552,21 @@ registered in a quarry pairs the same job with `quarry init` and
 `09-interfaces.md` and fails the PR when a field one of its consumers
 reads is gone.
 
-**Upgrading from 6.2:** the project config is committed now. Run any
-command once and the initializer drops the `capstone.json` line from
-`docs/capstone/.gitignore`, reporting what it removed; commit the
-file, since it holds the settings every run on the repo follows.
+**Upgrading from 6.2:** the project config is committed now. On a
+repo that already has `docs/capstone/.gitignore`, only `/capstone:map`
+(a build or refresh, not `map check`) or the repair
+`/capstone:doctor` offers for it runs the initializer, which drops the
+`capstone.json` line from that file, reporting what it removed;
+commit the file, since it holds the settings every run on the repo
+follows.
 `09-interfaces.md`'s frontmatter is where the edges live: an `edges:`
 block with a `kind`, `name`, `site` and `schema` per row, and the
 Produces and Consumes tables rendered from it. `to` and `from` are
 yours: `map` writes neither and never edits one, quarry fills them in
 by joining every registered repo's rows on `(kind, name)`, and you are
-asked only about a contract several repos sit on. Whatever your
+asked only about a contract several repos sit on. With every repo of
+a system cloned into one folder, `/capstone:edges` fills each
+consumer's empty `from` out of the code. Whatever your
 chapter already says in a `To` or `From` cell survives the first run
 untouched. `Site` cells lose their line numbers on that run - the
 chapter is normative and a line number drifts on every edit - and
